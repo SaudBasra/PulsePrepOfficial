@@ -1,0 +1,548 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - My Account</title>
+    
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/myAccount.css' %}" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'questionbank' %}" class="nav-item">
+            <i class="fas fa-question-circle"></i>
+            <span>Manage Questions</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Modules</span>
+          </a>
+          <a href="{% url 'users' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Manage Users</span>
+          </a>
+          <a href="{% url 'mocktest' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'analytics_report' %}" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics & Reports</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notificationsetting' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notification Settings</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'setting' %}" class="nav-item active">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>My Account</h1>
+          <div class="user-menu">
+            <a href="all-notification.html"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Account Content -->
+        <div class="dashboard-content">
+          <!-- Tabs for Account Management -->
+          <div class="account-tabs">
+            <button class="tab-button active" data-tab="profile">
+              <i class="fas fa-user-circle"></i> Profile
+            </button>
+            <button class="tab-button" data-tab="security">
+              <i class="fas fa-shield-alt"></i> Security
+            </button>
+            <button class="tab-button" data-tab="preferences">
+              <i class="fas fa-sliders-h"></i> Preferences
+            </button>
+            <button class="tab-button" data-tab="admin-controls">
+              <i class="fas fa-user-shield"></i> Admin Controls
+            </button>
+          </div>
+
+          <!-- Profile Tab Content -->
+          <div class="tab-content" id="profile">
+            <section class="account-section">
+              <div class="profile-header">
+                <div class="profile-avatar">
+                  <img
+                    src="https://i.pravatar.cc/120?img=12"
+                    alt="Admin Profile"
+                  />
+                  <button class="change-avatar-btn">
+                    <i class="fas fa-camera"></i>
+                  </button>
+                </div>
+                <div class="profile-info">
+                  <h2>Admin Profile</h2>
+                  <p class="profile-role">System Administrator</p>
+                  <p class="profile-joined">
+                    <i class="fas fa-calendar-alt"></i> Joined: March 15, 2023
+                  </p>
+                </div>
+              </div>
+
+              <div class="profile-form-container">
+                <h3 class="section-title">Personal Information</h3>
+                <form class="profile-form">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="first-name">First Name</label>
+                      <input
+                        type="text"
+                        id="first-name"
+                        value="John"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="last-name">Last Name</label>
+                      <input type="text" id="last-name" value="Doe" required />
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="email">Email Address</label>
+                      <input
+                        type="email"
+                        id="email"
+                        value="admin@pulseprep.com"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="phone">Phone Number</label>
+                      <input type="tel" id="phone" value="+1 (555) 123-4567" />
+                    </div>
+                  </div>
+
+                  <h3 class="section-title">Additional Information</h3>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="department">Department</label>
+                      <select id="department">
+                        <option value="admin">Administration</option>
+                        <option value="medical">Medical</option>
+                        <option value="development">Development</option>
+                        <option value="support">Support</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="position">Position</label>
+                      <input
+                        type="text"
+                        id="position"
+                        value="Lead Administrator"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" rows="4">
+Platform administrator responsible for system maintenance, user management, and content oversight.</textarea
+                    >
+                  </div>
+
+                  <div class="form-actions">
+                    <button type="reset" class="action-button secondary">
+                      Reset
+                    </button>
+                    <button type="submit" class="action-button primary">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </section>
+          </div>
+
+          <!-- Security Tab Content -->
+          <div class="tab-content" id="security" style="display: none">
+            <section class="account-section">
+              <h3 class="section-title">Change Password</h3>
+              <form class="security-form">
+                <div class="form-group">
+                  <label for="current-password">Current Password</label>
+                  <input type="password" id="current-password" required />
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <input type="password" id="new-password" required />
+                    <div class="password-strength">
+                      <div class="strength-bar">
+                        <div class="strength-level" style="width: 70%"></div>
+                      </div>
+                      <span>Strong</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="confirm-password">Confirm New Password</label>
+                    <input type="password" id="confirm-password" required />
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="reset" class="action-button secondary">
+                    Cancel
+                  </button>
+                  <button type="submit" class="action-button primary">
+                    Update Password
+                  </button>
+                </div>
+              </form>
+
+              <h3 class="section-title">Two-Factor Authentication</h3>
+              <div class="two-factor-section">
+                <div class="two-factor-status">
+                  <div class="status-indicator enabled">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Enabled</span>
+                  </div>
+                  <p>
+                    Your account is protected with two-factor authentication.
+                  </p>
+                </div>
+                <div class="two-factor-actions">
+                  <button class="action-button">Disable 2FA</button>
+                  <button class="action-button">Change 2FA Method</button>
+                </div>
+              </div>
+
+              <h3 class="section-title">Login Sessions</h3>
+              <div class="sessions-table-container">
+                <table class="sessions-table">
+                  <thead>
+                    <tr>
+                      <th>Device</th>
+                      <th>Location</th>
+                      <th>IP Address</th>
+                      <th>Last Activity</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="current-session">
+                      <td><i class="fas fa-laptop"></i> Chrome on Windows</td>
+                      <td>San Francisco, CA</td>
+                      <td>192.168.1.1</td>
+                      <td>Current Session</td>
+                      <td><button class="link-button">This Device</button></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <i class="fas fa-mobile-alt"></i> Safari on iPhone
+                      </td>
+                      <td>New York, NY</td>
+                      <td>198.51.100.1</td>
+                      <td>2 days ago</td>
+                      <td>
+                        <button class="link-button danger">Logout</button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><i class="fas fa-tablet-alt"></i> Chrome on iPad</td>
+                      <td>Seattle, WA</td>
+                      <td>203.0.113.1</td>
+                      <td>5 days ago</td>
+                      <td>
+                        <button class="link-button danger">Logout</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="sessions-actions">
+                <button class="action-button danger">
+                  Logout of All Other Devices
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <!-- Preferences Tab Content -->
+          <div class="tab-content" id="preferences" style="display: none">
+            <section class="account-section">
+              <h3 class="section-title">Display Preferences</h3>
+
+              <div class="preferences-group">
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Theme</h4>
+                    <p>Change the appearance of the interface</p>
+                  </div>
+                  <div class="preference-control">
+                    <select id="theme-selector">
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                      <option value="system">System Default</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Date Format</h4>
+                    <p>Choose how dates are displayed</p>
+                  </div>
+                  <div class="preference-control">
+                    <select id="date-format">
+                      <option value="mdy">MM/DD/YYYY</option>
+                      <option value="dmy">DD/MM/YYYY</option>
+                      <option value="ymd">YYYY-MM-DD</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Default Dashboard View</h4>
+                    <p>Set your preferred dashboard layout</p>
+                  </div>
+                  <div class="preference-control">
+                    <select id="dashboard-view">
+                      <option value="overview">Overview</option>
+                      <option value="statistics">Statistics</option>
+                      <option value="activity">Recent Activity</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <h3 class="section-title">Email Preferences</h3>
+
+              <div class="preferences-group">
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>System Notifications</h4>
+                    <p>Updates about system maintenance and changes</p>
+                  </div>
+                  <div class="preference-control toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>User Activity Reports</h4>
+                    <p>Daily summary of user activities</p>
+                  </div>
+                  <div class="preference-control toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="preference-item">
+                  <div class="preference-info">
+                    <h4>Feature Updates</h4>
+                    <p>Information about new features and improvements</p>
+                  </div>
+                  <div class="preference-control toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="action-button primary">
+                  Save Preferences
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <!-- Admin Controls Tab Content -->
+          <div class="tab-content" id="admin-controls" style="display: none">
+            <section class="account-section">
+              <h3 class="section-title">Admin Privileges</h3>
+
+              <div class="admin-section">
+                <div class="admin-card">
+                  <div class="admin-card-icon">
+                    <i class="fas fa-user-cog"></i>
+                  </div>
+                  <div class="admin-card-content">
+                    <h4>User Management</h4>
+                    <p>Create, edit, and delete user accounts</p>
+                    <button class="action-button">Manage Users</button>
+                  </div>
+                </div>
+
+                <div class="admin-card">
+                  <div class="admin-card-icon">
+                    <i class="fas fa-database"></i>
+                  </div>
+                  <div class="admin-card-content">
+                    <h4>Database Management</h4>
+                    <p>Access and modify database settings</p>
+                    <button class="action-button">Database Console</button>
+                  </div>
+                </div>
+
+                <div class="admin-card">
+                  <div class="admin-card-icon">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <div class="admin-card-content">
+                    <h4>System Logs</h4>
+                    <p>View and export system activity logs</p>
+                    <button class="action-button">View Logs</button>
+                  </div>
+                </div>
+
+                <div class="admin-card">
+                  <div class="admin-card-icon">
+                    <i class="fas fa-cogs"></i>
+                  </div>
+                  <div class="admin-card-content">
+                    <h4>System Settings</h4>
+                    <p>Configure global system parameters</p>
+                    <button class="action-button">System Settings</button>
+                  </div>
+                </div>
+              </div>
+
+              <h3 class="section-title">API Access</h3>
+
+              <div class="api-keys-section">
+                <div class="api-info">
+                  <p>Use API keys to authenticate your applications</p>
+                  <button class="action-button primary">
+                    Generate New API Key
+                  </button>
+                </div>
+
+                <div class="api-table-container">
+                  <table class="api-table">
+                    <thead>
+                      <tr>
+                        <th>API Key Name</th>
+                        <th>Created</th>
+                        <th>Last Used</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Development Key</td>
+                        <td>Jan 15, 2023</td>
+                        <td>Today</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td class="actions-cell">
+                          <button class="icon-button">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Production Key</td>
+                        <td>Mar 5, 2023</td>
+                        <td>Yesterday</td>
+                        <td><span class="status-badge active">Active</span></td>
+                        <td class="actions-cell">
+                          <button class="icon-button">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Testing Key</td>
+                        <td>Feb 20, 2023</td>
+                        <td>3 days ago</td>
+                        <td>
+                          <span class="status-badge inactive">Inactive</span>
+                        </td>
+                        <td class="actions-cell">
+                          <button class="icon-button">
+                            <i class="fas fa-eye"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-edit"></i>
+                          </button>
+                          <button class="icon-button">
+                            <i class="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/myAccount.js' %}"></script>
+  </body>
+</html>

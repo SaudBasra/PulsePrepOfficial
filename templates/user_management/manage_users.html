@@ -1,0 +1,48 @@
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+<div class="admin-approval-dashboard">
+    <h1>Pending User Approvals</h1>
+    
+    {% if pending_users %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Degree</th>
+                <th>Year</th>
+                <th>Payment Slip</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in pending_users %}
+            <tr>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.get_degree_display }}</td>
+                <td>{{ user.get_year_display }}</td>
+                <td>
+                    {% if user.payment_slip %}
+                    <a href="{{ user.payment_slip.url }}" target="_blank">View Slip</a>
+                    {% else %}
+                    No slip uploaded
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" action="{% url 'admin:approve_user' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="approve">Approve</button>
+                        <button type="submit" name="action" value="reject">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No pending approvals</p>
+    {% endif %}
+</div>
+{% endblock %}

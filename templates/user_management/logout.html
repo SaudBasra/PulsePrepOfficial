@@ -1,0 +1,98 @@
+{% load static %}  
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Logout</title>
+
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/user_management/logout.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Centered Logout Container -->
+      <div class="logout-container">
+        <div class="logout-card">
+          <div class="logo-container">
+            <img src="Logo.png" alt="PulsePrep Logo" class="logo" />
+          </div>
+
+          <div class="logout-content">
+            <div class="logout-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>You've been logged out</h1>
+            <p>
+              Thank you for using PulsePrep. You have been successfully logged
+              out of your account.
+            </p>
+
+            <div class="action-buttons">
+              <a href="login.html" class="login-button">
+                <i class="fas fa-sign-in-alt"></i> Login Again
+              </a>
+              <a href="index.html" class="home-button">
+                <i class="fas fa-home"></i> Back to Home
+              </a>
+            </div>
+          </div>
+
+          <div class="logout-footer">
+            <div class="footer-links">
+              <a href="#">Privacy Policy</a>
+              <span class="separator">•</span>
+              <a href="#">Terms of Service</a>
+              <span class="separator">•</span>
+              <a href="#">Contact Us</a>
+            </div>
+            <div class="copyright">
+              &copy; 2023 PulsePrep. All rights reserved.
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info Cards -->
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="info-content">
+              <h3>Stay Secure</h3>
+              <p>Always remember to log out when using shared devices.</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="info-content">
+              <h3>Get Our App</h3>
+              <p>Download the PulsePrep mobile app for learning on the go.</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="info-content">
+              <h3>Need Help?</h3>
+              <p>Our support team is available 24/7 to assist you.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/logout.js' %}"></script>
+  </body>
+</html>

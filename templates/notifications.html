@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - All Notifications</title>
+    <link rel="stylesheet" href="DAstyles.css" />
+    <link rel="stylesheet" href="NTstyles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'questionbank' %}" class="nav-item">
+            <i class="fas fa-question-circle"></i>
+            <span>Manage Questions</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Modules</span>
+          </a>
+          <a href="{% url 'users' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Manage Users</span>
+          </a>
+          <a href="{% url 'mocktest' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'analytics_report' %}" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics & Reports</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notificationsetting' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notification Settings</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'setting' %}" class="nav-item active">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>All Notifications</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="all-notification.html"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Notification List Content -->
+        <div class="dashboard-content">
+          <div class="all-notifications-container">
+            <div class="notification-filter-card">
+              <div class="notification-filters">
+                <div class="filter-tabs">
+                  <button class="filter-tab active" data-filter="all">
+                    All
+                  </button>
+                  <button class="filter-tab" data-filter="unread">
+                    Unread
+                  </button>
+                  <button class="filter-tab" data-filter="comments">
+                    Comments
+                  </button>
+                  <button class="filter-tab" data-filter="reminders">
+                    Reminders
+                  </button>
+                  <button class="filter-tab" data-filter="updates">
+                    Updates
+                  </button>
+                </div>
+                <div class="notification-actions">
+                  <button class="btn-secondary" id="mark-all-read-btn">
+                    <i class="fas fa-check-double"></i> Mark all as read
+                  </button>
+                  <button class="btn-secondary" id="settings-btn">
+                    <i class="fas fa-cog"></i> Settings
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="notification-list-card">
+              <div class="notification-date-group">
+                <h3 class="date-header">Today</h3>
+                <div class="notification-items">
+                  <div class="notification-item unread" data-type="comments">
+                    <div class="notification-icon">
+                      <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        John Smith commented on your post: "Great question about
+                        cardiovascular system!"
+                      </p>
+                      <span class="notification-time">2 minutes ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="fas fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item unread" data-type="comments">
+                    <div class="notification-icon">
+                      <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Sarah Johnson liked your question about the respiratory
+                        system
+                      </p>
+                      <span class="notification-time">15 minutes ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="fas fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="reminders">
+                    <div class="notification-icon">
+                      <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Reminder: Complete your Module 3 assignment by tomorrow
+                      </p>
+                      <span class="notification-time">1 hour ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item unread" data-type="updates">
+                    <div class="notification-icon">
+                      <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        New feature: We've added a new quiz format to help you
+                        study more effectively
+                      </p>
+                      <span class="notification-time">3 hours ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="fas fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="notification-date-group">
+                <h3 class="date-header">Yesterday</h3>
+                <div class="notification-items">
+                  <div class="notification-item" data-type="comments">
+                    <div class="notification-icon">
+                      <i class="fas fa-reply"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Dr. Williams replied to your comment in the anatomy
+                        discussion
+                      </p>
+                      <span class="notification-time"
+                        >Yesterday at 4:30 PM</span
+                      >
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="updates">
+                    <div class="notification-icon">
+                      <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Your mock test results are now available. You scored
+                        85%!
+                      </p>
+                      <span class="notification-time"
+                        >Yesterday at 2:15 PM</span
+                      >
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="notification-date-group">
+                <h3 class="date-header">Last Week</h3>
+                <div class="notification-items">
+                  <div class="notification-item" data-type="reminders">
+                    <div class="notification-icon">
+                      <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Module 2 of Cardiovascular System is now available for
+                        study
+                      </p>
+                      <span class="notification-time">Monday at 9:00 AM</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="comments">
+                    <div class="notification-icon">
+                      <i class="fas fa-star"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Your question was featured in the weekly digest: "How
+                        does the lymphatic system interact with blood
+                        circulation?"
+                      </p>
+                      <span class="notification-time">Monday at 8:30 AM</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="updates">
+                    <div class="notification-icon">
+                      <i class="fas fa-book-medical"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        New study materials added to the Respiratory System
+                        module
+                      </p>
+                      <span class="notification-time">Sunday at 7:45 PM</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="notification-date-group">
+                <h3 class="date-header">Earlier</h3>
+                <div class="notification-items">
+                  <div class="notification-item" data-type="reminders">
+                    <div class="notification-icon">
+                      <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Congratulations! You've completed all assignments for
+                        the Anatomy module
+                      </p>
+                      <span class="notification-time">2 weeks ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="updates">
+                    <div class="notification-icon">
+                      <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Your account has been upgraded to Premium. Enjoy all the
+                        new features!
+                      </p>
+                      <span class="notification-time">3 weeks ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="notification-item" data-type="comments">
+                    <div class="notification-icon">
+                      <i class="fas fa-users"></i>
+                    </div>
+                    <div class="notification-content">
+                      <p>
+                        Welcome to PulsePrep! Get started by completing your
+                        profile
+                      </p>
+                      <span class="notification-time">1 month ago</span>
+                    </div>
+                    <div class="notification-actions">
+                      <button class="mark-read-btn">
+                        <i class="far fa-circle"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pagination">
+                <button class="pagination-btn prev-page" disabled>
+                  <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div class="page-numbers">
+                  <button class="page-number active">1</button>
+                  <button class="page-number">2</button>
+                  <button class="page-number">3</button>
+                </div>
+                <button class="pagination-btn next-page">
+                  Next <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="social-icons">
+          <a href="#"><i class="far fa-envelope"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <div class="copyright">
+          &copy; PlayOne Media Direct, LLC. All rights reserved
+        </div>
+      </div>
+    </footer>
+
+    <!-- Notification Dropdown -->
+    <div class="notification-dropdown" id="notification-dropdown">
+      <div class="notification-header">
+        <h3>Notifications</h3>
+        <div class="notification-actions">
+          <button class="mark-all-read">Mark all as read</button>
+          <button class="notification-settings-btn">Settings</button>
+        </div>
+      </div>
+      <div class="notification-list">
+        <div class="notification-item unread">
+          <div class="notification-icon">
+            <i class="fas fa-comment"></i>
+          </div>
+          <div class="notification-content">
+            <p>
+              John Smith commented on your post: "Great question about
+              cardiovascular system!"
+            </p>
+            <span class="notification-time">2 minutes ago</span>
+          </div>
+          <div class="notification-actions">
+            <button class="mark-read-btn"><i class="fas fa-circle"></i></button>
+          </div>
+        </div>
+
+        <div class="notification-item unread">
+          <div class="notification-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <div class="notification-content">
+            <p>
+              Sarah Johnson liked your question about the respiratory system
+            </p>
+            <span class="notification-time">15 minutes ago</span>
+          </div>
+          <div class="notification-actions">
+            <button class="mark-read-btn"><i class="fas fa-circle"></i></button>
+          </div>
+        </div>
+
+        <div class="notification-item">
+          <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <div class="notification-content">
+            <p>Reminder: Complete your Module 3 assignment by tomorrow</p>
+            <span class="notification-time">1 hour ago</span>
+          </div>
+          <div class="notification-actions">
+            <button class="mark-read-btn"><i class="far fa-circle"></i></button>
+          </div>
+        </div>
+
+        <div class="notification-item">
+          <div class="notification-icon">
+            <i class="fas fa-bullhorn"></i>
+          </div>
+          <div class="notification-content">
+            <p>
+              New feature: We've added a new quiz format to help you study more
+              effectively
+            </p>
+            <span class="notification-time">Yesterday</span>
+          </div>
+          <div class="notification-actions">
+            <button class="mark-read-btn"><i class="far fa-circle"></i></button>
+          </div>
+        </div>
+
+        <div class="notification-item">
+          <div class="notification-icon">
+            <i class="fas fa-reply"></i>
+          </div>
+          <div class="notification-content">
+            <p>
+              Dr. Williams replied to your comment in the anatomy discussion
+            </p>
+            <span class="notification-time">2 days ago</span>
+          </div>
+          <div class="notification-actions">
+            <button class="mark-read-btn"><i class="far fa-circle"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="notification-footer-dropdown">
+        <a href="all-notifications.html">View all notifications</a>
+      </div>
+    </div>
+
+    <!-- Notification element -->
+    <div class="notification-toast" id="notification"></div>
+
+    <script src="DAscript.js"></script>
+    <script src="notification-list.js"></script>
+  </body>
+</html>

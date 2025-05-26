@@ -1,0 +1,452 @@
+/* Base Styles */
+:root {
+  --primary-color: #953543;
+  --secondary-color: #144c7c;
+  --light-bg: #f9f9f9;
+  --white: #ffffff;
+  --text-color: #333333;
+  --light-text: #666666;
+  --border-color: #e0e0e0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  color: var(--text-color);
+  line-height: 1.6;
+  background-color: var(--light-bg);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+a {
+  text-decoration: none;
+  color: var(--primary-color);
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--secondary-color);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Hero Section */
+.hero {
+  background-image: url("images/help-center-hero.jpg");
+  background-size: cover;
+  background-position: center;
+  color: var(--white);
+  text-align: center;
+  padding: 100px 0;
+  position: relative;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero .container {
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Help Categories Section */
+.help-categories {
+  padding: 60px 0;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.category-card {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.icon-container {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-container img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.category-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 15px;
+  color: var(--secondary-color);
+}
+
+.category-card p {
+  font-size: 0.9rem;
+  color: var(--light-text);
+  margin-bottom: 20px;
+}
+
+.learn-more {
+  display: inline-block;
+  padding: 8px 20px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  transition: background-color 0.3s ease;
+}
+
+.learn-more:hover {
+  background-color: var(--secondary-color);
+  color: var(--white);
+}
+
+/* FAQ Section */
+.faq-section {
+  padding: 60px 0;
+  background-color: var(--white);
+}
+
+.faq-section h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--light-text);
+  margin-bottom: 40px;
+}
+
+.faq-accordion {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 15px;
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  cursor: pointer;
+}
+
+.faq-question h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.toggle-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.faq-answer {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.faq-item.active .faq-answer {
+  padding: 0 0 20px;
+  max-height: 500px;
+}
+
+.faq-answer p {
+  color: var(--light-text);
+}
+
+/* Help Banner */
+.help-banner {
+  padding: 60px 0;
+}
+
+.help-banner-content {
+  display: flex;
+  background: linear-gradient(
+    to right,
+    var(--secondary-color) 50%,
+    var(--white) 50%
+  );
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.help-text {
+  flex: 1;
+  padding: 40px;
+  color: var(--white);
+}
+
+.help-text h2 {
+  font-size: 1.75rem;
+  margin-bottom: 15px;
+}
+
+.help-text p {
+  margin-bottom: 20px;
+}
+
+.contact-btn {
+  display: inline-block;
+  padding: 10px 25px;
+  background-color: var(--white);
+  color: var(--secondary-color);
+  border-radius: 25px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.contact-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.help-image {
+  flex: 1;
+  position: relative;
+}
+
+.help-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Newsletter */
+.newsletter {
+  padding: 60px 0;
+  text-align: center;
+}
+
+.newsletter h3 {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+}
+
+.newsletter-form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  gap: 10px;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1px solid var(--border-color);
+  border-radius: 30px;
+  font-size: 0.875rem;
+}
+
+.newsletter-btn {
+  padding: 12px 25px;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.3s ease;
+}
+
+.newsletter-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+/* Media Queries for Responsive Design */
+@media screen and (max-width: 1024px) {
+  .container {
+    padding: 0 30px;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .help-banner-content {
+    flex-direction: column;
+    background: var(--secondary-color);
+  }
+
+  .help-text,
+  .help-image {
+    width: 100%;
+  }
+
+  .help-image {
+    height: 300px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero {
+    padding: 80px 0;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .help-categories {
+    padding: 40px 0;
+  }
+
+  .categories-grid {
+    gap: 20px;
+  }
+
+  .category-card {
+    padding: 20px;
+  }
+
+  .icon-container {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+  }
+
+  .faq-section h2 {
+    font-size: 1.75rem;
+  }
+
+  .faq-question h3 {
+    font-size: 1rem;
+  }
+
+  .help-text {
+    padding: 30px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+  }
+
+  .newsletter-input,
+  .newsletter-btn {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 60px 0;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+  }
+
+  .category-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .faq-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .help-text h2 {
+    font-size: 1.5rem;
+  }
+
+  .help-image {
+    height: 250px;
+  }
+
+  .newsletter h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .category-card {
+    padding: 15px;
+  }
+
+  .icon-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .faq-question h3 {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .help-text {
+    padding: 20px;
+  }
+
+  .help-text p {
+    font-size: 0.9rem;
+  }
+
+  .help-image {
+    height: 200px;
+  }
+}

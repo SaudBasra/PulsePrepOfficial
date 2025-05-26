@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="dashboard-content">
+  <div class="confirmation-dialog">
+    <h2>Delete Mock Test</h2>
+    <p>Are you sure you want to delete "<strong>{{ test.title }}</strong>"?</p>
+    <p class="warning">This action cannot be undone. All associated test attempts and results will also be deleted.</p>
+    
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="action-button primary">Yes, Delete</button>
+      <a href="{% url 'mocktest:mocktest_list' %}" class="action-button secondary">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,675 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="nav-item active">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'questionbank' %}" class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Manage Questions</span>
+                </a>
+                <a href="{% url 'managemodule' %}" class="nav-item">
+                    <i class="fas fa-cubes"></i>
+                    <span>Modules</span>
+                </a>
+                <a href="/admin/user_management/customuser/" class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Manage Users</span>
+                </a>
+                <a href="{% url 'mocktest_list' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'analytics_report' %}" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics & Reports</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'notificationsetting' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notification Settings</span>
+                </a>
+                <a href="{% url 'setting' %}" class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <div class="header-info">
+                    <h1>Admin Dashboard</h1>
+                    <div class="header-meta">
+                        <span class="time-info">
+                            <i class="fas fa-clock"></i>
+                            {{ current_time|date:"M d, Y H:i" }}
+                        </span>
+                        <span class="timezone-info">{{ timezone_label }}</span>
+                    </div>
+                </div>
+                <div class="header-stats">
+                    <div class="quick-stat">
+                        <span class="stat-label">Questions</span>
+                        <span class="stat-value">{{ quick_stats.total_questions }}</span>
+                    </div>
+                </div>
+                <div class="user-menu">
+                    <a href="#" class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        {% if pending_users > 0 %}
+                        <span class="notification-badge">{{ pending_users }}</span>
+                        {% endif %}
+                    </a>
+                    <div class="user-avatar">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                        {% else %}
+                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Key Metrics Section -->
+                <section class="overview-section">
+                    <div class="section-header">
+                        <h2>Key Metrics</h2>
+                        <div class="header-actions">
+                            <button class="refresh-btn" onclick="location.reload()">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                            <a href="/admin/user_management/customuser/" class="view-detail-btn">
+                                Manage Users
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <!-- Total Users -->
+                        <div class="stat-card primary">
+                            <div class="stat-header">
+                                <span class="stat-title">Total Students</span>
+                                <div class="icon-badge blue">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value count-up" data-value="{{ total_users }}">0</div>
+                            <div class="stat-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Approved:</span>
+                                    <span class="detail-value approved">{{ approved_users }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Pending:</span>
+                                    <span class="detail-value pending">{{ pending_users }}</span>
+                                </div>
+                            </div>
+                            <a href="/admin/user_management/customuser/" class="stat-link">View All Students</a>
+                        </div>
+
+                        <!-- Pending Approvals -->
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <span class="stat-title">Pending Approvals</span>
+                                <div class="icon-badge orange">
+                                    <i class="fas fa-user-clock"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value count-up" data-value="{{ pending_users }}">0</div>
+                            <div class="stat-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ pending_percentage }}%"></div>
+                                </div>
+                                <span class="progress-text">{{ pending_percentage }}% of total users</span>
+                            </div>
+                            <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="stat-link">Review Pending</a>
+                        </div>
+
+                        <!-- MBBS Students -->
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <span class="stat-title">MBBS Students</span>
+                                <div class="trend-indicator {% if mbbs_growth_trend == 'up' %}positive{% else %}negative{% endif %}">
+                                    <i class="fas fa-arrow-{% if mbbs_growth_trend == 'up' %}up{% else %}down{% endif %}"></i>
+                                    <span>{{ weekly_stats.mbbs_growth }}%</span>
+                                </div>
+                            </div>
+                            <div class="stat-value count-up" data-value="{{ mbbs_users }}">0</div>
+                            <div class="chart-container small">
+                                <canvas id="mbbs-chart"></canvas>
+                                <div class="chart-overlay">
+                                    <span class="chart-percentage">{{ mbbs_percentage }}%</span>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="new-registrations">+{{ new_mbbs_users }} this week</span>
+                            </div>
+                            <a href="/admin/user_management/customuser/?degree__exact=MBBS" class="stat-link">View MBBS Students</a>
+                        </div>
+
+                        <!-- BDS Students -->
+                        <div class="stat-card info">
+                            <div class="stat-header">
+                                <span class="stat-title">BDS Students</span>
+                                <div class="trend-indicator {% if bds_growth_trend == 'up' %}positive{% else %}negative{% endif %}">
+                                    <i class="fas fa-arrow-{% if bds_growth_trend == 'up' %}up{% else %}down{% endif %}"></i>
+                                    <span>{{ weekly_stats.bds_growth }}%</span>
+                                </div>
+                            </div>
+                            <div class="stat-value count-up" data-value="{{ bds_users }}">0</div>
+                            <div class="chart-container small">
+                                <canvas id="bds-chart"></canvas>
+                                <div class="chart-overlay">
+                                    <span class="chart-percentage">{{ bds_percentage }}%</span>
+                                </div>
+                            </div>
+                            <div class="stat-footer">
+                                <span class="new-registrations">+{{ new_bds_users }} this week</span>
+                            </div>
+                            <a href="/admin/user_management/customuser/?degree__exact=BDS" class="stat-link">View BDS Students</a>
+                        </div>
+
+                        <!-- Weekly Growth -->
+                        <div class="stat-card neutral">
+                            <div class="stat-header">
+                                <span class="stat-title">Weekly Registrations</span>
+                                <div class="icon-badge green">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                            </div>
+                            <div class="stat-value count-up" data-value="{{ weekly_stats.current_week }}">0</div>
+                            <div class="stat-breakdown">
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">MBBS:</span>
+                                    <span class="breakdown-value">{{ new_mbbs_users }}</span>
+                                </div>
+                                <div class="breakdown-item">
+                                    <span class="breakdown-label">BDS:</span>
+                                    <span class="breakdown-value">{{ new_bds_users }}</span>
+                                </div>
+                            </div>
+                            <div class="stat-trend">
+                                <i class="fas fa-calendar-week"></i>
+                                <span>Last 7 days</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Section -->
+                <section class="analytics-section">
+                    <div class="charts-container">
+                        <!-- User Distribution Chart -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Student Distribution</h3>
+                                <div class="chart-controls">
+                                    <button class="chart-control active" data-view="degree">By Degree</button>
+                                    <button class="chart-control" data-view="status">By Status</button>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="distribution-chart"></canvas>
+                                <div class="chart-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color mbbs"></span>
+                                        <span>MBBS ({{ mbbs_percentage }}%)</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color bds"></span>
+                                        <span>BDS ({{ bds_percentage }}%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Registration Trends Chart -->
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Registration Trends</h3>
+                                <div class="chart-period">
+                                    <span>Last 7 Days</span>
+                                </div>
+                            </div>
+                            <div class="chart-content">
+                                <canvas id="trends-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- User Management Section -->
+                <section class="users-section">
+                    <div class="users-container">
+                        <!-- Pending Approvals -->
+                        <div class="users-card urgent">
+                            <div class="card-header">
+                                <h3>
+                                    <i class="fas fa-clock"></i>
+                                    Pending Approvals
+                                </h3>
+                                <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="view-all-link">
+                                    View All ({{ pending_users }})
+                                </a>
+                            </div>
+                            <div class="users-list">
+                                {% for user in pending_approvals %}
+                                <div class="user-item" onclick="location.href='/admin/user_management/customuser/{{ user.id }}/change/'" style="cursor: pointer;">
+                                    <div class="user-avatar">
+                                        {% if user.profile_image %}
+                                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                                        {% else %}
+                                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="user-meta">
+                                            <span class="user-degree">{{ user.degree }}</span>
+                                            <span class="user-year">Year {{ user.year }}</span>
+                                        </div>
+                                        <div class="user-email">{{ user.email }}</div>
+                                    </div>
+                                    <div class="user-actions">
+                                        <span class="status-badge pending">{{ user.approval_status }}</span>
+                                        <div class="action-buttons">
+                                            <button class="approve-btn" title="Approve">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="reject-btn" title="Reject">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-state">
+                                    <i class="fas fa-check-circle"></i>
+                                    <p>No pending approvals</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Recent MBBS Students -->
+                        <div class="users-card">
+                            <div class="card-header">
+                                <h3>
+                                    <i class="fas fa-graduation-cap"></i>
+                                    Recent MBBS Students
+                                </h3>
+                                <a href="/admin/user_management/customuser/?degree__exact=MBBS" class="view-all-link">
+                                    View All ({{ mbbs_users }})
+                                </a>
+                            </div>
+                            <div class="users-list">
+                                {% for user in recent_mbbs_users %}
+                                <div class="user-item" onclick="location.href='/admin/user_management/customuser/{{ user.id }}/change/'" style="cursor: pointer;">
+                                    <div class="user-avatar">
+                                        {% if user.profile_image %}
+                                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                                        {% else %}
+                                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="user-meta">
+                                            <span class="user-degree">{{ user.degree }}</span>
+                                            <span class="user-year">Year {{ user.year }}</span>
+                                        </div>
+                                        <div class="user-email">{{ user.email }}</div>
+                                    </div>
+                                    <div class="user-status">
+                                        <span class="status-badge {{ user.approval_status }}">{{ user.approval_status }}</span>
+                                        <span class="join-date">{{ user.date_joined|date:"M d" }}</span>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-state">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <p>No recent MBBS registrations</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Recent BDS Students -->
+                        <div class="users-card">
+                            <div class="card-header">
+                                <h3>
+                                    <i class="fas fa-tooth"></i>
+                                    Recent BDS Students
+                                </h3>
+                                <a href="/admin/user_management/customuser/?degree__exact=BDS" class="view-all-link">
+                                    View All ({{ bds_users }})
+                                </a>
+                            </div>
+                            <div class="users-list">
+                                {% for user in recent_bds_users %}
+                                <div class="user-item" onclick="location.href='/admin/user_management/customuser/{{ user.id }}/change/'" style="cursor: pointer;">
+                                    <div class="user-avatar">
+                                        {% if user.profile_image %}
+                                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                                        {% else %}
+                                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="user-meta">
+                                            <span class="user-degree">{{ user.degree }}</span>
+                                            <span class="user-year">Year {{ user.year }}</span>
+                                        </div>
+                                        <div class="user-email">{{ user.email }}</div>
+                                    </div>
+                                    <div class="user-status">
+                                        <span class="status-badge {{ user.approval_status }}">{{ user.approval_status }}</span>
+                                        <span class="join-date">{{ user.date_joined|date:"M d" }}</span>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="empty-state">
+                                    <i class="fas fa-tooth"></i>
+                                    <p>No recent BDS registrations</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <section class="actions-section">
+                    <h3>Quick Actions</h3>
+                    <div class="actions-grid">
+                        <a href="{% url 'questionbank' %}" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Add Questions</h4>
+                                <p>Create new questions or import from CSV</p>
+                            </div>
+                        </a>
+                        <a href="{% url 'mocktest_list' %}" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Schedule Mock Test</h4>
+                                <p>Create and schedule new mock tests</p>
+                            </div>
+                        </a>
+                        <a href="/admin/user_management/customuser/" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-users-cog"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Manage Users</h4>
+                                <p>Review and approve user registrations</p>
+                            </div>
+                        </a>
+                        <a href="{% url 'analytics_report' %}" class="action-card">
+                            <div class="action-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>View Reports</h4>
+                                <p>Access detailed analytics and reports</p>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-left">
+                        <span>&copy; 2025 PulsePrep Media Direct, LLC. All rights reserved.</span>
+                    </div>
+                    <div class="footer-right">
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        // Registration trends data from backend
+        const registrationData = {{ registration_trends|safe }};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            initializeCounters();
+            setupEventListeners();
+        });
+
+        function initializeCharts() {
+            // MBBS Donut Chart
+            const mbbsCtx = document.getElementById('mbbs-chart');
+            if (mbbsCtx) {
+                new Chart(mbbsCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [{{ mbbs_percentage }}, {{ 100|add:"-"|add:mbbs_percentage }}],
+                            backgroundColor: ['#2563eb', '#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        plugins: { legend: { display: false } },
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            // BDS Donut Chart
+            const bdsCtx = document.getElementById('bds-chart');
+            if (bdsCtx) {
+                new Chart(bdsCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [{{ bds_percentage }}, {{ 100|add:"-"|add:bds_percentage }}],
+                            backgroundColor: ['#dc2626', '#e5e7eb'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        cutout: '75%',
+                        plugins: { legend: { display: false } },
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            // Distribution Chart
+            const distributionCtx = document.getElementById('distribution-chart');
+            if (distributionCtx) {
+                window.distributionChart = new Chart(distributionCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['MBBS', 'BDS'],
+                        datasets: [{
+                            data: [{{ mbbs_users }}, {{ bds_users }}],
+                            backgroundColor: ['#2563eb', '#dc2626'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Registration Trends Chart
+            const trendsCtx = document.getElementById('trends-chart');
+            if (trendsCtx) {
+                new Chart(trendsCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: registrationData.map(d => d.date),
+                        datasets: [
+                            {
+                                label: 'MBBS',
+                                data: registrationData.map(d => d.mbbs),
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                                fill: false,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'BDS',
+                                data: registrationData.map(d => d.bds),
+                                borderColor: '#dc2626',
+                                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                                fill: false,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                align: 'end'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initializeCounters() {
+            const countElements = document.querySelectorAll('.count-up');
+            countElements.forEach(element => {
+                const target = parseInt(element.getAttribute('data-value'));
+                animateCounter(element, target);
+            });
+        }
+
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 30);
+        }
+
+        function setupEventListeners() {
+            // Chart control buttons
+            const chartControls = document.querySelectorAll('.chart-control');
+            chartControls.forEach(control => {
+                control.addEventListener('click', function() {
+                    chartControls.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const view = this.getAttribute('data-view');
+                    updateDistributionChart(view);
+                });
+            });
+
+            // Refresh button
+            const refreshBtn = document.querySelector('.refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    this.querySelector('i').style.animation = 'spin 1s linear';
+                    setTimeout(() => {
+                        this.querySelector('i').style.animation = '';
+                    }, 1000);
+                });
+            }
+        }
+
+        function updateDistributionChart(view) {
+            if (!window.distributionChart) return;
+            
+            if (view === 'status') {
+                window.distributionChart.data.labels = ['Approved', 'Pending', 'Rejected'];
+                window.distributionChart.data.datasets[0].data = [{{ approved_users }}, {{ pending_users }}, {{ rejected_users }}];
+                window.distributionChart.data.datasets[0].backgroundColor = ['#28a745', '#ffa800', '#dc3545'];
+            } else {
+                window.distributionChart.data.labels = ['MBBS', 'BDS'];
+                window.distributionChart.data.datasets[0].data = [{{ mbbs_users }}, {{ bds_users }}];
+                window.distributionChart.data.datasets[0].backgroundColor = ['#2563eb', '#dc2626'];
+            }
+            window.distributionChart.update();
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

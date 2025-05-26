@@ -1,0 +1,451 @@
+<!-- templates/dashboard/student_dashboard.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Avatar and image styling */
+        .header .user-menu .avatar {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .user-menu .avatar img {
+            width: 40px !important;
+            height: 40px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            display: block !important;
+            border: 2px solid #e5e7eb !important;
+        }
+
+        .header .user-menu .avatar .avatar-placeholder {
+            width: 40px !important;
+            height: 40px !important;
+            background-color: #2563eb !important;
+            color: white !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-weight: bold !important;
+            font-size: 16px !important;
+            text-transform: uppercase !important;
+            border: 2px solid #e5e7eb !important;
+        }
+
+        /* Welcome banner styling */
+        .welcome-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner h1 {
+            margin: 0;
+            font-size: 32px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-banner p {
+            margin: 0;
+            font-size: 18px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-avatar {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-size: 32px !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            overflow: hidden !important;
+            flex-shrink: 0 !important;
+        }
+
+        .profile-avatar img {
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            display: block !important;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 8px;
+            color: #1f2937;
+            font-size: 24px;
+        }
+
+        .profile-info p {
+            margin: 4px 0;
+            color: #6b7280;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .badge-mbbs {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-bds {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Status styling */
+        .approval-status {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .approval-status h2 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .approval-status p {
+            margin: 8px 0 0;
+            opacity: 0.8;
+        }
+        
+        .pending {
+            background: linear-gradient(135deg, #fef3c7, #f59e0b);
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .approved {
+            background: linear-gradient(135deg, #d1fae5, #10b981);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .rejected {
+            background: linear-gradient(135deg, #fee2e2, #ef4444);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Dashboard content animation */
+        .dashboard-content {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .welcome-banner {
+                padding: 24px 16px;
+            }
+            
+            .welcome-banner h1 {
+                font-size: 24px;
+            }
+            
+            .profile-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+
+            .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+<nav class="nav-menu">
+    <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item">
+        <i class="fas fa-question-circle"></i>
+        <span>Question Bank</span>
+    </a>
+    <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
+        <i class="fas fa-vial"></i>
+        <span>Mock Tests</span>
+    </a>
+    <a href="#" class="nav-item">
+        <i class="fas fa-chart-bar"></i>
+        <span>My Progress</span>
+    </a>
+    <a href="#" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>My Profile</span>
+    </a>
+    <a href="{% url 'logout' %}" class="nav-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+    </a>
+</nav>
+
+</aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1>Student Dashboard</h1>
+                <div class="user-menu">
+                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <div class="avatar">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" 
+                                 onload="this.style.display='block'" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="avatar-placeholder" style="display: none;">{{ user.first_name|first|upper }}</div>
+                        {% else %}
+                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Welcome Banner -->
+                <div class="welcome-banner">
+                    <h1>Welcome to PulsePrep, {{ user.first_name }}!</h1>
+                    <p>Your comprehensive platform for medical exam preparation</p>
+                    <p>
+                        <strong>Current Time:</strong> {{ current_time|date:"M d, Y H:i:s" }}<br>
+                        <strong>Timezone:</strong> {{ timezone_label }}
+                    </p>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="profile-card">
+                    <div class="profile-avatar">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" 
+                                 onload="this.style.display='block'" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div style="display: none; color: white; font-size: 32px; font-weight: bold;">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
+                        {% else %}
+                            <div style="color: white; font-size: 32px; font-weight: bold;">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="profile-info">
+                        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                        <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                        {% if user.degree %}
+                        <p><i class="fas fa-graduation-cap"></i> 
+                            <span class="profile-badge badge-{{ user.degree|lower }}">{{ user.get_degree_display }}</span>
+                            {% if user.year %} - Year {{ user.year }}{% endif %}
+                        </p>
+                        {% endif %}
+                        <p><i class="fas fa-calendar"></i> Joined {{ user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Approval Status -->
+                {% if user.approval_status == 'pending' %}
+                <div class="approval-status pending">
+                    <div>
+                        <h2><i class="fas fa-clock"></i> Your account is pending approval</h2>
+                        <p>Please wait while an administrator reviews your account. You'll receive an email once approved.</p>
+                    </div>
+                </div>
+                {% elif user.approval_status == 'approved' %}
+                <div class="approval-status approved">
+                    <div>
+                        <h2><i class="fas fa-check-circle"></i> Your account is approved</h2>
+                        <p>You have full access to all features and content for {{ user.get_degree_display }}{% if user.year %} - Year {{ user.year }}{% endif %}.</p>
+                    </div>
+                </div>
+                {% elif user.approval_status == 'rejected' %}
+                <div class="approval-status rejected">
+                    <div>
+                        <h2><i class="fas fa-times-circle"></i> Your account has been rejected</h2>
+                        <p>Please contact support for assistance with your account.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+
+<!-- Add this after the approval status div -->
+{% if user.approval_status == 'approved' %}
+    <!-- Quick Actions -->
+    <div class="quick-actions" style="margin-top: 24px;">
+        <h3 style="margin-bottom: 16px; color: #1f2937;">Quick Actions</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+            <a href="{% url 'student_mock_tests' %}" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; background: #e0e7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-vial" style="font-size: 24px; color: #4f46e5;"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #1f2937;">Take Mock Test</h4>
+                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Practice with timed tests</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="{% url 'student_progress' %}" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; background: #d1fae5; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-chart-line" style="font-size: 24px; color: #10b981;"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #1f2937;">View Progress</h4>
+                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Track your performance</p>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="#" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-question-circle" style="font-size: 24px; color: #f59e0b;"></i>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #1f2937;">Question Bank</h4>
+                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Browse study materials</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="recent-activity" style="margin-top: 32px;">
+        <h3 style="margin-bottom: 16px; color: #1f2937;">Recent Test Activity</h3>
+        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <p style="color: #6b7280; text-align: center; padding: 20px 0;">No recent test activity</p>
+        </div>
+    </div>
+{% endif %}
+
+
+
+
+
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar toggle for mobile
+        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Student dashboard loaded');
+            
+            // Debug image loading
+            const avatarImages = document.querySelectorAll('.avatar img, .profile-avatar img');
+            
+            avatarImages.forEach(img => {
+                console.log('Image src:', img.src);
+                
+                img.addEventListener('load', function() {
+                    console.log('Image loaded successfully:', this.src);
+                });
+                
+                img.addEventListener('error', function() {
+                    console.log('Image failed to load:', this.src);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

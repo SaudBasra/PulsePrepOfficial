@@ -1,0 +1,340 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Preview Test: {{ test.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/mockTest.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+      .preview-container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      .test-info-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      .test-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+      }
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .meta-item i {
+        color: var(--primary-color);
+        width: 20px;
+      }
+      
+      .question-preview-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      
+      .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      
+      .question-number {
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+      }
+      
+      .question-options {
+        margin: 15px 0;
+      }
+      
+      .option-item {
+        padding: 10px 15px;
+        margin: 8px 0;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background: #f9f9f9;
+      }
+      
+      .option-item.correct {
+        background: #e8f5e9;
+        border-color: #4caf50;
+      }
+      
+      .difficulty-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      
+      .difficulty-badge.easy {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      
+      .difficulty-badge.medium {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+      
+      .difficulty-badge.hard {
+        background: #ffebee;
+        color: #c62828;
+      }
+      
+      .instructions-box {
+        background: #f5f5f5;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+        white-space: pre-wrap;
+      }
+      
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin: 30px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'questionbank' %}" class="nav-item">
+            <i class="fas fa-question-circle"></i>
+            <span>Manage Questions</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Modules</span>
+          </a>
+          <a href="/admin/user_management/customuser/" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Manage Users</span>
+          </a>
+          <a href="{% url 'mocktest_list' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'analytics_report' %}" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics & Reports</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notificationsetting' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notification Settings</span>
+          </a>
+          <a href="{% url 'setting' %}" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Preview Test</h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <div class="preview-container">
+            <!-- Test Information -->
+            <div class="test-info-card">
+              <h2>{{ test.title }}</h2>
+              {% if test.description %}
+                <p>{{ test.description }}</p>
+              {% endif %}
+              
+              <div class="test-meta">
+                <div class="meta-item">
+                  <i class="fas fa-graduation-cap"></i>
+                  <span>{{ test.degree|default:"All Degrees" }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-calendar"></i>
+                  <span>{{ test.year|default:"All Years" }} Year</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-clock"></i>
+                  <span>{{ test.duration_minutes }} minutes</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-question-circle"></i>
+                  <span>{{ question_count }} questions</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-percentage"></i>
+                  <span>Pass: {{ test.passing_percentage }}%</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-redo"></i>
+                  <span>{{ test.max_attempts }} attempt(s)</span>
+                </div>
+              </div>
+              
+              {% if test.instructions %}
+                <h3>Instructions</h3>
+                <div class="instructions-box">{{ test.instructions }}</div>
+              {% endif %}
+              
+              <div class="test-meta">
+                <div class="meta-item">
+                  <i class="fas fa-play-circle"></i>
+                  <span>Start: {{ test.start_datetime|date:"M d, Y g:i A" }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-stop-circle"></i>
+                  <span>End: {{ test.end_datetime|date:"M d, Y g:i A" }}</span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-info-circle"></i>
+                  <span class="status-badge {{ test.status }}">{{ test.get_status_display }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Question Preview -->
+            <h3>Questions ({{ question_count }})</h3>
+            
+            {% for test_question in test_questions %}
+              <div class="question-preview-card">
+                <div class="question-header">
+                  <span class="question-number">Question {{ test_question.question_order }}</span>
+                  <span class="difficulty-badge {{ test_question.question.difficulty|lower }}">
+                    {{ test_question.question.difficulty }}
+                  </span>
+                </div>
+                
+                <div class="question-text">
+                  <p>{{ test_question.question.question_text }}</p>
+                </div>
+                
+                <div class="question-options">
+                  {% if test_question.question.option_a %}
+                    <div class="option-item {% if test_question.question.correct_answer == 'A' %}correct{% endif %}">
+                      A) {{ test_question.question.option_a }}
+                    </div>
+                  {% endif %}
+                  {% if test_question.question.option_b %}
+                    <div class="option-item {% if test_question.question.correct_answer == 'B' %}correct{% endif %}">
+                      B) {{ test_question.question.option_b }}
+                    </div>
+                  {% endif %}
+                  {% if test_question.question.option_c %}
+                    <div class="option-item {% if test_question.question.correct_answer == 'C' %}correct{% endif %}">
+                      C) {{ test_question.question.option_c }}
+                    </div>
+                  {% endif %}
+                  {% if test_question.question.option_d %}
+                    <div class="option-item {% if test_question.question.correct_answer == 'D' %}correct{% endif %}">
+                      D) {{ test_question.question.option_d }}
+                    </div>
+                  {% endif %}
+                  {% if test_question.question.option_e %}
+                    <div class="option-item {% if test_question.question.correct_answer == 'E' %}correct{% endif %}">
+                      E) {{ test_question.question.option_e }}
+                    </div>
+                  {% endif %}
+                </div>
+                
+                <div class="question-meta">
+                  <small>
+                    {{ test_question.question.block }} > 
+                    {{ test_question.question.module }} > 
+                    {{ test_question.question.subject }} > 
+                    {{ test_question.question.topic }}
+                  </small>
+                </div>
+              </div>
+            {% empty %}
+              <div class="test-info-card">
+                <p>No questions added to this test yet.</p>
+              </div>
+            {% endfor %}
+            
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <a href="{% url 'mocktest_list' %}" class="action-button secondary">
+                <i class="fas fa-arrow-left"></i> Back to Tests
+              </a>
+              <a href="{% url 'create_test' %}?id={{ test.id }}" class="action-button">
+                <i class="fas fa-edit"></i> Edit Test
+              </a>
+              {% if test.status == 'draft' %}
+                <button class="action-button primary" id="publish-test">
+                  <i class="fas fa-rocket"></i> Publish Test
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Publish test
+      const publishBtn = document.getElementById('publish-test');
+      if (publishBtn) {
+        publishBtn.addEventListener('click', function() {
+          if (confirm('Are you sure you want to publish this test? Students will be able to take it once published.')) {
+            // In a real implementation, this would make an API call to update the test status
+            alert('Test published successfully!');
+            window.location.href = '{% url "mocktest_list" %}';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

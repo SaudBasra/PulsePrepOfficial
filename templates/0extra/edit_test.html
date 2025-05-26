@@ -1,0 +1,573 @@
+<!-- templates/mocktest/edit_test.html -->
+{% extends 'mocktest/base_mocktest.html' %}
+
+{% block title %}Edit {{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Test Form -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-edit"></i> Edit Mock Test</h4>
+                <div>
+                    <a href="{% url 'mocktest:preview_test' test.id %}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-eye"></i> Preview
+                    </a>
+                    <a href="{% url 'mocktest:duplicate_test' test.id %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-copy"></i> Duplicate
+                    </a>
+                </div>
+            </div>
+            
+            <form method="post" id="editTestForm">
+                {% csrf_token %}
+                <div class="card-body">
+                    <!-- Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary"><i class="fas fa-info-circle"></i> Basic Information</h6>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Test Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.degree.id_for_label }}" class="form-label">Degree *</label>
+                            {{ form.degree }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.year.id_for_label }}" class="form-label">Year *</label>
+                            {{ form.year }}
+                        </div>
+                        
+                        <div class="col-12 mt-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                        
+                        <div class="col-md-4 mt-3">
+                            <label for="{{ form.block.id_for_label }}" class="form-label">Block</label>
+                            {{ form.block }}
+                        </div>
+                        
+                        <div class="col-md-4 mt-3">
+                            <label for="{{ form.module.id_for_label }}" class="form-label">Module</label>
+                            {{ form.module }}
+                        </div>
+                        
+                        <div class="col-md-4 mt-3">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                            {{ form.subject }}
+                        </div>
+                    </div>
+
+                    <!-- Scheduling -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary"><i class="fas fa-calendar"></i> Scheduling & Duration</h6>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date & Time *</label>
+                            {{ form.start_date }}
+                            {% if form.start_date.errors %}
+                                <div class="text-danger">{{ form.start_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date & Time *</label>
+                            {{ form.end_date }}
+                            {% if form.end_date.errors %}
+                                <div class="text-danger">{{ form.end_date.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="{{ form.duration.id_for_label }}" class="form-label">Duration (min) *</label>
+                            {{ form.duration }}
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+
+                    <!-- Question Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary"><i class="fas fa-cogs"></i> Question Configuration</h6>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.total_questions.id_for_label }}" class="form-label">Total Questions *</label>
+                            {{ form.total_questions }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.difficulty_level.id_for_label }}" class="form-label">Difficulty Level</label>
+                            {{ form.difficulty_level }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.question_source.id_for_label }}" class="form-label">Question Source</label>
+                            {{ form.question_source }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.passing_score.id_for_label }}" class="form-label">Passing Score (%)</label>
+                            {{ form.passing_score }}
+                        </div>
+                    </div>
+
+                    <!-- Test Behavior -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary"><i class="fas fa-sliders-h"></i> Test Behavior</h6>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                {{ form.shuffle_questions }}
+                                <label class="form-check-label" for="{{ form.shuffle_questions.id_for_label }}">
+                                    Shuffle Questions Order
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                {{ form.shuffle_options }}
+                                <label class="form-check-label" for="{{ form.shuffle_options.id_for_label }}">
+                                    Shuffle Answer Options
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                {{ form.show_results_immediately }}
+                                <label class="form-check-label" for="{{ form.show_results_immediately.id_for_label }}">
+                                    Show Results Immediately
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check mb-2">
+                                {{ form.ai_explanations_enabled }}
+                                <label class="form-check-label" for="{{ form.ai_explanations_enabled.id_for_label }}">
+                                    Enable Explanations
+                                </label>
+                            </div>
+                            
+                            <div class="form-check mb-2">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Test is Active
+                                </label>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <label for="{{ form.max_attempts.id_for_label }}" class="form-label">Max Attempts</label>
+                                {{ form.max_attempts }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'mocktest:test_list' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Tests
+                        </a>
+                        
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Question Management Sidebar -->
+    <div class="col-lg-4">
+        <!-- Question Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6><i class="fas fa-question-circle"></i> Question Summary</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4 class="text-primary">{{ selected_count }}</h4>
+                        <small>Selected</small>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-secondary">{{ test.total_questions }}</h4>
+                        <small>Required</small>
+                    </div>
+                </div>
+                
+                <div class="progress mt-3">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: {% widthratio selected_count test.total_questions 100 %}%">
+                        {% widthratio selected_count test.total_questions 100 %}%
+                    </div>
+                </div>
+                
+                {% if selected_count < test.total_questions %}
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <small>
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Need {{ test.total_questions|sub:selected_count }} more questions
+                        </small>
+                    </div>
+                {% elif selected_count == test.total_questions %}
+                    <div class="alert alert-success mt-3 mb-0">
+                        <small>
+                            <i class="fas fa-check-circle"></i>
+                            All questions selected!
+                        </small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Question Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6><i class="fas fa-tools"></i> Question Management</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'mocktest:manage_questions' test.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-list"></i> Manage Questions
+                    </a>
+                    
+                    {% if test.question_source == 'Random' %}
+                    <button type="button" class="btn btn-outline-secondary" onclick="regenerateQuestions()">
+                        <i class="fas fa-sync"></i> Regenerate Random
+                    </button>
+                    {% endif %}
+                    
+                    <button type="button" class="btn btn-outline-danger" onclick="clearAllQuestions()">
+                        <i class="fas fa-trash"></i> Clear All Questions
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <h6>Quick Actions</h6>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="exportQuestions()">
+                        <i class="fas fa-download"></i> Export Questions
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="importQuestions()">
+                        <i class="fas fa-upload"></i> Import Questions
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h6><i class="fas fa-chart-bar"></i> Test Statistics</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-8">Created:</div>
+                    <div class="col-4">{{ test.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-8">Last Modified:</div>
+                    <div class="col-4">{{ test.updated_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-8">Created By:</div>
+                    <div class="col-4">{{ test.created_by.email|truncatechars:15 }}</div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-8">Total Attempts:</div>
+                    <div class="col-4">
+                        <span class="badge bg-info">{{ test.testattempt_set.count }}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">Avg Score:</div>
+                    <div class="col-4">
+                        {% with avg_score=test.testattempt_set.all|average:'score' %}
+                            {% if avg_score %}
+                                <span class="badge bg-success">{{ avg_score|floatformat:1 }}%</span>
+                            {% else %}
+                                <span class="badge bg-secondary">N/A</span>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Selected Questions Preview -->
+        {% if selected_questions %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6><i class="fas fa-eye"></i> Selected Questions Preview</h6>
+            </div>
+            <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                {% for tq in selected_questions|slice:":5" %}
+                <div class="border-bottom pb-2 mb-2">
+                    <small class="text-muted">Q{{ tq.order }}</small>
+                    <div class="small">{{ tq.question.question_text|truncatechars:60 }}</div>
+                    <small class="badge bg-light text-dark">{{ tq.question.difficulty }}</small>
+                    {% if tq.question.subject %}
+                        <small class="badge bg-info">{{ tq.question.subject }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                {% if selected_questions.count > 5 %}
+                <div class="text-center">
+                    <small class="text-muted">
+                        ... and {{ selected_questions.count|add:"-5" }} more questions
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Question source change handler
+    const questionSourceSelect = document.getElementById('{{ form.question_source.id_for_label }}');
+    const currentSource = questionSourceSelect.value;
+    
+    questionSourceSelect.addEventListener('change', function() {
+        if (this.value !== currentSource) {
+            if (this.value === 'Random') {
+                if (confirm('Changing to Random will clear current questions and select new ones. Continue?')) {
+                    // Will be handled on form submit
+                } else {
+                    this.value = currentSource;
+                }
+            } else if (this.value === 'Manual') {
+                if (confirm('Changing to Manual will allow you to select questions manually. Continue?')) {
+                    // Will be handled on form submit
+                } else {
+                    this.value = currentSource;
+                }
+            }
+        }
+    });
+    
+    // Total questions change warning
+    const totalQuestionsInput = document.getElementById('{{ form.total_questions.id_for_label }}');
+    const currentTotal = parseInt(totalQuestionsInput.value);
+    
+    totalQuestionsInput.addEventListener('change', function() {
+        const newTotal = parseInt(this.value);
+        const selectedCount = {{ selected_count }};
+        
+        if (newTotal < selectedCount) {
+            if (!confirm(`You currently have ${selectedCount} questions selected, but only want ${newTotal}. This will remove ${selectedCount - newTotal} questions. Continue?`)) {
+                this.value = currentTotal;
+            }
+        }
+    });
+});
+
+// Quick action functions
+function regenerateQuestions() {
+    if (confirm('This will replace all current questions with new random ones. Continue?')) {
+        // Add hidden input to trigger regeneration
+        const form = document.getElementById('editTestForm');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'regenerate_questions';
+        input.value = 'true';
+        form.appendChild(input);
+        form.submit();
+    }
+}
+
+function clearAllQuestions() {
+    if (confirm('This will remove all selected questions from this test. Continue?')) {
+        fetch(`/mocktest/${{{ test.id }}}/clear-questions/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error clearing questions: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error clearing questions. Please try again.');
+        });
+    }
+}
+
+function exportQuestions() {
+    window.open(`/mocktest/${{{ test.id }}}/export-questions/`, '_blank');
+}
+
+function importQuestions() {
+    // Redirect to question management page
+    window.location.href = '{% url "mocktest:manage_questions" test.id %}';
+}
+
+// Form validation
+document.getElementById('editTestForm').addEventListener('submit', function(e) {
+    const totalQuestions = parseInt(document.getElementById('{{ form.total_questions.id_for_label }}').value);
+    const duration = parseInt(document.getElementById('{{ form.duration.id_for_label }}').value);
+    const selectedCount = {{ selected_count }};
+    
+    // Check if question count is realistic
+    if (totalQuestions > 100) {
+        if (!confirm('You have selected more than 100 questions. This might be too long for students. Continue?')) {
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Check duration
+    if (duration > 180) {
+        if (!confirm('Test duration is more than 3 hours. This might be too long. Continue?')) {
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Check if we have enough questions
+    if (selectedCount < totalQuestions && !document.querySelector('input[name="regenerate_questions"]')) {
+        if (!confirm(`You only have ${selectedCount} questions selected but need ${totalQuestions}. The test will be incomplete until you add more questions. Continue?`)) {
+            e.preventDefault();
+            return;
+        }
+    }
+    
+    // Validate dates
+    const startDate = new Date(document.getElementById('{{ form.start_date.id_for_label }}').value);
+    const endDate = new Date(document.getElementById('{{ form.end_date.id_for_label }}').value);
+    
+    if (startDate >= endDate) {
+        alert('End date must be after start date.');
+        e.preventDefault();
+        return;
+    }
+    
+    // Check if test is live and we're making major changes
+    const status = document.getElementById('{{ form.status.id_for_label }}').value;
+    if (status === 'Live' && '{{ test.status }}' === 'Live') {
+        const hasAttempts = {{ test.testattempt_set.count }} > 0;
+        if (hasAttempts) {
+            if (!confirm('This test already has student attempts. Changes might affect ongoing attempts. Continue?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+});
+
+// Auto-save draft functionality
+let autoSaveTimeout;
+function triggerAutoSave() {
+    clearTimeout(autoSaveTimeout);
+    autoSaveTimeout = setTimeout(function() {
+        // Could implement auto-save draft functionality here
+        console.log('Auto-save triggered');
+    }, 5000);
+}
+
+// Trigger auto-save on input changes
+document.querySelectorAll('input, textarea, select').forEach(element => {
+    element.addEventListener('input', triggerAutoSave);
+    element.addEventListener('change', triggerAutoSave);
+});
+
+// Real-time question count validation
+document.getElementById('{{ form.total_questions.id_for_label }}').addEventListener('input', function() {
+    const totalNeeded = parseInt(this.value) || 0;
+    const selectedCount = {{ selected_count }};
+    const progressBar = document.querySelector('.progress-bar');
+    
+    if (totalNeeded > 0) {
+        const percentage = Math.min((selectedCount / totalNeeded) * 100, 100);
+        progressBar.style.width = percentage + '%';
+        progressBar.textContent = percentage.toFixed(0) + '%';
+        
+        // Update alert
+        const alertContainer = document.querySelector('.progress').nextElementSibling;
+        if (selectedCount < totalNeeded) {
+            alertContainer.className = 'alert alert-warning mt-3 mb-0';
+            alertContainer.innerHTML = `<small><i class="fas fa-exclamation-triangle"></i> Need ${totalNeeded - selectedCount} more questions</small>`;
+        } else if (selectedCount === totalNeeded) {
+            alertContainer.className = 'alert alert-success mt-3 mb-0';
+            alertContainer.innerHTML = '<small><i class="fas fa-check-circle"></i> All questions selected!</small>';
+        } else {
+            alertContainer.className = 'alert alert-info mt-3 mb-0';
+            alertContainer.innerHTML = `<small><i class="fas fa-info-circle"></i> ${selectedCount - totalNeeded} extra questions selected</small>`;
+        }
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+        switch(e.key) {
+            case 's':
+                e.preventDefault();
+                document.getElementById('editTestForm').submit();
+                break;
+            case 'p':
+                e.preventDefault();
+                window.open('{% url "mocktest:preview_test" test.id %}', '_blank');
+                break;
+            case 'm':
+                e.preventDefault();
+                window.location.href = '{% url "mocktest:manage_questions" test.id %}';
+                break;
+        }
+    }
+});
+
+// Show keyboard shortcuts help
+function showKeyboardHelp() {
+    alert('Keyboard Shortcuts:\nCtrl+S: Save test\nCtrl+P: Preview test\nCtrl+M: Manage questions');
+}
+
+// Add help button
+document.addEventListener('DOMContentLoaded', function() {
+    const helpButton = document.createElement('button');
+    helpButton.type = 'button';
+    helpButton.className = 'btn btn-link btn-sm position-fixed';
+    helpButton.style.cssText = 'bottom: 20px; right: 20px; z-index: 1000;';
+    helpButton.innerHTML = '<i class="fas fa-keyboard"></i>';
+    helpButton.title = 'Keyboard Shortcuts';
+    helpButton.onclick = showKeyboardHelp;
+    document.body.appendChild(helpButton);
+});
+</script>
+{% endblock %}

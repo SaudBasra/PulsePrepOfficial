@@ -1,0 +1,1896 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Manage CSV</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      
+     <!-- Sidebar Navigation -->
+     <aside class="sidebar">
+      <div class="logo-container">
+        <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+      </div>
+      <nav class="nav-menu">
+        <a href="{% url 'dashboard' %}" class="nav-item">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'questionbank' %}" class="nav-item active">
+          <i class="fas fa-question-circle"></i>
+          <span>Manage Questions</span>
+        </a>
+        <a href="{% url 'managemodule' %}" class="nav-item">
+          <i class="fas fa-cubes"></i>
+          <span>Modules</span>
+        </a>
+        <a href="/admin/user_management/customuser/" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Manage Users</span>
+      </a>
+      <a href="{% url 'mocktest_list' %}" class="nav-item">
+        <i class="fas fa-vial"></i>
+          <span>Mock Tests</span>
+        </a>
+        <a href="{% url 'analytics_report' %}" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics & Reports</span>
+        </a>
+        <a href="{% url 'myaccount' %}" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>My Account</span>
+        </a>
+        <a href="{% url 'notificationsetting' %}" class="nav-item">
+          <i class="fas fa-bell"></i>
+          <span>Notification Settings</span>
+          <span class="notification-badge-sidebar"></span>
+        </a>
+        <a href="{% url 'setting' %}" class="nav-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" class="nav-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>
+            <i class="fas fa-file-csv"></i>
+            Manage CSV
+          </h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- CSV Management Content -->
+        <div class="dashboard-content">
+          <div class="csv-management-container">
+            
+            <!-- Breadcrumb Navigation -->
+            <div class="breadcrumb-nav">
+              <a href="{% url 'questionbank' %}" class="breadcrumb-link">
+                <i class="fas fa-question-circle"></i> Questions
+              </a>
+              <i class="fas fa-chevron-right"></i>
+              <span class="breadcrumb-current">
+                CSV Management
+              </span>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+              <div class="messages">
+                {% for message in messages %}
+                  <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {% if message.tags == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% elif message.tags == 'error' %}
+                      <i class="fas fa-exclamation-circle"></i>
+                    {% elif message.tags == 'warning' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            
+            <!-- CSV Statistics Section -->
+            <div class="csv-stats-section">
+              <h2><i class="fas fa-chart-line"></i> CSV Import Statistics</h2>
+              <p class="section-description">Overview of all CSV import activities and success rates</p>
+              
+              <div class="stats-cards">
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <i class="fas fa-file-upload"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ csv_stats.total_imports|default:"0" }}</h3>
+                    <p>Total Imports</p>
+                  </div>
+                </div>
+                
+                <div class="stat-card success">
+                  <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ csv_stats.successful_imports|default:"0" }}</h3>
+                    <p>Successful</p>
+                  </div>
+                </div>
+                
+                <div class="stat-card failed">
+                  <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ csv_stats.failed_imports|default:"0" }}</h3>
+                    <p>Failed</p>
+                  </div>
+                </div>
+                
+                <div class="stat-card">
+                  <div class="stat-icon">
+                    <i class="fas fa-question-circle"></i>
+                  </div>
+                  <div class="stat-content">
+                    <h3>{{ csv_stats.total_questions_imported|default:"0" }}</h3>
+                    <p>Questions Imported</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="success-rate">
+                <h3><i class="fas fa-trophy"></i> Overall Success Rate</h3>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: {{ csv_stats.success_rate|default:"0" }}%"></div>
+                </div>
+                <span class="rate-text">{{ csv_stats.success_rate|default:"0" }}% Success Rate</span>
+              </div>
+            </div>
+
+            <!-- Quick Actions Section -->
+            <div class="quick-actions-section">
+              <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+              <div class="action-cards">
+                <div class="action-card">
+                  <div class="action-icon">
+                    <i class="fas fa-download"></i>
+                  </div>
+                  <div class="action-content">
+                    <h3>Download Template</h3>
+                    <p>Get a sample CSV file with proper formatting</p>
+                    <button class="action-btn download-template" data-template="basic">
+                      <i class="fas fa-download"></i> Basic Template
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="action-card">
+                  <div class="action-icon">
+                    <i class="fas fa-file-excel"></i>
+                  </div>
+                  <div class="action-content">
+                    <h3>MCQ Template</h3>
+                    <p>Template specifically for multiple choice questions</p>
+                    <button class="action-btn download-template" data-template="mcq">
+                      <i class="fas fa-download"></i> MCQ Template
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="action-card">
+                  <div class="action-icon">
+                    <i class="fas fa-file-export"></i>
+                  </div>
+                  <div class="action-content">
+                    <h3>Export Questions</h3>
+                    <p>Export existing questions to CSV format</p>
+                    <a href="{% url 'export_questions' %}" class="action-btn">
+                      <i class="fas fa-file-export"></i> Export CSV
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Upload New CSV Section -->
+            <div class="upload-section">
+              <h2><i class="fas fa-cloud-upload-alt"></i> Upload New CSV File</h2>
+              <p class="section-description">Bulk import questions from a CSV file with proper validation</p>
+              
+              <div class="upload-area" id="upload-area">
+                <div class="upload-icon">
+                  <i class="fas fa-file-csv"></i>
+                </div>
+                <h3>Drag & Drop CSV File Here</h3>
+                <p>or <button type="button" id="browse-btn" class="browse-link">browse files</button></p>
+                <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+                
+                <div class="file-requirements">
+                  <h4><i class="fas fa-info-circle"></i> CSV Requirements:</h4>
+                  <ul>
+                    <li><strong>File Format:</strong> Must have .csv extension</li>
+                    <li><strong>File Size:</strong> Maximum 10MB allowed</li>
+                    <li><strong>Required Columns:</strong> question_text</li>
+                    <li><strong>MCQ Columns:</strong> option_a, option_b, option_c, option_d, option_e, correct_answer</li>
+                    <li><strong>Classification:</strong> degree, year, block, module, subject, topic, difficulty</li>
+                    <li><strong>Optional:</strong> explanation (recommended for better learning)</li>
+                  </ul>
+                  
+                  <div class="requirement-note">
+                    <i class="fas fa-lightbulb"></i>
+                    <span><strong>Tip:</strong> Use our templates above to ensure proper formatting</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="upload-progress" id="upload-progress" style="display: none;">
+                <div class="progress-container">
+                  <div class="progress-bar">
+                    <div class="progress-fill" id="upload-progress-fill"></div>
+                  </div>
+                  <div class="progress-info">
+                    <span class="progress-text" id="upload-status">Uploading...</span>
+                    <span class="progress-percentage" id="upload-percentage">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Import History Section -->
+            <div class="history-section">
+              <h2><i class="fas fa-history"></i> Import History</h2>
+              <p class="section-description">Track all your CSV import attempts and their results</p>
+              
+              {% if import_history %}
+                <div class="history-controls">
+                  <div class="history-filters">
+                    <select class="filter-select" id="status-filter">
+                      <option value="">All Status</option>
+                      <option value="success">Success Only</option>
+                      <option value="failed">Failed Only</option>
+                      <option value="processing">Processing</option>
+                    </select>
+                    
+                    <input type="date" class="filter-date" id="date-filter" placeholder="Filter by date">
+                  </div>
+                  
+                  <div class="history-actions">
+                    <button class="btn-secondary clear-history" title="Clear All History">
+                      <i class="fas fa-trash"></i> Clear History
+                    </button>
+                  </div>
+                </div>
+              {% endif %}
+              
+              <div class="history-table-container">
+                <table class="history-table">
+                  <thead>
+                    <tr>
+                      <th><i class="fas fa-file"></i> File Details</th>
+                      <th><i class="fas fa-calendar"></i> Upload Date</th>
+                      <th><i class="fas fa-flag"></i> Status</th>
+                      <th><i class="fas fa-list-ol"></i> Total Rows</th>
+                      <th><i class="fas fa-check"></i> Success</th>
+                      <th><i class="fas fa-times"></i> Failed</th>
+                      <th><i class="fas fa-percentage"></i> Success Rate</th>
+                      <th><i class="fas fa-cog"></i> Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for record in import_history %}
+                      <tr class="history-row" data-status="{{ record.status|lower }}">
+                        <td>
+                          <div class="file-info">
+                            <i class="fas fa-file-csv"></i>
+                            <div class="file-details">
+                              <span class="file-name">{{ record.file_name }}</span>
+                              <span class="file-size">{{ record.file_size|filesizeformat|default:"" }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="date-info">
+                            <span class="date">{{ record.uploaded_at|date:"M d, Y" }}</span>
+                            <span class="time">{{ record.uploaded_at|time:"H:i" }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="status-badge {{ record.status|lower }}">
+                            {% if record.status == 'SUCCESS' %}
+                              <i class="fas fa-check"></i> Success
+                            {% elif record.status == 'FAILED' %}
+                              <i class="fas fa-times"></i> Failed
+                            {% else %}
+                              <i class="fas fa-clock"></i> Processing
+                            {% endif %}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="number-badge">{{ record.total_rows|default:"0" }}</span>
+                        </td>
+                        <td class="success-count">{{ record.successful_imports|default:"0" }}</td>
+                        <td class="failed-count">{{ record.failed_imports|default:"0" }}</td>
+                        <td>
+                          <div class="mini-progress">
+                            <div class="mini-progress-bar">
+                              <div class="mini-progress-fill" style="width: {{ record.success_rate|default:"0" }}%"></div>
+                            </div>
+                            <span>{{ record.success_rate|default:"0" }}%</span>
+                          </div>
+                        </td>
+                        <td class="actions">
+                          {% if record.error_details %}
+                            <button class="btn-icon view-errors" data-errors="{{ record.error_details }}" title="View Error Details">
+                              <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                          {% endif %}
+                          {% if record.status == 'SUCCESS' %}
+                            <button class="btn-icon view-details" data-id="{{ record.id }}" title="View Import Details">
+                              <i class="fas fa-eye"></i>
+                            </button>
+                          {% endif %}
+                          <button class="btn-icon download-sample" title="Download Sample CSV">
+                            <i class="fas fa-download"></i>
+                          </button>
+                          <button class="btn-icon delete-record" data-id="{{ record.id }}" title="Delete Record">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="8" class="no-data">
+                          <div class="no-data-content">
+                            <i class="fas fa-file-csv"></i>
+                            <h3>No Import History</h3>
+                            <p>You haven't uploaded any CSV files yet. Start by uploading your first file above.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination for history -->
+              {% if import_history.has_other_pages %}
+                <div class="pagination">
+                  {% if import_history.has_previous %}
+                    <a href="?page=1" class="pagination-link">
+                      <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                    <a href="?page={{ import_history.previous_page_number }}" class="pagination-link">
+                      <i class="fas fa-angle-left"></i> Prev
+                    </a>
+                  {% endif %}
+                  
+                  {% for num in import_history.paginator.page_range %}
+                    {% if import_history.number == num %}
+                      <span class="pagination-link active">{{ num }}</span>
+                    {% elif num > import_history.number|add:'-3' and num < import_history.number|add:'3' %}
+                      <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if import_history.has_next %}
+                    <a href="?page={{ import_history.next_page_number }}" class="pagination-link">
+                      Next <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ import_history.paginator.num_pages }}" class="pagination-link">
+                      Last <i class="fas fa-angle-double-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-exclamation-triangle"></i> Import Errors</h3>
+          <button class="close-modal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="error-content">
+            <p>The following errors occurred during the import process:</p>
+            <pre id="error-details"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-check-circle"></i> Upload Results</h3>
+          <button class="close-modal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="success-details"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-info-circle"></i> Import Details</h3>
+          <button class="close-modal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="details-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('csv-file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressFill = document.getElementById('upload-progress-fill');
+        const uploadStatus = document.getElementById('upload-status');
+        const uploadPercentage = document.getElementById('upload-percentage');
+
+        // Animate sections on page load
+        const sections = document.querySelectorAll('.csv-stats-section, .quick-actions-section, .upload-section, .history-section');
+        sections.forEach((section, index) => {
+          section.style.opacity = '0';
+          section.style.transform = 'translateY(20px)';
+          
+          setTimeout(() => {
+            section.style.transition = 'all 0.5s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+          }, index * 150);
+        });
+
+        // Handle browse button click
+        browseBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('drag-over');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFileUpload(files[0]);
+          }
+        });
+
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            handleFileUpload(e.target.files[0]);
+          }
+        });
+
+        // Handle file upload
+        function handleFileUpload(file) {
+          // Validate file
+          if (!file.name.toLowerCase().endsWith('.csv')) {
+            showNotification('Please select a valid CSV file.', 'error');
+            return;
+          }
+
+          if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            showNotification('File size must be less than 10MB.', 'error');
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('csv_file', file);
+
+          // Show upload progress
+          uploadProgress.style.display = 'block';
+          uploadArea.style.display = 'none';
+          
+          // Simulate progress
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            progressFill.style.width = progress + '%';
+            uploadPercentage.textContent = Math.round(progress) + '%';
+            
+            if (progress >= 90) {
+              clearInterval(progressInterval);
+              uploadStatus.textContent = 'Processing file...';
+            }
+          }, 300);
+
+          // Upload file
+          fetch('{% url "import_questions" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+            uploadPercentage.textContent = '100%';
+            uploadStatus.textContent = 'Complete!';
+            
+            setTimeout(() => {
+              if (data.success) {
+                showUploadResult(data);
+              } else {
+                showError(data.error || 'Unknown error occurred');
+              }
+            }, 500);
+          })
+          .catch(error => {
+            clearInterval(progressInterval);
+            showError('Upload failed: ' + error.message);
+          })
+          .finally(() => {
+            setTimeout(() => {
+              resetUploadArea();
+            }, 2000);
+          });
+        }
+
+        function resetUploadArea() {
+          uploadProgress.style.display = 'none';
+          uploadArea.style.display = 'block';
+          progressFill.style.width = '0%';
+          uploadPercentage.textContent = '0%';
+          uploadStatus.textContent = 'Uploading...';
+          fileInput.value = '';
+        }
+
+        function showUploadResult(data) {
+          const successModal = document.getElementById('success-modal');
+          const successDetails = document.getElementById('success-details');
+          
+          let resultHtml = `
+            <div class="upload-result">
+              <div class="result-header">
+                <i class="fas fa-check-circle result-icon success"></i>
+                <h4>Upload Completed!</h4>
+              </div>
+              
+              <div class="result-summary">
+                <div class="result-stats">
+                  <div class="result-stat">
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Total Rows</span>
+                      <span class="stat-value">${data.total || 0}</span>
+                    </div>
+                  </div>
+                  <div class="result-stat success">
+                    <div class="stat-icon"><i class="fas fa-check"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Successfully Imported</span>
+                      <span class="stat-value">${data.imported || 0}</span>
+                    </div>
+                  </div>
+                  <div class="result-stat failed">
+                    <div class="stat-icon"><i class="fas fa-times"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Failed/Duplicates</span>
+                      <span class="stat-value">${data.failed || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          `;
+          
+          // Show errors if any (including duplicates)
+          if (data.errors && data.errors.length > 0) {
+            resultHtml += `
+              <div class="result-errors">
+                <h5><i class="fas fa-exclamation-triangle"></i> Issues Found (First 10):</h5>
+                <ul class="error-list">
+                  ${data.errors.slice(0, 10).map(error => `<li>${error}</li>`).join('')}
+                </ul>
+                ${data.errors.length > 10 ? `<p class="error-note">... and ${data.errors.length - 10} more issues</p>` : ''}
+                <div class="info-note">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Duplicate questions and errors were automatically skipped to maintain data quality.</span>
+                </div>
+              </div>
+            `;
+          }
+          
+          resultHtml += `
+              <div class="result-actions">
+                <button class="btn-primary" onclick="window.location.reload()">
+                  <i class="fas fa-sync"></i> Refresh Page
+                </button>
+                <a href="{% url 'questionbank' %}" class="btn-secondary">
+                  <i class="fas fa-arrow-left"></i> View Questions
+                </a>
+              </div>
+            </div>
+          `;
+          
+          successDetails.innerHTML = resultHtml;
+          successModal.style.display = 'block';
+        }
+
+        function showError(error) {
+          showNotification(error, 'error');
+        }
+
+        function showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.innerHTML = `
+            <i class="fas fa-${type === 'error' ? 'times-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button class="close-notification">&times;</button>
+          `;
+          
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.classList.add('show');
+          }, 100);
+          
+          // Auto remove after 5 seconds
+          setTimeout(() => {
+            notification.remove();
+          }, 5000);
+          
+          // Manual close
+          notification.querySelector('.close-notification').addEventListener('click', () => {
+            notification.remove();
+          });
+        }
+
+        // Template downloads
+        document.querySelectorAll('.download-template').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const templateType = this.dataset.template;
+            downloadTemplate(templateType);
+          });
+        });
+
+        function downloadTemplate(type) {
+          let csvContent = '';
+          let filename = '';
+          
+          if (type === 'basic') {
+            csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation
+"What is the capital of France?",MCQ,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
+"Explain photosynthesis",SEQ,MBBS,1st,Biology,Botany,Processes,Plants,medium,"Process by which plants make food using sunlight."
+"Types of muscle tissue",NOTE,MBBS,1st,Anatomy,Histology,Tissues,Muscles,Easy,"Study notes on different types of muscle tissue."`;
+            filename = 'question_template_basic.csv';
+          } else if (type === 'mcq') {
+            csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation
+"What is the capital of France?","Paris","London","Berlin","Madrid","Rome",A,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
+"Solve: 2 + 2 = ?","3","4","5","6","7",B,MBBS,1st,Mathematics,Arithmetic,Addition,Easy,"Basic addition problem."
+"Which organ pumps blood?","Heart","Liver","Kidney","Brain","Lung",A,MBBS,1st,Anatomy,Cardiology,Circulation,Heart,Medium,"The heart is the muscular organ that pumps blood throughout the body."`;
+            filename = 'question_template_mcq.csv';
+          }
+          
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          
+          showNotification(`${filename} downloaded successfully!`, 'success');
+        }
+
+        // View errors modal
+        document.querySelectorAll('.view-errors').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const errors = this.dataset.errors;
+            document.getElementById('error-details').textContent = errors;
+            document.getElementById('error-modal').style.display = 'block';
+          });
+        });
+
+        // View details modal
+        document.querySelectorAll('.view-details').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const recordId = this.dataset.id;
+            // You can fetch detailed information here
+            document.getElementById('details-content').innerHTML = `
+              <div class="import-details">
+                <h4>Import Details for Record #${recordId}</h4>
+                <p>Detailed information about this import would be displayed here.</p>
+                <div class="detail-item">
+                  <strong>Processing Time:</strong> <span>2.3 seconds</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Memory Usage:</strong> <span>45.2 MB</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Validation Errors:</strong> <span>None</span>
+                </div>
+              </div>
+            `;
+            document.getElementById('details-modal').style.display = 'block';
+          });
+        });
+
+        // Delete record functionality
+        document.querySelectorAll('.delete-record').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const recordId = this.dataset.id;
+            if (confirm('Are you sure you want to delete this import record?')) {
+              // Here you would make an AJAX call to delete the record
+              showNotification('Import record deleted successfully!', 'success');
+              this.closest('tr').remove();
+            }
+          });
+        });
+
+        // Clear all history
+        document.querySelector('.clear-history')?.addEventListener('click', function() {
+          if (confirm('Are you sure you want to clear all import history? This action cannot be undone.')) {
+            // Here you would make an AJAX call to clear all history
+            showNotification('All import history cleared successfully!', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          }
+        });
+
+        // History filtering
+        const statusFilter = document.getElementById('status-filter');
+        const dateFilter = document.getElementById('date-filter');
+        
+        function filterHistory() {
+          const statusValue = statusFilter?.value.toLowerCase() || '';
+          const dateValue = dateFilter?.value || '';
+          const rows = document.querySelectorAll('.history-row');
+          
+          rows.forEach(row => {
+            const status = row.dataset.status;
+            const dateCell = row.querySelector('.date-info .date');
+            const rowDate = dateCell ? new Date(dateCell.textContent).toISOString().split('T')[0] : '';
+            
+            const statusMatch = !statusValue || status === statusValue;
+            const dateMatch = !dateValue || rowDate === dateValue;
+            
+            if (statusMatch && dateMatch) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        }
+        
+        statusFilter?.addEventListener('change', filterHistory);
+        dateFilter?.addEventListener('change', filterHistory);
+
+        // Close modals
+        document.querySelectorAll('.close-modal').forEach(btn => {
+          btn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+          });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+          if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+          }
+        });
+
+        // Download sample CSV (legacy support)
+        document.querySelectorAll('.download-sample').forEach(btn => {
+          btn.addEventListener('click', function() {
+            downloadTemplate('basic');
+          });
+        });
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+      });
+    </script>
+    <style>
+      /* Additional styles for CSV Management */
+      .section-description {
+        color: #6b7280;
+        font-size: 14px;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      /* Quick Actions Section */
+      .quick-actions-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #10b981;
+      }
+
+      .quick-actions-section h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #10b981;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .action-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .action-card {
+        background: #f9fafb;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+
+      .action-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #10b981;
+      }
+
+      .action-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        color: #10b981;
+        font-size: 20px;
+      }
+
+      .action-content h3 {
+        margin: 0 0 8px 0;
+        color: #1f2937;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .action-content p {
+        margin: 0 0 15px 0;
+        color: #6b7280;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .action-btn {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .action-btn:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      }
+
+      /* Enhanced Upload Area */
+      .upload-area.drag-over {
+        border-color: #82272e;
+        background-color: rgba(130, 39, 46, 0.02);
+        transform: scale(1.02);
+      }
+
+      .requirement-note {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1e40af;
+        font-size: 13px;
+      }
+
+      /* Enhanced Progress */
+      .progress-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .progress-percentage {
+        font-weight: 600;
+        color: #82272e;
+      }
+
+      /* Enhanced History Table */
+      .history-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .history-filters {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .filter-date {
+        padding: 8px 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        font-size: 14px;
+        background: white;
+      }
+
+      .history-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .clear-history {
+        background: #ef4444;
+        color: white;
+        border: none;
+      }
+
+      .clear-history:hover {
+        background: #dc2626;
+      }
+
+      .file-details {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .file-name {
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      .file-size {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .date-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .date {
+        font-weight: 500;
+        color: #1f2937;
+      }
+
+      .time {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .number-badge {
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      .no-data-content {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .no-data-content i {
+        font-size: 48px;
+        color: #d1d5db;
+        margin-bottom: 15px;
+      }
+
+      .no-data-content h3 {
+        margin: 0 0 10px 0;
+        color: #6b7280;
+        font-size: 18px;
+      }
+
+      .no-data-content p {
+        margin: 0;
+        color: #9ca3af;
+        font-size: 14px;
+      }
+
+      /* Modal Enhancements */
+      .modal-content {
+        max-width: 600px;
+        width: 90%;
+      }
+
+      .error-content p {
+        margin-bottom: 15px;
+        color: #6b7280;
+      }
+
+      /* Upload Result Styles */
+      .upload-result {
+        text-align: center;
+      }
+
+      .result-header {
+        margin-bottom: 25px;
+      }
+
+      .result-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+      }
+
+      .result-icon.success {
+        color: #10b981;
+      }
+
+      .result-header h4 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 20px;
+      }
+
+      .result-stats {
+        display: grid;
+        gap: 15px;
+        margin-bottom: 25px;
+      }
+
+      .result-stat {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .result-stat.success {
+        background: rgba(16, 185, 129, 0.05);
+        border-color: #10b981;
+      }
+
+      .result-stat.failed {
+        background: rgba(239, 68, 68, 0.05);
+        border-color: #ef4444;
+      }
+
+      .result-stat .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(130, 39, 46, 0.1);
+        color: #82272e;
+      }
+
+      .result-stat.success .stat-icon {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      .result-stat.failed .stat-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+
+      .stat-info {
+        flex: 1;
+        text-align: left;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 24px;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .result-errors {
+        background: rgba(239, 68, 68, 0.05);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .result-errors h5 {
+        margin: 0 0 15px 0;
+        color: #dc2626;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .error-list {
+        margin: 0 0 10px 0;
+        padding-left: 20px;
+        color: #7f1d1d;
+      }
+
+      .error-list li {
+        margin-bottom: 8px;
+        line-height: 1.4;
+      }
+
+      .error-note {
+        margin: 0;
+        font-style: italic;
+        color: #9ca3af;
+        font-size: 14px;
+      }
+
+      .result-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* Notifications */
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        border-left: 4px solid #6b7280;
+        max-width: 400px;
+      }
+
+      .notification.show {
+        transform: translateX(0);
+      }
+
+      .notification.success {
+        border-left-color: #10b981;
+        color: #059669;
+      }
+
+      .notification.error {
+        border-left-color: #ef4444;
+        color: #dc2626;
+      }
+
+      .notification.info {
+        border-left-color: #3b82f6;
+        color: #2563eb;
+      }
+
+      .close-notification {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #6b7280;
+        margin-left: auto;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .action-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .history-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .history-filters {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .filter-date,
+        .filter-select {
+          width: 100%;
+        }
+
+        .result-actions {
+          flex-direction: column;
+        }
+
+        .result-actions .btn-primary,
+        .result-actions .btn-secondary {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .notification {
+          right: 10px;
+          left: 10px;
+          max-width: none;
+        }
+      }
+
+      /* Add these styles to your CSS file (DAstyles.css or MQstyles.css) */
+
+/* Enhanced result styles */
+.result-errors {
+  margin-top: 20px;
+  padding: 15px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+}
+
+.result-errors h5 {
+  color: #856404;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-list li {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background: #ffeaa7;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #856404;
+  border-left: 3px solid #ffa500;
+}
+
+.error-note {
+  font-style: italic;
+  color: #856404;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.info-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 10px;
+  background: #d1ecf1;
+  border-radius: 6px;
+  border: 1px solid #bee5eb;
+}
+
+.info-note i {
+  color: #0c5460;
+  font-size: 16px;
+}
+
+.info-note span {
+  font-size: 13px;
+  color: #0c5460;
+  font-weight: 500;
+}
+
+/* Enhanced stats display */
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  transition: transform 0.2s ease;
+}
+
+.result-stat:hover {
+  transform: translateY(-2px);
+}
+
+.result-stat .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.result-stat.success {
+  border-left-color: #28a745;
+}
+
+.result-stat.success .stat-icon {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.result-stat.failed {
+  border-left-color: #dc3545;
+}
+
+.result-stat.failed .stat-icon {
+  background: linear-gradient(135deg, #dc3545, #bd2130);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  max-width: 400px;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.error {
+  border-left: 4px solid #dc3545;
+}
+
+.notification.success {
+  border-left: 4px solid #28a745;
+}
+
+.notification.info {
+  border-left: 4px solid #17a2b8;
+}
+
+.notification i {
+  font-size: 18px;
+}
+
+.notification.error i {
+  color: #dc3545;
+}
+
+.notification.success i {
+  color: #28a745;
+}
+
+.notification.info i {
+  color: #17a2b8;
+}
+
+.close-notification {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #6c757d;
+  margin-left: auto;
+  padding: 0;
+}
+
+.close-notification:hover {
+  color: #333;
+}
+
+/* Modal enhancements */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 20px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-modal:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add these styles to your CSS file (DAstyles.css or MQstyles.css) */
+
+/* Enhanced result styles */
+.result-errors {
+  margin-top: 20px;
+  padding: 15px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+}
+
+.result-errors h5 {
+  color: #856404;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-list li {
+  padding: 8px 12px;
+  margin: 5px 0;
+  background: #ffeaa7;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #856404;
+  border-left: 3px solid #ffa500;
+}
+
+.error-note {
+  font-style: italic;
+  color: #856404;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.info-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 10px;
+  background: #d1ecf1;
+  border-radius: 6px;
+  border: 1px solid #bee5eb;
+}
+
+.info-note i {
+  color: #0c5460;
+  font-size: 16px;
+}
+
+.info-note span {
+  font-size: 13px;
+  color: #0c5460;
+  font-weight: 500;
+}
+
+/* Enhanced stats display */
+.result-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  transition: transform 0.2s ease;
+}
+
+.result-stat:hover {
+  transform: translateY(-2px);
+}
+
+.result-stat .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.result-stat.success {
+  border-left-color: #28a745;
+}
+
+.result-stat.success .stat-icon {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.result-stat.failed {
+  border-left-color: #dc3545;
+}
+
+.result-stat.failed .stat-icon {
+  background: linear-gradient(135deg, #dc3545, #bd2130);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Notification styles */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  max-width: 400px;
+}
+
+.notification.show {
+  transform: translateX(0);
+}
+
+.notification.error {
+  border-left: 4px solid #dc3545;
+}
+
+.notification.success {
+  border-left: 4px solid #28a745;
+}
+
+.notification.info {
+  border-left: 4px solid #17a2b8;
+}
+
+.notification i {
+  font-size: 18px;
+}
+
+.notification.error i {
+  color: #dc3545;
+}
+
+.notification.success i {
+  color: #28a745;
+}
+
+.notification.info i {
+  color: #17a2b8;
+}
+
+.close-notification {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #6c757d;
+  margin-left: auto;
+  padding: 0;
+}
+
+.close-notification:hover {
+  color: #333;
+}
+
+/* Modal enhancements */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 20px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-modal:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+    </style>
+  </body>
+</html>

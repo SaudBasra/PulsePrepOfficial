@@ -1,0 +1,304 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - {{ form_title }}</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'questionbank' %}" class="nav-item active">
+            <i class="fas fa-question-circle"></i>
+            <span>Manage Questions</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Modules</span>
+          </a>
+          <a href="{% url 'users' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Manage Users</span>
+          </a>
+          <a href="{% url 'mocktest' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'analytics_report' %}" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics & Reports</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notificationsetting' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notification Settings</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'setting' %}" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>{{ form_title }}</h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Question Management Content -->
+        <div class="dashboard-content">
+          <div class="question-management-container">
+            <section class="questions-section">
+              <h2>{{ form_title }}</h2>
+              
+              {% if messages %}
+                <div class="messages">
+                  {% for message in messages %}
+                    <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                      {{ message }}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <!-- Question Detail Form -->
+              <form method="POST" action="{{ request.path }}">
+                {% csrf_token %}
+                <div class="question-detail-card">
+                  <h3>Question Information</h3>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_question_text">Question Text</label>
+                      {{ form.question_text }}
+                      {% if form.question_text.errors %}
+                        <div class="error-message">{{ form.question_text.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_question_type">Question Type</label>
+                      <div class="select-container">
+                        {{ form.question_type }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.question_type.errors %}
+                        <div class="error-message">{{ form.question_type.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group date-group">
+                      <label for="created-on">Created On</label>
+                      <div class="date-input-container">
+                        <input
+                          type="text"
+                          id="created-on"
+                          value="{% if question %}{{ question.created_on|date:'F j, Y' }}{% else %}{% now 'F j, Y' %}{% endif %}"
+                          readonly
+                          class="form-control"
+                        />
+                        <i class="fas fa-calendar"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MCQ Options Section (will be shown/hidden based on question type) -->
+                  <div id="mcq-options" class="form-row">
+                    <div class="form-group">
+                      <label for="id_option_a">Option A</label>
+                      {{ form.option_a }}
+                      {% if form.option_a.errors %}
+                        <div class="error-message">{{ form.option_a.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_option_b">Option B</label>
+                      {{ form.option_b }}
+                      {% if form.option_b.errors %}
+                        <div class="error-message">{{ form.option_b.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_option_c">Option C</label>
+                      {{ form.option_c }}
+                      {% if form.option_c.errors %}
+                        <div class="error-message">{{ form.option_c.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_option_d">Option D</label>
+                      {{ form.option_d }}
+                      {% if form.option_d.errors %}
+                        <div class="error-message">{{ form.option_d.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_correct_answer">Correct Answer</label>
+                      <div class="select-container">
+                        {{ form.correct_answer }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.correct_answer.errors %}
+                        <div class="error-message">{{ form.correct_answer.errors }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_degree">Degree</label>
+                      <div class="select-container">
+                        {{ form.degree }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.degree.errors %}
+                        <div class="error-message">{{ form.degree.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_year">Year</label>
+                      <div class="select-container">
+                        {{ form.year }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.year.errors %}
+                        <div class="error-message">{{ form.year.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_block">Block</label>
+                      {{ form.block }}
+                      {% if form.block.errors %}
+                        <div class="error-message">{{ form.block.errors }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_module">Module</label>
+                      {{ form.module }}
+                      {% if form.module.errors %}
+                        <div class="error-message">{{ form.module.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_subject">Subject</label>
+                      {{ form.subject }}
+                      {% if form.subject.errors %}
+                        <div class="error-message">{{ form.subject.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_topic">Topic</label>
+                      {{ form.topic }}
+                      {% if form.topic.errors %}
+                        <div class="error-message">{{ form.topic.errors }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_difficulty">Level of difficulty</label>
+                      <div class="select-container">
+                        {{ form.difficulty }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.difficulty.errors %}
+                        <div class="error-message">{{ form.difficulty.errors }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group full-width">
+                      <label for="id_explanation">Explanation</label>
+                      {{ form.explanation }}
+                      {% if form.explanation.errors %}
+                        <div class="error-message">{{ form.explanation.errors }}</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="form-actions">
+                  <a href="{% url 'questionbank' %}" class="cancel-btn">Cancel</a>
+                  <button type="submit" class="save-btn">Save</button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const questionTypeSelect = document.getElementById('id_question_type');
+        const mcqOptionsDiv = document.getElementById('mcq-options');
+        
+        // Show/hide MCQ options based on question type
+        function toggleMcqOptions() {
+          if(questionTypeSelect.value === 'MCQ') {
+            mcqOptionsDiv.style.display = 'flex';
+          } else {
+            mcqOptionsDiv.style.display = 'none';
+          }
+        }
+        
+        // Add event listeners
+        if (questionTypeSelect) {
+          questionTypeSelect.addEventListener('change', toggleMcqOptions);
+          toggleMcqOptions(); // Initialize on page load
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,230 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | PulsePrep Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'dashboard' %}">
+        <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">
+        PulsePrep Administration
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/disable_dark_mode.css' %}">
+<style>
+/* Force disable dark mode */
+:root {
+    --primary: #79aec8;
+    --secondary: #417690;
+    --accent: #f5dd5d;
+    --primary-fg: #fff;
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
+    --header-color: #ffc;
+    --header-branding-color: #f8f8f8;
+    --header-bg: #417690;
+    --header-link-color: #ffc;
+    --breadcrumbs-fg: #c4dce8;
+    --breadcrumbs-link-fg: #fff;
+    --breadcrumbs-bg: var(--primary);
+    --link-fg: #447e9b;
+    --link-hover-color: #036;
+    --link-selected-fg: #5b80b2;
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
+    --error-fg: #ba2121;
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
+    --darkened-bg: #f8f8f8;
+    --selected-bg: #e4e4e4;
+    --selected-row: #ffc;
+    --button-fg: #fff;
+    --button-bg: #79aec8;
+    --button-hover-bg: #609ab6;
+    --default-button-bg: var(--primary);
+    --default-button-hover-bg: var(--secondary);
+    --close-button-bg: #888;
+    --close-button-hover-bg: #747474;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
+    --object-tools-fg: var(--button-fg);
+    --object-tools-bg: var(--close-button-bg);
+    --object-tools-hover-bg: var(--close-button-hover-bg);
+}
+
+/* Force light mode styles */
+html, body {
+    background: #fff !important;
+    color: #333 !important;
+}
+
+/* Ensure all elements use light mode */
+*, *::before, *::after {
+    color-scheme: light !important;
+}
+
+/* Override any dark mode media queries */
+@media (prefers-color-scheme: dark) {
+    html, body {
+        background: #fff !important;
+        color: #333 !important;
+    }
+    
+    .module, .module table {
+        background: #fff !important;
+        color: #333 !important;
+    }
+    
+    input, select, textarea {
+        background: #fff !important;
+        color: #333 !important;
+        border: 1px solid #ccc !important;
+    }
+}
+
+/* Simple color scheme customization */
+#header {
+    background: #82272e !important;
+    color: white !important;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: white !important;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #13406a !important;
+    color: white !important;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #82272e !important;
+    color: white !important;
+    border: none !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: #13406a !important;
+}
+
+.selector-chosen h2 {
+    background: #13406a !important;
+}
+
+.calendar td.selected a {
+    background: #82272e !important;
+}
+
+.timelist a {
+    color: #82272e !important;
+}
+
+#changelist-search .button {
+    background: #82272e !important;
+}
+
+/* Status badges for user approval */
+.field-approval_status {
+    font-weight: bold;
+}
+
+/* Quick navigation buttons */
+.dashboard-shortcuts {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    border-left: 4px solid #82272e;
+}
+
+.dashboard-shortcuts h3 {
+    color: #82272e;
+    margin: 0 0 10px 0;
+}
+
+.quick-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.quick-link {
+    background: #82272e;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.quick-link:hover {
+    background: #13406a;
+    color: white;
+    text-decoration: none;
+}
+
+
+
+
+
+/* Hide the specific theme toggle button */
+button.theme-toggle {
+    display: none !important;
+}
+
+/* Hide by class names from your screenshot */
+.theme-toggle,
+.theme-icon-when-auto,
+.theme-icon-when-light,
+.theme-icon-when-dark,
+.theme-label-when-auto,
+.theme-label-when-light,
+.theme-label-when-dark {
+    display: none !important;
+}
+
+/* Force light mode */
+html {
+    color-scheme: light !important;
+}
+
+body {
+    background: #fff !important;
+    color: #333 !important;
+}
+
+/* Your custom admin colors */
+#header {
+    background: #82272e !important;
+    color: white !important;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: white !important;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #13406a !important;
+    color: white !important;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #82272e !important;
+    color: white !important;
+    border: none !important;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background: #13406a !important;
+}
+
+
+</style>
+{% endblock %}

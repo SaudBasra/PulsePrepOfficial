@@ -1,0 +1,367 @@
+
+
+{% load static %}  <!-- Add this line at the top -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Home Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+  </head>
+  <body>
+
+    <main>
+        {% block content %}
+        <!-- Child templates will insert content here -->
+        {% endblock %}
+    </main>
+
+    <!-- Header -->
+    <header>
+      <div class="header-container">
+        <nav class="nav-menu">
+          <a href="ine.html">Features</a>
+          <a href="aboutUS.html">About Us</a>
+          <a href="contactUS.html">Contact Us</a>
+          <a href="faqs.html">FAQs</a>
+        </nav>
+
+        <div class="logo">
+          <img src="Logo.png" alt="PulsePrep Logo" />
+        </div>
+
+        <div class="auth-buttons">
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="login-btn">Log in</a>
+                <a href="{% url 'signup' %}" class="signup-btn">Sign up</a>
+            {% endif %}
+        </div>
+        
+        <button class="mobile-menu-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1>
+            Master Your Subjects with Interactive MCQs & Personalized Modules!
+          </h1>
+        </div>
+
+        <div class="profile-images">
+          <img
+            src="https://randomuser.me/api/portraits/women/44.jpg"
+            alt="Student"
+            class="profile-img-1"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/men/32.jpg"
+            alt="Student"
+            class="profile-img-2"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/women/68.jpg"
+            alt="Student"
+            class="profile-img-3"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/men/65.jpg"
+            alt="Student"
+            class="profile-img-4"
+          />
+          <img
+            src="https://randomuser.me/api/portraits/women/90.jpg"
+            alt="Student"
+            class="profile-img-5"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about container">
+      <div class="about-content">
+        <h2>About us</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ut
+          pellentesque ipsum. Nulla facilisi. Duis eu arcu quis neque faucibus
+          varius. Vestibulum ante ipsum primis in faucibus orci luctus et
+          ultrices posuere cubilia curae; Suspendisse potenti. Proin dignissim,
+          risus non pulvinar suscipit.
+        </p>
+        <a href="#" class="learn-more">Learn more</a>
+      </div>
+
+      <div class="about-img">
+        <img
+          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60"
+          alt="Student studying"
+        />
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features container">
+      <h2>Features</h2>
+      <div class="features-grid">
+        <div id="blueF" class="feature-card blue">
+          <h3>Feature</h3>
+          <p>
+            Lorem ipsum dolor sit ligula consequat dui semper enim sit ipsum
+            sodales nec.
+          </p>
+          <a href="#" class="details">Details</a>
+          <img
+            src="https://via.placeholder.com/50?text=Icon"
+            alt="Feature icon"
+            class="icon"
+          />
+        </div>
+
+        <div id="pinkF" class="feature-card pink">
+          <h3>Feature</h3>
+          <p>
+            Lorem ipsum dolor sit ligula consequat dui semper enim sit ipsum
+            sodales nec.
+          </p>
+          <a href="#" class="details">Details</a>
+          <img
+            src="https://via.placeholder.com/50?text=Icon"
+            alt="Feature icon"
+            class="icon"
+          />
+        </div>
+
+        <div id="pinkF" class="feature-card pink">
+          <h3>Feature</h3>
+          <p>
+            Lorem ipsum dolor sit ligula consequat dui semper enim sit ipsum
+            sodales nec.
+          </p>
+          <a href="#" class="details">Details</a>
+          <img
+            src="https://via.placeholder.com/50?text=Icon"
+            alt="Feature icon"
+            class="icon"
+          />
+        </div>
+
+        <div id="blueF" class="feature-card blue">
+          <h3>Feature</h3>
+          <p>
+            Lorem ipsum dolor sit ligula consequat dui semper enim sit ipsum
+            sodales nec.
+          </p>
+          <a href="#" class="details">Details</a>
+          <img
+            src="https://via.placeholder.com/50?text=Icon"
+            alt="Feature icon"
+            class="icon"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Efficiency Banner -->
+    <section class="efficiency-banner container">
+      <p>
+        Prepare for exams efficiently with our subject-based quizzes and modules
+      </p>
+      <p>Track your progress and enhance your learning experience</p>
+    </section>
+
+    <!-- Plans Section -->
+    <section class="plans">
+      <div class="container">
+        <h2>Find your perfect plan</h2>
+
+        <div class="plan-cards">
+          <div class="plan-card">
+            <div class="plan-header">
+              <div class="plan-title">MBBS</div>
+              <div class="plan-icon">
+                <i class="fas fa-brain"></i>
+              </div>
+            </div>
+
+            <div class="plan-features">
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>MCQ Library</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Subject Tests</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Progress Tracking</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Study Material</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Mock Exams</span>
+              </div>
+            </div>
+
+            <button class="subscribe-btn">Subscribe Now</button>
+          </div>
+
+          <div class="plan-card">
+            <div class="plan-header">
+              <div class="plan-title">BDS</div>
+              <div class="plan-icon">
+                <i class="fas fa-tooth"></i>
+              </div>
+            </div>
+
+            <div class="plan-features">
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>MCQ Library</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Subject Tests</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Progress Tracking</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Study Material</span>
+              </div>
+              <div class="plan-feature">
+                <i class="fas fa-check"></i>
+                <span>Mock Exams</span>
+              </div>
+            </div>
+
+            <button class="subscribe-btn">Subscribe Now</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits container">
+      <h2>Our benefits</h2>
+
+      <div class="benefits-grid">
+        <div id="blue" class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="benefit-title">Subject-Wise MCQs</div>
+        </div>
+
+        <div id="red" class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="benefit-title">Custom Modules</div>
+        </div>
+
+        <div id="blue" class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="benefit-title">Progress Tracking</div>
+        </div>
+
+        <div id="red" class="benefit-card">
+          <div class="benefit-icon">
+            <i class="fas fa-gamepad"></i>
+          </div>
+          <div class="benefit-title">Easy & Interactive</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Getting Started Section -->
+    <section class="getting-started container">
+      <div class="getting-started-card">
+        <h2>Getting started</h2>
+        <button class="getting-started-btn">Start Now</button>
+      </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter container">
+      <p>Subscribe to our newsletter</p>
+
+      <form class="newsletter-form">
+        <input
+          type="email"
+          class="newsletter-input"
+          placeholder="Enter your email"
+        />
+        <button type="submit" class="newsletter-btn">Subscribe</button>
+      </form>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-container">
+          <div class="footer-logo">
+            <img src="only Name.png" alt="PulsePrep Logo" />
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-links">
+            <div class="footer-column">
+              <h3>Company</h3>
+              <a href="#">About Us</a>
+              <a href="#">Careers</a>
+              <a href="#">Blog</a>
+              <a href="#">Press</a>
+            </div>
+
+            <div class="footer-column">
+              <h3>Resources</h3>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+            </div>
+
+            <div class="footer-column">
+              <h3>Products</h3>
+              <a href="#">MBBS</a>
+              <a href="#">BDS</a>
+              <a href="#">Medical PG</a>
+              <a href="#">NEET</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2025 PulsePrep. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>

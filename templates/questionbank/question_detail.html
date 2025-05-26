@@ -1,0 +1,997 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - {{ form_title|default:"Question Form" }}</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      
+     <!-- Sidebar Navigation -->
+     <aside class="sidebar">
+      <div class="logo-container">
+        <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+      </div>
+      <nav class="nav-menu">
+        <a href="{% url 'dashboard' %}" class="nav-item">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'questionbank' %}" class="nav-item active">
+          <i class="fas fa-question-circle"></i>
+          <span>Manage Questions</span>
+        </a>
+        <a href="{% url 'managemodule' %}" class="nav-item">
+          <i class="fas fa-cubes"></i>
+          <span>Modules</span>
+        </a>
+        <a href="/admin/user_management/customuser/" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Manage Users</span>
+      </a>
+      <a href="{% url 'mocktest_list' %}" class="nav-item">
+        <i class="fas fa-vial"></i>
+          <span>Mock Tests</span>
+        </a>
+        <a href="{% url 'analytics_report' %}" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics & Reports</span>
+        </a>
+        <a href="{% url 'myaccount' %}" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>My Account</span>
+        </a>
+        <a href="{% url 'notificationsetting' %}" class="nav-item">
+          <i class="fas fa-bell"></i>
+          <span>Notification Settings</span>
+          <span class="notification-badge-sidebar"></span>
+        </a>
+        <a href="{% url 'setting' %}" class="nav-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" class="nav-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>
+            <i class="fas fa-{% if question %}edit{% else %}plus{% endif %}"></i>
+            {{ form_title|default:"Question Form" }}
+          </h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Question Management Content -->
+        <div class="dashboard-content">
+          <div class="question-management-container">
+            
+            <!-- Breadcrumb Navigation -->
+            <div class="breadcrumb-nav">
+              <a href="{% url 'questionbank' %}" class="breadcrumb-link">
+                <i class="fas fa-question-circle"></i> Questions
+              </a>
+              <i class="fas fa-chevron-right"></i>
+              <span class="breadcrumb-current">
+                {% if question %}Edit Question{% else %}Add Question{% endif %}
+              </span>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+              <div class="messages">
+                {% for message in messages %}
+                  <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {% if message.tags == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% elif message.tags == 'error' %}
+                      <i class="fas fa-exclamation-circle"></i>
+                    {% elif message.tags == 'warning' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <section class="questions-section">
+              <h2>
+                <i class="fas fa-{% if question %}edit{% else %}plus{% endif %}"></i>
+                {{ form_title|default:"Question Form" }}
+              </h2>
+
+              <!-- Question Detail Form -->
+              <form method="POST" action="{{ request.path }}" class="question-form" novalidate>
+                {% csrf_token %}
+                
+                <!-- Basic Information Card -->
+                <div class="question-detail-card">
+                  <div class="card-header">
+                    <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    <p>Enter the main question details and classification</p>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group full-width">
+                      <label for="id_question_text">
+                        <i class="fas fa-question"></i> Question Text *
+                      </label>
+                      {{ form.question_text }}
+                      {% if form.question_text.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.question_text.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Enter the complete question text that will be displayed to students</div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_question_type">
+                        <i class="fas fa-tag"></i> Question Type *
+                      </label>
+                      <div class="select-container">
+                        {{ form.question_type }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.question_type.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.question_type.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Select the type of question (MCQ, Short Essay, or Notes)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="id_difficulty">
+                        <i class="fas fa-tachometer-alt"></i> Difficulty Level *
+                      </label>
+                      <div class="select-container">
+                        {{ form.difficulty }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.difficulty.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.difficulty.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Choose the difficulty level for this question</div>
+                    </div>
+                    
+                    <div class="form-group date-group">
+                      <label for="created-on">
+                        <i class="fas fa-calendar"></i> Created On
+                      </label>
+                      <div class="date-input-container">
+                        <input
+                          type="text"
+                          id="created-on"
+                          value="{% if question %}{{ question.created_on|date:'F j, Y' }}{% else %}{% now 'F j, Y' %}{% endif %}"
+                          readonly
+                          class="form-control"
+                        />
+                        <i class="fas fa-calendar-alt"></i>
+                      </div>
+                      <div class="help-text">Question creation date</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MCQ Options Card (will be shown/hidden based on question type) -->
+                <div id="mcq-options" class="question-detail-card mcq-options-card">
+                  <div class="card-header">
+                    <h3><i class="fas fa-list-ol"></i> Multiple Choice Options</h3>
+                    <p>Enter all five options and select the correct answer</p>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_option_a">
+                        <span class="option-label">A</span> Option A *
+                      </label>
+                      {{ form.option_a }}
+                      {% if form.option_a.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.option_a.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_option_b">
+                        <span class="option-label">B</span> Option B *
+                      </label>
+                      {{ form.option_b }}
+                      {% if form.option_b.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.option_b.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_option_c">
+                        <span class="option-label">C</span> Option C *
+                      </label>
+                      {{ form.option_c }}
+                      {% if form.option_c.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.option_c.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_option_d">
+                        <span class="option-label">D</span> Option D *
+                      </label>
+                      {{ form.option_d }}
+                      {% if form.option_d.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.option_d.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_option_e">
+                        <span class="option-label">E</span> Option E *
+                      </label>
+                      {{ form.option_e }}
+                      {% if form.option_e.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.option_e.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="form-group">
+                      <label for="id_correct_answer">
+                        <i class="fas fa-check-circle"></i> Correct Answer *
+                      </label>
+                      <div class="select-container">
+                        {{ form.correct_answer }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.correct_answer.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.correct_answer.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Select which option is the correct answer</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Classification Card -->
+                <div class="question-detail-card">
+                  <div class="card-header">
+                    <h3><i class="fas fa-tags"></i> Question Classification</h3>
+                    <p>Categorize the question by academic structure</p>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_degree">
+                        <i class="fas fa-graduation-cap"></i> Degree *
+                      </label>
+                      <div class="select-container">
+                        {{ form.degree }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.degree.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.degree.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Select the degree program (MBBS or BDS)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="id_year">
+                        <i class="fas fa-calendar-check"></i> Year *
+                      </label>
+                      <div class="select-container">
+                        {{ form.year }}
+                        <i class="fas fa-chevron-down"></i>
+                      </div>
+                      {% if form.year.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.year.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Academic year level</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="id_block">
+                        <i class="fas fa-cube"></i> Block
+                      </label>
+                      {{ form.block }}
+                      {% if form.block.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.block.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Academic block or semester</div>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="id_module">
+                        <i class="fas fa-cubes"></i> Module
+                      </label>
+                      {{ form.module }}
+                      {% if form.module.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.module.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Course module or unit</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="id_subject">
+                        <i class="fas fa-book"></i> Subject
+                      </label>
+                      {{ form.subject }}
+                      {% if form.subject.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.subject.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Subject area or discipline</div>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="id_topic">
+                        <i class="fas fa-bookmark"></i> Topic
+                      </label>
+                      {{ form.topic }}
+                      {% if form.topic.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.topic.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Specific topic or chapter</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Explanation Card -->
+                <div class="question-detail-card">
+                  <div class="card-header">
+                    <h3><i class="fas fa-lightbulb"></i> Question Explanation</h3>
+                    <p>Provide detailed explanation for the correct answer</p>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group full-width">
+                      <label for="id_explanation">
+                        <i class="fas fa-comment-alt"></i> Explanation
+                      </label>
+                      {{ form.explanation }}
+                      {% if form.explanation.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.explanation.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Explain why the correct answer is right and provide additional context</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="form-actions">
+                  <a href="{% url 'questionbank' %}" class="cancel-btn">
+                    <i class="fas fa-times"></i> Cancel
+                  </a>
+                  <button type="submit" class="save-btn">
+                    <i class="fas fa-save"></i>
+                    {% if question %}Update Question{% else %}Save Question{% endif %}
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const questionTypeSelect = document.getElementById('id_question_type');
+        const mcqOptionsDiv = document.getElementById('mcq-options');
+        
+        // Show/hide MCQ options based on question type
+        function toggleMcqOptions() {
+          if(questionTypeSelect && mcqOptionsDiv) {
+            if(questionTypeSelect.value === 'MCQ') {
+              mcqOptionsDiv.style.display = 'block';
+              mcqOptionsDiv.style.animation = 'slideIn 0.3s ease';
+              
+              // Make MCQ fields required
+              const mcqInputs = mcqOptionsDiv.querySelectorAll('input, select');
+              mcqInputs.forEach(input => {
+                if(['id_option_a', 'id_option_b', 'id_option_c', 'id_option_d', 'id_option_e', 'id_correct_answer'].includes(input.id)) {
+                  input.required = true;
+                }
+              });
+            } else {
+              mcqOptionsDiv.style.display = 'none';
+              
+              // Remove required attribute from MCQ fields
+              const mcqInputs = mcqOptionsDiv.querySelectorAll('input, select');
+              mcqInputs.forEach(input => {
+                input.required = false;
+              });
+            }
+          }
+        }
+        
+        // Add event listeners
+        if (questionTypeSelect) {
+          questionTypeSelect.addEventListener('change', toggleMcqOptions);
+          toggleMcqOptions(); // Initialize on page load
+        }
+
+        // Form validation and enhancement
+        const form = document.querySelector('.question-form');
+        const submitBtn = document.querySelector('.save-btn');
+        
+        if (form && submitBtn) {
+          // Add loading state on form submission
+          form.addEventListener('submit', function(e) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            // Re-enable after 5 seconds in case of errors
+            setTimeout(() => {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<i class="fas fa-save"></i> {% if question %}Update Question{% else %}Save Question{% endif %}';
+            }, 5000);
+          });
+        }
+
+        // Character counter for question text
+        const questionTextArea = document.getElementById('id_question_text');
+        if (questionTextArea) {
+          const maxLength = questionTextArea.getAttribute('maxlength') || 1000;
+          
+          // Create character counter
+          const counterDiv = document.createElement('div');
+          counterDiv.className = 'char-counter';
+          counterDiv.innerHTML = `<span class="current">0</span>/<span class="max">${maxLength}</span> characters`;
+          questionTextArea.parentNode.appendChild(counterDiv);
+          
+          // Update counter on input
+          questionTextArea.addEventListener('input', function() {
+            const current = this.value.length;
+            const currentSpan = counterDiv.querySelector('.current');
+            currentSpan.textContent = current;
+            
+            // Change color when approaching limit
+            if (current > maxLength * 0.9) {
+              counterDiv.style.color = '#ef4444';
+            } else if (current > maxLength * 0.8) {
+              counterDiv.style.color = '#f59e0b';
+            } else {
+              counterDiv.style.color = '#6b7280';
+            }
+          });
+          
+          // Trigger initial count
+          questionTextArea.dispatchEvent(new Event('input'));
+        }
+
+        // Auto-resize textareas
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+          textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+          });
+          
+          // Set initial height
+          textarea.style.height = textarea.scrollHeight + 'px';
+        });
+
+        // Enhanced form animations
+        const cards = document.querySelectorAll('.question-detail-card');
+        cards.forEach((card, index) => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          
+          setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, index * 150);
+        });
+      });
+    </script>
+    
+    <style>
+      /* NEW: Bulk Actions Styles */
+      .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px 15px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 6px;
+        animation: slideInRight 0.3s ease;
+      }
+
+      .bulk-info {
+        font-size: 14px;
+        font-weight: 600;
+        color: #dc2626;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .bulk-info::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: #dc2626;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      .select-mode-btn {
+        transition: all 0.3s ease;
+      }
+
+      .select-mode-btn.active {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+      }
+
+      /* NEW: Enhanced Checkbox Styles */
+      .checkbox-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        opacity: 0;
+        position: absolute;
+        width: 0;
+        height: 0;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .checkbox-label i {
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.2s ease;
+        color: white;
+        font-size: 12px;
+      }
+
+      .checkbox-container input:checked + .checkbox-label {
+        background: #dc2626;
+        border-color: #dc2626;
+      }
+
+      .checkbox-container input:checked + .checkbox-label i {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .select-column {
+        width: 50px;
+        text-align: center;
+      }
+
+      /* NEW: Row Selection States */
+      .question-row.selected {
+        background: rgba(239, 68, 68, 0.05);
+        border-left: 3px solid #dc2626;
+      }
+
+      .question-row.select-mode {
+        cursor: pointer;
+      }
+
+      .question-row.select-mode:hover {
+        background: rgba(239, 68, 68, 0.02);
+      }
+
+      /* NEW: Button Styles */
+      .btn-danger {
+        background: #dc2626;
+        color: white;
+        border: 2px solid #dc2626;
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        background: #b91c1c;
+        border-color: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+      }
+
+      .btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .deselect-all-btn {
+        background: white;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+      }
+
+      .deselect-all-btn:hover {
+        background: #f9fafb;
+        color: #374151;
+      }
+
+      /* NEW: Bulk Delete Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        overflow: auto;
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        animation: modalFadeIn 0.3s ease;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+      }
+
+      .close-modal:hover {
+        color: #111827;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .bulk-delete-warning {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .warning-icon {
+        text-align: center;
+        font-size: 48px;
+        color: #dc2626;
+        margin-bottom: 10px;
+      }
+
+      .warning-content h4 {
+        color: #dc2626;
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      .warning-content p {
+        color: #374151;
+        margin: 0 0 20px 0;
+        text-align: center;
+        line-height: 1.6;
+      }
+
+      .selected-questions-preview {
+        max-height: 200px;
+        overflow-y: auto;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+      }
+
+      .preview-question {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5e7eb;
+        font-size: 13px;
+      }
+
+      .preview-question:last-child {
+        border-bottom: none;
+      }
+
+      .preview-question-number {
+        background: #dc2626;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .preview-question-text {
+        flex: 1;
+        color: #374151;
+        line-height: 1.4;
+      }
+
+      .warning-checklist {
+        background: rgba(239, 68, 68, 0.05);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 6px;
+        padding: 15px;
+      }
+
+      .warning-checklist h5 {
+        margin: 0 0 10px 0;
+        color: #dc2626;
+        font-size: 14px;
+      }
+
+      .warning-checklist ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #7f1d1d;
+      }
+
+      .warning-checklist li {
+        margin-bottom: 5px;
+        line-height: 1.4;
+      }
+
+      .confirmation-checkbox {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .confirmation-checkbox .checkbox-container {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .confirmation-checkbox .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #e5e7eb;
+        border-radius: 4px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .confirmation-checkbox input[type="checkbox"]:checked + .checkmark {
+        background: #dc2626;
+        border-color: #dc2626;
+      }
+
+      .confirmation-checkbox input[type="checkbox"]:checked + .checkmark::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding: 20px;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      /* NEW: Animations */
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      /* NEW: Responsive Design for Bulk Actions */
+      @media (max-width: 768px) {
+        .bulk-actions {
+          flex-direction: column;
+          gap: 10px;
+          align-items: stretch;
+        }
+
+        .bulk-info {
+          justify-content: center;
+        }
+
+        .modal-footer {
+          flex-direction: column;
+        }
+
+        .modal-footer .btn-danger,
+        .modal-footer .btn-secondary {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .bulk-actions {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: white;
+          border-top: 2px solid #dc2626;
+          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+          padding: 15px;
+          z-index: 100;
+          margin: 0;
+          border-radius: 0;
+        }
+        
+        .questions-section {
+          padding-bottom: 80px;
+        }
+      }
+    </style>
+  </body>
+</html>

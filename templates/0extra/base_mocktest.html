@@ -1,0 +1,341 @@
+<!-- templates/mocktest/base_mocktest.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mock Tests{% endblock %} - PulsePrep</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .test-card {
+            transition: transform 0.2s;
+            border-left: 4px solid #007bff;
+            margin-bottom: 1rem;
+        }
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
+        .question-counter {
+            background: #f8f9fa;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+        .timer-display {
+            background: #dc3545;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .question-nav {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .question-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px;
+            cursor: pointer;
+            border: 2px solid #dee2e6;
+            background: white;
+            color: #333;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .question-number:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+        .question-number.answered {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .question-number.current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .fullscreen-test {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10000;
+            overflow-y: auto;
+        }
+        .test-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Additional styles for better UX */
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .alert {
+            border-radius: 8px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .btn {
+            border-radius: 6px;
+        }
+        
+        .form-control {
+            border-radius: 6px;
+        }
+        
+        /* Test mode specific styles */
+        .test-mode {
+            background: #f8f9fa;
+        }
+        
+        .test-mode .card {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .timer-display {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+            
+            .question-nav {
+                max-height: 150px;
+            }
+            
+            .question-number {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if not is_test_mode %}
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-stethoscope"></i> PulsePrep
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    {% if user.is_admin %}
+                        <a class="nav-link" href="{% url 'mocktest:test_list' %}">
+                            <i class="fas fa-clipboard-list"></i> Manage Tests
+                        </a>
+                        <a class="nav-link" href="/dashboard/">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+
+                    {% else %}
+                        <a class="nav-link" href="/dashboard/">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    {% endif %}
+                    <a class="nav-link" href="/logout/">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                {% else %}
+                    <a class="nav-link" href="/login/">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="{% if not is_test_mode %}container mt-4{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Global JavaScript functions and variables
+        let isTestMode = {% if is_test_mode %}true{% else %}false{% endif %};
+        
+        // Disable right-click in test mode
+        {% if is_test_mode %}
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // Disable common shortcuts in test mode
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S, etc.
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.key === 'u') ||
+                (e.ctrlKey && e.key === 's') ||
+                (e.ctrlKey && e.key === 'a') ||
+                (e.ctrlKey && e.key === 'c') ||
+                (e.ctrlKey && e.key === 'v') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                e.key === 'F5' ||
+                (e.ctrlKey && e.key === 'r')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Fullscreen enforcement
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Auto-enter fullscreen on test start
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.body.classList.contains('test-mode')) {
+                setTimeout(enterFullscreen, 500);
+            }
+        });
+
+        // Warning on fullscreen exit during test
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement && document.body.classList.contains('test-mode')) {
+                setTimeout(function() {
+                    if (!document.fullscreenElement) {
+                        alert('⚠️ Please stay in fullscreen mode during the test for security reasons!');
+                        enterFullscreen();
+                    }
+                }, 1000);
+            }
+        });
+
+        // Prevent tab switching during test
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && isTestMode) {
+                console.warn('Tab switch detected during test');
+                // Could implement warning system here
+            }
+        });
+        {% endif %}
+
+        // General utility functions
+        function showAlert(message, type = 'info') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            const container = document.querySelector('.container') || document.querySelector('main');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(function() {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+
+        // Form validation helpers
+        function validateForm(formElement) {
+            const requiredFields = formElement.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Auto-dismiss alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-dismiss success messages after 5 seconds
+            const successAlerts = document.querySelectorAll('.alert-success');
+            successAlerts.forEach(alert => {
+                setTimeout(function() {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

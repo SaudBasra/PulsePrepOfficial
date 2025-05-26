@@ -1,0 +1,760 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Manage Questions</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      
+     <!-- Sidebar Navigation -->
+     <aside class="sidebar">
+      <div class="logo-container">
+        <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+      </div>
+      <nav class="nav-menu">
+        <a href="{% url 'dashboard' %}" class="nav-item">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'questionbank' %}" class="nav-item active">
+          <i class="fas fa-question-circle"></i>
+          <span>Manage Questions</span>
+        </a>
+        <a href="{% url 'managemodule' %}" class="nav-item">
+          <i class="fas fa-cubes"></i>
+          <span>Modules</span>
+        </a>
+        <a href="/admin/user_management/customuser/" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Manage Users</span>
+      </a>
+      <a href="{% url 'mocktest_list' %}" class="nav-item">
+        <i class="fas fa-vial"></i>
+          <span>Mock Tests</span>
+        </a>
+        <a href="{% url 'analytics_report' %}" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics & Reports</span>
+        </a>
+        <a href="{% url 'myaccount' %}" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>My Account</span>
+        </a>
+        <a href="{% url 'notificationsetting' %}" class="nav-item">
+          <i class="fas fa-bell"></i>
+          <span>Notification Settings</span>
+          <span class="notification-badge-sidebar"></span>
+        </a>
+        <a href="{% url 'setting' %}" class="nav-item">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" class="nav-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Manage Questions</h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Question Management Content -->
+        <div class="dashboard-content">
+          <div class="question-management-container">
+            
+            <!-- Analytics Section -->
+            <div class="analytics-section">
+              <h2><i class="fas fa-chart-bar"></i> Question Analytics</h2>
+              <div class="analytics-cards">
+                <div class="analytics-card">
+                  <div class="card-icon">
+                    <i class="fas fa-question-circle"></i>
+                  </div>
+                  <div class="card-content">
+                    <h3>{{ analytics.total_questions|default:"0" }}</h3>
+                    <p>Total Questions</p>
+                  </div>
+                </div>
+                
+                <div class="analytics-card">
+                  <div class="card-icon">
+                    <i class="fas fa-plus-circle"></i>
+                  </div>
+                  <div class="card-content">
+                    <h3>{{ analytics.recent_count|default:"0" }}</h3>
+                    <p>Added This Week</p>
+                  </div>
+                </div>
+                
+                <div class="analytics-card">
+                  <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                  </div>
+                  <div class="card-content">
+                    <h3>{{ analytics.by_degree.MBBS|default:"0" }}</h3>
+                    <p>MBBS Questions</p>
+                  </div>
+                </div>
+                
+                <div class="analytics-card">
+                  <div class="card-icon">
+                    <i class="fas fa-tooth"></i>
+                  </div>
+                  <div class="card-content">
+                    <h3>{{ analytics.by_degree.BDS|default:"0" }}</h3>
+                    <p>BDS Questions</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Difficulty Distribution -->
+              <div class="difficulty-stats">
+                <h3><i class="fas fa-tachometer-alt"></i> Difficulty Distribution</h3>
+                <div class="difficulty-bars">
+                  <div class="difficulty-item">
+                    <span class="difficulty-label">Easy</span>
+                    <div class="difficulty-bar">
+                      <div class="difficulty-fill easy" style="width: {% if analytics.total_questions > 0 %}{% widthratio analytics.by_difficulty.Easy analytics.total_questions 100 %}{% else %}0{% endif %}%"></div>
+                    </div>
+                    <span class="difficulty-count">{{ analytics.by_difficulty.Easy|default:"0" }}</span>
+                  </div>
+                  <div class="difficulty-item">
+                    <span class="difficulty-label">Medium</span>
+                    <div class="difficulty-bar">
+                      <div class="difficulty-fill medium" style="width: {% if analytics.total_questions > 0 %}{% widthratio analytics.by_difficulty.Medium analytics.total_questions 100 %}{% else %}0{% endif %}%"></div>
+                    </div>
+                    <span class="difficulty-count">{{ analytics.by_difficulty.Medium|default:"0" }}</span>
+                  </div>
+                  <div class="difficulty-item">
+                    <span class="difficulty-label">Hard</span>
+                    <div class="difficulty-bar">
+                      <div class="difficulty-fill hard" style="width: {% if analytics.total_questions > 0 %}{% widthratio analytics.by_difficulty.Hard analytics.total_questions 100 %}{% else %}0{% endif %}%"></div>
+                    </div>
+                    <span class="difficulty-count">{{ analytics.by_difficulty.Hard|default:"0" }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Question Bank Controls -->
+            <div class="question-bank-controls">
+              <div class="controls-left">
+                <form method="GET" action="{% url 'questionbank' %}" class="search-form">
+                  <div class="search-container">
+                    <input
+                      type="text"
+                      placeholder="Search questions..."
+                      class="search-input"
+                      name="q"
+                      value="{{ query|default:'' }}"
+                    />
+                    <button type="submit" class="search-button">
+                      <i class="fas fa-search search-icon"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="filter-container">
+                    <select class="filter-select" name="degree" onchange="this.form.submit()">
+                      <option value="" {% if not filter_degree %}selected{% endif %}>All Degrees</option>
+                      {% for value, label in degree_choices %}
+                        <option value="{{ value }}" {% if filter_degree == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="filter-container">
+                    <select class="filter-select" name="difficulty" onchange="this.form.submit()">
+                      <option value="" {% if not filter_difficulty %}selected{% endif %}>All Difficulties</option>
+                      {% for value, label in difficulty_choices %}
+                        <option value="{{ value }}" {% if filter_difficulty == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  
+                  <div class="filter-container">
+                    <select class="filter-select" name="type" onchange="this.form.submit()">
+                      <option value="" {% if not filter_type %}selected{% endif %}>All Types</option>
+                      {% for value, label in type_choices %}
+                        <option value="{{ value }}" {% if filter_type == value %}selected{% endif %}>{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </form>
+              </div>
+              
+              <div class="controls-right">
+                <a href="{% url 'manage_csv' %}" class="btn-secondary">
+                  <i class="fas fa-file-csv"></i> Manage CSV
+                </a>
+                <a href="{% url 'add_question' %}" class="btn-primary">
+                  <i class="fas fa-plus"></i> Add Question
+                </a>
+              </div>
+            </div>
+            
+            <!-- Messages -->
+            {% if messages %}
+              <div class="messages">
+                {% for message in messages %}
+                  <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {% if message.tags == 'success' %}
+                      <i class="fas fa-check-circle"></i>
+                    {% elif message.tags == 'error' %}
+                      <i class="fas fa-exclamation-circle"></i>
+                    {% elif message.tags == 'warning' %}
+                      <i class="fas fa-exclamation-triangle"></i>
+                    {% else %}
+                      <i class="fas fa-info-circle"></i>
+                    {% endif %}
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            
+            <!-- Questions Section -->
+            <section class="questions-section">
+              <h2><i class="fas fa-list"></i> Questions</h2>
+
+              <!-- Question List -->
+              <div class="question-list">
+                <table class="questions-table">
+                  <thead>
+                    <tr>
+                      <th><i class="fas fa-question"></i> Question Text</th>
+                      <th><i class="fas fa-tag"></i> Type</th>
+                      <th><i class="fas fa-graduation-cap"></i> Degree</th>
+                      <th><i class="fas fa-cube"></i> Block</th>
+                      <th><i class="fas fa-tachometer-alt"></i> Difficulty</th>
+                      <th><i class="fas fa-cog"></i> Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for question in page_obj %}
+                      <tr>
+                        <td>
+                          <span title="{{ question.question_text }}">
+                            {{ question.question_text|truncatechars:60 }}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="type-badge">
+                            {{ question.get_question_type_display }}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="degree-badge">
+                            {{ question.degree }}
+                          </span>
+                        </td>
+                        <td>{{ question.block|default:"-" }}</td>
+                        <td>
+                          <span class="difficulty-badge {{ question.difficulty|lower }}">
+                            {{ question.difficulty }}
+                          </span>
+                        </td>
+                        <td class="actions">
+                          <a href="{% url 'edit_question' question.id %}" class="btn-icon" title="Edit Question">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                          <a href="{% url 'delete_question' question.id %}" class="btn-icon" title="Delete Question">
+                            <i class="fas fa-trash"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    {% empty %}
+                      <tr>
+                        <td colspan="6" class="no-data">
+                          <i class="fas fa-search"></i>
+                          <p>No questions found matching your criteria.</p>
+                          <p>Try adjusting your search or filters.</p>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination -->
+              {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                  {% if page_obj.has_previous %}
+                    <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if filter_degree %}&degree={{ filter_degree }}{% endif %}{% if filter_difficulty %}&difficulty={{ filter_difficulty }}{% endif %}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="pagination-link">
+                      <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if filter_degree %}&degree={{ filter_degree }}{% endif %}{% if filter_difficulty %}&difficulty={{ filter_difficulty }}{% endif %}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="pagination-link">
+                      <i class="fas fa-angle-left"></i> Prev
+                    </a>
+                  {% endif %}
+                  
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                      <span class="pagination-link active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                      <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if filter_degree %}&degree={{ filter_degree }}{% endif %}{% if filter_difficulty %}&difficulty={{ filter_difficulty }}{% endif %}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="pagination-link">{{ num }}</a>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if filter_degree %}&degree={{ filter_degree }}{% endif %}{% if filter_difficulty %}&difficulty={{ filter_difficulty }}{% endif %}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="pagination-link">
+                      Next <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if filter_degree %}&degree={{ filter_degree }}{% endif %}{% if filter_difficulty %}&difficulty={{ filter_difficulty }}{% endif %}{% if filter_type %}&type={{ filter_type }}{% endif %}" class="pagination-link">
+                      Last <i class="fas fa-angle-double-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              <!-- Results Info -->
+              {% if page_obj %}
+                <div class="results-info">
+                  <p>
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} questions
+                    {% if query %} for "{{ query }}"{% endif %}
+                    {% if filter_degree or filter_difficulty or filter_type %}
+                      with filters applied
+                    {% endif %}
+                  </p>
+                </div>
+              {% endif %}
+            </section>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('csv-file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressFill = document.getElementById('upload-progress-fill');
+        const uploadStatus = document.getElementById('upload-status');
+        const uploadPercentage = document.getElementById('upload-percentage');
+
+        // Animate sections on page load
+        const sections = document.querySelectorAll('.csv-stats-section, .quick-actions-section, .upload-section, .history-section');
+        sections.forEach((section, index) => {
+          section.style.opacity = '0';
+          section.style.transform = 'translateY(20px)';
+          
+          setTimeout(() => {
+            section.style.transition = 'all 0.5s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+          }, index * 150);
+        });
+
+        // Handle browse button click
+        browseBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.classList.remove('drag-over');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFileUpload(files[0]);
+          }
+        });
+
+        // Handle file input change
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            handleFileUpload(e.target.files[0]);
+          }
+        });
+
+        // Handle file upload
+        function handleFileUpload(file) {
+          // Validate file
+          if (!file.name.toLowerCase().endsWith('.csv')) {
+            showNotification('Please select a valid CSV file.', 'error');
+            return;
+          }
+
+          if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            showNotification('File size must be less than 10MB.', 'error');
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('csv_file', file);
+
+          // Show upload progress
+          uploadProgress.style.display = 'block';
+          uploadArea.style.display = 'none';
+          
+          // Simulate progress
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            
+            progressFill.style.width = progress + '%';
+            uploadPercentage.textContent = Math.round(progress) + '%';
+            
+            if (progress >= 90) {
+              clearInterval(progressInterval);
+              uploadStatus.textContent = 'Processing file...';
+            }
+          }, 300);
+
+          // Upload file
+          fetch('{% url "import_questions" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+            uploadPercentage.textContent = '100%';
+            uploadStatus.textContent = 'Complete!';
+            
+            setTimeout(() => {
+              if (data.success) {
+                showUploadResult(data);
+              } else {
+                showError(data.error || 'Unknown error occurred');
+              }
+            }, 500);
+          })
+          .catch(error => {
+            clearInterval(progressInterval);
+            showError('Upload failed: ' + error.message);
+          })
+          .finally(() => {
+            setTimeout(() => {
+              resetUploadArea();
+            }, 2000);
+          });
+        }
+
+        function resetUploadArea() {
+          uploadProgress.style.display = 'none';
+          uploadArea.style.display = 'block';
+          progressFill.style.width = '0%';
+          uploadPercentage.textContent = '0%';
+          uploadStatus.textContent = 'Uploading...';
+          fileInput.value = '';
+        }
+
+        function showUploadResult(data) {
+          const successModal = document.getElementById('success-modal');
+          const successDetails = document.getElementById('success-details');
+          
+          let resultHtml = `
+            <div class="upload-result">
+              <div class="result-header">
+                <i class="fas fa-check-circle result-icon success"></i>
+                <h4>Upload Completed!</h4>
+              </div>
+              
+              <div class="result-summary">
+                <div class="result-stats">
+                  <div class="result-stat">
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Total Rows</span>
+                      <span class="stat-value">${data.total || 0}</span>
+                    </div>
+                  </div>
+                  <div class="result-stat success">
+                    <div class="stat-icon"><i class="fas fa-check"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Successfully Imported</span>
+                      <span class="stat-value">${data.imported || 0}</span>
+                    </div>
+                  </div>
+                  <div class="result-stat failed">
+                    <div class="stat-icon"><i class="fas fa-times"></i></div>
+                    <div class="stat-info">
+                      <span class="stat-label">Failed/Duplicates</span>
+                      <span class="stat-value">${data.failed || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          `;
+          
+          // Show errors if any (including duplicates)
+          if (data.errors && data.errors.length > 0) {
+            resultHtml += `
+              <div class="result-errors">
+                <h5><i class="fas fa-exclamation-triangle"></i> Issues Found (First 10):</h5>
+                <ul class="error-list">
+                  ${data.errors.slice(0, 10).map(error => `<li>${error}</li>`).join('')}
+                </ul>
+                ${data.errors.length > 10 ? `<p class="error-note">... and ${data.errors.length - 10} more issues</p>` : ''}
+                <div class="info-note">
+                  <i class="fas fa-info-circle"></i>
+                  <span>Duplicate questions and errors were automatically skipped to maintain data quality.</span>
+                </div>
+              </div>
+            `;
+          }
+          
+          resultHtml += `
+              <div class="result-actions">
+                <button class="btn-primary" onclick="window.location.reload()">
+                  <i class="fas fa-sync"></i> Refresh Page
+                </button>
+                <a href="{% url 'questionbank' %}" class="btn-secondary">
+                  <i class="fas fa-arrow-left"></i> View Questions
+                </a>
+              </div>
+            </div>
+          `;
+          
+          successDetails.innerHTML = resultHtml;
+          successModal.style.display = 'block';
+        }
+
+        function showError(error) {
+          showNotification(error, 'error');
+        }
+
+        function showNotification(message, type = 'info') {
+          const notification = document.createElement('div');
+          notification.className = `notification ${type}`;
+          notification.innerHTML = `
+            <i class="fas fa-${type === 'error' ? 'times-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button class="close-notification">&times;</button>
+          `;
+          
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.classList.add('show');
+          }, 100);
+          
+          // Auto remove after 5 seconds
+          setTimeout(() => {
+            notification.remove();
+          }, 5000);
+          
+          // Manual close
+          notification.querySelector('.close-notification').addEventListener('click', () => {
+            notification.remove();
+          });
+        }
+
+        // Template downloads
+        document.querySelectorAll('.download-template').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const templateType = this.dataset.template;
+            downloadTemplate(templateType);
+          });
+        });
+
+        function downloadTemplate(type) {
+          let csvContent = '';
+          let filename = '';
+          
+          if (type === 'basic') {
+            csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation
+"What is the capital of France?",MCQ,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
+"Explain photosynthesis",SEQ,MBBS,1st,Biology,Botany,Processes,Plants,medium,"Process by which plants make food using sunlight."
+"Types of muscle tissue",NOTE,MBBS,1st,Anatomy,Histology,Tissues,Muscles,Easy,"Study notes on different types of muscle tissue."`;
+            filename = 'question_template_basic.csv';
+          } else if (type === 'mcq') {
+            csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation
+"What is the capital of France?","Paris","London","Berlin","Madrid","Rome",A,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
+"Solve: 2 + 2 = ?","3","4","5","6","7",B,MBBS,1st,Mathematics,Arithmetic,Addition,Easy,"Basic addition problem."
+"Which organ pumps blood?","Heart","Liver","Kidney","Brain","Lung",A,MBBS,1st,Anatomy,Cardiology,Circulation,Heart,Medium,"The heart is the muscular organ that pumps blood throughout the body."`;
+            filename = 'question_template_mcq.csv';
+          }
+          
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          
+          showNotification(`${filename} downloaded successfully!`, 'success');
+        }
+
+        // View errors modal
+        document.querySelectorAll('.view-errors').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const errors = this.dataset.errors;
+            document.getElementById('error-details').textContent = errors;
+            document.getElementById('error-modal').style.display = 'block';
+          });
+        });
+
+        // View details modal
+        document.querySelectorAll('.view-details').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const recordId = this.dataset.id;
+            // You can fetch detailed information here
+            document.getElementById('details-content').innerHTML = `
+              <div class="import-details">
+                <h4>Import Details for Record #${recordId}</h4>
+                <p>Detailed information about this import would be displayed here.</p>
+                <div class="detail-item">
+                  <strong>Processing Time:</strong> <span>2.3 seconds</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Memory Usage:</strong> <span>45.2 MB</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Validation Errors:</strong> <span>None</span>
+                </div>
+              </div>
+            `;
+            document.getElementById('details-modal').style.display = 'block';
+          });
+        });
+
+        // Delete record functionality
+        document.querySelectorAll('.delete-record').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const recordId = this.dataset.id;
+            if (confirm('Are you sure you want to delete this import record?')) {
+              // Here you would make an AJAX call to delete the record
+              showNotification('Import record deleted successfully!', 'success');
+              this.closest('tr').remove();
+            }
+          });
+        });
+
+        // Clear all history
+        document.querySelector('.clear-history')?.addEventListener('click', function() {
+          if (confirm('Are you sure you want to clear all import history? This action cannot be undone.')) {
+            // Here you would make an AJAX call to clear all history
+            showNotification('All import history cleared successfully!', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1500);
+          }
+        });
+
+        // History filtering
+        const statusFilter = document.getElementById('status-filter');
+        const dateFilter = document.getElementById('date-filter');
+        
+        function filterHistory() {
+          const statusValue = statusFilter?.value.toLowerCase() || '';
+          const dateValue = dateFilter?.value || '';
+          const rows = document.querySelectorAll('.history-row');
+          
+          rows.forEach(row => {
+            const status = row.dataset.status;
+            const dateCell = row.querySelector('.date-info .date');
+            const rowDate = dateCell ? new Date(dateCell.textContent).toISOString().split('T')[0] : '';
+            
+            const statusMatch = !statusValue || status === statusValue;
+            const dateMatch = !dateValue || rowDate === dateValue;
+            
+            if (statusMatch && dateMatch) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        }
+        
+        statusFilter?.addEventListener('change', filterHistory);
+        dateFilter?.addEventListener('change', filterHistory);
+
+        // Close modals
+        document.querySelectorAll('.close-modal').forEach(btn => {
+          btn.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+          });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+          if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+          }
+        });
+
+        // Download sample CSV (legacy support)
+        document.querySelectorAll('.download-sample').forEach(btn => {
+          btn.addEventListener('click', function() {
+            downloadTemplate('basic');
+          });
+        });
+
+        // Get CSRF token from cookies
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+      });
+    </script>
+    </body>
+</html>

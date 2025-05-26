@@ -1,0 +1,138 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'PulsePrep Administration' %}</h1>
+
+<!-- Quick Navigation -->
+<div class="dashboard-shortcuts">
+    <h3>Quick Navigation</h3>
+    <div class="quick-links">
+        <a href="{% url 'dashboard' %}" class="quick-link">
+            <i class="fas fa-th-large"></i> Main Dashboard
+        </a>
+        <a href="{% url 'questionbank' %}" class="quick-link">
+            <i class="fas fa-question-circle"></i> Manage Questions
+        </a>
+        <a href="{% url 'managemodule' %}" class="quick-link">
+            <i class="fas fa-cubes"></i> Modules
+        </a>
+        <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="quick-link">
+            <i class="fas fa-user-clock"></i> Pending Approvals
+        </a>
+        <a href="{% url 'mocktest_list' %}" class="quick-link">
+            <i class="fas fa-vial"></i> Mock Tests
+        </a>
+        <a href="{% url 'analytics_report' %}" class="quick-link">
+            <i class="fas fa-chart-bar"></i> Analytics
+        </a>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="dashboard-shortcuts">
+    <h3>Quick Stats</h3>
+    <p>
+        <strong>Total Users:</strong> {{ total_users|default:"0" }} | 
+        <strong>Pending Approvals:</strong> {{ pending_users|default:"0" }} | 
+        <strong>Total Questions:</strong> {{ total_questions|default:"0" }}
+    </p>
+</div>
+
+<!-- Default Django Admin Apps -->
+{% if app_list %}
+    {% for app in app_list %}
+        <div class="app-{{ app.app_label }} module">
+            <table>
+                <caption>
+                    <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
+                </caption>
+                {% for model in app.models %}
+                    <tr class="model-{{ model.object_name|lower }}">
+                        {% if model.admin_url %}
+                            <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                        {% else %}
+                            <th scope="row">{{ model.name }}</th>
+                        {% endif %}
+
+                        {% if model.add_url %}
+                            <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+
+                        {% if model.admin_url %}
+                            {% if model.view_only %}
+                                <td><a href="{{ model.admin_url }}" class="viewlink">{% trans 'View' %}</a></td>
+                            {% else %}
+                                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+                            {% endif %}
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>{% trans "You don't have permission to view or edit anything." %}</p>
+{% endif %}
+
+<script>
+// Remove dark mode toggle button
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove theme toggle buttons
+    const themeToggles = document.querySelectorAll(
+        '#theme-toggle, .theme-toggle, [data-theme-toggle], .dark-mode-toggle, ' +
+        'button[aria-label*="theme"], button[title*="theme"], button[class*="theme"], ' +
+        'a[class*="theme"], .toggle[class*="theme"], ' +
+        'button[aria-label*="Dark"], button[aria-label*="Light"]'
+    );
+    
+    themeToggles.forEach(function(element) {
+        element.remove();
+    });
+    
+    // Also check for dynamically added toggles
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.nodeType === 1) { // Element node
+                    const toggles = node.querySelectorAll(
+                        '#theme-toggle, .theme-toggle, [data-theme-toggle], .dark-mode-toggle'
+                    );
+                    toggles.forEach(function(toggle) {
+                        toggle.remove();
+                    });
+                }
+            });
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    console.log('PulsePrep Admin loaded - Theme toggle removed');
+});
+
+// Nuclear approach - remove ANY button with moon/sun icons
+setInterval(function() {
+    const buttons = document.querySelectorAll('button, a');
+    buttons.forEach(btn => {
+        const hasThemeIcon = btn.innerHTML.includes('moon') || 
+                           btn.innerHTML.includes('sun') || 
+                           btn.innerHTML.includes('theme') ||
+                           btn.classList.toString().includes('theme') ||
+                           btn.classList.toString().includes('dark') ||
+                           btn.classList.toString().includes('light');
+        if (hasThemeIcon) {
+            btn.remove();
+        }
+    });
+}, 500); // Check every 500ms
+</script>
+{% endblock %}

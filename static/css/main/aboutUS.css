@@ -1,0 +1,628 @@
+/* Hero Section */
+.heroo {
+  text-align: center;
+  padding: 60px 0 40px;
+}
+
+.heroo h1 {
+  color: #092c47;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  max-width: 700px;
+  margin: 0 auto 30px;
+  line-height: 1.3;
+}
+
+.heroo-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.btn {
+  padding: 10px 25px;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.btn-outline {
+  border: 1px solid #82272e;
+  color: #82272e;
+  background-color: transparent;
+}
+
+.btn-outline:hover {
+  background-color: #f5f5f5;
+  border: 1px solid #82272e;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background-color: #82272e;
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  font-size: 16px;
+  background-color: #82272e;
+}
+
+.heroo-image {
+  max-width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.heroo-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Mission Section */
+.mission-section {
+  display: flex;
+  justify-content: center;
+  margin: 50px auto; /* Changed to auto for horizontal centering */
+  gap: 30px;
+  background-color: #ffecec;
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 1200px; /* Added max-width */
+  width: 90%; /* Added width for responsiveness */
+}
+
+.mission-content {
+  padding: 40px;
+  flex: 1;
+}
+
+.mission-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #092c47;
+  text-align: center; /* Center the heading */
+}
+
+.mission-content p {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center; /* Center the paragraph */
+}
+
+.mission-image {
+  flex: 1;
+  max-width: 40%;
+}
+
+.mission-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Vision Section */
+.vision-section {
+  display: flex;
+  margin: 50px auto; /* Changed to auto for horizontal centering */
+  gap: 30px;
+  flex-direction: row-reverse;
+  max-width: 1200px; /* Added max-width */
+  width: 90%; /* Added width for responsiveness */
+}
+
+.vision-content {
+  padding: 40px;
+  flex: 1;
+  background-color: #ffecec;
+  border-radius: 10px;
+}
+
+.vision-content h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center; /* Center the heading */
+}
+
+.vision-content p {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center; /* Center the paragraph */
+}
+
+.vision-image {
+  flex: 1;
+  max-width: 40%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.vision-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Info Sections */
+.info-section {
+  margin: 60px auto; /* Changed to auto for horizontal centering */
+  max-width: 1200px; /* Added max-width */
+  width: 90%; /* Added width for responsiveness */
+}
+
+.info-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #333;
+  text-align: center;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  max-width: 1200px; /* Added max-width */
+  margin: 0 auto; /* Center the grid */
+}
+
+.info-card {
+  margin-bottom: 30px;
+  text-align: center; /* Center card content */
+}
+
+.info-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.info-card p {
+  color: #666;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Team Section */
+.team-section {
+  margin: 60px auto; /* Changed to auto for horizontal centering */
+  text-align: center;
+  max-width: 1200px; /* Added max-width */
+  width: 90%; /* Added width for responsiveness */
+}
+
+.team-section h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: 1200px; /* Added max-width */
+  margin: 0 auto; /* Center the grid */
+}
+
+.team-card {
+  margin-bottom: 20px;
+  transition: transform 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-5px);
+}
+
+.team-image {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.team-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.team-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.team-role {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Contact Section */
+.contact-section {
+  margin: 60px auto; /* Changed to auto for horizontal centering */
+  background-color: #ffecec;
+  border-radius: 10px;
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  max-width: 1200px; /* Added max-width */
+  width: 90%; /* Added width for responsiveness */
+}
+
+.contact-form {
+  flex: 1;
+}
+
+.contact-form h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center; /* Center the heading */
+}
+
+.contact-form p {
+  color: #666;
+  font-size: 15px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+  text-align: center; /* Center the paragraph */
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  background-color: white;
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #953543;
+}
+
+.submit-btn {
+  background-color: #953543;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+  display: block; /* Make button a block element */
+  margin: 0 auto; /* Center the button */
+  width: fit-content; /* Make button width fit content */
+}
+
+.submit-btn:hover {
+  background-color: #7e2e39;
+}
+
+.contact-images {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.contact-image {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.contact-image.large {
+  grid-row: span 2;
+}
+
+.contact-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: #4267b2;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.contact-icon.twitter {
+  background-color: #1da1f2;
+}
+
+.contact-icon.linkedin {
+  background-color: #0077b5;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1024px) {
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 868px) {
+  .mission-section,
+  .vision-section {
+    flex-direction: column;
+  }
+
+  .mission-image,
+  .vision-image {
+    max-width: 100%;
+    height: 250px;
+  }
+
+  .contact-section {
+    flex-direction: column;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .contact-form h2 {
+    font-size: 20px;
+  }
+
+  .contact-section {
+    padding: 25px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .mission-image,
+  .vision-image {
+    height: 180px;
+  }
+
+  .mission-content,
+  .vision-content {
+    padding: 20px;
+  }
+
+  .mission-content p,
+  .vision-content p {
+    font-size: 14px;
+  }
+
+  .contact-images {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-image.large {
+    grid-row: span 1;
+  }
+}
+/* Newsletter Section */
+.newsletter {
+  margin: 60px 0;
+  text-align: center;
+}
+
+.newsletter h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 500;
+}
+
+.newsletter-form {
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  overflow: hidden;
+}
+
+.newsletter-input {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+}
+
+.newsletter-btn {
+  background-color: #953543;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.newsletter-btn:hover {
+  background-color: #7e2e39;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 1024px) {
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 868px) {
+  .mission-section,
+  .vision-section {
+    flex-direction: column;
+  }
+
+  .mission-image,
+  .vision-image {
+    max-width: 100%;
+    height: 250px;
+  }
+
+  .contact-section {
+    flex-direction: column;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .heroo h1 {
+    font-size: 28px;
+  }
+
+  .heroo-buttons {
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto 30px;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .mission-content,
+  .vision-content {
+    padding: 25px;
+  }
+
+  .mission-content h2,
+  .vision-content h2 {
+    font-size: 20px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .info-section h2,
+  .team-section h2 {
+    font-size: 24px;
+  }
+
+  .contact-form h2 {
+    font-size: 20px;
+  }
+
+  .contact-section {
+    padding: 25px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+    border: none;
+  }
+
+  .newsletter-input {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .newsletter-btn {
+    border-radius: 5px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroo {
+    padding: 40px 0 30px;
+  }
+
+  .heroo h1 {
+    font-size: 24px;
+  }
+
+  .mission-image,
+  .vision-image {
+    height: 180px;
+  }
+
+  .mission-content,
+  .vision-content {
+    padding: 20px;
+  }
+
+  .mission-content p,
+  .vision-content p {
+    font-size: 14px;
+  }
+
+  .contact-images {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-image.large {
+    grid-row: span 1;
+  }
+}

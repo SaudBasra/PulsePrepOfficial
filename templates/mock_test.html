@@ -1,0 +1,457 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep Mock Tests</title>
+
+
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/mockTest.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'questionbank' %}" class="nav-item">
+            <i class="fas fa-question-circle"></i>
+            <span>Manage Questions</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Modules</span>
+          </a>
+          <a href="{% url 'users' %}" class="nav-item">
+            <i class="fas fa-users"></i>
+            <span>Manage Users</span>
+          </a>
+          <a href="{% url 'mocktest' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'analytics_report' %}" class="nav-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>Analytics & Reports</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notificationsetting' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notification Settings</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'setting' %}" class="nav-item active">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+      
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Mock Tests</h1>
+          <div class="user-menu">
+            <a href="all-notification.html"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Mock Test Content -->
+        <div class="dashboard-content">
+          <!-- Tabs for Test Management -->
+          <div class="mock-test-tabs">
+            <button class="tab-button active" data-tab="manage-tests">
+              Manage Tests
+            </button>
+            <button class="tab-button" data-tab="create-test">
+              Create New Test
+            </button>
+          </div>
+
+          <!-- Manage Tests Tab Content -->
+          <div class="tab-content" id="manage-tests">
+            <section class="mock-test-filters">
+              <div class="filter-group">
+                <input
+                  type="text"
+                  placeholder="Search tests..."
+                  class="search-input"
+                />
+                <select class="filter-select">
+                  <option value="">All Statuses</option>
+                  <option value="draft">Draft</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="live">Live</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <select class="filter-select">
+                  <option value="">All Degrees</option>
+                  <option value="mbbs">MBBS</option>
+                  <option value="bds">BDS</option>
+                </select>
+                <button class="action-button primary">
+                  <i class="fas fa-filter"></i> Apply Filters
+                </button>
+              </div>
+            </section>
+
+            <section class="mock-test-list">
+              <div class="test-list-header">
+                <h2>Your Mock Tests</h2>
+                <button class="action-button primary">
+                  <i class="fas fa-plus"></i> Create Test
+                </button>
+              </div>
+
+              <div class="test-table-container">
+                <table class="test-table">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>Degree</th>
+                      <th>Questions</th>
+                      <th>Date</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>MBBS First Year Anatomy Test</td>
+                      <td>MBBS</td>
+                      <td>100</td>
+                      <td>15 Apr 2025, 10:00 AM</td>
+                      <td>1 hour</td>
+                      <td>
+                        <span class="status-badge scheduled">Scheduled</span>
+                      </td>
+                      <td class="action-cell">
+                        <button class="icon-button">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Physiology Practice Exam</td>
+                      <td>MBBS</td>
+                      <td>60</td>
+                      <td>12 Apr 2025, 2:00 PM</td>
+                      <td>45 minutes</td>
+                      <td><span class="status-badge live">Live</span></td>
+                      <td class="action-cell">
+                        <button class="icon-button">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>BDS Oral Pathology Quiz</td>
+                      <td>BDS</td>
+                      <td>80</td>
+                      <td>10 Apr 2025, 9:00 AM</td>
+                      <td>1 hour</td>
+                      <td>
+                        <span class="status-badge completed">Completed</span>
+                      </td>
+                      <td class="action-cell">
+                        <button class="icon-button">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Biochemistry Module Test</td>
+                      <td>MBBS</td>
+                      <td>75</td>
+                      <td>18 Apr 2025, 11:30 AM</td>
+                      <td>1 hour</td>
+                      <td><span class="status-badge draft">Draft</span></td>
+                      <td class="action-cell">
+                        <button class="icon-button">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-button">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="pagination">
+                <button class="pagination-button">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="pagination-button active">1</button>
+                <button class="pagination-button">2</button>
+                <button class="pagination-button">3</button>
+                <button class="pagination-button">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <!-- Create Test Tab Content -->
+          <div class="tab-content" id="create-test" style="display: none">
+            <section class="test-form-section">
+              <div class="section-header">
+                <h2>Create New Mock Test</h2>
+              </div>
+
+              <form class="mock-test-form">
+                <div class="form-grid">
+                  <!-- Basic Test Information -->
+                  <div class="form-section">
+                    <h3 class="form-section-title">Basic Information</h3>
+
+                    <div class="form-group">
+                      <label for="test-title">Title of Test</label>
+                      <input
+                        type="text"
+                        id="test-title"
+                        placeholder="Enter test title"
+                        required
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-description">Test Description</label>
+                      <textarea
+                        id="test-description"
+                        rows="4"
+                        placeholder="Enter test description"
+                      ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="test-start-date">Start Date & Time</label>
+                        <input
+                          type="datetime-local"
+                          id="test-start-date"
+                          required
+                        />
+                      </div>
+
+                      <div class="form-group">
+                        <label for="test-end-date">End Date & Time</label>
+                        <input
+                          type="datetime-local"
+                          id="test-end-date"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-duration">Duration (minutes)</label>
+                      <input
+                        type="number"
+                        id="test-duration"
+                        min="5"
+                        placeholder="60"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Test Classification -->
+                  <div class="form-section">
+                    <h3 class="form-section-title">Test Classification</h3>
+
+                    <div class="form-group">
+                      <label for="test-degree">Related Degree</label>
+                      <select id="test-degree" required>
+                        <option value="">Select Degree</option>
+                        <option value="mbbs">MBBS</option>
+                        <option value="bds">BDS</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-year">Year</label>
+                      <select id="test-year" required>
+                        <option value="">Select Year</option>
+                        <option value="1">First Year</option>
+                        <option value="2">Second Year</option>
+                        <option value="3">Third Year</option>
+                        <option value="4">Fourth Year</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-block">Block</label>
+                      <select id="test-block">
+                        <option value="">Select Block</option>
+                        <option value="block1">Block 1</option>
+                        <option value="block2">Block 2</option>
+                        <option value="block3">Block 3</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-module">Module</label>
+                      <select id="test-module">
+                        <option value="">Select Module</option>
+                        <option value="anatomy">Anatomy</option>
+                        <option value="physiology">Physiology</option>
+                        <option value="biochemistry">Biochemistry</option>
+                        <option value="pathology">Pathology</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-subject">Subject</label>
+                      <select id="test-subject">
+                        <option value="">Select Subject</option>
+                        <option value="gross-anatomy">Gross Anatomy</option>
+                        <option value="histology">Histology</option>
+                        <option value="embryology">Embryology</option>
+                        <option value="neuroanatomy">Neuroanatomy</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Questions Configuration -->
+                  <div class="form-section">
+                    <h3 class="form-section-title">Questions Configuration</h3>
+
+                    <div class="form-group">
+                      <label for="total-questions">Total Questions</label>
+                      <input
+                        type="number"
+                        id="total-questions"
+                        min="1"
+                        placeholder="100"
+                        required
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="difficulty-range">Difficulty Range</label>
+                      <select id="difficulty-range" required>
+                        <option value="">Select Difficulty</option>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                        <option value="mixed">Mixed</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Question Pool Source</label>
+                      <div class="radio-group">
+                        <label class="radio-label">
+                          <input
+                            type="radio"
+                            name="question-source"
+                            value="random"
+                            checked
+                          />
+                          <span>Random Selection</span>
+                        </label>
+                        <label class="radio-label">
+                          <input
+                            type="radio"
+                            name="question-source"
+                            value="manual"
+                          />
+                          <span>Manual Selection</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                      <label class="checkbox-label">
+                        <input type="checkbox" id="ai-explanations" />
+                        <span>Enable AI Explanations</span>
+                      </label>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="test-status">Status</label>
+                      <select id="test-status" required>
+                        <option value="draft">Draft</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="live">Live</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="action-button secondary">
+                    Cancel
+                  </button>
+                  <button type="button" class="action-button">Preview</button>
+                  <button type="submit" class="action-button primary">
+                    Create Test
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/mockTest.js' %}"></script>
+  </body>
+</html>

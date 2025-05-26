@@ -1,0 +1,355 @@
+{% load static %}  
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - FAQs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+ 
+    <link rel="stylesheet" href="{% static 'css/main/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/main/faqs.css' %}" />
+
+  </head>
+  <body>
+    <!-- Header -->
+    <header>        
+        <div class="header-container">
+          <nav class="nav-menu">
+            <a href="{% url 'home' %}">Features</a>
+            <a href="{% url 'about' %}">About Us</a>
+            <a href="{% url 'faqs' %}">FAQs</a>
+            <a href="{% url 'contact' %}">Contact Us</a>
+  
+          </nav>
+  
+        <div class="logo">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+
+        </div>
+<!-- Auth buttons -->
+<div class="auth-buttons">
+  <a href="{% url 'login' %}" class="login-btn">Log in</a>
+  <a href="{% url 'signup' %}" class="signup-btn">Sign up</a>
+</div>
+
+        <button class="mobile-menu-btn">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="container">
+          <h1>How can we help you?</h1>
+        </div>
+      </section>
+
+      <!-- Help Categories Section -->
+      <section class="help-categories">
+        <div class="container">
+          <div class="categories-grid">
+            <!-- Category 1 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img
+                  src="images/getting-started-icon.png"
+                  alt="Getting Started"
+                />
+              </div>
+              <h3>Getting Started</h3>
+              <p>
+                Discover the first steps to access your account and get started
+                with PulsePrep.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+
+            <!-- Category 2 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img
+                  src="images/account-admin-icon.png"
+                  alt="Account Administration"
+                />
+              </div>
+              <h3>Account Administration</h3>
+              <p>
+                Manage credentials, access, account and user administrative
+                settings.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+
+            <!-- Category 3 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img
+                  src="images/plans-billing-icon.png"
+                  alt="Plans & Billing"
+                />
+              </div>
+              <h3>Plans & Billing</h3>
+              <p>
+                Learn about plans, fees and payment options available for your
+                subscription.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+
+            <!-- Category 4 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img src="images/feature-usage-icon.png" alt="Feature Usage" />
+              </div>
+              <h3>Feature Usage</h3>
+              <p>
+                Discover the capabilities and access the functions of the
+                platform.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+
+            <!-- Category 5 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img
+                  src="images/feature-request-icon.png"
+                  alt="Feature Request"
+                />
+              </div>
+              <h3>Feature Request</h3>
+              <p>
+                Suggest an improvement and share your ideas for a better
+                experience.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+
+            <!-- Category 6 -->
+            <div class="category-card">
+              <div class="icon-container">
+                <img src="images/partnership-icon.png" alt="Partnership" />
+              </div>
+              <h3>Partnership</h3>
+              <p>
+                Connect, collaborate and explore partnership opportunities with
+                PulsePrep.
+              </p>
+              <a href="#" class="learn-more">Learn More</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section">
+        <div class="container">
+          <h2>Frequently asked questions</h2>
+          <p class="subtitle">
+            Find answers to your frequently asked questions
+          </p>
+
+          <div class="faq-accordion">
+            <!-- FAQ Item 1 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>
+                  Eiusmod id laboris nulla dolor velit aliqua nisi consequat
+                  velit ea?
+                </h3>
+                <span class="toggle-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Nisi qui sunt veniam esse duis et labore Lorem et. Excepteur
+                  dolore mollit ea ex officia labore duis nulla ipsum vel. Minim
+                  reprehenderit amet id duis. Minim molestie velit et in.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>
+                  Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt
+                </h3>
+                <span class="toggle-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
+                  ut nulla nec arcu dapibus placerat. Nulla facilisi.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>Eu ex officia nostrud excepteur qui?</h3>
+                <span class="toggle-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Nisi qui sunt veniam esse duis et labore Lorem et. Excepteur
+                  dolore mollit ea ex officia labore.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>
+                  Sint occaecat dolor ex officia dolore veenim minim aliquip?
+                </h3>
+                <span class="toggle-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras
+                  ut nulla nec arcu dapibus placerat.
+                </p>
+              </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>
+                  Velit nulla ex nostrud consequat incididunt sint qui sunt?
+                </h3>
+                <span class="toggle-icon">+</span>
+              </div>
+              <div class="faq-answer">
+                <p>
+                  Nisi qui sunt veniam esse duis et labore Lorem et. Excepteur
+                  dolore mollit ea ex officia labore duis nulla ipsum vel.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Help Banner -->
+      <section class="help-banner">
+        <div class="container">
+          <div class="help-banner-content">
+            <div class="help-text">
+              <h2>Still need help?</h2>
+              <p>
+                Adipisicing fugiat et do fugiat deserunt. Do eiusmod incididunt
+                ullamco consectetur occaecat deserunt. Do a facillimis.
+              </p>
+              <a href="#" class="contact-btn">Contact us</a>
+            </div>
+            <div class="help-image">
+
+              <img src="{% static 'images/support-agent.jpg' %}" alt="Customer support agent" />
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter Section -->
+      <section class="newsletter">
+        <div class="container">
+          <h3>Subscribe to our newsletter</h3>
+
+          <form class="newsletter-form">
+            <input
+              type="email"
+              class="newsletter-input"
+              placeholder="Input your email"
+            />
+            <button type="submit" class="newsletter-btn">Subscribe</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Simple accordion functionality for FAQs
+      document.addEventListener("DOMContentLoaded", function () {
+        const faqItems = document.querySelectorAll(".faq-question");
+
+        faqItems.forEach((item) => {
+          item.addEventListener("click", function () {
+            const parent = this.parentElement;
+            parent.classList.toggle("active");
+
+            const icon = this.querySelector(".toggle-icon");
+            if (parent.classList.contains("active")) {
+              icon.textContent = "−";
+            } else {
+              icon.textContent = "+";
+            }
+          });
+        });
+      });
+    </script>
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-container">
+          <div class="footer-logo">
+            <img src="{% static 'images/onlyName.png' %}" alt="PulsePrep Logo" />            <div class="social-icons">
+
+            <div class="social-icons">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-links">
+            <div class="footer-column">
+              <h3>Company</h3>
+              <a href="#">About Us</a>
+              <a href="#">Careers</a>
+              <a href="#">Blog</a>
+              <a href="#">Press</a>
+            </div>
+
+            <div class="footer-column">
+              <h3>Resources</h3>
+              <a href="#">Help Center</a>
+              <a href="#">Contact Us</a>
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+            </div>
+
+            <div class="footer-column">
+              <h3>Products</h3>
+              <a href="#">MBBS</a>
+              <a href="#">BDS</a>
+              <a href="#">Medical PG</a>
+              <a href="#">NEET</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2025 PulsePrep. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/user_management/signup.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-image-container">
+          <div class="auth-overlay"></div>
+          <div class="auth-content">
+            <h2>Join PulsePrep</h2>
+            <p>
+              Create an account to get started and explore all our features and
+              benefits.
+            </p>
+          </div>
+        </div>
+
+        <div class="auth-form-container">
+          <div class="logo-container">
+            <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="auth-logo" />
+          </div>
+
+          <h1>Create Account</h1>
+
+          {% if messages %}
+          <div class="messages">
+              {% for message in messages %}
+              <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                  {{ message }}
+              </div>
+              {% endfor %}
+          </div>
+          {% endif %}
+
+          <form class="auth-form" method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-user"></i>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="first_name"
+                    placeholder="First name"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-user"></i>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="last_name"
+                    placeholder="Last name"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signupEmail">Email Address</label>
+              <div class="input-with-icon">
+                <i class="fas fa-envelope"></i>
+                <input
+                  type="email"
+                  id="signupEmail"
+                  name="email"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="signupPassword">Password</label>
+              <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="signupPassword"
+                  name="password"
+                  placeholder="Create a password"
+                  required
+                />
+                <i class="fas fa-eye-slash toggle-password"></i>
+              </div>
+              <div class="password-requirements">
+                <p>Password must contain:</p>
+                <ul>
+                  <li>At least 8 characters</li>
+                  <li>At least one uppercase letter</li>
+                  <li>At least one number</li>
+                  <li>At least one special character</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm Password</label>
+              <div class="input-with-icon">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirm_password"
+                  placeholder="Confirm your password"
+                  required
+                />
+                <i class="fas fa-eye-slash toggle-password"></i>
+              </div>
+            </div>
+
+            <!-- Fields for degree and year -->
+            <div class="form-row">
+              <div class="form-group">
+                <label for="degree">Degree</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-graduation-cap"></i>
+                  <select id="degree" name="degree" required>
+                    <option value="" disabled selected>Select your degree</option>
+                    <option value="MBBS">MBBS</option>
+                    <option value="BDS">BDS</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="year">Year</label>
+                <div class="input-with-icon">
+                  <i class="fas fa-calendar-alt"></i>
+                  <select id="year" name="year" required>
+                    <option value="" disabled selected>Select your year</option>
+                    <option value="1">First Year</option>
+                    <option value="2">Second Year</option>
+                    <option value="3">Third Year</option>
+                    <option value="4">Fourth Year</option>
+                    <option value="5">Fifth Year</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+<!-- Profile Picture-->
+<div class="form-group">
+  <label for="profile_image">Profile Picture</label>
+  <div class="file-upload">
+    <input type="file" id="profile_image" name="profile_image" accept="image/*" />
+    <label for="profile_image" class="file-upload-label">
+      <i class="fas fa-cloud-upload-alt"></i> Upload Profile Picture
+    </label>
+    <span class="file-name">No file chosen</span>
+  </div>
+  <small class="form-text text-muted">Upload a profile picture (recommended size: 256x256 pixels)</small>
+</div>
+
+            <!-- Payment slip upload -->
+            <div class="form-group">
+              <label for="payment_slip">Payment Slip</label>
+              <div class="file-upload">
+                <input type="file" id="payment_slip" name="payment_slip" accept="image/*" />
+                <label for="payment_slip" class="file-upload-label">
+                  <i class="fas fa-cloud-upload-alt"></i> Upload Payment Slip
+                </label>
+                <span class="file-name">No file chosen</span>
+              </div>
+              <small class="form-text text-muted">Upload a picture of your payment slip for verification</small>
+            </div>
+
+            <div class="form-group terms-checkbox">
+              <input type="checkbox" id="terms" name="terms" required />
+              <label for="terms"
+                >I agree to the <a href="#">Terms of Service</a> and
+                <a href="#">Privacy Policy</a></label
+              >
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+            
+            <div class="form-notice">
+              <p>Note: Your account will be pending until approved by an administrator.</p>
+            </div>
+          </form>
+
+          <div class="auth-footer">
+            <p>Already have an account? <a href="/login/">Login</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Toggle password visibility
+      document.querySelectorAll('.toggle-password').forEach(icon => {
+        icon.addEventListener('click', function() {
+          const input = this.previousElementSibling;
+          if (input.type === 'password') {
+            input.type = 'text';
+            this.classList.remove('fa-eye-slash');
+            this.classList.add('fa-eye');
+          } else {
+            input.type = 'password';
+            this.classList.remove('fa-eye');
+            this.classList.add('fa-eye-slash');
+          }
+        });
+      });
+      
+      // Form validation
+      document.querySelector('.auth-form').addEventListener('submit', function(e) {
+        const password = document.getElementById('signupPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        
+        // Check if passwords match
+        if (password.value !== confirmPassword.value) {
+          e.preventDefault();
+          alert('Passwords do not match!');
+          return false;
+        }
+        
+        // Validate password strength
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(password.value)) {
+          e.preventDefault();
+          alert('Password does not meet the requirements!');
+          return false;
+        }
+      });
+      
+      // Display filename when file is selected
+      document.getElementById('payment_slip').addEventListener('change', function() {
+        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+        this.nextElementSibling.nextElementSibling.textContent = fileName;
+      });
+
+      // Add to your existing signup form JavaScript
+// Handle multiple file upload fields
+document.querySelectorAll('input[type="file"]').forEach(input => {
+  input.addEventListener('change', function() {
+    const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+    const fileNameSpan = this.nextElementSibling.nextElementSibling;
+    if (fileNameSpan) {
+      fileNameSpan.textContent = fileName;
+    }
+  });
+});
+    </script>
+  </body>
+</html>

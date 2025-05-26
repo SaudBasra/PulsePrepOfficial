@@ -1,0 +1,141 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Manage Questions</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      
+     <!-- Sidebar Navigation -->
+     <aside class="sidebar">
+      <div class="logo-container">
+        <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+      </div>
+      <nav class="nav-menu">
+        <a href="{% url 'dashboard' %}" class="nav-item">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'questionbank' %}" class="nav-item">
+          <i class="fas fa-question-circle"></i>
+          <span>Manage Questions</span>
+        </a>
+        <a href="{% url 'managemodule' %}" class="nav-item">
+          <i class="fas fa-cubes"></i>
+          <span>Modules</span>
+        </a>
+        <a href="/admin/user_management/customuser/" class="nav-item">
+          <i class="fas fa-users"></i>
+          <span>Manage Users</span>
+      </a>
+        <a href="{% url 'mocktest' %}" class="nav-item">
+          <i class="fas fa-vial"></i>
+          <span>Mock Tests</span>
+        </a>
+        <a href="{% url 'analytics_report' %}" class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>Analytics & Reports</span>
+        </a>
+        <a href="{% url 'myaccount' %}" class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>My Account</span>
+        </a>
+        <a href="{% url 'notificationsetting' %}" class="nav-item">
+          <i class="fas fa-bell"></i>
+          <span>Notification Settings</span>
+          <span class="notification-badge-sidebar"></span>
+        </a>
+        <a href="{% url 'setting' %}" class="nav-item active">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+        <a href="{% url 'logout' %}" class="nav-item">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Manage Questions</h1>
+          <div class="user-menu">
+            <a href="all-notification.html"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Question List -->
+        <div class="dashboard-content">
+          <div class="questions-list-card">
+            <div class="card-header">
+              <h3>Questions</h3>
+              <a href="{% url 'addquestions' %}" class="add-question-btn">
+                <i class="fas fa-plus"></i> Add Questions
+              </a>
+            </div>
+
+            <div class="questions-table">
+              <!-- Loop through questions from database here -->
+              {% for question in questions %}
+                <div class="question-item">
+                  <div class="question-number">
+                    <i class="fas fa-grip-lines"></i>
+                    <span>Question {{ forloop.counter }}</span>
+                  </div>
+                  <div class="question-content">
+                    <div class="question-type">
+                      <i class="far fa-square-check"></i>
+                    </div>
+                    <span>{{ question.text }}</span>
+                  </div>
+                  <div class="question-actions">
+                    <a href="{% url 'editquestion' question.id %}" class="edit-btn">
+                      <i class="fas fa-pencil"></i>
+                    </a>
+                    <button class="delete-btn" onclick="deleteQuestion({{ question.id }})">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script src="{% static 'js/MQscript.js' %}"></script>
+  </body>
+</html>
