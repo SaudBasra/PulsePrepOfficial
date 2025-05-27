@@ -13,5 +13,7 @@ urlpatterns = [
     path('myaccount/', include('myaccount.urls')),
     path('notificationsetting/', include('notificationsetting.urls')),
     path('setting/', include('setting.urls')),
+    path('analytics-report/', include('analytics_report.urls')),
+    path('notification/', include('notificationsetting.urls')),
 
 ]

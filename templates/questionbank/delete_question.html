@@ -15,56 +15,55 @@
   </head>
   <body>
     <div class="container">
-      
-     <!-- Sidebar Navigation -->
-     <aside class="sidebar">
-      <div class="logo-container">
-        <img src="{% static 'Logo.png' %}" alt="PulsePrep Logo" class="logo" />
-      </div>
-      <nav class="nav-menu">
-        <a href="{% url 'dashboard' %}" class="nav-item">
-          <i class="fas fa-th-large"></i>
-          <span>Dashboard</span>
-        </a>
-        <a href="{% url 'questionbank' %}" class="nav-item active">
-          <i class="fas fa-question-circle"></i>
-          <span>Manage Questions</span>
-        </a>
-        <a href="{% url 'managemodule' %}" class="nav-item">
-          <i class="fas fa-cubes"></i>
-          <span>Modules</span>
-        </a>
-        <a href="/admin/user_management/customuser/" class="nav-item">
-          <i class="fas fa-users"></i>
-          <span>Manage Users</span>
-      </a>
-      <a href="{% url 'mocktest_list' %}" class="nav-item">
-        <i class="fas fa-vial"></i>
-          <span>Mock Tests</span>
-        </a>
-        <a href="{% url 'analytics_report' %}" class="nav-item">
-          <i class="fas fa-chart-bar"></i>
-          <span>Analytics & Reports</span>
-        </a>
-        <a href="{% url 'myaccount' %}" class="nav-item">
-          <i class="fas fa-user"></i>
-          <span>My Account</span>
-        </a>
-        <a href="{% url 'notificationsetting' %}" class="nav-item">
-          <i class="fas fa-bell"></i>
-          <span>Notification Settings</span>
-          <span class="notification-badge-sidebar"></span>
-        </a>
-        <a href="{% url 'setting' %}" class="nav-item">
-          <i class="fas fa-cog"></i>
-          <span>Settings</span>
-        </a>
-        <a href="{% url 'logout' %}" class="nav-item">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </a>
-      </nav>
-    </aside>
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <div class="logo-container">
+    <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+  </div>
+  <nav class="nav-menu">
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="fas fa-th-large"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'questionbank' %}" class="nav-item {% if request.resolver_match.url_name == 'questionbank' %}active{% endif %}">
+      <i class="fas fa-question-circle"></i>
+      <span>Manage Questions</span>
+    </a>
+    <a href="{% url 'manage_csv' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_csv' %}active{% endif %}">
+      <i class="fas fa-file-csv"></i>
+      <span>Manage CSVs</span>
+    </a>
+    <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
+      <i class="fas fa-cubes"></i>
+      <span>Modules</span>
+    </a>
+    <a href="/admin/user_management/customuser/" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Manage Users</span>
+    </a>
+    <a href="{% url 'mocktest_list' %}" class="nav-item {% if request.resolver_match.url_name == 'mocktest_list' %}active{% endif %}">
+      <i class="fas fa-vial"></i>
+      <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
+      <i class="fas fa-chart-bar"></i>
+      <span>Analytics & Reports</span>
+    </a>
+    <a href="{% url 'myaccount' %}" class="nav-item {% if request.resolver_match.url_name == 'myaccount' %}active{% endif %}">
+      <i class="fas fa-user"></i>
+      <span>My Account</span>
+    </a>
+    <a href="{% url 'notificationsetting' %}" class="nav-item {% if request.resolver_match.url_name == 'notificationsetting' %}active{% endif %}">
+      <i class="fas fa-bell"></i>
+      <span>Notifications</span>
+      <span class="notification-badge-sidebar"></span>
+    </a>
+    <a href="{% url 'logout' %}" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+</aside>
 
       <!-- Main Content -->
       <main class="main-content">

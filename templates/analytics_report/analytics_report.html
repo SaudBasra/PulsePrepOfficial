@@ -1,0 +1,689 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Analytics & Reports</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/analytics.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="container">
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <div class="logo-container">
+    <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+  </div>
+  <nav class="nav-menu">
+    <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+      <i class="fas fa-th-large"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'questionbank' %}" class="nav-item {% if request.resolver_match.url_name == 'questionbank' %}active{% endif %}">
+      <i class="fas fa-question-circle"></i>
+      <span>Manage Questions</span>
+    </a>
+    <a href="{% url 'manage_csv' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_csv' %}active{% endif %}">
+      <i class="fas fa-file-csv"></i>
+      <span>Manage CSVs</span>
+    </a>
+    <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
+      <i class="fas fa-cubes"></i>
+      <span>Modules</span>
+    </a>
+    <a href="/admin/user_management/customuser/" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Manage Users</span>
+    </a>
+    <a href="{% url 'mocktest_list' %}" class="nav-item {% if request.resolver_match.url_name == 'mocktest_list' %}active{% endif %}">
+      <i class="fas fa-vial"></i>
+      <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
+      <i class="fas fa-chart-bar"></i>
+      <span>Analytics & Reports</span>
+    </a>
+    <a href="{% url 'myaccount' %}" class="nav-item {% if request.resolver_match.url_name == 'myaccount' %}active{% endif %}">
+      <i class="fas fa-user"></i>
+      <span>My Account</span>
+    </a>
+    <a href="{% url 'notificationsetting' %}" class="nav-item {% if request.resolver_match.url_name == 'notificationsetting' %}active{% endif %}">
+      <i class="fas fa-bell"></i>
+      <span>Notifications</span>
+      <span class="notification-badge-sidebar"></span>
+    </a>
+    <a href="{% url 'logout' %}" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Analytics & Reports</h1>
+          <div class="user-menu">
+            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Analytics Content -->
+        <div class="dashboard-content">
+          
+          <!-- Filter Controls -->
+          <section class="analytics-filters">
+            <div class="filter-group">
+              <form method="GET" action="{% url 'analytics_report' %}">
+                <div class="filter-row">
+                  <div class="filter-item">
+                    <label for="date-range">Date Range:</label>
+                    <select id="date-range" name="date_range" class="filter-select" onchange="this.form.submit()">
+                      <option value="7" {% if current_filters.date_range == 7 %}selected{% endif %}>Last 7 Days</option>
+                      <option value="30" {% if current_filters.date_range == 30 or not current_filters.date_range %}selected{% endif %}>Last 30 Days</option>
+                      <option value="90" {% if current_filters.date_range == 90 %}selected{% endif %}>Last 3 Months</option>
+                      <option value="365" {% if current_filters.date_range == 365 %}selected{% endif %}>Last Year</option>
+                    </select>
+                  </div>
+
+                  <div class="filter-item">
+                    <label for="degree-filter">Degree:</label>
+                    <select id="degree-filter" name="degree" class="filter-select" onchange="this.form.submit()">
+                      <option value="" {% if not current_filters.degree %}selected{% endif %}>All Degrees</option>
+                      <option value="MBBS" {% if current_filters.degree == 'MBBS' %}selected{% endif %}>MBBS</option>
+                      <option value="BDS" {% if current_filters.degree == 'BDS' %}selected{% endif %}>BDS</option>
+                    </select>
+                  </div>
+
+                  <div class="filter-item">
+                    <label for="year-filter">Year:</label>
+                    <select id="year-filter" name="year" class="filter-select" onchange="this.form.submit()">
+                      <option value="" {% if not current_filters.year %}selected{% endif %}>All Years</option>
+                      <option value="1st" {% if current_filters.year == '1st' %}selected{% endif %}>1st Year</option>
+                      <option value="2nd" {% if current_filters.year == '2nd' %}selected{% endif %}>2nd Year</option>
+                      <option value="3rd" {% if current_filters.year == '3rd' %}selected{% endif %}>3rd Year</option>
+                      <option value="4th" {% if current_filters.year == '4th' %}selected{% endif %}>4th Year</option>
+                      <option value="5th" {% if current_filters.year == '5th' %}selected{% endif %}>5th Year</option>
+                    </select>
+                  </div>
+
+                  <div class="filter-actions">
+                    <button type="submit" class="action-button primary">
+                      <i class="fas fa-filter"></i> Apply Filters
+                    </button>
+                    <a href="{% url 'export_analytics_report' %}?{{ request.GET.urlencode }}" class="action-button secondary">
+                      <i class="fas fa-download"></i> Export Report
+                    </a>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <!-- Key Metrics -->
+          <section class="analytics-metrics">
+            <div class="metrics-header">
+              <h2>Key Performance Indicators</h2>
+              <p class="last-updated">Last updated: <span id="last-refresh">{{ current_time|date:"M d, Y g:i A" }}</span></p>
+            </div>
+            
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <div class="metric-icon students">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="metric-content">
+                  <div class="metric-value" id="total-students">{{ analytics.total_students|default:"0" }}</div>
+                  <div class="metric-label">Total Students</div>
+                  <div class="metric-change {% if analytics.students_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.students_growth >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.students_growth|floatformat:1 }}% vs Previous Period
+                  </div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon questions">
+                  <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="metric-content">
+                  <div class="metric-value" id="total-questions">{{ analytics.total_questions|default:"0" }}</div>
+                  <div class="metric-label">Total Questions</div>
+                  <div class="metric-change {% if analytics.questions_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.questions_growth >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.questions_growth|floatformat:1 }}% vs Previous Period
+                  </div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon tests">
+                  <i class="fas fa-vial"></i>
+                </div>
+                <div class="metric-content">
+                  <div class="metric-value" id="total-tests">{{ analytics.total_tests|default:"0" }}</div>
+                  <div class="metric-label">Mock Tests</div>
+                  <div class="metric-change {% if analytics.tests_growth >= 0 %}positive{% else %}negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.tests_growth >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.tests_growth|floatformat:1 }}% vs Previous Period
+                  </div>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon score">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="metric-content">
+                  <div class="metric-value">{{ analytics.avg_test_score|floatformat:1|default:"0" }}%</div>
+                  <div class="metric-label">Avg. Test Score</div>
+                  <div class="metric-change {% if analytics.score_trend >= 0 %}positive{% else %}negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.score_trend >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.score_trend|floatformat:1 }}% vs Previous Period
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Charts Section -->
+          <section class="analytics-charts">
+            <div class="chart-row">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-chart-pie"></i> Questions by Degree</h3>
+                </div>
+                <div class="chart-container">
+                  <canvas id="degreeDistributionChart"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-chart-bar"></i> Questions by Difficulty</h3>
+                </div>
+                <div class="chart-container">
+                  <canvas id="difficultyChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="chart-row">
+              <div class="chart-card full-width">
+                <div class="chart-header">
+                  <h3><i class="fas fa-chart-line"></i> Performance Trends (Last 30 Days)</h3>
+                </div>
+                <div class="chart-container large">
+                  <canvas id="performanceTrendsChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Data Tables Section -->
+          <section class="analytics-tables">
+            
+            <!-- Mock Test Performance -->
+            <div class="table-card">
+              <div class="table-header">
+                <h3><i class="fas fa-vial"></i> Mock Test Performance</h3>
+                <div class="table-search">
+                  <input type="text" placeholder="Search tests..." class="search-input" id="testSearch">
+                  <i class="fas fa-search"></i>
+                </div>
+              </div>
+              <div class="table-container">
+                <table class="analytics-table" id="testTable">
+                  <thead>
+                    <tr>
+                      <th>Test Title</th>
+                      <th>Degree</th>
+                      <th>Total Attempts</th>
+                      <th>Avg. Score</th>
+                      <th>Completion Rate</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for test in analytics.test_performance %}
+                    <tr>
+                      <td>
+                        <div class="test-title">{{ test.title|truncatechars:40 }}</div>
+                      </td>
+                      <td>{{ test.degree|default:"All" }}</td>
+                      <td>{{ test.total_attempts }}</td>
+                      <td>
+                        <span class="score-badge">{{ test.avg_score|floatformat:1 }}%</span>
+                      </td>
+                      <td>
+                        <div class="progress-container">
+                          <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ test.completion_rate }}%"></div>
+                          </div>
+                          <span class="progress-text">{{ test.completion_rate|floatformat:1 }}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="status-badge {{ test.status }}">{{ test.get_status_display }}</span>
+                      </td>
+                      <td class="action-cell">
+                        <a href="{% url 'preview_test' test.id %}" class="icon-button" title="View Details">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="7" class="no-data">No mock tests found</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Top Performing Students -->
+            <div class="table-card">
+              <div class="table-header">
+                <h3><i class="fas fa-trophy"></i> Top Performing Students</h3>
+                <a href="/admin/user_management/customuser/" class="action-button secondary">
+                  <i class="fas fa-users"></i> See All Students
+                </a>
+              </div>
+              <div class="table-container">
+                <table class="analytics-table" id="studentTable">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Degree</th>
+                      <th>Tests Taken</th>
+                      <th>Avg. Score</th>
+                      <th>Latest Score</th>
+                      <th>Performance</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for student in analytics.top_students %}
+                    <tr>
+                      <td>
+                        <div class="student-info">
+                          <div class="student-avatar">
+                            {% if student.profile_image %}
+                            <img src="{{ student.profile_image.url }}" alt="{{ student.first_name }}" />
+                            {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ student.first_name }}+{{ student.last_name }}&background=007bff&color=fff&size=32" alt="{{ student.first_name }}" />
+                            {% endif %}
+                          </div>
+                          <div class="student-name">
+                            <div class="name">{{ student.first_name }} {{ student.last_name }}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>{{ student.degree|default:"N/A" }}</td>
+                      <td>{{ student.test_count }}</td>
+                      <td>
+                        <span class="score-badge">{{ student.avg_score|floatformat:1 }}%</span>
+                      </td>
+                      <td>
+                        <span class="score-badge">{{ student.latest_score|floatformat:1 }}%</span>
+                      </td>
+                      <td>
+                        <span class="performance-badge {% if student.avg_score >= 80 %}excellent{% elif student.avg_score >= 60 %}good{% else %}needs-improvement{% endif %}">
+                          {% if student.avg_score >= 80 %}Excellent{% elif student.avg_score >= 60 %}Good{% else %}Needs Improvement{% endif %}
+                        </span>
+                      </td>
+                      <td class="action-cell">
+                        <button class="icon-button" title="View Profile">
+                          <i class="fas fa-user"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="7" class="no-data">No student data available</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Subject Performance -->
+            <div class="table-card">
+              <div class="table-header">
+                <h3><i class="fas fa-cubes"></i> Subject Performance</h3>
+                <div class="table-search">
+                  <input type="text" placeholder="Search subjects..." class="search-input" id="subjectSearch">
+                  <i class="fas fa-search"></i>
+                </div>
+              </div>
+              <div class="table-container">
+                <table class="analytics-table" id="subjectTable">
+                  <thead>
+                    <tr>
+                      <th>Subject</th>
+                      <th>Questions</th>
+                      <th>Avg. Score</th>
+                      <th>Difficulty Distribution</th>
+                      <th>Most Common Block</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for subject in analytics.subject_performance %}
+                    <tr>
+                      <td>
+                        <div class="subject-name">{{ subject.name }}</div>
+                      </td>
+                      <td>{{ subject.question_count }}</td>
+                      <td>
+                        <span class="score-badge">{{ subject.avg_score|floatformat:1 }}%</span>
+                      </td>
+                      <td>
+                        <div class="difficulty-distribution">
+                          <span class="difficulty-tag easy" title="Easy Questions">E: {{ subject.easy_count }}</span>
+                          <span class="difficulty-tag medium" title="Medium Questions">M: {{ subject.medium_count }}</span>
+                          <span class="difficulty-tag hard" title="Hard Questions">H: {{ subject.hard_count }}</span>
+                        </div>
+                      </td>
+                      <td>{{ subject.common_block|default:"Various" }}</td>
+                      <td class="action-cell">
+                        <a href="{% url 'topic_questions' %}?subject={{ subject.name }}" class="icon-button" title="View Questions">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="6" class="no-data">No subject data available</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Chart.js configurations
+      const chartColors = {
+        primary: '#007bff',
+        secondary: '#6c757d',
+        success: '#28a745',
+        danger: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8',
+        light: '#f8f9fa',
+        dark: '#343a40'
+      };
+
+      // Initialize charts when DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        
+        // Degree Distribution Chart
+        if (document.getElementById('degreeDistributionChart')) {
+          const ctx1 = document.getElementById('degreeDistributionChart').getContext('2d');
+          new Chart(ctx1, {
+            type: 'doughnut',
+            data: {
+              labels: {{ analytics.degree_labels|safe }},
+              datasets: [{
+                data: {{ analytics.degree_data|safe }},
+                backgroundColor: [chartColors.primary, chartColors.secondary, chartColors.success, chartColors.info],
+                borderWidth: 2,
+                borderColor: '#fff'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    padding: 20,
+                    usePointStyle: true
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        // Difficulty Distribution Chart
+        if (document.getElementById('difficultyChart')) {
+          const ctx2 = document.getElementById('difficultyChart').getContext('2d');
+          new Chart(ctx2, {
+            type: 'bar',
+            data: {
+              labels: ['Easy', 'Medium', 'Hard'],
+              datasets: [{
+                label: 'Questions',
+                data: {{ analytics.difficulty_data|safe }},
+                backgroundColor: [chartColors.success, chartColors.warning, chartColors.danger],
+                borderWidth: 1,
+                borderRadius: 4
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: false
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        // Performance Trends Chart
+        if (document.getElementById('performanceTrendsChart')) {
+          const ctx3 = document.getElementById('performanceTrendsChart').getContext('2d');
+          new Chart(ctx3, {
+            type: 'line',
+            data: {
+              labels: {{ analytics.trend_labels|safe }},
+              datasets: [
+                {
+                  label: 'Average Score (%)',
+                  data: {{ analytics.trend_scores|safe }},
+                  borderColor: chartColors.primary,
+                  backgroundColor: chartColors.primary + '20',
+                  tension: 0.4,
+                  fill: true,
+                  yAxisID: 'y'
+                },
+                {
+                  label: 'Test Attempts',
+                  data: {{ analytics.trend_attempts|safe }},
+                  borderColor: chartColors.secondary,
+                  backgroundColor: chartColors.secondary + '20',
+                  tension: 0.4,
+                  yAxisID: 'y1'
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: 'index',
+                intersect: false,
+              },
+              plugins: {
+                legend: {
+                  position: 'top',
+                  labels: {
+                    usePointStyle: true,
+                    padding: 20
+                  }
+                }
+              },
+              scales: {
+                y: {
+                  type: 'linear',
+                  display: true,
+                  position: 'left',
+                  title: {
+                    display: true,
+                    text: 'Score (%)'
+                  },
+                  beginAtZero: true
+                },
+                y1: {
+                  type: 'linear',
+                  display: true,
+                  position: 'right',
+                  title: {
+                    display: true,
+                    text: 'Attempts'
+                  },
+                  beginAtZero: true,
+                  grid: {
+                    drawOnChartArea: false,
+                  },
+                }
+              }
+            }
+          });
+        }
+
+        // Initialize table search functionality
+        initializeTableSearch();
+        
+        // Initialize animations
+        animateMetrics();
+        animateProgressBars();
+      });
+
+      // Table search functionality
+      function initializeTableSearch() {
+        // Test table search
+        const testSearch = document.getElementById('testSearch');
+        if (testSearch) {
+          testSearch.addEventListener('input', function() {
+            filterTable('testTable', this.value);
+          });
+        }
+
+        // Subject table search
+        const subjectSearch = document.getElementById('subjectSearch');
+        if (subjectSearch) {
+          subjectSearch.addEventListener('input', function() {
+            filterTable('subjectTable', this.value);
+          });
+        }
+      }
+
+      function filterTable(tableId, searchTerm) {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll('tbody tr');
+        const term = searchTerm.toLowerCase();
+
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          if (text.includes(term)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      }
+
+      // Animate metric cards
+      function animateMetrics() {
+        const metricCards = document.querySelectorAll('.metric-card');
+        metricCards.forEach((card, index) => {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px)';
+          
+          setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+          }, index * 100);
+        });
+      }
+
+      // Animate progress bars
+      function animateProgressBars() {
+        const progressBars = document.querySelectorAll('.progress-fill');
+        progressBars.forEach(bar => {
+          const width = bar.style.width;
+          bar.style.width = '0%';
+          
+          setTimeout(() => {
+            bar.style.transition = 'width 1s ease-in-out';
+            bar.style.width = width;
+          }, 500);
+        });
+      }
+
+      // Auto-refresh functionality
+      function refreshAnalytics() {
+        fetch('{% url "analytics_api" %}')
+          .then(response => response.json())
+          .then(data => {
+            if (!data.error) {
+              // Update metric values
+              document.getElementById('total-students').textContent = data.total_students.toLocaleString();
+              document.getElementById('total-questions').textContent = data.total_questions.toLocaleString();
+              document.getElementById('total-tests').textContent = data.active_tests.toLocaleString();
+              
+              // Update last refresh time
+              document.getElementById('last-refresh').textContent = new Date(data.timestamp).toLocaleString();
+            }
+          })
+          .catch(error => console.error('Error refreshing analytics:', error));
+      }
+
+      // Set up auto-refresh every 5 minutes
+      setInterval(refreshAnalytics, 300000);
+
+      // CSRF token helper
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Preferences - PulsePrep</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .preferences-form {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .preference-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preference-group:last-child {
+            border-bottom: none;
+        }
+
+        .preference-info {
+            flex: 1;
+        }
+
+        .preference-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .preference-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .preference-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .slider {
+            transform: translateX(30px);
+        }
+
+        .toggle-switch input:checked ~ .toggle-switch {
+            background: #667eea;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        /* Select Styles */
+        .preference-select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            min-width: 150px;
+            transition: border-color 0.3s ease;
+        }
+
+        .preference-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .save-section {
+            background: white;
+            padding: 30px 40px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .btn-save {
+            background: #667eea;
+            color: white;
+            padding: 12px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-save:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: #666;
+            padding: 12px 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 15px;
+        }
+
+        .btn-reset:hover {
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-link {
+                position: static;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+            
+            .preferences-form {
+                padding: 20px;
+            }
+            
+            .preference-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .preference-control {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'notificationsetting' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Notifications
+            </a>
+            <h1><i class="fas fa-cog"></i> Notification Preferences</h1>
+            <p>Customize how and when you receive notifications</p>
+        </div>
+
+        <form method="POST" class="preferences-form">
+            {% csrf_token %}
+            
+            <!-- Email Notifications Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-envelope"></i>
+                    Email Notifications
+                </h2>
+                
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Enable Email Notifications</div>
+                        <div class="preference-description">Receive notifications via email</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.email_enabled %}active{% endif %}">
+                            <input type="checkbox" name="email_enabled" {% if preferences.email_enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Email Frequency</div>
+                        <div class="preference-description">How often to send email notifications</div>
+                    </div>
+                    <div class="preference-control">
+                        <select name="email_digest_frequency" class="preference-select">
+                            {% for value, label in digest_choices %}
+                            <option value="{{ value }}" {% if preferences.email_digest_frequency == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-App Notifications Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i>
+                    In-App Notifications
+                </h2>
+                
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Web App Notifications</div>
+                        <div class="preference-description">Show notifications in the web application</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.webapp_enabled %}active{% endif %}">
+                            <input type="checkbox" name="webapp_enabled" {% if preferences.webapp_enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Desktop Notifications</div>
+                        <div class="preference-description">Show browser desktop notifications</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.show_desktop_notifications %}active{% endif %}">
+                            <input type="checkbox" name="show_desktop_notifications" {% if preferences.show_desktop_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Notification Count Badge</div>
+                        <div class="preference-description">Show unread notification count in navigation</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.show_notification_count %}active{% endif %}">
+                            <input type="checkbox" name="show_notification_count" {% if preferences.show_notification_count %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Sound Alerts</div>
+                        <div class="preference-description">Play sound when receiving notifications</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.sound_enabled %}active{% endif %}">
+                            <input type="checkbox" name="sound_enabled" {% if preferences.sound_enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Categories Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Notification Categories
+                </h2>
+                
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">System Notifications</div>
+                        <div class="preference-description">System alerts, maintenance, and important updates</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.system_notifications %}active{% endif %}">
+                            <input type="checkbox" name="system_notifications" {% if preferences.system_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Test Notifications</div>
+                        <div class="preference-description">Mock test results, reminders, and updates</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.test_notifications %}active{% endif %}">
+                            <input type="checkbox" name="test_notifications" {% if preferences.test_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">User Management</div>
+                        <div class="preference-description">Account approvals, status changes, and user updates</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.user_notifications %}active{% endif %}">
+                            <input type="checkbox" name="user_notifications" {% if preferences.user_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Import Notifications</div>
+                        <div class="preference-description">CSV import status, results, and errors</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.import_notifications %}active{% endif %}">
+                            <input type="checkbox" name="import_notifications" {% if preferences.import_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="preference-group">
+                    <div class="preference-info">
+                        <div class="preference-label">Announcements</div>
+                        <div class="preference-description">General announcements, news, and feature updates</div>
+                    </div>
+                    <div class="preference-control">
+                        <label class="toggle-switch {% if preferences.announcement_notifications %}active{% endif %}">
+                            <input type="checkbox" name="announcement_notifications" {% if preferences.announcement_notifications %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="save-section">
+            <button type="submit" form="preferences-form" class="btn-save">
+                <i class="fas fa-save"></i> Save Preferences
+            </button>
+            <button type="reset" class="btn-reset">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Handle toggle switches
+        document.querySelectorAll('.toggle-switch').forEach(toggle => {
+            const input = toggle.querySelector('input');
+            
+            toggle.addEventListener('click', function(e) {
+                if (e.target !== input) {
+                    input.checked = !input.checked;
+                    updateToggleState(toggle, input.checked);
+                }
+            });
+            
+            input.addEventListener('change', function() {
+                updateToggleState(toggle, this.checked);
+            });
+        });
+
+        function updateToggleState(toggle, checked) {
+            if (checked) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+        }
+
+        // Show success message if redirected after save
+        {% if messages %}
+        {% for message in messages %}
+        showToast('{{ message }}', '{% if message.tags %}{{ message.tags }}{% else %}success{% endif %}');
+        {% endfor %}
+        {% endif %}
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation-triangle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Add any client-side validation here if needed
+            showToast('Saving preferences...', 'info');
+        });
+    </script>
+</body>
+</html>
