@@ -76,11 +76,10 @@ DATABASES = {
 
 # Static and media files config
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Used in development
 
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / 'static']
-else:
-    STATIC_ROOT = '/opt/PulsePrep/staticfiles'
+# Always define STATIC_ROOT for collectstatic to work
+STATIC_ROOT = '/opt/PulsePrep/staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
