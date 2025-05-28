@@ -4,223 +4,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mock Tests | PulsePrep</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-light: #6366f1;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --light: #f8fafc;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --gray-light: #e2e8f0;
-            --success-bg: #ecfdf5;
-            --success-text: #065f46;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
-            --info-bg: #dbeafe;
-            --info-text: #1e40af;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-        
-        /* Dashboard Layout */
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            background: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            z-index: 50;
-            transition: all 0.3s ease;
-        }
-        
-        .logo-container {
-            padding: 24px;
-            border-bottom: 1px solid var(--gray-light);
-        }
-        
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-        
-        .nav-menu {
-            padding: 16px 0;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin: 4px 0;
-        }
-        
-        .nav-item i {
-            width: 24px;
-            text-align: center;
-        }
-        
-        .nav-item:hover {
-            color: var(--primary);
-            background-color: #f5f3ff;
-        }
-        
-        .nav-item.active {
-            color: var(--primary);
-            background-color: #f5f3ff;
-            border-right: 3px solid var(--primary);
-        }
-        
-        /* Main Content */
-        .main-content {
-            background-color: #f9fafb;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-        
-        /* Header */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 24px;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 40;
-        }
-        
-        .header h1 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        .mobile-menu {
-            display: none;
-        }
-        
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .user-menu .notification-bell {
-            position: relative;
-            color: var(--gray);
-            font-size: 18px;
-            cursor: pointer;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--danger);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 600;
-        }
-        
-        .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            overflow: hidden;
-            background-color: var(--primary-light);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        /* Dashboard Content */
-        .dashboard-content {
-            padding: 24px;
-        }
-        
-        /* Section Header */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        
-        .section-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        
-        .section-title i {
-            color: var(--primary);
-        }
-        
-        .info-banner {
-            background: #e0f2fe;
-            color: #0369a1;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        /* Test Grid */
+        /* Mock Tests specific styles that complement DAstyles.css */
         .test-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -228,43 +19,35 @@
             margin-bottom: 40px;
         }
         
-        /* Test Card */
         .test-card {
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
-            border: 1px solid var(--gray-light);
+            animation: fadeInUp 0.5s ease-out;
         }
         
         .test-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary-light);
+            box-shadow: 0 10px 25px rgba(130, 39, 46, 0.15);
+            border-color: #82272e;
         }
         
         .test-card-header {
             padding: 20px;
-            border-bottom: 1px solid var(--gray-light);
+            border-bottom: 1px solid #e2e8f0;
             position: relative;
-        }
-        
-        .test-card-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            background: linear-gradient(135deg, #82272e 0%, #a53b47 100%);
+            color: white;
         }
         
         .test-title {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 8px;
-            color: var(--dark);
+            color: white;
         }
         
         .test-status {
@@ -280,18 +63,21 @@
         }
         
         .status-available {
-            background-color: var(--success-bg);
-            color: var(--success-text);
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
         
         .status-completed {
-            background-color: #ede9fe;
-            color: var(--primary-dark);
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.3);
         }
         
         .status-upcoming {
-            background-color: var(--warning-bg);
-            color: var(--warning-text);
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
         
         .test-card-body {
@@ -299,13 +85,12 @@
         }
         
         .test-description {
-            color: var(--gray);
+            color: #64748b;
             font-size: 14px;
             margin-bottom: 16px;
             line-height: 1.5;
         }
         
-        /* Meta Information */
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -318,19 +103,18 @@
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            color: var(--gray);
+            color: #64748b;
         }
         
         .meta-item i {
-            color: var(--primary);
+            color: #82272e;
             width: 16px;
             text-align: center;
         }
         
-        /* Schedule */
         .schedule-container {
             background: #f8fafc;
-            border: 1px solid var(--gray-light);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 16px;
@@ -342,7 +126,7 @@
             gap: 12px;
             margin-bottom: 8px;
             font-size: 13px;
-            color: var(--gray);
+            color: #64748b;
         }
         
         .schedule-item:last-child {
@@ -350,15 +134,14 @@
         }
         
         .schedule-item i {
-            color: var(--primary);
+            color: #82272e;
             width: 16px;
             text-align: center;
         }
         
-        /* Attempt Info */
         .attempt-info {
             background: #f8fafc;
-            border: 1px solid var(--gray-light);
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
             padding: 12px 16px;
             margin-bottom: 16px;
@@ -372,7 +155,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            background: var(--secondary);
+            background: #10b981;
             color: white;
             padding: 2px 8px;
             border-radius: 12px;
@@ -381,10 +164,9 @@
             margin-left: 8px;
         }
         
-        /* Countdown */
         .countdown {
-            background: var(--warning-bg);
-            color: var(--warning-text);
+            background: #fef3c7;
+            color: #92400e;
             padding: 8px 12px;
             border-radius: 6px;
             font-size: 13px;
@@ -395,7 +177,6 @@
             margin-top: 8px;
         }
         
-        /* Test Actions */
         .test-actions {
             display: flex;
             gap: 12px;
@@ -419,23 +200,23 @@
         }
         
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, #82272e 0%, #a53b47 100%);
             color: white;
         }
         
         .btn-primary:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
         }
         
         .btn-secondary {
             background: white;
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            color: #82272e;
+            border: 1px solid #82272e;
         }
         
         .btn-secondary:hover {
-            background: #f5f3ff;
+            background: rgba(130, 39, 46, 0.1);
             transform: translateY(-2px);
         }
         
@@ -445,65 +226,99 @@
             transform: none !important;
         }
         
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             background: white;
             border-radius: 12px;
-            border: 2px dashed var(--gray-light);
+            border: 2px dashed #e2e8f0;
         }
         
         .empty-state i {
             font-size: 48px;
-            color: var(--gray-light);
+            color: #cbd5e1;
             margin-bottom: 16px;
         }
         
         .empty-state h3 {
-            color: var(--gray);
+            color: #64748b;
             font-size: 18px;
             margin-bottom: 8px;
         }
         
         .empty-state p {
-            color: var(--gray-light);
+            color: #94a3b8;
             font-size: 14px;
         }
         
-        /* Messages/Alerts */
-        .alert {
-            padding: 12px 16px;
-            margin-bottom: 16px;
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .section-title i {
+            color: #82272e;
+        }
+        
+        .info-banner {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Messages */
+        .messages {
+            margin-bottom: 25px;
+        }
+        
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 12px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 14px;
+            font-weight: 500;
             animation: slideIn 0.3s ease-out;
         }
         
-        .alert-success {
-            background: var(--success-bg);
-            color: var(--success-text);
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
             border: 1px solid #a7f3d0;
         }
         
-        .alert-error {
-            background: var(--error-bg);
-            color: var(--error-text);
-            border: 1px solid #fecaca;
+        .message.error {
+            background: #fecaca;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
         }
         
-        .alert-info {
-            background: var(--info-bg);
-            color: var(--info-text);
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
             border: 1px solid #bfdbfe;
         }
         
-        .alert-warning {
-            background: var(--warning-bg);
-            color: var(--warning-text);
+        .message.warning {
+            background: #fef3c7;
+            color: #92400e;
             border: 1px solid #fde68a;
         }
         
@@ -527,38 +342,25 @@
             }
         }
         
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         /* Responsive Design */
         @media (max-width: 1024px) {
-            .dashboard-container {
-                grid-template-columns: 240px 1fr;
-            }
-            
             .test-grid {
                 grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             }
         }
         
         @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                position: fixed;
-                left: -280px;
-                top: 0;
-                height: 100vh;
-                z-index: 100;
-            }
-            
-            .sidebar.active {
-                left: 0;
-            }
-            
-            .mobile-menu {
-                display: block;
-            }
-            
             .test-grid {
                 grid-template-columns: 1fr;
             }
@@ -577,70 +379,38 @@
                 grid-template-columns: 1fr;
             }
         }
-        
-        /* Animations */
-        .test-card {
-            animation: fadeInUp 0.5s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-light);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="container">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="logo-container">
                 <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
             </div>
             <nav class="nav-menu">
-                <a href="{% url 'student_dashboard' %}" class="nav-item">
+                <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Question Bank</span>
-                </a>
-                <a href="{% url 'student_mock_tests' %}" class="nav-item active">
+                <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
                     <i class="fas fa-vial"></i>
                     <span>Mock Tests</span>
                 </a>
-                <a href="{% url 'student_progress' %}" class="nav-item">
+                <a href="#" class="nav-item">
                     <i class="fas fa-chart-bar"></i>
                     <span>My Progress</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{% url 'my_profile' %}" class="nav-item {% if request.resolver_match.url_name == 'my_profile' %}active{% endif %}">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'student_notifications' %}active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    {% if unread_count > 0 %}
+                    <span class="notification-badge-sidebar">{{ unread_count }}</span>
+                    {% endif %}
                 </a>
                 <a href="{% url 'logout' %}" class="nav-item">
                     <i class="fas fa-sign-out-alt"></i>
@@ -654,21 +424,23 @@
             <!-- Header -->
             <header class="header">
                 <div class="mobile-menu">
-                    <button id="sidebar-toggle" class="btn-icon">
+                    <button id="sidebar-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-                <h1>Mock Tests</h1>
+                <h1><i class="fas fa-vial"></i> Mock Tests</h1>
                 <div class="user-menu">
-                    <div class="notification-bell">
+                    <a href="{% url 'student_notifications' %}">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </div>
+                        {% if unread_count > 0 %}
+                        <span class="notification-badge">{{ unread_count }}</span>
+                        {% endif %}
+                    </a>
                     <div class="avatar">
                         {% if user.profile_image %}
                             <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
                         {% else %}
-                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
                         {% endif %}
                     </div>
                 </div>
@@ -676,9 +448,9 @@
 
             <!-- Messages -->
             {% if messages %}
-                <div class="messages-container">
+                <div class="messages">
                     {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
+                        <div class="message {{ message.tags }}">
                             {% if message.tags == 'error' %}
                                 <i class="fas fa-exclamation-circle"></i>
                             {% elif message.tags == 'success' %}
@@ -894,19 +666,26 @@
                     </section>
                 {% endif %}
             </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="social-links">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+                </div>
+            </footer>
         </main>
     </div>
 
     <script src="{% static 'js/DAscript.js' %}"></script>
     <script>
-        // Mobile sidebar toggle
-        document.getElementById('sidebar-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
-        });
-        
         // Auto-dismiss messages after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            const alerts = document.querySelectorAll('.alert');
+            const alerts = document.querySelectorAll('.message');
             alerts.forEach(alert => {
                 setTimeout(() => {
                     alert.style.opacity = '0';

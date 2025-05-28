@@ -3,15 +3,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ test.title }} - PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Test specific styles that complement DAstyles.css */
         :root {
-            --primary: #4f46e5;
-            --primary-light: #6366f1;
-            --primary-dark: #4338ca;
+            --primary: #82272e;
+            --primary-light: #a53b47;
+            --primary-dark: #6b1e24;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -20,20 +22,6 @@
             --dark: #1e293b;
             --gray: #64748b;
             --gray-light: #e2e8f0;
-            --success-bg: #ecfdf5;
-            --success-text: #065f46;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
-            --info-bg: #dbeafe;
-            --info-text: #1e40af;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
@@ -42,6 +30,56 @@
             color: var(--dark);
             line-height: 1.6;
             overflow: hidden;
+            /* Disable text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Screenshot protection overlay */
+        .screenshot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(130, 39, 46, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(20px);
+        }
+
+        .screenshot-overlay.active {
+            display: flex;
+        }
+
+        .screenshot-warning {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .screenshot-warning i {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .screenshot-warning h3 {
+            color: var(--dark);
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .screenshot-warning p {
+            color: var(--gray);
+            margin-bottom: 20px;
         }
 
         /* Test Container */
@@ -112,14 +150,16 @@
             background: #f8fafc;
         }
 
-        /* Question Panel */
+        /* Question Panel - Static height for better UX */
         .question-panel {
             flex: 1;
             padding: 24px;
-            overflow-y: auto;
             background: white;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
         .question-card {
@@ -128,8 +168,18 @@
             padding: 32px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.05);
             max-width: 800px;
-            margin: 0 auto;
             width: 100%;
+            height: 100%;
+            max-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .question-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .question-number {
@@ -156,16 +206,26 @@
             margin-bottom: 28px;
             color: var(--dark);
             font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        /* Fixed height options container */
+        .options-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            min-height: 300px;
         }
 
         .options-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 32px;
+            margin: 0;
+            width: 100%;
         }
 
         .option-item {
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .option-label {
@@ -194,7 +254,7 @@
         }
 
         .option-label.selected {
-            background: #e0e7ff;
+            background: rgba(130, 39, 46, 0.1);
             border-color: var(--primary);
             font-weight: 500;
         }
@@ -206,7 +266,7 @@
             flex: 1;
         }
 
-        /* Navigation Panel */
+        /* Navigation Panel - Rearranged */
         .navigation-panel {
             width: 320px;
             background: white;
@@ -214,6 +274,77 @@
             border-left: 1px solid #e5e7eb;
             overflow-y: auto;
             box-shadow: -4px 0 16px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Test Progress at top */
+        .test-progress {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #bae6fd;
+        }
+
+        .test-progress h5 {
+            margin: 0 0 12px;
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+
+        .progress-item span:first-child {
+            color: var(--gray);
+        }
+
+        .progress-item strong {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Legend above navigation */
+        .legend {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+        }
+
+        .legend h5 {
+            margin: 0 0 12px;
+            color: var(--dark);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+        }
+
+        /* Question navigation at bottom */
+        .question-navigation {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .navigation-panel h4 {
@@ -227,7 +358,8 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            margin-bottom: 28px;
+            flex: 1;
+            align-content: start;
         }
 
         .question-nav-btn {
@@ -265,74 +397,15 @@
             border-color: var(--warning);
         }
 
-        .legend {
-            background: #f8fafc;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 24px;
-        }
-
-        .legend h5 {
-            margin: 0 0 12px;
-            color: var(--dark);
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            font-size: 13px;
-            color: var(--gray);
-        }
-
-        .legend-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-        }
-
-        .test-progress {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border: 1px solid #bae6fd;
-        }
-
-        .test-progress h5 {
-            margin: 0 0 12px;
-            color: #0369a1;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .progress-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 6px 0;
-            font-size: 13px;
-        }
-
-        .progress-item span:first-child {
-            color: var(--gray);
-        }
-
-        .progress-item strong {
-            color: var(--dark);
-            font-weight: 600;
-        }
-
         /* Action Buttons */
         .action-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 32px;
+            margin-top: 24px;
             padding-top: 20px;
             border-top: 1px solid #e5e7eb;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .btn {
@@ -349,13 +422,13 @@
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
         }
 
         .btn-secondary {
@@ -510,6 +583,8 @@
             
             .question-card {
                 padding: 20px;
+                height: auto;
+                max-height: none;
             }
             
             .navigation-panel {
@@ -518,6 +593,7 @@
                 border-top: 1px solid #e5e7eb;
                 order: 2;
                 padding: 20px;
+                max-height: 300px;
             }
             
             .question-grid {
@@ -546,6 +622,10 @@
                 font-size: 18px;
                 padding: 6px 16px;
             }
+
+            .options-container {
+                min-height: auto;
+            }
         }
 
         /* Animations */
@@ -556,6 +636,13 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        /* Disable print screen styles */
+        @media print {
+            body {
+                display: none !important;
+            }
         }
 
         /* Custom scrollbar */
@@ -579,6 +666,18 @@
     </style>
 </head>
 <body>
+    <!-- Screenshot Protection Overlay -->
+    <div class="screenshot-overlay" id="screenshot-overlay">
+        <div class="screenshot-warning">
+            <i class="fas fa-camera-retro"></i>
+            <h3>Screenshot Detected!</h3>
+            <p>Taking screenshots is not allowed during the test. This action has been logged.</p>
+            <button class="btn btn-primary" onclick="hideScreenshotWarning()">
+                <i class="fas fa-check"></i> Continue Test
+            </button>
+        </div>
+    </div>
+
     <div class="test-container">
         <!-- Test Header -->
         <div class="test-header">
@@ -608,8 +707,10 @@
             <!-- Question Panel -->
             <div class="question-panel">
                 <div class="question-card fade-in" id="question-card">
-                    <div id="question-container">
-                        <!-- Questions will be loaded here -->
+                    <div class="question-content">
+                        <div id="question-container">
+                            <!-- Questions will be loaded here -->
+                        </div>
                     </div>
                     
                     <div class="action-buttons">
@@ -628,20 +729,26 @@
                 </div>
             </div>
             
-            <!-- Navigation Panel -->
+            <!-- Navigation Panel - Rearranged -->
             <div class="navigation-panel">
-                <h4>Question Navigation</h4>
-                
-                <div class="question-grid" id="question-nav">
-                    {% for i in test_questions %}
-                        <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
-                                onclick="goToQuestion({{ forloop.counter }})"
-                                data-question="{{ forloop.counter }}">
-                            {{ forloop.counter }}
-                        </button>
-                    {% endfor %}
+                <!-- Test Progress at top -->
+                <div class="test-progress">
+                    <h5>Test Progress</h5>
+                    <div class="progress-item">
+                        <span>Answered:</span>
+                        <strong id="answered-count">0</strong>
+                    </div>
+                    <div class="progress-item">
+                        <span>Marked:</span>
+                        <strong id="marked-count">0</strong>
+                    </div>
+                    <div class="progress-item">
+                        <span>Remaining:</span>
+                        <strong id="remaining-count">{{ total_questions }}</strong>
+                    </div>
                 </div>
-                
+
+                <!-- Legend -->
                 <div class="legend">
                     <h5>Legend</h5>
                     <div class="legend-item">
@@ -662,19 +769,17 @@
                     </div>
                 </div>
                 
-                <div class="test-progress">
-                    <h5>Test Progress</h5>
-                    <div class="progress-item">
-                        <span>Answered:</span>
-                        <strong id="answered-count">0</strong>
-                    </div>
-                    <div class="progress-item">
-                        <span>Marked:</span>
-                        <strong id="marked-count">0</strong>
-                    </div>
-                    <div class="progress-item">
-                        <span>Remaining:</span>
-                        <strong id="remaining-count">{{ total_questions }}</strong>
+                <!-- Question Navigation at bottom -->
+                <div class="question-navigation">
+                    <h4>Question Navigation</h4>
+                    <div class="question-grid" id="question-nav">
+                        {% for i in test_questions %}
+                            <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
+                                    onclick="goToQuestion({{ forloop.counter }})"
+                                    data-question="{{ forloop.counter }}">
+                                {{ forloop.counter }}
+                            </button>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -741,21 +846,96 @@
             loadQuestion(0);
             startTimer();
             setupTabDetection();
+            setupScreenshotProtection();
             updateProgress();
             updateNavigationState();
             
             // Disable right-click
             document.addEventListener('contextmenu', e => e.preventDefault());
             
-            // Disable text selection
-            document.onselectstart = function() { return false; };
-            document.onmousedown = function() { return false; };
-            
             // Auto request fullscreen
             setTimeout(() => {
                 requestFullscreen();
             }, 1000);
         });
+
+        // Screenshot protection
+        function setupScreenshotProtection() {
+            // Detect print screen key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'PrintScreen') {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                    reportScreenshotAttempt();
+                }
+                
+                // Disable common screenshot shortcuts
+                if ((e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                    (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                    reportScreenshotAttempt();
+                }
+                
+                // Disable developer tools
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                }
+            });
+
+            // Blur screen when window loses focus
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    document.body.style.filter = 'blur(20px)';
+                } else {
+                    document.body.style.filter = 'none';
+                }
+            });
+
+            // Detect if dev tools are open
+            let devtools = {
+                open: false,
+                orientation: null
+            };
+            
+            const threshold = 160;
+            
+            setInterval(() => {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        showScreenshotWarning();
+                        reportScreenshotAttempt();
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+        }
+
+        function showScreenshotWarning() {
+            document.getElementById('screenshot-overlay').classList.add('active');
+        }
+
+        function hideScreenshotWarning() {
+            document.getElementById('screenshot-overlay').classList.remove('active');
+        }
+
+        function reportScreenshotAttempt() {
+            fetch('{% url "report_warning" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `attempt_id=${attemptId}&violation_type=screenshot`
+            });
+        }
         
         // Fullscreen functionality
         function toggleFullscreen() {
@@ -811,7 +991,7 @@
             document.getElementById('current-question').textContent = index + 1;
             
             // Create options HTML
-            let optionsHtml = '<ul class="options-list">';
+            let optionsHtml = '<div class="options-container"><ul class="options-list">';
             const options = Object.entries(question.options);
             
             // Randomize options if enabled
@@ -832,7 +1012,7 @@
                     </li>
                 `;
             });
-            optionsHtml += '</ul>';
+            optionsHtml += '</ul></div>';
             
             // Load question content with fade animation
             const questionContainer = document.getElementById('question-container');
@@ -846,9 +1026,6 @@
             updateNavigation();
             updateNavigationState();
             updateMarkButtonState();
-            
-            // Scroll to top of question
-            document.querySelector('.question-panel').scrollTo(0, 0);
         }
         
         // Update navigation button states
@@ -1138,22 +1315,67 @@
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
+            // Prevent common shortcuts that might be used for cheating
             if (e.altKey || e.ctrlKey || e.metaKey) {
-                e.preventDefault(); // Prevent browser shortcuts
+                e.preventDefault();
             }
             
+            // Allow only test navigation keys
             switch(e.key) {
                 case 'ArrowLeft':
-                    previousQuestion();
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        previousQuestion();
+                    }
                     break;
                 case 'ArrowRight':
-                    nextQuestion();
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        nextQuestion();
+                    }
                     break;
                 case 'm':
                 case 'M':
-                    markForReview();
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        markForReview();
+                    }
                     break;
             }
+        });
+
+        // Additional security measures
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your test progress will be lost.';
+            return 'Are you sure you want to leave? Your test progress will be lost.';
+        });
+
+        // Disable text selection and copy
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            showScreenshotWarning();
+            reportScreenshotAttempt();
+        });
+
+        // Detect zoom attempts
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            const currentWidth = window.innerWidth;
+            const currentHeight = window.innerHeight;
+            
+            // Check if it's a zoom change (not window resize)
+            if (Math.abs(currentWidth - lastWidth) > 100 || Math.abs(currentHeight - lastHeight) > 100) {
+                if (currentWidth < lastWidth * 0.9 || currentWidth > lastWidth * 1.1) {
+                    showWarning('Please do not zoom in or out during the test.');
+                }
+            }
+            
+            lastWidth = currentWidth;
+            lastHeight = currentHeight;
         });
     </script>
 </body>

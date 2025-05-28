@@ -3,15 +3,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Progress | PulsePrep</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* Progress specific styles that complement DAstyles.css */
         :root {
-            --primary: #4f46e5;
-            --primary-light: #6366f1;
-            --primary-dark: #4338ca;
+            --primary: #82272e;
+            --primary-light: #a53b47;
+            --primary-dark: #6b1e24;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -20,20 +22,6 @@
             --dark: #1e293b;
             --gray: #64748b;
             --gray-light: #e2e8f0;
-            --success-bg: #ecfdf5;
-            --success-text: #065f46;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
-            --info-bg: #dbeafe;
-            --info-text: #1e40af;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
@@ -93,12 +81,12 @@
 
         .nav-item:hover {
             color: var(--primary);
-            background-color: #f5f3ff;
+            background-color: rgba(130, 39, 46, 0.1);
         }
 
         .nav-item.active {
             color: var(--primary);
-            background-color: #f5f3ff;
+            background-color: rgba(130, 39, 46, 0.1);
             border-right: 3px solid var(--primary);
         }
 
@@ -115,8 +103,9 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 24px;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.2);
             position: sticky;
             top: 0;
             z-index: 40;
@@ -125,11 +114,20 @@
         .header h1 {
             font-size: 20px;
             font-weight: 600;
-            color: var(--dark);
+            color: white;
         }
 
         .mobile-menu {
             display: none;
+        }
+
+        .mobile-menu button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
         }
 
         .user-menu {
@@ -140,9 +138,14 @@
 
         .user-menu .notification-bell {
             position: relative;
-            color: var(--gray);
+            color: rgba(255,255,255,0.8);
             font-size: 18px;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-menu .notification-bell:hover {
+            color: white;
         }
 
         .notification-badge {
@@ -166,13 +169,14 @@
             height: 36px;
             border-radius: 50%;
             overflow: hidden;
-            background-color: var(--primary-light);
+            background-color: rgba(255,255,255,0.2);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
         }
 
         .avatar img {
@@ -189,13 +193,23 @@
         /* Progress Header */
         .progress-header {
             margin-bottom: 32px;
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            border: 1px solid var(--gray-light);
         }
 
         .progress-header h1 {
             color: var(--dark);
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
             margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .progress-header p {
@@ -206,89 +220,240 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
             margin-bottom: 32px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
             border: 1px solid var(--gray-light);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(130, 39, 46, 0.15);
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
-            font-size: 20px;
+            margin-bottom: 20px;
+            font-size: 24px;
         }
 
         .stat-icon.primary {
-            background: #e0e7ff;
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
         }
 
         .stat-icon.success {
-            background: #d1fae5;
-            color: var(--secondary);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
         }
 
         .stat-icon.warning {
-            background: #fef3c7;
-            color: var(--warning);
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
         }
 
-        .stat-icon.danger {
-            background: #fee2e2;
-            color: var(--danger);
+        .stat-icon.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
         }
 
         .stat-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-label {
             color: var(--gray);
             font-size: 14px;
+            font-weight: 500;
         }
 
-        /* Test History */
-        .history-section {
+        .stat-trend {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stat-trend.up {
+            color: var(--secondary);
+        }
+
+        .stat-trend.down {
+            color: var(--danger);
+        }
+
+        /* Performance Overview */
+        .performance-overview {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-section {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
             border: 1px solid var(--gray-light);
-            overflow: hidden;
         }
 
-        .section-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--gray-light);
+        .chart-header {
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .chart-header h3 {
+            margin: 0;
+            color: var(--dark);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-toggle {
+            padding: 6px 12px;
+            border: 1px solid var(--gray-light);
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chart-toggle.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Performance Summary */
+        .performance-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            border: 1px solid var(--gray-light);
+        }
+
+        .summary-item {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .summary-item h4 {
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .summary-item p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-fill.excellent {
+            background: linear-gradient(90deg, #10b981, #059669);
+        }
+
+        .progress-fill.good {
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+
+        .progress-fill.average {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .progress-fill.poor {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        /* Test History */
+        .history-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            border: 1px solid var(--gray-light);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--gray-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        }
+
         .section-header h2 {
             margin: 0;
             color: var(--dark);
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
         }
 
@@ -298,13 +463,21 @@
         }
 
         .filter-select {
-            padding: 8px 16px;
+            padding: 10px 16px;
             border: 1px solid var(--gray-light);
             border-radius: 8px;
             font-size: 14px;
             color: var(--gray);
             background: white;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(130, 39, 46, 0.1);
         }
 
         /* Progress Table */
@@ -315,7 +488,7 @@
 
         .progress-table th {
             background: #f8fafc;
-            padding: 16px 24px;
+            padding: 20px 32px;
             text-align: left;
             font-weight: 600;
             color: var(--gray);
@@ -326,10 +499,10 @@
         }
 
         .progress-table td {
-            padding: 16px 24px;
+            padding: 20px 32px;
             border-bottom: 1px solid var(--gray-light);
             color: var(--dark);
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .progress-table tr:hover {
@@ -341,7 +514,8 @@
             color: var(--dark);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            font-size: 16px;
         }
 
         .test-badge {
@@ -350,8 +524,10 @@
             gap: 4px;
             padding: 4px 10px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .badge-mbbs {
@@ -366,44 +542,45 @@
 
         .date-time {
             color: var(--gray);
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .score-display {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
         }
 
         .score-bar {
-            width: 100px;
-            height: 6px;
+            width: 120px;
+            height: 8px;
             background: #e5e7eb;
-            border-radius: 3px;
+            border-radius: 4px;
             overflow: hidden;
         }
 
         .score-fill {
             height: 100%;
-            border-radius: 3px;
+            border-radius: 4px;
+            transition: width 0.5s ease;
         }
 
         .score-fill.high {
-            background: var(--secondary);
+            background: linear-gradient(90deg, #10b981, #059669);
         }
 
         .score-fill.medium {
-            background: var(--warning);
+            background: linear-gradient(90deg, #f59e0b, #d97706);
         }
 
         .score-fill.low {
-            background: var(--danger);
+            background: linear-gradient(90deg, #ef4444, #dc2626);
         }
 
         .score-text {
             font-weight: 600;
-            font-size: 15px;
-            min-width: 40px;
+            font-size: 16px;
+            min-width: 45px;
             text-align: right;
         }
 
@@ -411,25 +588,25 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
         }
 
         .status-completed {
-            background: var(--success-bg);
-            color: var(--success-text);
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .status-failed {
-            background: var(--error-bg);
-            color: var(--error-text);
+            background: #fecaca;
+            color: #991b1b;
         }
 
         .status-in-progress {
-            background: var(--info-bg);
-            color: var(--info-text);
+            background: #dbeafe;
+            color: #1e40af;
         }
 
         .status-abandoned {
@@ -440,22 +617,32 @@
         .action-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: #f1f5f9;
-            color: var(--primary);
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
             border-radius: 8px;
             text-decoration: none;
             font-size: 13px;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.2s;
             border: none;
             cursor: pointer;
         }
 
         .action-btn:hover {
-            background: #e0e7ff;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .action-btn.secondary:hover {
+            background: #e2e8f0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .action-btn i {
@@ -465,34 +652,38 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: var(--gray);
         }
 
         .empty-state i {
-            font-size: 60px;
+            font-size: 80px;
             color: #cbd5e1;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .empty-state h3 {
-            font-size: 20px;
+            font-size: 24px;
             color: var(--gray);
             margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .empty-state p {
-            font-size: 15px;
+            font-size: 16px;
             color: #94a3b8;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .empty-state .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 24px;
-            background: var(--primary);
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
             border-radius: 8px;
             text-decoration: none;
@@ -501,40 +692,67 @@
         }
 
         .empty-state .btn:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(130, 39, 46, 0.3);
         }
 
-        /* Chart Section */
-        .chart-section {
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .quick-action-card {
             background: white;
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.1);
             border: 1px solid var(--gray-light);
-            margin-top: 24px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
         }
 
-        .chart-header {
-            margin-bottom: 20px;
+        .quick-action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(130, 39, 46, 0.15);
         }
 
-        .chart-header h3 {
-            margin: 0;
-            color: var(--dark);
-            font-size: 18px;
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+        }
+
+        .quick-action-title {
             font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
         }
 
-        .chart-container {
-            position: relative;
-            height: 280px;
+        .quick-action-desc {
+            font-size: 13px;
+            color: var(--gray);
         }
 
         /* Responsive Design */
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .performance-overview {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -549,6 +767,7 @@
                 top: 0;
                 height: 100vh;
                 z-index: 100;
+                transition: left 0.3s ease;
             }
 
             .sidebar.active {
@@ -566,7 +785,8 @@
             .section-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
+                gap: 16px;
+                padding: 20px 24px;
             }
 
             .filter-controls {
@@ -580,17 +800,72 @@
             .progress-table {
                 display: block;
                 overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .progress-table th,
+            .progress-table td {
+                padding: 16px 20px;
+            }
+
+            .dashboard-content {
+                padding: 16px;
+            }
+
+            .progress-header {
+                padding: 24px;
+            }
+
+            .chart-section,
+            .performance-summary {
+                padding: 24px;
             }
         }
 
         /* Animations */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .fade-in {
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(130, 39, 46, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -602,25 +877,28 @@
                 <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
             </div>
             <nav class="nav-menu">
-                <a href="{% url 'student_dashboard' %}" class="nav-item">
+                <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Question Bank</span>
-                </a>
-                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
                     <i class="fas fa-vial"></i>
                     <span>Mock Tests</span>
                 </a>
-                <a href="{% url 'student_progress' %}" class="nav-item active">
+                <a href="#" class="nav-item active">
                     <i class="fas fa-chart-bar"></i>
                     <span>My Progress</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="{% url 'my_profile' %}" class="nav-item">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'student_notifications' %}active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    {% if unread_count > 0 %}
+                    <span class="notification-badge-sidebar">{{ unread_count }}</span>
+                    {% endif %}
                 </a>
                 <a href="{% url 'logout' %}" class="nav-item">
                     <i class="fas fa-sign-out-alt"></i>
@@ -634,15 +912,17 @@
             <!-- Header -->
             <header class="header">
                 <div class="mobile-menu">
-                    <button id="sidebar-toggle" class="btn-icon">
+                    <button id="sidebar-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-                <h1>My Progress</h1>
+                <h1>My Progress Analytics</h1>
                 <div class="user-menu">
                     <div class="notification-bell">
                         <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+                        {% if unread_count > 0 %}
+                        <span class="notification-badge">{{ unread_count }}</span>
+                        {% endif %}
                     </div>
                     <div class="avatar">
                         {% if user.profile_image %}
@@ -656,49 +936,177 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
+                <!-- Progress Header -->
                 <div class="progress-header fade-in">
-                    <h1>Performance Overview</h1>
-                    <p>Track your test history and analyze your progress</p>
+                    <h1>Performance Dashboard</h1>
+                    <p>Track your test history, analyze your progress, and identify areas for improvement</p>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions fade-in">
+                    <a href="{% url 'student_mock_tests' %}" class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="quick-action-title">Take New Test</div>
+                        <div class="quick-action-desc">Start a new mock test</div>
+                    </a>
+                    <a href="#test-history" class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <div class="quick-action-title">Test History</div>
+                        <div class="quick-action-desc">View all attempts</div>
+                    </a>
+                    <a href="#performance-chart" class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="quick-action-title">Progress Chart</div>
+                        <div class="quick-action-desc">Visual progress tracking</div>
+                    </a>
+                    <button onclick="exportProgress()" class="quick-action-card">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="quick-action-title">Export Data</div>
+                        <div class="quick-action-desc">Download your progress</div>
+                    </button>
                 </div>
                 
                 <!-- Statistics Cards -->
-                <div class="stats-grid fade-in">
-                  <div class="stat-card">
-                      <div class="stat-icon primary">
-                          <i class="fas fa-clipboard-check"></i>
-                      </div>
-                      <div class="stat-value">{{ total_tests }}</div>
-                      <div class="stat-label">Total Tests Taken</div>
-                  </div>
-                  
-                  <div class="stat-card">
-                      <div class="stat-icon success">
-                          <i class="fas fa-trophy"></i>
-                      </div>
-                      <div class="stat-value">{{ best_score|floatformat:0 }}%</div>
-                      <div class="stat-label">Best Score</div>
-                  </div>
-                  
-                  <div class="stat-card">
-                      <div class="stat-icon warning">
-                          <i class="fas fa-chart-line"></i>
-                      </div>
-                      <div class="stat-value">{{ avg_score|floatformat:0 }}%</div>
-                      <div class="stat-label">Average Score</div>
-                  </div>
-                  
-                  <div class="stat-card">
-                      <div class="stat-icon danger">
-                          <i class="fas fa-clock"></i>
-                      </div>
-                      <div class="stat-value">{{ avg_time|floatformat:0 }}m</div>
-                      <div class="stat-label">Avg. Time Taken</div>
-                  </div>
-              </div>           
-              <!-- Test History -->
-                <div class="history-section fade-in">
+                <div class="stats-grid slide-in-left">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="stat-value">{{ total_tests }}</div>
+                        <div class="stat-label">Total Tests Taken</div>
+                        {% if test_trend %}
+                        <div class="stat-trend {% if test_trend > 0 %}up{% else %}down{% endif %}">
+                            <i class="fas fa-arrow-{% if test_trend > 0 %}up{% else %}down{% endif %}"></i>
+                            {{ test_trend|floatformat:0 }}% this month
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-value">{{ best_score|floatformat:0 }}%</div>
+                        <div class="stat-label">Best Score Achieved</div>
+                        {% if best_score >= 80 %}
+                        <div class="stat-trend up">
+                            <i class="fas fa-star"></i>
+                            Excellent performance!
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-value">{{ avg_score|floatformat:0 }}%</div>
+                        <div class="stat-label">Average Score</div>
+                        {% if score_improvement %}
+                        <div class="stat-trend {% if score_improvement > 0 %}up{% else %}down{% endif %}">
+                            <i class="fas fa-arrow-{% if score_improvement > 0 %}up{% else %}down{% endif %}"></i>
+                            {{ score_improvement|floatformat:1 }}% vs last month
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon info">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-value">{{ avg_time|floatformat:0 }}m</div>
+                        <div class="stat-label">Average Time Taken</div>
+                        <div class="stat-trend {% if avg_time <= 45 %}up{% else %}down{% endif %}">
+                            <i class="fas fa-{% if avg_time <= 45 %}thumbs-up{% else %}clock{% endif %}"></i>
+                            {% if avg_time <= 45 %}Great time management{% else %}Consider pacing{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Overview -->
+                <div class="performance-overview fade-in">
+                    <!-- Chart Section -->
+                    <div class="chart-section" id="performance-chart">
+                        <div class="chart-header">
+                            <h3>Score Progression</h3>
+                            <div class="chart-controls">
+                                <button class="chart-toggle active" data-period="all">All Time</button>
+                                <button class="chart-toggle" data-period="month">Last Month</button>
+                                <button class="chart-toggle" data-period="week">Last Week</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            {% if completed_attempts|length > 1 %}
+                                <canvas id="scoreChart"></canvas>
+                            {% else %}
+                                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray);">
+                                    <div style="text-align: center;">
+                                        <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                                        <p>Take more tests to see your progress chart</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Performance Summary -->
+                    <div class="performance-summary">
+                        <h3 style="margin-bottom: 24px; color: var(--dark); font-size: 20px; font-weight: 600;">Performance Insights</h3>
+                        
+                        <div class="summary-item">
+                            <h4>Overall Performance</h4>
+                            <p>Your average score across all tests</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if avg_score >= 80 %}excellent{% elif avg_score >= 60 %}good{% elif avg_score >= 40 %}average{% else %}poor{% endif %}" 
+                                     style="width: {{ avg_score }}%"></div>
+                            </div>
+                            <small>{{ avg_score|floatformat:1 }}% average score</small>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <h4>Consistency Rate</h4>
+                            <p>How consistent your scores are</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if consistency_rate >= 80 %}excellent{% elif consistency_rate >= 60 %}good{% elif consistency_rate >= 40 %}average{% else %}poor{% endif %}" 
+                                     style="width: {{ consistency_rate|default:75 }}%"></div>
+                            </div>
+                            <small>{{ consistency_rate|default:75|floatformat:0 }}% consistency</small>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <h4>Improvement Trend</h4>
+                            <p>Your progress over time</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if improvement_rate >= 15 %}excellent{% elif improvement_rate >= 5 %}good{% elif improvement_rate >= 0 %}average{% else %}poor{% endif %}" 
+                                     style="width: {% if improvement_rate > 0 %}{{ improvement_rate|add:50 }}{% else %}25{% endif %}%"></div>
+                            </div>
+                            <small>{% if improvement_rate > 0 %}+{{ improvement_rate|floatformat:1 }}% improvement{% elif improvement_rate < 0 %}{{ improvement_rate|floatformat:1 }}% decline{% else %}Stable performance{% endif %}</small>
+                        </div>
+                        
+                        <div class="summary-item">
+                            <h4>Test Frequency</h4>
+                            <p>How regularly you take tests</p>
+                            <div class="progress-bar">
+                                <div class="progress-fill {% if test_frequency >= 4 %}excellent{% elif test_frequency >= 2 %}good{% elif test_frequency >= 1 %}average{% else %}poor{% endif %}" 
+                                     style="width: {% widthratio test_frequency|default:2 5 100 %}%"></div>
+                            </div>
+                            <small>{{ test_frequency|default:2 }} tests per week</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test History -->
+                <div class="history-section fade-in" id="test-history">
                     <div class="section-header">
-                        <h2>Test History</h2>
+                        <h2>Detailed Test History</h2>
                         <div class="filter-controls">
                             <select class="filter-select" id="statusFilter">
                                 <option value="all">All Status</option>
@@ -712,111 +1120,151 @@
                                 <option value="week">This Week</option>
                                 <option value="month">This Month</option>
                             </select>
+                            <select class="filter-select" id="subjectFilter">
+                                <option value="all">All Subjects</option>
+                                <option value="mbbs">MBBS</option>
+                                <option value="bds">BDS</option>
+                            </select>
                         </div>
                     </div>
                     
                     {% if attempts %}
-                        <table class="progress-table">
-                            <thead>
-                                <tr>
-                                    <th>Test Details</th>
-                                    <th>Date & Time</th>
-                                    <th>Score</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for attempt in attempts %}
-                                <tr class="attempt-row" data-status="{{ attempt.status }}" data-date="{{ attempt.started_at|date:'Y-m-d' }}">
-                                    <td>
-                                        <div class="test-title">
-                                            {{ attempt.mock_test.title }}
-                                            {% if attempt.mock_test.degree %}
-                                                <span class="test-badge badge-{{ attempt.mock_test.degree|lower }}">
-                                                    {{ attempt.mock_test.get_degree_display }}
-                                                </span>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="date-time">
-                                            <div>{{ attempt.started_at|date:"M d, Y" }}</div>
-                                            <div style="color: #94a3b8; font-size: 12px;">{{ attempt.started_at|date:"g:i A" }}</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if attempt.status == 'completed' %}
-                                            <div class="score-display">
-                                                <div class="score-bar">
-                                                    <div class="score-fill {% if attempt.percentage >= 70 %}high{% elif attempt.percentage >= 40 %}medium{% else %}low{% endif %}" 
-                                                         style="width: {{ attempt.percentage }}%"></div>
-                                                </div>
-                                                <span class="score-text">{{ attempt.percentage|floatformat:0 }}%</span>
+                        <div style="overflow-x: auto;">
+                            <table class="progress-table">
+                                <thead>
+                                    <tr>
+                                        <th>Test Details</th>
+                                        <th>Date & Time</th>
+                                        <th>Duration</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="test-table-body">
+                                    {% for attempt in attempts %}
+                                    <tr class="attempt-row" data-status="{{ attempt.status }}" data-date="{{ attempt.started_at|date:'Y-m-d' }}" data-subject="{{ attempt.mock_test.degree|lower }}">
+                                        <td>
+                                            <div class="test-title">
+                                                {{ attempt.mock_test.title }}
+                                                {% if attempt.mock_test.degree %}
+                                                    <span class="test-badge badge-{{ attempt.mock_test.degree|lower }}">
+                                                        {{ attempt.mock_test.get_degree_display }}
+                                                    </span>
+                                                {% endif %}
                                             </div>
-                                        {% else %}
-                                            <span style="color: #94a3b8;">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if attempt.status == 'completed' %}
-                                            {% if attempt.passed %}
-                                                <span class="status-badge status-completed">
-                                                    <i class="fas fa-check-circle"></i> Passed
+                                            <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">
+                                                {{ attempt.mock_test.total_questions }} Questions • {{ attempt.mock_test.duration_minutes }} min
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="date-time">
+                                                <div style="font-weight: 500;">{{ attempt.started_at|date:"M d, Y" }}</div>
+                                                <div style="color: #94a3b8; font-size: 13px;">{{ attempt.started_at|date:"g:i A" }}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if attempt.time_taken %}
+                                                <div style="font-weight: 500;">{{ attempt.time_taken|floatformat:0 }}m</div>
+                                                <div style="color: #94a3b8; font-size: 13px;">
+                                                    {% if attempt.time_taken < attempt.mock_test.duration_minutes %}
+                                                        {{ attempt.mock_test.duration_minutes|floatformat:0|add:"-"|add:attempt.time_taken|floatformat:0 }}m saved
+                                                    {% else %}
+                                                        Full time used
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <span style="color: #94a3b8;">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if attempt.status == 'completed' %}
+                                                <div class="score-display">
+                                                    <div class="score-bar">
+                                                        <div class="score-fill {% if attempt.percentage >= 70 %}high{% elif attempt.percentage >= 40 %}medium{% else %}low{% endif %}" 
+                                                             style="width: {{ attempt.percentage }}%"></div>
+                                                    </div>
+                                                    <span class="score-text">{{ attempt.percentage|floatformat:0 }}%</span>
+                                                </div>
+                                                <div style="font-size: 12px; color: var(--gray); margin-top: 4px;">
+                                                    {{ attempt.score }}/{{ attempt.mock_test.total_questions }} correct
+                                                </div>
+                                            {% else %}
+                                                <span style="color: #94a3b8;">Not completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if attempt.status == 'completed' %}
+                                                {% if attempt.passed %}
+                                                    <span class="status-badge status-completed">
+                                                        <i class="fas fa-check-circle"></i> Passed
+                                                    </span>
+                                                {% else %}
+                                                    <span class="status-badge status-failed">
+                                                        <i class="fas fa-times-circle"></i> Failed
+                                                    </span>
+                                                {% endif %}
+                                            {% elif attempt.status == 'in_progress' %}
+                                                <span class="status-badge status-in-progress">
+                                                    <i class="fas fa-clock"></i> In Progress
                                                 </span>
                                             {% else %}
-                                                <span class="status-badge status-failed">
-                                                    <i class="fas fa-times-circle"></i> Failed
+                                                <span class="status-badge status-abandoned">
+                                                    <i class="fas fa-ban"></i> Abandoned
                                                 </span>
                                             {% endif %}
-                                        {% elif attempt.status == 'in_progress' %}
-                                            <span class="status-badge status-in-progress">
-                                                <i class="fas fa-clock"></i> In Progress
-                                            </span>
-                                        {% else %}
-                                            <span class="status-badge status-abandoned">
-                                                <i class="fas fa-ban"></i> Abandoned
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if attempt.status == 'completed' or attempt.status == 'abandoned' %}
-                                            <a href="{% url 'test_result' attempt.id %}" class="action-btn">
-                                                <i class="fas fa-eye"></i> Results
-                                            </a>
-                                        {% elif attempt.status == 'in_progress' %}
-                                            <a href="{% url 'take_test' attempt.mock_test.id %}" class="action-btn">
-                                                <i class="fas fa-play"></i> Continue
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; gap: 8px;">
+                                                {% if attempt.status == 'completed' or attempt.status == 'abandoned' %}
+                                                    <a href="{% url 'test_result' attempt.id %}" class="action-btn">
+                                                        <i class="fas fa-eye"></i> View Results
+                                                    </a>
+                                                {% elif attempt.status == 'in_progress' %}
+                                                    <a href="{% url 'take_test' attempt.mock_test.id %}" class="action-btn">
+                                                        <i class="fas fa-play"></i> Continue
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'take_test' attempt.mock_test.id %}" class="action-btn secondary">
+                                                    <i class="fas fa-redo"></i> Retake
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination if needed -->
+                        {% if attempts.paginator.num_pages > 1 %}
+                        <div style="padding: 20px 32px; border-top: 1px solid var(--gray-light); display: flex; justify-content: center;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                {% if attempts.has_previous %}
+                                    <a href="?page={{ attempts.previous_page_number }}" style="padding: 8px 12px; border: 1px solid var(--gray-light); border-radius: 6px; text-decoration: none; color: var(--gray);">Previous</a>
+                                {% endif %}
+                                
+                                <span style="padding: 8px 12px; color: var(--gray);">
+                                    Page {{ attempts.number }} of {{ attempts.paginator.num_pages }}
+                                </span>
+                                
+                                {% if attempts.has_next %}
+                                    <a href="?page={{ attempts.next_page_number }}" style="padding: 8px 12px; border: 1px solid var(--gray-light); border-radius: 6px; text-decoration: none; color: var(--gray);">Next</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
                     {% else %}
                         <div class="empty-state">
                             <i class="fas fa-clipboard-list"></i>
                             <h3>No Test History Yet</h3>
-                            <p>Start taking mock tests to track your progress and improve your scores.</p>
+                            <p>You haven't taken any tests yet. Start your journey by taking your first mock test and track your progress over time.</p>
                             <a href="{% url 'student_mock_tests' %}" class="btn">
                                 <i class="fas fa-play"></i> Take Your First Test
                             </a>
                         </div>
                     {% endif %}
                 </div>
-                
-                <!-- Performance Chart -->
-                {% if completed_attempts|length > 1 %}
-                <div class="chart-section fade-in">
-                    <div class="chart-header">
-                        <h3>Score Trend</h3>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="scoreChart"></canvas>
-                    </div>
-                </div>
-            {% endif %}
             </div>
         </main>
     </div>
@@ -832,10 +1280,12 @@
         // Filter functionality
         document.getElementById('statusFilter').addEventListener('change', filterTable);
         document.getElementById('dateFilter').addEventListener('change', filterTable);
+        document.getElementById('subjectFilter').addEventListener('change', filterTable);
         
         function filterTable() {
             const statusFilter = document.getElementById('statusFilter').value;
             const dateFilter = document.getElementById('dateFilter').value;
+            const subjectFilter = document.getElementById('subjectFilter').value;
             const today = new Date();
             const weekAgo = new Date();
             weekAgo.setDate(today.getDate() - 7);
@@ -845,9 +1295,11 @@
             document.querySelectorAll('.attempt-row').forEach(row => {
                 const status = row.getAttribute('data-status');
                 const dateStr = row.getAttribute('data-date');
+                const subject = row.getAttribute('data-subject');
                 const attemptDate = new Date(dateStr);
                 
                 let statusMatch = statusFilter === 'all' || status === statusFilter;
+                let subjectMatch = subjectFilter === 'all' || subject === subjectFilter;
                 let dateMatch = true;
                 
                 if (dateFilter === 'today') {
@@ -858,112 +1310,229 @@
                     dateMatch = attemptDate >= monthAgo;
                 }
                 
-                if (statusMatch && dateMatch) {
+                if (statusMatch && dateMatch && subjectMatch) {
                     row.style.display = '';
                 } else {
                     row.style.display = 'none';
                 }
             });
         }
+
+        // Chart period toggles
+        document.querySelectorAll('.chart-toggle').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.chart-toggle').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                // Update chart based on period - implement as needed
+                updateChart(this.dataset.period);
+            });
+        });
+
+        function updateChart(period) {
+            // Filter chart data based on period
+            console.log('Updating chart for period:', period);
+            // Implement chart filtering logic here
+        }
+
+        // Export progress function
+        function exportProgress() {
+            // Show loading state
+            const button = event.target.closest('.quick-action-card');
+            const originalContent = button.innerHTML;
+            button.innerHTML = `
+                <div class="quick-action-icon">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div class="quick-action-title">Exporting...</div>
+                <div class="quick-action-desc">Please wait</div>
+            `;
+            
+            // Simulate export process
+            setTimeout(() => {
+                // Reset button
+                button.innerHTML = originalContent;
+                
+                // Create and download CSV
+                const csvData = generateCSVData();
+                downloadCSV(csvData, 'progress-report.csv');
+            }, 2000);
+        }
+
+        function generateCSVData() {
+            const headers = ['Test Name', 'Date', 'Score', 'Status', 'Time Taken'];
+            const rows = [];
+            
+            document.querySelectorAll('.attempt-row').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [
+                    cells[0].textContent.trim(),
+                    cells[1].textContent.trim(),
+                    cells[3].textContent.trim(),
+                    cells[4].textContent.trim(),
+                    cells[2].textContent.trim()
+                ];
+                rows.push(rowData.join(','));
+            });
+            
+            return [headers.join(','), ...rows].join('\n');
+        }
+
+        function downloadCSV(data, filename) {
+            const blob = new Blob([data], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', filename);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
         
         // Initialize filters
         filterTable();
         
-// Score trend chart
-{% if completed_attempts|length > 1 %}
-    const ctx = document.getElementById('scoreChart').getContext('2d');
-    const attemptsData = [
-        {% for attempt in completed_attempts|dictsort:"started_at" %}
-        {
-            date: '{{ attempt.started_at|date:"M d" }}',
-            score: {{ attempt.percentage|floatformat:0 }},
-            passed: {% if attempt.passed %}true{% else %}false{% endif %}
-        },
-        {% endfor %}
-    ];
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: attemptsData.map(a => a.date),
-            datasets: [{
-                label: 'Score %',
-                data: attemptsData.map(a => a.score),
-                borderColor: '#4f46e5',
-                backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                borderWidth: 3,
-                tension: 0.3,
-                pointRadius: 5,
-                pointBackgroundColor: function(context) {
-                    return attemptsData[context.dataIndex].passed ? '#10b981' : '#ef4444';
+        // Score trend chart
+        {% if completed_attempts|length > 1 %}
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            const attemptsData = [
+                {% for attempt in completed_attempts|dictsort:"started_at" %}
+                {
+                    date: '{{ attempt.started_at|date:"M d" }}',
+                    fullDate: '{{ attempt.started_at|date:"Y-m-d" }}',
+                    score: {{ attempt.percentage|floatformat:0 }},
+                    passed: {% if attempt.passed %}true{% else %}false{% endif %},
+                    testName: '{{ attempt.mock_test.title|truncatechars:20 }}'
                 },
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: '#1e293b',
-                    padding: 12,
-                    cornerRadius: 8,
-                    titleFont: {
-                        size: 14,
-                        weight: '600'
-                    },
-                    bodyFont: {
-                        size: 16,
-                        weight: '700'
-                    },
-                    callbacks: {
-                        label: function(context) {
-                            return context.parsed.y + '%';
+                {% endfor %}
+            ];
+            
+            const chartConfig = {
+                type: 'line',
+                data: {
+                    labels: attemptsData.map(a => a.date),
+                    datasets: [{
+                        label: 'Score %',
+                        data: attemptsData.map(a => a.score),
+                        borderColor: '#82272e',
+                        backgroundColor: 'rgba(130, 39, 46, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: function(context) {
+                            return attemptsData[context.dataIndex].passed ? '#10b981' : '#ef4444';
                         },
-                        afterLabel: function(context) {
-                            const attempt = attemptsData[context.dataIndex];
-                            return attempt.passed ? 'Passed' : 'Failed';
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 3,
+                        pointHoverRadius: 8,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                            padding: 16,
+                            cornerRadius: 8,
+                            titleFont: {
+                                size: 14,
+                                weight: '600'
+                            },
+                            bodyFont: {
+                                size: 16,
+                                weight: '700'
+                            },
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                title: function(context) {
+                                    const attempt = attemptsData[context[0].dataIndex];
+                                    return attempt.testName;
+                                },
+                                label: function(context) {
+                                    return 'Score: ' + context.parsed.y + '%';
+                                },
+                                afterLabel: function(context) {
+                                    const attempt = attemptsData[context.dataIndex];
+                                    return attempt.passed ? '✓ Passed' : '✗ Failed';
+                                }
+                            }
                         }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#64748b'
+                            },
+                            grid: {
+                                color: '#f1f5f9',
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                },
+                                color: '#64748b'
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        },
-                        font: {
-                            size: 12
-                        },
-                        color: '#64748b'
-                    },
-                    grid: {
-                        color: '#f1f5f9'
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            size: 12
-                        },
-                        color: '#64748b'
-                    },
-                    grid: {
-                        display: false
-                    }
+            };
+            
+            const chart = new Chart(ctx, chartConfig);
+        {% endif %}
+
+        // Animate progress bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const progressFills = document.querySelectorAll('.progress-fill');
+                progressFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 200);
+                });
+            }, 800);
+        });
+
+        // Smooth scrolling for quick actions
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
-            }
-        }
-    });
-{% endif %}
+            });
+        });
     </script>
 </body>
 </html>

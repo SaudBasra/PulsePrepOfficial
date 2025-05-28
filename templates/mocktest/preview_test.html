@@ -4,6 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PulsePrep - Preview Test: {{ test.title }}</title>
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
@@ -160,7 +161,7 @@
       <i class="fas fa-user"></i>
       <span>My Account</span>
     </a>
-    <a href="{% url 'notificationsetting' %}" class="nav-item {% if request.resolver_match.url_name == 'notificationsetting' %}active{% endif %}">
+    <a href="{% url 'notification_center' %}" class="nav-item {% if request.resolver_match.url_name == 'notification_center' %}active{% endif %}">
       <i class="fas fa-bell"></i>
       <span>Notifications</span>
       <span class="notification-badge-sidebar"></span>
@@ -183,7 +184,7 @@
           </div>
           <h1>Preview Test</h1>
           <div class="user-menu">
-            <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+            <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
             <div class="avatar">
               <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
             </div>

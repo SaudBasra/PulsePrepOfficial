@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'local-default-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS handles both development and production
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost 127.0.0.1').split()
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS','127.0.0.1').split()
 
 # Application definition
 INSTALLED_APPS = [
@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'mocktest',
     'analytics_report',
     'myaccount',
-    'notificationsetting',
+    'notifications',
     'setting',
 ]
 
@@ -76,11 +76,10 @@ DATABASES = {
 
 # Static and media files config
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Used in development
 
-if DEBUG:
-    STATICFILES_DIRS = [BASE_DIR / 'static']
-else:
-    STATIC_ROOT = '/opt/PulsePrep/staticfiles'
+# Always define STATIC_ROOT for collectstatic to work
+STATIC_ROOT = '/opt/PulsePrep/staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

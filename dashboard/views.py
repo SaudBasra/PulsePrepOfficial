@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from user_management.models import CustomUser
 from django.utils import timezone
 from mocktest.models import TestAttempt
-
+from django.contrib.auth import logout
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.db.models import Count, Q
@@ -257,25 +257,19 @@ def student_dashboard(request):
     return render(request, 'dashboard/student_dashboard.html', context)
 
 
-
-"""
-# dashboard/views.py
+from django.contrib.auth import logout as auth_logout
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout
 
-def dashboard(request):
-    # Add any context data needed for the dashboard
-    context = {
-        # Example data for the dashboard
-        'total_users': 5230,
-        'active_subscriptions': 700,
-        'mbbs_percentage': 72,
-        'bds_percentage': 72,
-        'new_users_mbbs': 300,
-        'new_users_bds': 100,
-    }
-    return render(request, 'dashboard.html', context)
-"""
+
+def logout_view(request):
+    """Handle user logout"""
+    try:
+        auth_logout(request)
+        messages.success(request, 'You have been successfully logged out.')
+        return redirect('login')
+    except Exception as e:
+        messages.error(request, f'Error during logout: {str(e)}')
+        return redirect('login')
 def manage_questions(request):
     # Placeholder for the manage questions view
     return render(request, 'questionbank.html')

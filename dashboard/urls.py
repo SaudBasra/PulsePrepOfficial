@@ -17,4 +17,6 @@ urlpatterns = [
     path('settings/', views.settings, name='settings'),
     path('logout/', views.logout_view, name='logout'),
     path('all-notifications/', views.all_notifications, name='all_notifications'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+
 ]
