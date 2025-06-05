@@ -49,12 +49,11 @@ def signup_view(request):
             approval_status='pending'
         )
         
-                # Handle profile image upload
+        # Handle profile image upload
         if 'profile_image' in request.FILES:
             user.profile_image = request.FILES['profile_image']
 
         user.set_password(password)
-        
         
         # Handle payment slip upload
         if 'payment_slip' in request.FILES:
@@ -69,15 +68,7 @@ def signup_view(request):
     
     return render(request, 'user_management/signup.html')
 
-
-
-
-
-
-
-
-
-# Login view
+# Login view - FIXED VERSION
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -123,16 +114,16 @@ def login_view(request):
                 # Session will expire when browser is closed
                 request.session.set_expiry(0)
             
-            # Redirect based on user type
-            if user.is_admin or user.is_superuser:
-                return redirect('dashboard')
-            else:
-                return redirect('dashboard')  # Or student dashboard
+            # FIXED: Redirect to dashboard for all users
+            # The dashboard view will handle routing based on user type
+            return redirect('dashboard')
+            
         else:
             messages.error(request, "Invalid email or password!")
             return render(request, 'user_management/login.html')
     
     return render(request, 'user_management/login.html')
+
 # Logout view
 @login_required
 def logout_view(request):

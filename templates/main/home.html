@@ -4,6 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PulsePrep - Home Page</title>
     <link
@@ -28,17 +29,16 @@
         <div class="logo">
           <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
         </div>
-
         <div class="auth-buttons">
-            {% if user.is_authenticated %}
-                <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
-            {% else %}
-                <a href="{% url 'login' %}" class="login-btn">Log in</a>
-                <a href="{% url 'signup' %}" class="signup-btn">Sign up</a>
-            {% endif %}
-        </div>
-        
-        <button class="mobile-menu-btn">
+          {% if user.is_authenticated %}
+              <a href="{% url 'dashboard' %}" class="dashboard-btn">Dashboard</a>
+              <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+          {% else %}
+              <a href="{% url 'login' %}" class="login-btn">Log in</a>
+              <a href="{% url 'signup' %}" class="signup-btn">Sign up</a>
+          {% endif %}
+      </div>
+              <button class="mobile-menu-btn">
           <i class="fas fa-bars"></i>
         </button>
       </div>

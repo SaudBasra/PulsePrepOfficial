@@ -3,15 +3,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Results - {{ test.title }} | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Test Results specific styles that complement DAstyles.css */
         :root {
-            --primary: #4f46e5;
-            --primary-light: #6366f1;
-            --primary-dark: #4338ca;
+            --primary: #82272e;
+            --primary-light: #a53b47;
+            --primary-dark: #6b1e24;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -20,20 +22,6 @@
             --dark: #1e293b;
             --gray: #64748b;
             --gray-light: #e2e8f0;
-            --success-bg: #ecfdf5;
-            --success-text: #065f46;
-            --error-bg: #fee2e2;
-            --error-text: #991b1b;
-            --info-bg: #dbeafe;
-            --info-text: #1e40af;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
@@ -41,6 +29,115 @@
             background-color: #f9fafb;
             color: var(--dark);
             line-height: 1.6;
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            
+            .result-container {
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+            
+            .summary-card, .review-section {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+            }
+            
+            .score-display {
+                page-break-inside: avoid;
+            }
+            
+            .print-header {
+                display: block !important;
+                margin-bottom: 30px !important;
+                text-align: center;
+                border-bottom: 2px solid #82272e;
+                padding-bottom: 20px;
+            }
+            
+            .print-header img {
+                height: 60px !important;
+                margin-bottom: 10px;
+            }
+            
+            .print-footer {
+                display: block !important;
+                margin-top: 30px;
+                text-align: center;
+                font-size: 12px;
+                color: #666;
+                border-top: 1px solid #ccc;
+                padding-top: 20px;
+            }
+        }
+
+        .print-header {
+            display: none;
+        }
+
+        .print-footer {
+            display: none;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nav-brand img {
+            height: 32px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         /* Result Container */
@@ -74,8 +171,9 @@
             border-radius: 16px;
             padding: 40px;
             margin-bottom: 32px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
             text-align: center;
+            border: 1px solid var(--gray-light);
         }
 
         .score-display {
@@ -97,6 +195,7 @@
             transform: translate(-50%, -50%);
             font-size: 48px;
             font-weight: 700;
+            color: var(--primary);
         }
 
         .pass-status {
@@ -109,13 +208,13 @@
         }
 
         .pass-status.passed {
-            background: var(--success-bg);
-            color: var(--success-text);
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .pass-status.failed {
-            background: var(--error-bg);
-            color: var(--error-text);
+            background: #fecaca;
+            color: #991b1b;
         }
 
         /* Stats Grid */
@@ -128,31 +227,45 @@
 
         .stat-card {
             background: #f8fafc;
-            padding: 20px;
+            padding: 24px;
             border-radius: 12px;
             text-align: center;
             border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(130, 39, 46, 0.1);
         }
 
         .stat-value {
             font-size: 32px;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-label {
             color: var(--gray);
             font-size: 14px;
+            font-weight: 500;
         }
 
-        /* Review Section */
-        .review-section {
+        .stat-icon {
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        /* Performance Summary */
+        .performance-summary {
             background: white;
             border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
             margin-bottom: 32px;
+            border: 1px solid var(--gray-light);
         }
 
         .section-title {
@@ -169,9 +282,91 @@
             color: var(--primary);
         }
 
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .performance-item {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .performance-item h4 {
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .performance-item p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .performance-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Review Section */
+        .review-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            margin-bottom: 32px;
+            border: 1px solid var(--gray-light);
+        }
+
+        .review-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .toggle-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
         .question-review {
             border-bottom: 1px solid var(--gray-light);
             padding: 24px 0;
+            display: none;
+        }
+
+        .question-review.show {
+            display: block;
         }
 
         .question-review:last-child {
@@ -188,6 +383,7 @@
         .question-number {
             font-weight: 600;
             color: var(--dark);
+            font-size: 16px;
         }
 
         .status-badge {
@@ -201,13 +397,13 @@
         }
 
         .status-correct {
-            background: var(--success-bg);
-            color: var(--success-text);
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .status-incorrect {
-            background: var(--error-bg);
-            color: var(--error-text);
+            background: #fecaca;
+            color: #991b1b;
         }
 
         .question-text {
@@ -215,6 +411,7 @@
             line-height: 1.6;
             margin-bottom: 16px;
             color: var(--dark);
+            font-weight: 500;
         }
 
         .options-list {
@@ -239,17 +436,17 @@
         }
 
         .option-label.correct {
-            background: var(--success-bg);
+            background: #d1fae5;
             border-color: var(--secondary);
         }
 
         .option-label.incorrect {
-            background: var(--error-bg);
+            background: #fecaca;
             border-color: var(--danger);
         }
 
         .option-label.selected {
-            background: #fff3e0;
+            background: #fef3c7;
             border-color: var(--warning);
         }
 
@@ -257,12 +454,14 @@
             margin-right: 12px;
             margin-top: 4px;
             pointer-events: none;
+            accent-color: var(--primary);
         }
 
         .option-text {
             font-size: 15px;
             line-height: 1.5;
             color: var(--dark);
+            flex: 1;
         }
 
         .option-icon {
@@ -271,7 +470,7 @@
         }
 
         .explanation-box {
-            background: var(--info-bg);
+            background: #dbeafe;
             padding: 16px;
             border-radius: 8px;
             margin-top: 16px;
@@ -280,7 +479,7 @@
 
         .explanation-title {
             font-weight: 600;
-            color: var(--info-text);
+            color: #1e40af;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -312,16 +511,17 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            border: none;
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
         }
 
         .btn-secondary {
@@ -332,6 +532,17 @@
 
         .btn-secondary:hover {
             background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
         }
 
         /* Responsive Design */
@@ -361,19 +572,89 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .nav-bar {
+                padding: 12px 16px;
+            }
+
+            .nav-brand {
+                font-size: 16px;
+            }
+
+            .nav-actions {
+                gap: 8px;
+            }
+
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Print Header (only visible when printing) -->
+    <div class="print-header">
+        <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+        <h1>Test Results Report</h1>
+        <p>{{ test.title }} • {{ attempt.started_at|date:"F j, Y g:i A" }}</p>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar no-print">
+        <div class="nav-brand">
+            <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+            Test Results
+        </div>
+        <div class="nav-actions">
+            <button onclick="printSummary()" class="nav-btn">
+                <i class="fas fa-print"></i> Print Summary
+            </button>
+            <a href="{% url 'student_dashboard' %}" class="nav-btn">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
     <div class="result-container">
         <!-- Result Header -->
         <div class="result-header">
-            <h1>Test Results</h1>
-            <p>{{ test.title }} • {{ attempt.started_at|date:"F j, Y" }}</p>
+            <h1>{{ test.title }}</h1>
+            <p>Test completed on {{ attempt.started_at|date:"F j, Y" }} at {{ attempt.started_at|time:"g:i A" }}</p>
         </div>
 
         <!-- Summary Card -->
-        <div class="summary-card">
+        <div class="summary-card fade-in">
             <div class="score-display">
                 <canvas id="scoreChart" class="score-circle" width="200" height="200"></canvas>
                 <div class="score-text">{{ attempt.percentage|floatformat:0 }}%</div>
@@ -386,159 +667,290 @@
 
             <div class="stats-grid">
                 <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
                     <div class="stat-value">{{ attempt.score }}</div>
                     <div class="stat-label">Correct Answers</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
                     <div class="stat-value">{{ test.total_questions }}</div>
                     <div class="stat-label">Total Questions</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
                     <div class="stat-value">{{ attempt.time_taken|floatformat:0 }}m</div>
                     <div class="stat-label">Time Taken</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
                     <div class="stat-value">{{ test.passing_percentage }}%</div>
                     <div class="stat-label">Passing Score</div>
                 </div>
             </div>
         </div>
 
-        <!-- Answers Review -->
-        {% if test.show_explanations %}
-        <div class="review-section">
+        <!-- Performance Summary -->
+        <div class="performance-summary fade-in">
             <h2 class="section-title">
-                <i class="fas fa-clipboard-check"></i>
-                Answers Review
+                <i class="fas fa-chart-line"></i>
+                Performance Analysis
             </h2>
             
-            {% for response in responses %}
-                <div class="question-review">
-                    <div class="review-header">
-                        <div class="question-number">Question {{ forloop.counter }}</div>
-                        <span class="status-badge {% if response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
-                            <i class="fas fa-{% if response.is_correct %}check{% else %}times{% endif %}"></i>
-                            {% if response.is_correct %}Correct{% else %}Incorrect{% endif %}
-                        </span>
+            <div class="performance-grid">
+                <div class="performance-item">
+                    <h4>Overall Score</h4>
+                    <p>Your performance in this test</p>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: {{ attempt.percentage }}%"></div>
                     </div>
-                    
-                    <div class="question-text">{{ response.question.question_text }}</div>
-                    
-                    <ul class="options-list">
-                        {% if response.question.option_a %}
-                            <li class="option-item">
-                                <label class="option-label 
-                                    {% if response.question.correct_answer == 'A' %}correct{% endif %}
-                                    {% if response.selected_answer == 'A' and not response.is_correct %}incorrect{% endif %}
-                                    {% if response.selected_answer == 'A' %}selected{% endif %}">
-                                    <input type="radio" name="q{{ forloop.counter }}" value="A" 
-                                        {% if response.selected_answer == 'A' %}checked{% endif %}>
-                                    <span class="option-text">A) {{ response.question.option_a }}</span>
-                                    {% if response.question.correct_answer == 'A' %}
-                                        <i class="fas fa-check option-icon" style="color: var(--success-text);"></i>
-                                    {% elif response.selected_answer == 'A' and not response.is_correct %}
-                                        <i class="fas fa-times option-icon" style="color: var(--error-text);"></i>
-                                    {% endif %}
-                                </label>
-                            </li>
-                        {% endif %}
-                        
-                        {% if response.question.option_b %}
-                            <li class="option-item">
-                                <label class="option-label 
-                                    {% if response.question.correct_answer == 'B' %}correct{% endif %}
-                                    {% if response.selected_answer == 'B' and not response.is_correct %}incorrect{% endif %}
-                                    {% if response.selected_answer == 'B' %}selected{% endif %}">
-                                    <input type="radio" name="q{{ forloop.counter }}" value="B" 
-                                        {% if response.selected_answer == 'B' %}checked{% endif %}>
-                                    <span class="option-text">B) {{ response.question.option_b }}</span>
-                                    {% if response.question.correct_answer == 'B' %}
-                                        <i class="fas fa-check option-icon" style="color: var(--success-text);"></i>
-                                    {% elif response.selected_answer == 'B' and not response.is_correct %}
-                                        <i class="fas fa-times option-icon" style="color: var(--error-text);"></i>
-                                    {% endif %}
-                                </label>
-                            </li>
-                        {% endif %}
-                        
-                        {% if response.question.option_c %}
-                            <li class="option-item">
-                                <label class="option-label 
-                                    {% if response.question.correct_answer == 'C' %}correct{% endif %}
-                                    {% if response.selected_answer == 'C' and not response.is_correct %}incorrect{% endif %}
-                                    {% if response.selected_answer == 'C' %}selected{% endif %}">
-                                    <input type="radio" name="q{{ forloop.counter }}" value="C" 
-                                        {% if response.selected_answer == 'C' %}checked{% endif %}>
-                                    <span class="option-text">C) {{ response.question.option_c }}</span>
-                                    {% if response.question.correct_answer == 'C' %}
-                                        <i class="fas fa-check option-icon" style="color: var(--success-text);"></i>
-                                    {% elif response.selected_answer == 'C' and not response.is_correct %}
-                                        <i class="fas fa-times option-icon" style="color: var(--error-text);"></i>
-                                    {% endif %}
-                                </label>
-                            </li>
-                        {% endif %}
-                        
-                        {% if response.question.option_d %}
-                            <li class="option-item">
-                                <label class="option-label 
-                                    {% if response.question.correct_answer == 'D' %}correct{% endif %}
-                                    {% if response.selected_answer == 'D' and not response.is_correct %}incorrect{% endif %}
-                                    {% if response.selected_answer == 'D' %}selected{% endif %}">
-                                    <input type="radio" name="q{{ forloop.counter }}" value="D" 
-                                        {% if response.selected_answer == 'D' %}checked{% endif %}>
-                                    <span class="option-text">D) {{ response.question.option_d }}</span>
-                                    {% if response.question.correct_answer == 'D' %}
-                                        <i class="fas fa-check option-icon" style="color: var(--success-text);"></i>
-                                    {% elif response.selected_answer == 'D' and not response.is_correct %}
-                                        <i class="fas fa-times option-icon" style="color: var(--error-text);"></i>
-                                    {% endif %}
-                                </label>
-                            </li>
-                        {% endif %}
-                        
-                        {% if response.question.option_e %}
-                            <li class="option-item">
-                                <label class="option-label 
-                                    {% if response.question.correct_answer == 'E' %}correct{% endif %}
-                                    {% if response.selected_answer == 'E' and not response.is_correct %}incorrect{% endif %}
-                                    {% if response.selected_answer == 'E' %}selected{% endif %}">
-                                    <input type="radio" name="q{{ forloop.counter }}" value="E" 
-                                        {% if response.selected_answer == 'E' %}checked{% endif %}>
-                                    <span class="option-text">E) {{ response.question.option_e }}</span>
-                                    {% if response.question.correct_answer == 'E' %}
-                                        <i class="fas fa-check option-icon" style="color: var(--success-text);"></i>
-                                    {% elif response.selected_answer == 'E' and not response.is_correct %}
-                                        <i class="fas fa-times option-icon" style="color: var(--error-text);"></i>
-                                    {% endif %}
-                                </label>
-                            </li>
-                        {% endif %}
-                    </ul>
-                    
-                    {% if response.question.explanation and not response.is_correct %}
-                        <div class="explanation-box">
-                            <div class="explanation-title">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>Explanation</span>
-                            </div>
-                            <div class="explanation-text">{{ response.question.explanation }}</div>
-                        </div>
-                    {% endif %}
+                    <small>{{ attempt.percentage|floatformat:1 }}% ({{ attempt.score }}/{{ test.total_questions }})</small>
                 </div>
-            {% endfor %}
+                
+                <div class="performance-item">
+                    <h4>Time Efficiency</h4>
+                    <p>How efficiently you used the time</p>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: {% widthratio attempt.time_taken test.duration_minutes 100 %}%"></div>
+                    </div>
+                    <small>{{ attempt.time_taken|floatformat:0 }} of {{ test.duration_minutes }} minutes used</small>
+                </div>
+                
+                <div class="performance-item">
+                    <h4>Accuracy Rate</h4>
+                    <p>Percentage of attempted questions correct</p>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: {{ attempt.percentage }}%"></div>
+                    </div>
+                    <small>{{ attempt.percentage|floatformat:1 }}% accuracy</small>
+                </div>
+                
+                <div class="performance-item">
+                    <h4>Completion Status</h4>
+                    <p>Test completion and submission</p>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: 100%"></div>
+                    </div>
+                    <small>Test completed successfully</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Information -->
+        <div class="performance-summary fade-in">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Test Information
+            </h2>
+            
+            <div class="performance-grid">
+                <div class="performance-item">
+                    <h4>Test Details</h4>
+                    <p><strong>Subject:</strong> {{ test.subject|default:"General" }}</p>
+                    <p><strong>Duration:</strong> {{ test.duration_minutes }} minutes</p>
+                    <p><strong>Total Questions:</strong> {{ test.total_questions }}</p>
+                    <p><strong>Passing Score:</strong> {{ test.passing_percentage }}%</p>
+                </div>
+                
+                <div class="performance-item">
+                    <h4>Attempt Details</h4>
+                    <p><strong>Started:</strong> {{ attempt.started_at|date:"M j, Y g:i A" }}</p>
+                    <p><strong>Submitted:</strong> {{ attempt.submitted_at|date:"M j, Y g:i A" }}</p>
+                    <p><strong>Time Taken:</strong> {{ attempt.time_taken|floatformat:0 }} minutes</p>
+                    <p><strong>Warnings:</strong> {{ attempt.warning_count }}</p>
+                </div>
+                
+                <div class="performance-item">
+                    <h4>Student Information</h4>
+                    <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    {% if user.student_id %}
+                    <p><strong>Student ID:</strong> {{ user.student_id }}</p>
+                    {% endif %}
+                    <p><strong>Course:</strong> {{ user.degree|default:"N/A" }}</p>
+                </div>
+                
+                <div class="performance-item">
+                    <h4>Result Summary</h4>
+                    <p><strong>Status:</strong> 
+                        <span style="color: {% if passed %}#065f46{% else %}#991b1b{% endif %};">
+                            {% if passed %}PASSED{% else %}FAILED{% endif %}
+                        </span>
+                    </p>
+                    <p><strong>Score:</strong> {{ attempt.percentage|floatformat:1 }}%</p>
+                    <p><strong>Grade:</strong> 
+                        {% if attempt.percentage >= 90 %}A+
+                        {% elif attempt.percentage >= 80 %}A
+                        {% elif attempt.percentage >= 70 %}B
+                        {% elif attempt.percentage >= 60 %}C
+                        {% elif attempt.percentage >= 50 %}D
+                        {% else %}F
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Answers Review (Optional) -->
+        {% if test.show_explanations %}
+        <div class="review-section fade-in no-print">
+            <div class="review-toggle">
+                <h2 class="section-title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Detailed Answers Review
+                </h2>
+                <button class="toggle-btn" onclick="toggleReview()">
+                    <i class="fas fa-eye" id="toggle-icon"></i>
+                    <span id="toggle-text">Show Answers</span>
+                </button>
+            </div>
+            
+            <div id="review-content">
+                {% for response in responses %}
+                    <div class="question-review">
+                        <div class="review-header">
+                            <div class="question-number">Question {{ forloop.counter }}</div>
+                            <span class="status-badge {% if response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
+                                <i class="fas fa-{% if response.is_correct %}check{% else %}times{% endif %}"></i>
+                                {% if response.is_correct %}Correct{% else %}Incorrect{% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="question-text">{{ response.question.question_text }}</div>
+                        
+                        <ul class="options-list">
+                            {% if response.question.option_a %}
+                                <li class="option-item">
+                                    <label class="option-label 
+                                        {% if response.question.correct_answer == 'A' %}correct{% endif %}
+                                        {% if response.selected_answer == 'A' and not response.is_correct %}incorrect{% endif %}
+                                        {% if response.selected_answer == 'A' %}selected{% endif %}">
+                                        <input type="radio" name="q{{ forloop.counter }}" value="A" 
+                                            {% if response.selected_answer == 'A' %}checked{% endif %}>
+                                        <span class="option-text">A) {{ response.question.option_a }}</span>
+                                        {% if response.question.correct_answer == 'A' %}
+                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                        {% elif response.selected_answer == 'A' and not response.is_correct %}
+                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endif %}
+                            
+                            {% if response.question.option_b %}
+                                <li class="option-item">
+                                    <label class="option-label 
+                                        {% if response.question.correct_answer == 'B' %}correct{% endif %}
+                                        {% if response.selected_answer == 'B' and not response.is_correct %}incorrect{% endif %}
+                                        {% if response.selected_answer == 'B' %}selected{% endif %}">
+                                        <input type="radio" name="q{{ forloop.counter }}" value="B" 
+                                            {% if response.selected_answer == 'B' %}checked{% endif %}>
+                                        <span class="option-text">B) {{ response.question.option_b }}</span>
+                                        {% if response.question.correct_answer == 'B' %}
+                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                        {% elif response.selected_answer == 'B' and not response.is_correct %}
+                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endif %}
+                            
+                            {% if response.question.option_c %}
+                                <li class="option-item">
+                                    <label class="option-label 
+                                        {% if response.question.correct_answer == 'C' %}correct{% endif %}
+                                        {% if response.selected_answer == 'C' and not response.is_correct %}incorrect{% endif %}
+                                        {% if response.selected_answer == 'C' %}selected{% endif %}">
+                                        <input type="radio" name="q{{ forloop.counter }}" value="C" 
+                                            {% if response.selected_answer == 'C' %}checked{% endif %}>
+                                        <span class="option-text">C) {{ response.question.option_c }}</span>
+                                        {% if response.question.correct_answer == 'C' %}
+                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                        {% elif response.selected_answer == 'C' and not response.is_correct %}
+                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endif %}
+                            
+                            {% if response.question.option_d %}
+                                <li class="option-item">
+                                    <label class="option-label 
+                                        {% if response.question.correct_answer == 'D' %}correct{% endif %}
+                                        {% if response.selected_answer == 'D' and not response.is_correct %}incorrect{% endif %}
+                                        {% if response.selected_answer == 'D' %}selected{% endif %}">
+                                        <input type="radio" name="q{{ forloop.counter }}" value="D" 
+                                            {% if response.selected_answer == 'D' %}checked{% endif %}>
+                                        <span class="option-text">D) {{ response.question.option_d }}</span>
+                                        {% if response.question.correct_answer == 'D' %}
+                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                        {% elif response.selected_answer == 'D' and not response.is_correct %}
+                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endif %}
+                            
+                            {% if response.question.option_e %}
+                                <li class="option-item">
+                                    <label class="option-label 
+                                        {% if response.question.correct_answer == 'E' %}correct{% endif %}
+                                        {% if response.selected_answer == 'E' and not response.is_correct %}incorrect{% endif %}
+                                        {% if response.selected_answer == 'E' %}selected{% endif %}">
+                                        <input type="radio" name="q{{ forloop.counter }}" value="E" 
+                                            {% if response.selected_answer == 'E' %}checked{% endif %}>
+                                        <span class="option-text">E) {{ response.question.option_e }}</span>
+                                        {% if response.question.correct_answer == 'E' %}
+                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                        {% elif response.selected_answer == 'E' and not response.is_correct %}
+                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                        {% endif %}
+                                    </label>
+                                </li>
+                            {% endif %}
+                        </ul>
+                        
+                        {% if response.question.explanation and not response.is_correct %}
+                            <div class="explanation-box">
+                                <div class="explanation-title">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Explanation</span>
+                                </div>
+                                <div class="explanation-text">{{ response.question.explanation }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
         <!-- Action Buttons -->
-        <div class="action-buttons">
-            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+        <div class="action-buttons no-print">
+            <a href="{% url 'student_mock_tests' %}" class="btn btn-secondary">
+                <i class="fas fa-vial"></i> Take Another Test
+            </a>
+            <button onclick="printSummary()" class="btn btn-success">
+                <i class="fas fa-print"></i> Print Summary
+            </button>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-primary">
                 <i class="fas fa-home"></i> Back to Dashboard
             </a>
-            <button onclick="window.print()" class="btn btn-primary">
-                <i class="fas fa-print"></i> Print Results
-            </button>
         </div>
+    </div>
+
+    <!-- Print Footer (only visible when printing) -->
+    <div class="print-footer">
+        <p>&copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.</p>
+        <p>This is an official test result report generated on {{ "now"|date:"F j, Y g:i A" }}</p>
+        <p>For verification, contact PulsePrep support with reference ID: TST-{{ attempt.id }}-{{ attempt.started_at|date:"Ymd" }}</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -570,8 +982,101 @@
                 },
                 animation: {
                     animateScale: true,
-                    animateRotate: true
+                    animateRotate: true,
+                    duration: 1500
                 }
+            }
+        });
+
+        // Toggle detailed review
+        let reviewVisible = false;
+        
+        function toggleReview() {
+            const reviewContent = document.getElementById('review-content');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleText = document.getElementById('toggle-text');
+            const questions = document.querySelectorAll('.question-review');
+            
+            reviewVisible = !reviewVisible;
+            
+            if (reviewVisible) {
+                questions.forEach((question, index) => {
+                    setTimeout(() => {
+                        question.classList.add('show', 'slide-down');
+                    }, index * 100);
+                });
+                toggleIcon.className = 'fas fa-eye-slash';
+                toggleText.textContent = 'Hide Answers';
+            } else {
+                questions.forEach(question => {
+                    question.classList.remove('show', 'slide-down');
+                });
+                toggleIcon.className = 'fas fa-eye';
+                toggleText.textContent = 'Show Answers';
+            }
+        }
+
+        // Print summary only (without detailed questions)
+        function printSummary() {
+            // Hide detailed review before printing
+            const reviewSection = document.querySelector('.review-section');
+            const originalDisplay = reviewSection ? reviewSection.style.display : '';
+            
+            if (reviewSection) {
+                reviewSection.style.display = 'none';
+            }
+            
+            // Print the page
+            window.print();
+            
+            // Restore review section display after printing
+            if (reviewSection) {
+                reviewSection.style.display = originalDisplay;
+            }
+        }
+
+        // Animate performance bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                const performanceFills = document.querySelectorAll('.performance-fill');
+                performanceFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 300);
+                });
+            }, 500);
+        });
+
+        // Add fade-in animation to cards
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            },
+            { threshold: 0.1 }
+        );
+
+        document.querySelectorAll('.summary-card, .performance-summary, .review-section').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Prevent right-click on results
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Add security message for screenshots
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'PrintScreen' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
+                alert('Screenshots are not permitted. Please use the Print Summary feature for official records.');
+                e.preventDefault();
             }
         });
     </script>

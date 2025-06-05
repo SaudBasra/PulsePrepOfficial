@@ -4,195 +4,234 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard | PulsePrep</title>
-    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Avatar and image styling */
-        .header .user-menu .avatar {
-            width: 50px;
-            height: 50px;
+        /* Enhanced Color Scheme and Variables */
+        :root {
+            --primary: #82272e;
+            --primary-light: #a53b47;
+            --primary-dark: #6b1e24;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --white: #ffffff;
+            --success: #10b981;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            --shadow-hover: 0 16px 40px rgba(130, 39, 46, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f9fafb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+
+        .logo-container {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-light);
+            text-align: center;
+        }
+
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .nav-menu {
+            padding: 16px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 4px 0;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background-color: rgba(130, 39, 46, 0.05);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background-color: rgba(130, 39, 46, 0.1);
+            border-right: 3px solid var(--primary);
+            font-weight: 600;
+        }
+
+        .notification-badge-sidebar {
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: auto;
         }
 
-        .header .user-menu .avatar img {
-            width: 40px !important;
-            height: 40px !important;
-            border-radius: 50% !important;
-            object-fit: cover !important;
-            display: block !important;
-            border: 2px solid #e5e7eb !important;
+        /* Main Content */
+        .main-content {
+            background-color: #f9fafb;
+            overflow-y: auto;
+            max-height: 100vh;
         }
 
-        .header .user-menu .avatar .avatar-placeholder {
-            width: 40px !important;
-            height: 40px !important;
-            background-color: #2563eb !important;
-            color: white !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-weight: bold !important;
-            font-size: 16px !important;
-            text-transform: uppercase !important;
-            border: 2px solid #e5e7eb !important;
-        }
-
-        /* Welcome banner styling */
-        .welcome-banner {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 24px;
-            text-align: center;
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .welcome-banner h1 {
-            margin: 0;
-            font-size: 32px;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .welcome-banner p {
-            margin: 0;
-            font-size: 18px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
+            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 40;
         }
 
-        /* Profile Card */
-        .profile-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            margin: 0;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        .mobile-menu button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .user-menu {
             display: flex;
             align-items: center;
             gap: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .profile-avatar {
-            width: 80px !important;
-            height: 80px !important;
-            border-radius: 50% !important;
-            background: linear-gradient(135deg, #667eea, #764ba2) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            color: white !important;
-            font-size: 32px !important;
-            font-weight: bold !important;
-            text-transform: uppercase !important;
-            overflow: hidden !important;
-            flex-shrink: 0 !important;
+        .user-menu a {
+            color: rgba(255,255,255,0.8);
+            font-size: 18px;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
         }
 
-        .profile-avatar img {
-            width: 80px !important;
-            height: 80px !important;
-            border-radius: 50% !important;
-            object-fit: cover !important;
-            display: block !important;
+        .user-menu a:hover {
+            color: white;
         }
 
-        .profile-info h2 {
-            margin: 0 0 8px;
-            color: #1f2937;
-            font-size: 24px;
-        }
-
-        .profile-info p {
-            margin: 4px 0;
-            color: #6b7280;
-        }
-
-        .profile-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .badge-mbbs {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-
-        .badge-bds {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        /* Status styling */
-        .approval-status {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .approval-status h2 {
-            margin: 0;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .approval-status p {
-            margin: 8px 0 0;
-            opacity: 0.8;
-        }
-        
-        .pending {
-            background: linear-gradient(135deg, #fef3c7, #f59e0b);
-            color: #92400e;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .approved {
-            background: linear-gradient(135deg, #d1fae5, #10b981);
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-        
-        .rejected {
-            background: linear-gradient(135deg, #fee2e2, #ef4444);
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
+            font-size: 10px;
+            font-weight: 600;
         }
 
-        /* Dashboard content animation */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Dashboard Content */
         .dashboard-content {
+            padding: 24px;
             animation: fadeIn 0.6s ease-out;
         }
 
@@ -207,66 +246,553 @@
             }
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .welcome-banner {
-                padding: 24px 16px;
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: var(--border-radius);
+            padding: 40px;
+            margin-bottom: 32px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .welcome-banner h1 {
+            margin: 0 0 12px;
+            font-size: 32px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-banner p {
+            margin: 8px 0;
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-banner .time-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            text-transform: uppercase;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 8px 16px rgba(130, 39, 46, 0.2);
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 8px;
+            color: var(--dark);
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .profile-info p {
+            margin: 6px 0;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .profile-info i {
+            width: 16px;
+            color: var(--primary);
+        }
+
+        .profile-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-mbbs {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        .badge-bds {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        /* Status Messages */
+        .approval-status {
+            margin-bottom: 32px;
+            padding: 24px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: var(--shadow);
+            border: 1px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approval-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-            
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .approval-status h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .approval-status p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .pending {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border-color: var(--warning);
+        }
+
+        .pending::before {
+            background: var(--warning);
+        }
+
+        .approved {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            border-color: var(--success);
+        }
+
+        .approved::before {
+            background: var(--success);
+        }
+
+        .rejected {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+            border-color: var(--danger);
+        }
+
+        .rejected::before {
+            background: var(--danger);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            margin-bottom: 32px;
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .action-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .action-icon.primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .action-icon.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .action-icon.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .action-info h4 {
+            margin: 0 0 6px;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .action-info p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            margin-bottom: 32px;
+        }
+
+        .recent-activity h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .activity-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            text-align: center;
+        }
+
+        .empty-state {
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #cbd5e1;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h4 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            color: var(--gray);
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 16px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 100;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .welcome-banner {
+                padding: 24px;
+            }
+
             .welcome-banner h1 {
                 font-size: 24px;
             }
-            
+
             .profile-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px;
+            }
+
+            .dashboard-content {
+                padding: 16px;
+            }
+
+            .action-content {
                 flex-direction: column;
                 text-align: center;
             }
 
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
-            .action-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-                }
+        @media (max-width: 480px) {
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+        }
 
+        /* Loading Animation */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(130, 39, 46, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sidebar overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar Navigation -->
+    <div class="dashboard-container">
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <aside class="sidebar">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
             <div class="logo-container">
                 <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
             </div>
-<nav class="nav-menu">
-    <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
-        <i class="fas fa-th-large"></i>
-        <span>Dashboard</span>
-    </a>
-    <a href="#" class="nav-item">
-        <i class="fas fa-question-circle"></i>
-        <span>Question Bank</span>
-    </a>
-    <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
-        <i class="fas fa-vial"></i>
-        <span>Mock Tests</span>
-    </a>
-    <a href="#" class="nav-item">
-        <i class="fas fa-chart-bar"></i>
-        <span>My Progress</span>
-    </a>
-    <a href="#" class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>My Profile</span>
-    </a>
-    <a href="{% url 'logout' %}" class="nav-item">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-    </a>
-</nav>
-
-</aside>
+            <nav class="nav-menu">
+                <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_progress' %}" class="nav-item {% if request.resolver_match.url_name == 'student_progress' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'my_profile' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'student_notifications' %}active{% endif %}">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    {% if unread_count > 0 %}
+                    <span class="notification-badge-sidebar">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -279,15 +805,24 @@
                 </div>
                 <h1>Student Dashboard</h1>
                 <div class="user-menu">
-                    <a href="#"><i class="fas fa-bell"></i></a>
+                    <a href="{% url 'student_notifications' %}">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_count > 0 %}
+                        <span class="notification-badge">{{ unread_count }}</span>
+                        {% endif %}
+                    </a>
                     <div class="avatar">
                         {% if user.profile_image %}
                             <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" 
                                  onload="this.style.display='block'" 
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                            <div class="avatar-placeholder" style="display: none;">{{ user.first_name|first|upper }}</div>
+                            <div class="avatar-placeholder" style="display: none;">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
                         {% else %}
-                            <div class="avatar-placeholder">{{ user.first_name|first|upper }}</div>
+                            <div class="avatar-placeholder">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -297,12 +832,12 @@
             <div class="dashboard-content">
                 <!-- Welcome Banner -->
                 <div class="welcome-banner">
-                    <h1>Welcome to PulsePrep, {{ user.first_name }}!</h1>
-                    <p>Your comprehensive platform for medical exam preparation</p>
-                    <p>
-                        <strong>Current Time:</strong> {{ current_time|date:"M d, Y H:i:s" }}<br>
-                        <strong>Timezone:</strong> {{ timezone_label }}
-                    </p>
+                    <h1>Welcome back, {{ user.first_name }}!</h1>
+                    <p>Ready to excel in your medical exam preparation journey</p>
+                    <div class="time-info">
+                        <p><strong>{{ current_time|date:"l, F d, Y" }}</strong></p>
+                        <p>{{ current_time|date:"g:i A" }} • {{ timezone_label }}</p>
+                    </div>
                 </div>
 
                 <!-- Profile Card -->
@@ -316,9 +851,7 @@
                                 {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                             </div>
                         {% else %}
-                            <div style="color: white; font-size: 32px; font-weight: bold;">
-                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                            </div>
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
                         {% endif %}
                     </div>
                     <div class="profile-info">
@@ -330,7 +863,7 @@
                             {% if user.year %} - Year {{ user.year }}{% endif %}
                         </p>
                         {% endif %}
-                        <p><i class="fas fa-calendar"></i> Joined {{ user.date_joined|date:"M d, Y" }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Member since {{ user.date_joined|date:"M d, Y" }}</p>
                     </div>
                 </div>
                 
@@ -338,102 +871,238 @@
                 {% if user.approval_status == 'pending' %}
                 <div class="approval-status pending">
                     <div>
-                        <h2><i class="fas fa-clock"></i> Your account is pending approval</h2>
-                        <p>Please wait while an administrator reviews your account. You'll receive an email once approved.</p>
+                        <h2><i class="fas fa-clock"></i> Account Pending Approval</h2>
+                        <p>Your account is being reviewed by our administrators. You'll receive an email notification once approved.</p>
                     </div>
                 </div>
                 {% elif user.approval_status == 'approved' %}
                 <div class="approval-status approved">
                     <div>
-                        <h2><i class="fas fa-check-circle"></i> Your account is approved</h2>
-                        <p>You have full access to all features and content for {{ user.get_degree_display }}{% if user.year %} - Year {{ user.year }}{% endif %}.</p>
+                        <h2><i class="fas fa-check-circle"></i> Account Approved</h2>
+                        <p>You have full access to all {{ user.get_degree_display }} features and content{% if user.year %} for Year {{ user.year }}{% endif %}.</p>
                     </div>
                 </div>
                 {% elif user.approval_status == 'rejected' %}
                 <div class="approval-status rejected">
                     <div>
-                        <h2><i class="fas fa-times-circle"></i> Your account has been rejected</h2>
-                        <p>Please contact support for assistance with your account.</p>
+                        <h2><i class="fas fa-times-circle"></i> Account Rejected</h2>
+                        <p>Your account application was not approved. Please contact our support team for assistance.</p>
                     </div>
                 </div>
                 {% endif %}
 
-
-<!-- Add this after the approval status div -->
-{% if user.approval_status == 'approved' %}
-    <!-- Quick Actions -->
-    <div class="quick-actions" style="margin-top: 24px;">
-        <h3 style="margin-bottom: 16px; color: #1f2937;">Quick Actions</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-            <a href="{% url 'student_mock_tests' %}" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; background: #e0e7ff; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-vial" style="font-size: 24px; color: #4f46e5;"></i>
+                {% if user.approval_status == 'approved' %}
+                    <!-- Quick Stats Overview -->
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Tests Completed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Best Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-value">-</div>
+                            <div class="stat-label">Average Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Study Streak</div>
+                        </div>
                     </div>
-                    <div>
-                        <h4 style="margin: 0; color: #1f2937;">Take Mock Test</h4>
-                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Practice with timed tests</p>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <div class="actions-grid">
+                            <a href="{% url 'student_mock_tests' %}" class="action-card">
+                                <div class="action-content">
+                                    <div class="action-icon primary">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                    <div class="action-info">
+                                        <h4>Start Mock Test</h4>
+                                        <p>Take a timed practice test to assess your knowledge and improve your performance</p>
+                                    </div>
+                                </div>
+                            </a>
+                            
+                            <a href="{% url 'student_progress' %}" class="action-card">
+                                <div class="action-content">
+                                    <div class="action-icon success">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div class="action-info">
+                                        <h4>View Progress</h4>
+                                        <p>Track your performance, analyze test results, and monitor improvement trends</p>
+                                    </div>
+                                </div>
+                            </a>
+                            
+                            <a href="{% url 'my_profile' %}" class="action-card">
+                                <div class="action-content">
+                                    <div class="action-icon info">
+                                        <i class="fas fa-user-cog"></i>
+                                    </div>
+                                    <div class="action-info">
+                                        <h4>Manage Profile</h4>
+                                        <p>Update your personal information, preferences, and account settings</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </a>
-            
-            <a href="{% url 'student_progress' %}" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; background: #d1fae5; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-chart-line" style="font-size: 24px; color: #10b981;"></i>
+                    
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h3>Recent Test Activity</h3>
+                        <div class="activity-card">
+                            <div class="empty-state">
+                                <i class="fas fa-clipboard-list"></i>
+                                <h4>No Recent Activity</h4>
+                                <p>Start taking mock tests to see your activity and progress here</p>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h4 style="margin: 0; color: #1f2937;">View Progress</h4>
-                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Track your performance</p>
+
+                    <!-- Study Tips -->
+                    <div class="study-tips">
+                        <h3>Study Tips</h3>
+                        <div class="tips-grid">
+                            <div class="tip-card">
+                                <div class="tip-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <h4>Consistent Practice</h4>
+                                    <p>Take regular mock tests to maintain your exam readiness and identify areas for improvement.</p>
+                                </div>
+                            </div>
+                            <div class="tip-card">
+                                <div class="tip-icon">
+                                    <i class="fas fa-target"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <h4>Focus on Weak Areas</h4>
+                                    <p>Use your progress analytics to identify subjects that need more attention and practice.</p>
+                                </div>
+                            </div>
+                            <div class="tip-card">
+                                <div class="tip-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="tip-content">
+                                    <h4>Track Your Progress</h4>
+                                    <p>Monitor your improvement over time and celebrate your achievements along the way.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </a>
-            
-            <a href="#" class="action-card" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-decoration: none; color: inherit; transition: all 0.3s;">
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-question-circle" style="font-size: 24px; color: #f59e0b;"></i>
+                {% else %}
+                    <!-- Account Status Message for Non-Approved Users -->
+                    <div class="account-status-info">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3>Account Access Information</h3>
+                                <p>Once your account is approved, you'll be able to:</p>
+                                <ul>
+                                    <li><i class="fas fa-check"></i> Access all mock tests for your degree program</li>
+                                    <li><i class="fas fa-check"></i> Track your performance and progress</li>
+                                    <li><i class="fas fa-check"></i> View detailed analytics and insights</li>
+                                    <li><i class="fas fa-check"></i> Access study materials and resources</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <h4 style="margin: 0; color: #1f2937;">Question Bank</h4>
-                        <p style="margin: 4px 0 0; color: #6b7280; font-size: 14px;">Browse study materials</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-    
-    <!-- Recent Activity -->
-    <div class="recent-activity" style="margin-top: 32px;">
-        <h3 style="margin-bottom: 16px; color: #1f2937;">Recent Test Activity</h3>
-        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <p style="color: #6b7280; text-align: center; padding: 20px 0;">No recent test activity</p>
-        </div>
-    </div>
-{% endif %}
-
-
-
-
-
-
+                {% endif %}
             </div>
         </main>
     </div>
 
     <script>
-        // Sidebar toggle for mobile
-        document.getElementById('sidebar-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('show');
+        // Enhanced sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Close sidebar when clicking on nav items on mobile
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
         });
 
-        // Initialize dashboard
+        // Close sidebar on window resize if screen becomes large
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Initialize dashboard with animations
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Student dashboard loaded');
+            console.log('Enhanced student dashboard loaded');
             
+            // Animate stat cards on load
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+
+            // Animate action cards
+            const actionCards = document.querySelectorAll('.action-card');
+            actionCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 300 + (index * 150));
+            });
+
             // Debug image loading
             const avatarImages = document.querySelectorAll('.avatar img, .profile-avatar img');
-            
             avatarImages.forEach(img => {
                 console.log('Image src:', img.src);
                 
@@ -445,7 +1114,245 @@
                     console.log('Image failed to load:', this.src);
                 });
             });
+
+            // Add smooth scrolling to anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
         });
+
+        // Add interactive feedback for action cards
+        document.querySelectorAll('.action-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Enhanced notification handling
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add notification styles if not already present
+            if (!document.getElementById('notification-styles')) {
+                const styles = document.createElement('style');
+                styles.id = 'notification-styles';
+                styles.textContent = `
+                    .notification {
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: white;
+                        border-radius: 8px;
+                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                        padding: 16px;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        z-index: 1000;
+                        max-width: 400px;
+                        animation: slideInRight 0.3s ease;
+                    }
+                    .notification-success { border-left: 4px solid var(--success); }
+                    .notification-error { border-left: 4px solid var(--danger); }
+                    .notification-info { border-left: 4px solid var(--info); }
+                    .notification-content { display: flex; align-items: center; gap: 8px; flex: 1; }
+                    .notification-close { background: none; border: none; cursor: pointer; color: var(--gray); }
+                    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+                `;
+                document.head.appendChild(styles);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
     </script>
+
+    <style>
+        /* Additional styles for study tips and info sections */
+        .study-tips {
+            margin-bottom: 32px;
+        }
+
+        .study-tips h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--info), #2563eb);
+        }
+
+        .tip-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .tip-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--info), #2563eb);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .tip-content h4 {
+            margin: 0 0 8px;
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tip-content p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Account status info styles */
+        .account-status-info {
+            margin-bottom: 32px;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--info), #2563eb);
+        }
+
+        .info-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--info), #2563eb);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .info-content h3 {
+            margin: 0 0 16px;
+            color: var(--dark);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .info-content p {
+            margin: 0 0 16px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .info-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-content li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .info-content li i {
+            color: var(--success);
+            font-size: 16px;
+        }
+
+        /* Enhanced responsive design */
+        @media (max-width: 640px) {
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tip-card {
+                padding: 20px;
+            }
+            
+            .info-card {
+                padding: 24px;
+            }
+        }
+    </style>
 </body>
 </html>

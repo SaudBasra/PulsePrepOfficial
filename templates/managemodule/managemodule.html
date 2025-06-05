@@ -53,7 +53,7 @@
       <i class="fas fa-user"></i>
       <span>My Account</span>
     </a>
-    <a href="{% url 'notificationsetting' %}" class="nav-item {% if request.resolver_match.url_name == 'notificationsetting' %}active{% endif %}">
+    <a href="{% url 'notification_center' %}" class="nav-item {% if request.resolver_match.url_name == 'notification_center' %}active{% endif %}">
       <i class="fas fa-bell"></i>
       <span>Notifications</span>
       <span class="notification-badge-sidebar"></span>
@@ -77,7 +77,7 @@
           <h1>Manage Modules</h1>
           <div class="user-menu">
             <div class="notification-container">
-              <a href="{% url 'notificationsetting' %}"><i class="fas fa-bell"></i></a>
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
               <span class="notification-badge"></span>
             </div>
             <div class="avatar">
