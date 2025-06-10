@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-item { 
+            border: 1px solid #ddd; 
+            margin: 10px 0; 
+            padding: 15px; 
+            background: #f9f9f9; 
+        }
+        .exists { color: green; }
+        .missing { color: red; }
+        .test-image { max-width: 100px; max-height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>Image Debug Information</h1>
+    
+    <div class="debug-item">
+        <h3>Settings</h3>
+        <p><strong>MEDIA_ROOT:</strong> {{ media_root }}</p>
+        <p><strong>MEDIA_URL:</strong> {{ media_url }}</p>
+    </div>
+    
+    {% for item in debug_info %}
+        <div class="debug-item">
+            <h3>Image #{{ item.id }}: {{ item.filename }}</h3>
+            <p><strong>Image Field:</strong> {{ item.image_field }}</p>
+            <p><strong>Image URL:</strong> <a href="{{ item.image_url }}" target="_blank">{{ item.image_url }}</a></p>
+            <p><strong>File Path:</strong> {{ item.file_path }}</p>
+            <p><strong>File Exists:</strong> 
+                <span class="{% if item.file_exists %}exists{% else %}missing{% endif %}">
+                    {{ item.file_exists|yesno:"YES,NO" }}
+                </span>
+            </p>
+            
+            {% if item.file_exists %}
+                <p><strong>Test Image:</strong></p>
+                <img src="{{ item.image_url }}" class="test-image" 
+                     onerror="this.style.border='2px solid red'; this.alt='Failed to load';">
+            {% endif %}
+        </div>
+    {% endfor %}
+    
+    <div class="debug-item">
+        <h3>Quick Test</h3>
+        <p>Try creating a simple test file in: {{ media_root }}/question_images/test.txt</p>
+        <p>Then access it at: <a href="{{ media_url }}question_images/test.txt" target="_blank">{{ media_url }}question_images/test.txt</a></p>
+    </div>
+</body>
+</html>

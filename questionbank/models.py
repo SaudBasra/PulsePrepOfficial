@@ -94,7 +94,8 @@ class Question(models.Model):
     # Additional info
     difficulty = models.CharField(max_length=6, choices=DIFFICULTY_CHOICES, default='Medium')
     explanation = models.TextField(blank=True, null=True)
-    
+    image = models.CharField(max_length=255, blank=True, null=True)
+
     def __str__(self):
         return self.question_text[:50]
     

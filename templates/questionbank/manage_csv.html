@@ -47,6 +47,12 @@
       <i class="fas fa-vial"></i>
       <span>Mock Tests</span>
     </a>
+    {% if 'modelpaper' in INSTALLED_APPS %}
+    <a href="{% url 'modelpaper_list' %}" class="nav-item {% if request.resolver_match.url_name == 'modelpaper_list' %}active{% endif %}">
+      <i class="fas fa-file-alt"></i>
+      <span>Model Papers</span>
+    </a>
+    {% endif %}
     <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
       <i class="fas fa-chart-bar"></i>
       <span>Analytics & Reports</span>
@@ -122,89 +128,204 @@
               </div>
             {% endif %}
             
-            <!-- CSV Statistics Section -->
-            <div class="csv-stats-section">
-              <h2><i class="fas fa-chart-line"></i> CSV Import Statistics</h2>
-              <p class="section-description">Overview of all CSV import activities and success rates</p>
-              
-              <div class="stats-cards">
-                <div class="stat-card">
-                  <div class="stat-icon">
-                    <i class="fas fa-file-upload"></i>
-                  </div>
-                  <div class="stat-content">
-                    <h3>{{ csv_stats.total_imports|default:"0" }}</h3>
-                    <p>Total Imports</p>
-                  </div>
-                </div>
+            <!-- Statistics Section - Side by Side Layout -->
+            <div class="stats-container">
+              <!-- Question Bank Statistics -->
+              <div class="stats-section">
+                <h2><i class="fas fa-question-circle"></i> Question Bank Statistics</h2>
+                <p class="section-description">Overview of question bank CSV import activities</p>
                 
-                <div class="stat-card success">
-                  <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
+                <div class="stats-cards">
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ questionbank_stats.total_imports|default:"0" }}</h3>
+                      <p>Total Imports</p>
+                    </div>
                   </div>
-                  <div class="stat-content">
-                    <h3>{{ csv_stats.successful_imports|default:"0" }}</h3>
-                    <p>Successful</p>
+                  
+                  <div class="stat-card success">
+                    <div class="stat-icon">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ questionbank_stats.successful_imports|default:"0" }}</h3>
+                      <p>Successful</p>
+                    </div>
                   </div>
-                </div>
-                
-                <div class="stat-card failed">
-                  <div class="stat-icon">
-                    <i class="fas fa-times-circle"></i>
+                  
+                  <div class="stat-card failed">
+                    <div class="stat-icon">
+                      <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ questionbank_stats.failed_imports|default:"0" }}</h3>
+                      <p>Failed</p>
+                    </div>
                   </div>
-                  <div class="stat-content">
-                    <h3>{{ csv_stats.failed_imports|default:"0" }}</h3>
-                    <p>Failed</p>
-                  </div>
-                </div>
-                
-                <div class="stat-card">
-                  <div class="stat-icon">
-                    <i class="fas fa-question-circle"></i>
-                  </div>
-                  <div class="stat-content">
-                    <h3>{{ csv_stats.total_questions_imported|default:"0" }}</h3>
-                    <p>Questions Imported</p>
+                  
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ questionbank_stats.total_questions_imported|default:"0" }}</h3>
+                      <p>Questions Imported</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              
-              <div class="success-rate">
-                <h3><i class="fas fa-trophy"></i> Overall Success Rate</h3>
-                <div class="progress-bar">
-                  <div class="progress-fill" style="width: {{ csv_stats.success_rate|default:"0" }}%"></div>
+
+              <!-- Model Paper Statistics -->
+              <div class="stats-section">
+                <h2><i class="fas fa-file-alt"></i> Model Paper Statistics</h2>
+                <p class="section-description">Overview of model paper CSV import activities</p>
+                
+                <div class="stats-cards">
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.total_imports|default:"0" }}</h3>
+                      <p>Total Imports</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card success">
+                    <div class="stat-icon">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.successful_imports|default:"0" }}</h3>
+                      <p>Successful</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card failed">
+                    <div class="stat-icon">
+                      <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.failed_imports|default:"0" }}</h3>
+                      <p>Failed</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.total_paper_names|default:"0" }}</h3>
+                      <p>Paper Names</p>
+                    </div>
+                  </div>
                 </div>
-                <span class="rate-text">{{ csv_stats.success_rate|default:"0" }}% Success Rate</span>
               </div>
             </div>
 
-            <!-- Quick Actions Section -->
-            <div class="quick-actions-section">
-              <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+            <!-- Upload Section - Side by Side Layout -->
+            <div class="upload-container">
+              <!-- Question Bank Upload -->
+              <div class="upload-section">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Questions to Question Bank</h2>
+                <p class="section-description">Import questions to the general question bank</p>
+                
+                <div class="upload-area" id="questionbank-upload-area">
+                  <div class="upload-icon">
+                    <i class="fas fa-file-csv"></i>
+                  </div>
+                  <h3>Drag & Drop CSV File Here</h3>
+                  <p>or <button type="button" class="browse-link" data-target="questionbank">browse files</button></p>
+                  <input type="file" id="questionbank-file-input" accept=".csv" style="display: none;">
+                  
+                  <!-- Update the file-requirements sections in manage_csv.html -->
+
+<!-- Question Bank Requirements -->
+<div class="file-requirements">
+  <h4><i class="fas fa-info-circle"></i> Question Bank CSV Requirements:</h4>
+  <ul>
+    <li><strong>Required:</strong> question_text, option_a, option_b, option_c, option_d</li>
+    <li><strong>Classification:</strong> degree, year, <strong>block</strong>, module, subject, topic</li>
+    <li><strong>Answer:</strong> correct_answer (A, B, C, D, or E)</li>
+    <li><strong>Optional:</strong> option_e, difficulty, explanation, <strong>image</strong></li>
+    <li><strong>Image:</strong> Filename only (e.g., heart_anatomy.jpg)</li>
+  </ul>
+</div>
+
+
+                  
+                </div>
+              </div>
+
+              <!-- Model Paper Upload -->
+              <div class="upload-section">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Questions for Model Papers</h2>
+                <p class="section-description">Import questions that can be used for creating model papers</p>
+                
+                <div class="upload-area" id="modelpaper-upload-area">
+                  <div class="upload-icon">
+                    <i class="fas fa-file-csv"></i>
+                  </div>
+                  <h3>Drag & Drop CSV File Here</h3>
+                  <p>or <button type="button" class="browse-link" data-target="modelpaper">browse files</button></p>
+                  <input type="file" id="modelpaper-file-input" accept=".csv" style="display: none;">
+                  
+<!-- Model Paper Requirements -->
+<div class="file-requirements">
+  <h4><i class="fas fa-info-circle"></i> Model Paper CSV Requirements:</h4>
+  <ul>
+    <li><strong>Required:</strong> question_text, option_a, option_b, option_c, option_d</li>
+    <li><strong>Paper:</strong> <strong>paper_name</strong> (e.g., "Final Exam 2024")</li>
+    <li><strong>Classification:</strong> degree, year, module, subject, topic</li>
+    <li><strong>Answer:</strong> correct_answer (A, B, C, D, or E)</li>
+    <li><strong>Optional:</strong> option_e, difficulty, explanation, <strong>image</strong>, marks</li>
+    <li><strong>Image:</strong> Filename only (e.g., ecg_reading.png)</li>
+  </ul>
+</div>                  
+                </div>
+              </div>
+            </div>
+
+            <!-- Templates and Export Section -->
+            <div class="actions-section">
+              <h2><i class="fas fa-download"></i> Templates & Export</h2>
+              <p class="section-description">Download templates for proper formatting or export existing data</p>
+              
               <div class="action-cards">
                 <div class="action-card">
                   <div class="action-icon">
                     <i class="fas fa-download"></i>
                   </div>
                   <div class="action-content">
-                    <h3>Download Template</h3>
-                    <p>Get a sample CSV file with proper formatting</p>
-                    <button class="action-btn download-template" data-template="basic">
-                      <i class="fas fa-download"></i> Basic Template
-                    </button>
+                    <h3>Question Bank Templates</h3>
+                    <p>Get properly formatted templates for question bank import</p>
+                    <div class="template-buttons">
+                      <button class="action-btn download-template" data-template="questionbank-basic">
+                        <i class="fas fa-download"></i> Basic Template
+                      </button>
+                      <button class="action-btn download-template" data-template="questionbank-mcq">
+                        <i class="fas fa-download"></i> MCQ Template
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
                 <div class="action-card">
                   <div class="action-icon">
-                    <i class="fas fa-file-excel"></i>
+                    <i class="fas fa-file-alt"></i>
                   </div>
                   <div class="action-content">
-                    <h3>MCQ Template</h3>
-                    <p>Template specifically for multiple choice questions</p>
-                    <button class="action-btn download-template" data-template="mcq">
-                      <i class="fas fa-download"></i> MCQ Template
-                    </button>
+                    <h3>Model Paper Template</h3>
+                    <p>Template specifically for model paper questions with paper name</p>
+                    <div class="template-buttons">
+                      <button class="action-btn download-template" data-template="modelpaper-medical">
+                        <i class="fas fa-download"></i> Model Paper Template
+                      </button>
+                    </div>
                   </div>
                 </div>
                 
@@ -214,110 +335,69 @@
                   </div>
                   <div class="action-content">
                     <h3>Export Questions</h3>
-                    <p>Export existing questions to CSV format</p>
-                    <a href="{% url 'export_questions' %}" class="action-btn">
-                      <i class="fas fa-file-export"></i> Export CSV
-                    </a>
+                    <p>Export existing questions from the question bank to CSV format</p>
+                    <div class="template-buttons">
+                      <a href="{% url 'export_questions' %}" class="action-btn">
+                        <i class="fas fa-file-export"></i> Export CSV
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <!-- Upload New CSV Section -->
-            <div class="upload-section">
-              <h2><i class="fas fa-cloud-upload-alt"></i> Upload New CSV File</h2>
-              <p class="section-description">Bulk import questions from a CSV file with proper validation</p>
-              
-              <div class="upload-area" id="upload-area">
-                <div class="upload-icon">
-                  <i class="fas fa-file-csv"></i>
-                </div>
-                <h3>Drag & Drop CSV File Here</h3>
-                <p>or <button type="button" id="browse-btn" class="browse-link">browse files</button></p>
-                <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
-                
-                <div class="file-requirements">
-                  <h4><i class="fas fa-info-circle"></i> CSV Requirements:</h4>
-                  <ul>
-                    <li><strong>File Format:</strong> Must have .csv extension</li>
-                    <li><strong>File Size:</strong> Maximum 10MB allowed</li>
-                    <li><strong>Required Columns:</strong> question_text</li>
-                    <li><strong>MCQ Columns:</strong> option_a, option_b, option_c, option_d, option_e, correct_answer</li>
-                    <li><strong>Classification:</strong> degree, year, block, module, subject, topic, difficulty</li>
-                    <li><strong>Optional:</strong> explanation (recommended for better learning)</li>
-                  </ul>
-                  
-                  <div class="requirement-note">
-                    <i class="fas fa-lightbulb"></i>
-                    <span><strong>Tip:</strong> Use our templates above to ensure proper formatting</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="upload-progress" id="upload-progress" style="display: none;">
-                <div class="progress-container">
-                  <div class="progress-bar">
-                    <div class="progress-fill" id="upload-progress-fill"></div>
-                  </div>
-                  <div class="progress-info">
-                    <span class="progress-text" id="upload-status">Uploading...</span>
-                    <span class="progress-percentage" id="upload-percentage">0%</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Import History Section -->
             <div class="history-section">
               <h2><i class="fas fa-history"></i> Import History</h2>
               <p class="section-description">Track all your CSV import attempts and their results</p>
               
-              {% if import_history %}
-                <div class="history-controls">
-                  <div class="history-filters">
-                    <select class="filter-select" id="status-filter">
-                      <option value="">All Status</option>
-                      <option value="success">Success Only</option>
-                      <option value="failed">Failed Only</option>
-                      <option value="processing">Processing</option>
-                    </select>
-                    
-                    <input type="date" class="filter-date" id="date-filter" placeholder="Filter by date">
-                  </div>
+              <!-- History Controls -->
+              <div class="history-controls">
+                <div class="history-filters">
+                  <select class="filter-select" id="status-filter">
+                    <option value="">All Status</option>
+                    <option value="success">Success Only</option>
+                    <option value="failed">Failed Only</option>
+                    <option value="processing">Processing</option>
+                  </select>
                   
-                  <div class="history-actions">
-                    <button class="btn-secondary clear-history" title="Clear All History">
-                      <i class="fas fa-trash"></i> Clear History
-                    </button>
-                  </div>
+                  <select class="filter-select" id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="questionbank">Question Bank</option>
+                    <option value="modelpaper">Model Paper</option>
+                  </select>
                 </div>
-              {% endif %}
+              </div>
               
               <div class="history-table-container">
                 <table class="history-table">
                   <thead>
                     <tr>
                       <th><i class="fas fa-file"></i> File Details</th>
+                      <th><i class="fas fa-tag"></i> Type</th>
                       <th><i class="fas fa-calendar"></i> Upload Date</th>
                       <th><i class="fas fa-flag"></i> Status</th>
-                      <th><i class="fas fa-list-ol"></i> Total Rows</th>
+                      <th><i class="fas fa-list-ol"></i> Total</th>
                       <th><i class="fas fa-check"></i> Success</th>
                       <th><i class="fas fa-times"></i> Failed</th>
-                      <th><i class="fas fa-percentage"></i> Success Rate</th>
                       <th><i class="fas fa-cog"></i> Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for record in import_history %}
-                      <tr class="history-row" data-status="{{ record.status|lower }}">
+                    {% for record in questionbank_history %}
+                      <tr class="history-row" data-status="{{ record.status|lower }}" data-type="questionbank">
                         <td>
                           <div class="file-info">
                             <i class="fas fa-file-csv"></i>
                             <div class="file-details">
                               <span class="file-name">{{ record.file_name }}</span>
-                              <span class="file-size">{{ record.file_size|filesizeformat|default:"" }}</span>
+                              <span class="file-size">{{ record.file_size|filesizeformat }}</span>
                             </div>
                           </div>
+                        </td>
+                        <td>
+                          <span class="type-badge questionbank">
+                            <i class="fas fa-question-circle"></i> Question Bank
+                          </span>
                         </td>
                         <td>
                           <div class="date-info">
@@ -341,78 +421,78 @@
                         </td>
                         <td class="success-count">{{ record.successful_imports|default:"0" }}</td>
                         <td class="failed-count">{{ record.failed_imports|default:"0" }}</td>
-                        <td>
-                          <div class="mini-progress">
-                            <div class="mini-progress-bar">
-                              <div class="mini-progress-fill" style="width: {{ record.success_rate|default:"0" }}%"></div>
-                            </div>
-                            <span>{{ record.success_rate|default:"0" }}%</span>
-                          </div>
-                        </td>
                         <td class="actions">
                           {% if record.error_details %}
                             <button class="btn-icon view-errors" data-errors="{{ record.error_details }}" title="View Error Details">
                               <i class="fas fa-exclamation-triangle"></i>
                             </button>
                           {% endif %}
-                          {% if record.status == 'SUCCESS' %}
-                            <button class="btn-icon view-details" data-id="{{ record.id }}" title="View Import Details">
-                              <i class="fas fa-eye"></i>
+                        </td>
+                      </tr>
+                    {% endfor %}
+
+                    {% for record in modelpaper_history %}
+                      <tr class="history-row" data-status="{{ record.status|lower }}" data-type="modelpaper">
+                        <td>
+                          <div class="file-info">
+                            <i class="fas fa-file-csv"></i>
+                            <div class="file-details">
+                              <span class="file-name">{{ record.file_name }}</span>
+                              <span class="file-size">{{ record.file_size|filesizeformat }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="type-badge modelpaper">
+                            <i class="fas fa-file-alt"></i> Model Paper
+                          </span>
+                        </td>
+                        <td>
+                          <div class="date-info">
+                            <span class="date">{{ record.uploaded_at|date:"M d, Y" }}</span>
+                            <span class="time">{{ record.uploaded_at|time:"H:i" }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="status-badge {{ record.status|lower }}">
+                            {% if record.status == 'SUCCESS' %}
+                              <i class="fas fa-check"></i> Success
+                            {% elif record.status == 'FAILED' %}
+                              <i class="fas fa-times"></i> Failed
+                            {% else %}
+                              <i class="fas fa-clock"></i> Processing
+                            {% endif %}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="number-badge">{{ record.total_rows|default:"0" }}</span>
+                        </td>
+                        <td class="success-count">{{ record.successful_imports|default:"0" }}</td>
+                        <td class="failed-count">{{ record.failed_imports|default:"0" }}</td>
+                        <td class="actions">
+                          {% if record.error_details %}
+                            <button class="btn-icon view-errors" data-errors="{{ record.error_details }}" title="View Error Details">
+                              <i class="fas fa-exclamation-triangle"></i>
                             </button>
                           {% endif %}
-                          <button class="btn-icon download-sample" title="Download Sample CSV">
-                            <i class="fas fa-download"></i>
-                          </button>
-                          <button class="btn-icon delete-record" data-id="{{ record.id }}" title="Delete Record">
-                            <i class="fas fa-trash"></i>
-                          </button>
                         </td>
                       </tr>
                     {% empty %}
-                      <tr>
-                        <td colspan="8" class="no-data">
-                          <div class="no-data-content">
-                            <i class="fas fa-file-csv"></i>
-                            <h3>No Import History</h3>
-                            <p>You haven't uploaded any CSV files yet. Start by uploading your first file above.</p>
-                          </div>
-                        </td>
-                      </tr>
+                      {% if not questionbank_history %}
+                        <tr>
+                          <td colspan="8" class="no-data">
+                            <div class="no-data-content">
+                              <i class="fas fa-file-csv"></i>
+                              <h3>No Import History</h3>
+                              <p>You haven't uploaded any CSV files yet. Start by uploading your first file above.</p>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endif %}
                     {% endfor %}
                   </tbody>
                 </table>
               </div>
-              
-              <!-- Pagination for history -->
-              {% if import_history.has_other_pages %}
-                <div class="pagination">
-                  {% if import_history.has_previous %}
-                    <a href="?page=1" class="pagination-link">
-                      <i class="fas fa-angle-double-left"></i> First
-                    </a>
-                    <a href="?page={{ import_history.previous_page_number }}" class="pagination-link">
-                      <i class="fas fa-angle-left"></i> Prev
-                    </a>
-                  {% endif %}
-                  
-                  {% for num in import_history.paginator.page_range %}
-                    {% if import_history.number == num %}
-                      <span class="pagination-link active">{{ num }}</span>
-                    {% elif num > import_history.number|add:'-3' and num < import_history.number|add:'3' %}
-                      <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
-                    {% endif %}
-                  {% endfor %}
-                  
-                  {% if import_history.has_next %}
-                    <a href="?page={{ import_history.next_page_number }}" class="pagination-link">
-                      Next <i class="fas fa-angle-right"></i>
-                    </a>
-                    <a href="?page={{ import_history.paginator.num_pages }}" class="pagination-link">
-                      Last <i class="fas fa-angle-double-right"></i>
-                    </a>
-                  {% endif %}
-                </div>
-              {% endif %}
             </div>
           </div>
         </div>
@@ -431,18 +511,21 @@
       </main>
     </div>
 
-    <!-- Error Modal -->
-    <div id="error-modal" class="modal" style="display: none;">
+    <!-- Upload Progress Modal -->
+    <div id="upload-modal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h3><i class="fas fa-exclamation-triangle"></i> Import Errors</h3>
-          <button class="close-modal" aria-label="Close">&times;</button>
+          <h3><i class="fas fa-cloud-upload-alt"></i> Processing Upload</h3>
         </div>
         <div class="modal-body">
-          <div class="error-content">
-            <p>The following errors occurred during the import process:</p>
-            <pre id="error-details"></pre>
+          <div class="progress-bar">
+            <div class="progress-fill" id="modal-progress-fill"></div>
           </div>
+          <div class="progress-info">
+            <span class="progress-text" id="upload-status">Processing your file...</span>
+            <span class="progress-percentage" id="upload-percentage">0%</span>
+          </div>
+          <div id="upload-details"></div>
         </div>
       </div>
     </div>
@@ -460,113 +543,112 @@
       </div>
     </div>
 
-    <!-- Details Modal -->
-    <div id="details-modal" class="modal" style="display: none;">
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h3><i class="fas fa-info-circle"></i> Import Details</h3>
+          <h3><i class="fas fa-exclamation-triangle"></i> Import Errors</h3>
           <button class="close-modal" aria-label="Close">&times;</button>
         </div>
         <div class="modal-body">
-          <div id="details-content"></div>
+          <div class="error-content">
+            <p>The following errors occurred during the import process:</p>
+            <pre id="error-details"></pre>
+          </div>
         </div>
       </div>
     </div>
 
     <script src="{% static 'js/DAscript.js' %}"></script>
-    <script src="{% static 'js/DAscript.js' %}"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const uploadArea = document.getElementById('upload-area');
-        const fileInput = document.getElementById('csv-file-input');
-        const browseBtn = document.getElementById('browse-btn');
-        const uploadProgress = document.getElementById('upload-progress');
-        const progressFill = document.getElementById('upload-progress-fill');
-        const uploadStatus = document.getElementById('upload-status');
-        const uploadPercentage = document.getElementById('upload-percentage');
+        // File upload handling
+        setupFileUpload('questionbank');
+        setupFileUpload('modelpaper');
 
-        // Animate sections on page load
-        const sections = document.querySelectorAll('.csv-stats-section, .quick-actions-section, .upload-section, .history-section');
-        sections.forEach((section, index) => {
-          section.style.opacity = '0';
-          section.style.transform = 'translateY(20px)';
-          
-          setTimeout(() => {
-            section.style.transition = 'all 0.5s ease';
-            section.style.opacity = '1';
-            section.style.transform = 'translateY(0)';
-          }, index * 150);
-        });
+        function setupFileUpload(type) {
+          const uploadArea = document.getElementById(type + '-upload-area');
+          const fileInput = document.getElementById(type + '-file-input');
+          const browseBtn = uploadArea?.querySelector('[data-target="' + type + '"]');
 
-        // Handle browse button click
-        browseBtn.addEventListener('click', () => {
-          fileInput.click();
-        });
+          if (!uploadArea || !fileInput) return;
 
-        // Handle drag and drop
-        uploadArea.addEventListener('dragover', (e) => {
-          e.preventDefault();
-          uploadArea.classList.add('drag-over');
-        });
+          // Browse button click
+          browseBtn?.addEventListener('click', () => {
+            fileInput.click();
+          });
 
-        uploadArea.addEventListener('dragleave', (e) => {
-          e.preventDefault();
-          uploadArea.classList.remove('drag-over');
-        });
+          // Drag and drop
+          uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+          });
 
-        uploadArea.addEventListener('drop', (e) => {
-          e.preventDefault();
-          uploadArea.classList.remove('drag-over');
-          const files = e.dataTransfer.files;
-          if (files.length > 0) {
-            handleFileUpload(files[0]);
-          }
-        });
+          uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+          });
 
-        // Handle file input change
-        fileInput.addEventListener('change', (e) => {
-          if (e.target.files.length > 0) {
-            handleFileUpload(e.target.files[0]);
-          }
-        });
+          uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+              handleFileUpload(files[0], type);
+            }
+          });
 
-        // Handle file upload
-        function handleFileUpload(file) {
+          // File input change
+          fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+              handleFileUpload(e.target.files[0], type);
+            }
+          });
+        }
+
+        function handleFileUpload(file, type) {
           // Validate file
           if (!file.name.toLowerCase().endsWith('.csv')) {
             showNotification('Please select a valid CSV file.', 'error');
             return;
           }
 
-          if (file.size > 10 * 1024 * 1024) { // 10MB limit
+          if (file.size > 10 * 1024 * 1024) {
             showNotification('File size must be less than 10MB.', 'error');
             return;
           }
 
           const formData = new FormData();
           formData.append('csv_file', file);
+          formData.append('import_type', type);
 
-          // Show upload progress
-          uploadProgress.style.display = 'block';
-          uploadArea.style.display = 'none';
+          // Show upload modal
+          const modal = document.getElementById('upload-modal');
+          const statusDiv = document.getElementById('upload-status');
+          const detailsDiv = document.getElementById('upload-details');
+          const progressFill = document.getElementById('modal-progress-fill');
+          const progressPercentage = document.getElementById('upload-percentage');
           
-          // Simulate progress
+          modal.style.display = 'block';
+          statusDiv.textContent = 'Uploading file...';
+          detailsDiv.innerHTML = '';
+          
+          // Animate progress
           let progress = 0;
           const progressInterval = setInterval(() => {
             progress += Math.random() * 15;
             if (progress > 90) progress = 90;
             
             progressFill.style.width = progress + '%';
-            uploadPercentage.textContent = Math.round(progress) + '%';
+            progressPercentage.textContent = Math.round(progress) + '%';
             
             if (progress >= 90) {
-              clearInterval(progressInterval);
-              uploadStatus.textContent = 'Processing file...';
+              statusDiv.textContent = 'Processing file...';
             }
           }, 300);
 
           // Upload file
-          fetch('{% url "import_questions" %}', {
+          fetch('{% url "import_questions_with_history" %}', {
             method: 'POST',
             body: formData,
             headers: {
@@ -577,10 +659,11 @@
           .then(data => {
             clearInterval(progressInterval);
             progressFill.style.width = '100%';
-            uploadPercentage.textContent = '100%';
-            uploadStatus.textContent = 'Complete!';
+            progressPercentage.textContent = '100%';
+            statusDiv.textContent = 'Complete!';
             
             setTimeout(() => {
+              modal.style.display = 'none';
               if (data.success) {
                 showUploadResult(data);
               } else {
@@ -590,22 +673,9 @@
           })
           .catch(error => {
             clearInterval(progressInterval);
+            modal.style.display = 'none';
             showError('Upload failed: ' + error.message);
-          })
-          .finally(() => {
-            setTimeout(() => {
-              resetUploadArea();
-            }, 2000);
           });
-        }
-
-        function resetUploadArea() {
-          uploadProgress.style.display = 'none';
-          uploadArea.style.display = 'block';
-          progressFill.style.width = '0%';
-          uploadPercentage.textContent = '0%';
-          uploadStatus.textContent = 'Uploading...';
-          fileInput.value = '';
         }
 
         function showUploadResult(data) {
@@ -645,6 +715,18 @@
                 </div>
               </div>
           `;
+          
+          // Show paper names if any
+          if (data.paper_names && data.paper_names.length > 0) {
+            resultHtml += `
+              <div class="result-papers">
+                <h5><i class="fas fa-copy"></i> Paper Names Imported:</h5>
+                <div class="paper-names-list">
+                  ${data.paper_names.map(name => `<span class="paper-name-tag">${name}</span>`).join('')}
+                </div>
+              </div>
+            `;
+          }
           
           // Show errors if any (including duplicates)
           if (data.errors && data.errors.length > 0) {
@@ -716,36 +798,49 @@
             downloadTemplate(templateType);
           });
         });
-
-        function downloadTemplate(type) {
-          let csvContent = '';
-          let filename = '';
-          
-          if (type === 'basic') {
-            csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation
-"What is the capital of France?",MCQ,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
-"Explain photosynthesis",SEQ,MBBS,1st,Biology,Botany,Processes,Plants,medium,"Process by which plants make food using sunlight."
-"Types of muscle tissue",NOTE,MBBS,1st,Anatomy,Histology,Tissues,Muscles,Easy,"Study notes on different types of muscle tissue."`;
-            filename = 'question_template_basic.csv';
-          } else if (type === 'mcq') {
-            csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation
-"What is the capital of France?","Paris","London","Berlin","Madrid","Rome",A,MBBS,1st,General,Geography,Europe,Capitals,easy,"Paris is the capital and largest city of France."
-"Solve: 2 + 2 = ?","3","4","5","6","7",B,MBBS,1st,Mathematics,Arithmetic,Addition,Easy,"Basic addition problem."
-"Which organ pumps blood?","Heart","Liver","Kidney","Brain","Lung",A,MBBS,1st,Anatomy,Cardiology,Circulation,Heart,Medium,"The heart is the muscular organ that pumps blood throughout the body."`;
-            filename = 'question_template_mcq.csv';
-          }
-          
-          const blob = new Blob([csvContent], { type: 'text/csv' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          
-          showNotification(`${filename} downloaded successfully!`, 'success');
-        }
-
+// Updated CSV template generation function
+function downloadTemplate(type) {
+  let csvContent = '';
+  let filename = '';
+  
+  switch(type) {
+    case 'questionbank-basic':
+      csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation,image
+"What is the normal heart rate range for a healthy adult?",MCQ,MBBS,1st,Cardiovascular,Physiology,Cardiology,"Heart Rate",Easy,"Normal adult heart rate is 60-100 beats per minute at rest.",heart_rate_diagram.jpg
+"Describe the pathophysiology of myocardial infarction",SEQ,MBBS,3rd,Cardiovascular,Pathology,Cardiology,"Myocardial Infarction",Hard,"MI occurs due to coronary artery occlusion leading to myocardial cell death.",mi_pathology.png
+"Anatomy of the human heart chambers",NOTE,MBBS,1st,Cardiovascular,Anatomy,Cardiology,"Heart Anatomy",Medium,"Study notes on the four chambers of the heart and their functions.",heart_chambers.jpg`;
+      filename = 'questionbank_template_basic.csv';
+      break;
+      
+    case 'questionbank-mcq':
+      csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation,image
+"What is the normal blood pressure reading for adults?","120/80 mmHg","140/90 mmHg","160/100 mmHg","100/60 mmHg","180/110 mmHg",A,MBBS,1st,Cardiovascular,Physiology,Cardiology,"Blood Pressure",Easy,"Normal blood pressure is approximately 120/80 mmHg for healthy adults.",bp_measurement.jpg
+"Which tooth is shown in the radiograph?","Central Incisor","Lateral Incisor","Canine","First Premolar","Second Premolar",C,BDS,2nd,Oral,Radiology,Dentistry,"Tooth Identification",Medium,"Canine teeth have characteristic single pointed crown and long root.",dental_xray_canine.png
+"The structure indicated by the arrow is:","Left Ventricle","Right Atrium","Aortic Arch","Pulmonary Trunk","Superior Vena Cava",A,MBBS,1st,Cardiovascular,Anatomy,Cardiology,"Heart Anatomy",Medium,"The left ventricle is the main pumping chamber with thick muscular walls.",heart_anatomy_labeled.jpg`;
+      filename = 'questionbank_template_mcq.csv';
+      break;
+      
+    case 'modelpaper-medical':
+      csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,paper_name,degree,year,module,subject,topic,difficulty,explanation,image,marks
+"The ECG shown indicates:","Normal Sinus Rhythm","Atrial Fibrillation","Ventricular Tachycardia","Complete Heart Block","ST Elevation MI",E,"MBBS Final Exam 2024",MBBS,4th,Cardiology,Medicine,"ECG Interpretation",Hard,"ST elevation in leads II, III, aVF indicates inferior wall MI.",ecg_stemi_inferior.jpg,2
+"Identify the dental restoration material shown:","Amalgam","Composite Resin","Glass Ionomer","Gold Inlay","Ceramic Crown",B,"BDS Final Exam 2024",BDS,4th,Restorative,Dentistry,"Dental Materials",Medium,"Composite resin appears tooth-colored and blends with natural enamel.",composite_restoration.png,1
+"The radiological finding shows:","Normal Chest X-ray","Pneumothorax","Pleural Effusion","Pneumonia","Pulmonary Edema",C,"MBBS Midterm 2024",MBBS,3rd,Respiratory,Medicine,"Chest Radiology",Medium,"Pleural effusion appears as fluid collection in the pleural space.",chest_xray_effusion.jpg,2
+"Which periodontal instrument is shown?","Periodontal Probe","Curette","Scaler","Explorer","Furcation Probe",A,"BDS Midterm 2024",BDS,3rd,Periodontics,Dentistry,"Periodontal Instruments",Easy,"Periodontal probe is used to measure pocket depths and has millimeter markings.",perio_probe.jpg,1
+"The histological section demonstrates:","Normal Liver Tissue","Fatty Liver","Cirrhosis","Hepatitis","Liver Cancer",C,"MBBS Pathology Exam 2024",MBBS,2nd,Pathology,Medicine,"Liver Pathology",Hard,"Cirrhosis shows fibrous bands dividing liver into regenerative nodules.",liver_cirrhosis_histo.jpg,3`;
+      filename = 'modelpaper_medical_template.csv';
+      break;
+  }
+  
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  window.URL.revokeObjectURL(url);
+  
+  showNotification(`${filename} downloaded successfully!`, 'success');
+}
         // View errors modal
         document.querySelectorAll('.view-errors').forEach(btn => {
           btn.addEventListener('click', function() {
@@ -755,71 +850,23 @@
           });
         });
 
-        // View details modal
-        document.querySelectorAll('.view-details').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const recordId = this.dataset.id;
-            // You can fetch detailed information here
-            document.getElementById('details-content').innerHTML = `
-              <div class="import-details">
-                <h4>Import Details for Record #${recordId}</h4>
-                <p>Detailed information about this import would be displayed here.</p>
-                <div class="detail-item">
-                  <strong>Processing Time:</strong> <span>2.3 seconds</span>
-                </div>
-                <div class="detail-item">
-                  <strong>Memory Usage:</strong> <span>45.2 MB</span>
-                </div>
-                <div class="detail-item">
-                  <strong>Validation Errors:</strong> <span>None</span>
-                </div>
-              </div>
-            `;
-            document.getElementById('details-modal').style.display = 'block';
-          });
-        });
-
-        // Delete record functionality
-        document.querySelectorAll('.delete-record').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const recordId = this.dataset.id;
-            if (confirm('Are you sure you want to delete this import record?')) {
-              // Here you would make an AJAX call to delete the record
-              showNotification('Import record deleted successfully!', 'success');
-              this.closest('tr').remove();
-            }
-          });
-        });
-
-        // Clear all history
-        document.querySelector('.clear-history')?.addEventListener('click', function() {
-          if (confirm('Are you sure you want to clear all import history? This action cannot be undone.')) {
-            // Here you would make an AJAX call to clear all history
-            showNotification('All import history cleared successfully!', 'success');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1500);
-          }
-        });
-
         // History filtering
         const statusFilter = document.getElementById('status-filter');
-        const dateFilter = document.getElementById('date-filter');
+        const typeFilter = document.getElementById('type-filter');
         
         function filterHistory() {
           const statusValue = statusFilter?.value.toLowerCase() || '';
-          const dateValue = dateFilter?.value || '';
+          const typeValue = typeFilter?.value.toLowerCase() || '';
           const rows = document.querySelectorAll('.history-row');
           
           rows.forEach(row => {
             const status = row.dataset.status;
-            const dateCell = row.querySelector('.date-info .date');
-            const rowDate = dateCell ? new Date(dateCell.textContent).toISOString().split('T')[0] : '';
+            const type = row.dataset.type;
             
             const statusMatch = !statusValue || status === statusValue;
-            const dateMatch = !dateValue || rowDate === dateValue;
+            const typeMatch = !typeValue || type === typeValue;
             
-            if (statusMatch && dateMatch) {
+            if (statusMatch && typeMatch) {
               row.style.display = '';
             } else {
               row.style.display = 'none';
@@ -828,7 +875,7 @@
         }
         
         statusFilter?.addEventListener('change', filterHistory);
-        dateFilter?.addEventListener('change', filterHistory);
+        typeFilter?.addEventListener('change', filterHistory);
 
         // Close modals
         document.querySelectorAll('.close-modal').forEach(btn => {
@@ -842,13 +889,6 @@
           if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
           }
-        });
-
-        // Download sample CSV (legacy support)
-        document.querySelectorAll('.download-sample').forEach(btn => {
-          btn.addEventListener('click', function() {
-            downloadTemplate('basic');
-          });
         });
 
         // Get CSRF token from cookies
@@ -866,10 +906,24 @@
           }
           return cookieValue;
         }
+
+        // Animate sections on page load
+        const sections = document.querySelectorAll('.stats-container, .upload-container, .actions-section, .history-section');
+        sections.forEach((section, index) => {
+          section.style.opacity = '0';
+          section.style.transform = 'translateY(20px)';
+          
+          setTimeout(() => {
+            section.style.transition = 'all 0.5s ease';
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+          }, index * 150);
+        });
       });
     </script>
+
     <style>
-      /* Additional styles for CSV Management */
+      /* Enhanced CSS for the new layout */
       .section-description {
         color: #6b7280;
         font-size: 14px;
@@ -877,21 +931,66 @@
         line-height: 1.5;
       }
 
-      /* Quick Actions Section */
-      .quick-actions-section {
+      /* Side by Side Layout */
+      .stats-container,
+      .upload-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+      }
+
+      .stats-section,
+      .upload-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .stats-section {
+        border-top: 3px solid #10b981;
+      }
+
+      .upload-section {
+        border-top: 3px solid #82272e;
+      }
+
+      .stats-section h2,
+      .upload-section h2 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
+      .stats-section h2 {
+        color: #10b981;
+      }
+
+      .upload-section h2 {
+        color: #82272e;
+      }
+
+      /* Actions Section */
+      .actions-section {
         background: white;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         padding: 20px;
         margin-bottom: 25px;
         border: 1px solid #e5e7eb;
-        border-top: 3px solid #10b981;
+        border-top: 3px solid #3b82f6;
       }
 
-      .quick-actions-section h2 {
+      .actions-section h2 {
         margin-top: 0;
         margin-bottom: 20px;
-        color: #10b981;
+        color: #3b82f6;
         font-size: 18px;
         display: flex;
         align-items: center;
@@ -901,7 +1000,7 @@
 
       .action-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
       }
 
@@ -917,19 +1016,19 @@
       .action-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #10b981;
+        border-color: #3b82f6;
       }
 
       .action-icon {
         width: 50px;
         height: 50px;
-        background: rgba(16, 185, 129, 0.1);
+        background: rgba(59, 130, 246, 0.1);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 15px;
-        color: #10b981;
+        color: #3b82f6;
         font-size: 20px;
       }
 
@@ -947,8 +1046,14 @@
         line-height: 1.4;
       }
 
+      .template-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
       .action-btn {
-        background: #10b981;
+        background: #3b82f6;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -960,56 +1065,92 @@
         text-decoration: none;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
       }
 
       .action-btn:hover {
-        background: #059669;
+        background: #2563eb;
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
       }
 
-      /* Enhanced Upload Area */
-      .upload-area.drag-over {
-        border-color: #82272e;
-        background-color: rgba(130, 39, 46, 0.02);
-        transform: scale(1.02);
+      /* Paper Names Section */
+      .paper-names-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #f59e0b;
       }
 
-      .requirement-note {
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid rgba(59, 130, 246, 0.2);
-        border-radius: 6px;
-        padding: 12px;
-        margin-top: 15px;
+      .paper-names-section h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #f59e0b;
+        font-size: 18px;
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #1e40af;
-        font-size: 13px;
-      }
-
-      /* Enhanced Progress */
-      .progress-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .progress-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 14px;
-        color: #6b7280;
-      }
-
-      .progress-percentage {
         font-weight: 600;
-        color: #82272e;
       }
 
-      /* Enhanced History Table */
+      .paper-names-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .paper-name-card {
+        background: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 6px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+
+      .paper-name-card:hover {
+        box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+        transform: translateY(-2px);
+      }
+
+      .paper-name-card h4 {
+        margin: 0 0 8px 0;
+        color: #92400e;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .paper-name-card p {
+        margin: 0;
+        color: #b45309;
+        font-size: 12px;
+      }
+
+      /* History Section */
+      .history-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #8b5cf6;
+      }
+
+      .history-section h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        color: #8b5cf6;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+      }
+
       .history-controls {
         display: flex;
         justify-content: space-between;
@@ -1025,105 +1166,56 @@
         align-items: center;
       }
 
-      .filter-date {
+      .filter-select {
         padding: 8px 12px;
         border: 1px solid #e5e7eb;
         border-radius: 4px;
         font-size: 14px;
         background: white;
+        color: #374151;
       }
 
-      .history-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .clear-history {
-        background: #ef4444;
-        color: white;
-        border: none;
-      }
-
-      .clear-history:hover {
-        background: #dc2626;
-      }
-
-      .file-details {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-
-      .file-name {
-        font-weight: 500;
-        color: #1f2937;
-      }
-
-      .file-size {
-        font-size: 12px;
-        color: #6b7280;
-      }
-
-      .date-info {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-
-      .date {
-        font-weight: 500;
-        color: #1f2937;
-      }
-
-      .time {
-        font-size: 12px;
-        color: #6b7280;
-      }
-
-      .number-badge {
-        background: #f3f4f6;
+      .type-badge {
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
-        color: #374151;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
       }
 
-      .no-data-content {
-        text-align: center;
-        padding: 40px 20px;
+      .type-badge.questionbank {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
       }
 
-      .no-data-content i {
-        font-size: 48px;
-        color: #d1d5db;
-        margin-bottom: 15px;
+      .type-badge.modelpaper {
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
       }
 
-      .no-data-content h3 {
-        margin: 0 0 10px 0;
-        color: #6b7280;
-        font-size: 18px;
+      /* Upload Area Enhancements */
+      .upload-area.drag-over {
+        border-color: #82272e;
+        background-color: rgba(130, 39, 46, 0.02);
+        transform: scale(1.02);
       }
 
-      .no-data-content p {
-        margin: 0;
-        color: #9ca3af;
-        font-size: 14px;
+      .browse-link {
+        background: none;
+        border: none;
+        color: #82272e;
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: inherit;
+      }
+
+      .browse-link:hover {
+        color: #651e26;
       }
 
       /* Modal Enhancements */
-      .modal-content {
-        max-width: 600px;
-        width: 90%;
-      }
-
-      .error-content p {
-        margin-bottom: 15px;
-        color: #6b7280;
-      }
-
-      /* Upload Result Styles */
       .upload-result {
         text-align: center;
       }
@@ -1213,6 +1305,39 @@
         color: #1f2937;
       }
 
+      .result-papers {
+        background: rgba(139, 92, 246, 0.05);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .result-papers h5 {
+        margin: 0 0 15px 0;
+        color: #8b5cf6;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .paper-names-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .paper-name-tag {
+        background: #8b5cf6;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
       .result-errors {
         background: rgba(239, 68, 68, 0.05);
         border: 1px solid rgba(239, 68, 68, 0.2);
@@ -1247,6 +1372,19 @@
         font-style: italic;
         color: #9ca3af;
         font-size: 14px;
+      }
+
+      .info-note {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 6px;
+        padding: 12px;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #1e40af;
+        font-size: 13px;
       }
 
       .result-actions {
@@ -1305,7 +1443,17 @@
 
       /* Responsive Design */
       @media (max-width: 768px) {
+        .stats-container,
+        .upload-container {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
         .action-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .paper-names-grid {
           grid-template-columns: 1fr;
         }
 
@@ -1319,7 +1467,6 @@
           gap: 10px;
         }
 
-        .filter-date,
         .filter-select {
           width: 100%;
         }
@@ -1341,557 +1488,20 @@
         }
       }
 
-      /* Add these styles to your CSS file (DAstyles.css or MQstyles.css) */
-
-/* Enhanced result styles */
-.result-errors {
-  margin-top: 20px;
-  padding: 15px;
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 8px;
-}
-
-.result-errors h5 {
-  color: #856404;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.error-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.error-list li {
-  padding: 8px 12px;
-  margin: 5px 0;
-  background: #ffeaa7;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #856404;
-  border-left: 3px solid #ffa500;
-}
-
-.error-note {
-  font-style: italic;
-  color: #856404;
-  margin: 10px 0;
-  font-size: 12px;
-}
-
-.info-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  padding: 10px;
-  background: #d1ecf1;
-  border-radius: 6px;
-  border: 1px solid #bee5eb;
-}
-
-.info-note i {
-  color: #0c5460;
-  font-size: 16px;
-}
-
-.info-note span {
-  font-size: 13px;
-  color: #0c5460;
-  font-weight: 500;
-}
-
-/* Enhanced stats display */
-.result-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin: 20px 0;
-}
-
-.result-stat {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
-  transition: transform 0.2s ease;
-}
-
-.result-stat:hover {
-  transform: translateY(-2px);
-}
-
-.result-stat .stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-.result-stat.success {
-  border-left-color: #28a745;
-}
-
-.result-stat.success .stat-icon {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-}
-
-.result-stat.failed {
-  border-left-color: #dc3545;
-}
-
-.result-stat.failed .stat-icon {
-  background: linear-gradient(135deg, #dc3545, #bd2130);
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #6c757d;
-  margin-bottom: 2px;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Notification styles */
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 8px;
-  padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 10000;
-  transform: translateX(400px);
-  transition: transform 0.3s ease;
-  max-width: 400px;
-}
-
-.notification.show {
-  transform: translateX(0);
-}
-
-.notification.error {
-  border-left: 4px solid #dc3545;
-}
-
-.notification.success {
-  border-left: 4px solid #28a745;
-}
-
-.notification.info {
-  border-left: 4px solid #17a2b8;
-}
-
-.notification i {
-  font-size: 18px;
-}
-
-.notification.error i {
-  color: #dc3545;
-}
-
-.notification.success i {
-  color: #28a745;
-}
-
-.notification.info i {
-  color: #17a2b8;
-}
-
-.close-notification {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #6c757d;
-  margin-left: auto;
-  padding: 0;
-}
-
-.close-notification:hover {
-  color: #333;
-}
-
-/* Modal enhancements */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 0;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s ease;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 20px;
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-
-.close-modal:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { 
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Add these styles to your CSS file (DAstyles.css or MQstyles.css) */
-
-/* Enhanced result styles */
-.result-errors {
-  margin-top: 20px;
-  padding: 15px;
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 8px;
-}
-
-.result-errors h5 {
-  color: #856404;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.error-list {
-  list-style: none;
-  padding: 0;
-  margin: 10px 0;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.error-list li {
-  padding: 8px 12px;
-  margin: 5px 0;
-  background: #ffeaa7;
-  border-radius: 4px;
-  font-size: 13px;
-  color: #856404;
-  border-left: 3px solid #ffa500;
-}
-
-.error-note {
-  font-style: italic;
-  color: #856404;
-  margin: 10px 0;
-  font-size: 12px;
-}
-
-.info-note {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  padding: 10px;
-  background: #d1ecf1;
-  border-radius: 6px;
-  border: 1px solid #bee5eb;
-}
-
-.info-note i {
-  color: #0c5460;
-  font-size: 16px;
-}
-
-.info-note span {
-  font-size: 13px;
-  color: #0c5460;
-  font-weight: 500;
-}
-
-/* Enhanced stats display */
-.result-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin: 20px 0;
-}
-
-.result-stat {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
-  transition: transform 0.2s ease;
-}
-
-.result-stat:hover {
-  transform: translateY(-2px);
-}
-
-.result-stat .stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 16px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-.result-stat.success {
-  border-left-color: #28a745;
-}
-
-.result-stat.success .stat-icon {
-  background: linear-gradient(135deg, #28a745, #1e7e34);
-}
-
-.result-stat.failed {
-  border-left-color: #dc3545;
-}
-
-.result-stat.failed .stat-icon {
-  background: linear-gradient(135deg, #dc3545, #bd2130);
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #6c757d;
-  margin-bottom: 2px;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Notification styles */
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 8px;
-  padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 10000;
-  transform: translateX(400px);
-  transition: transform 0.3s ease;
-  max-width: 400px;
-}
-
-.notification.show {
-  transform: translateX(0);
-}
-
-.notification.error {
-  border-left: 4px solid #dc3545;
-}
-
-.notification.success {
-  border-left: 4px solid #28a745;
-}
-
-.notification.info {
-  border-left: 4px solid #17a2b8;
-}
-
-.notification i {
-  font-size: 18px;
-}
-
-.notification.error i {
-  color: #dc3545;
-}
-
-.notification.success i {
-  color: #28a745;
-}
-
-.notification.info i {
-  color: #17a2b8;
-}
-
-.close-notification {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #6c757d;
-  margin-left: auto;
-  padding: 0;
-}
-
-.close-notification:hover {
-  color: #333;
-}
-
-/* Modal enhancements */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 0;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: slideIn 0.3s ease;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-  color: white;
-  padding: 20px;
-  border-radius: 12px 12px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.close-modal {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-
-.close-modal:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.modal-body {
-  padding: 20px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { 
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+      /* Progress Enhancement */
+      .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .progress-percentage {
+        font-weight: 600;
+        color: #82272e;
+      }
     </style>
   </body>
 </html>

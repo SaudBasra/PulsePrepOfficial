@@ -18,6 +18,10 @@ from questionbank.models import Question
 
 from mocktest.models import TestAttempt
 
+
+
+
+
 def mocktest_list(request):
     """List all mock tests with filtering"""
     query = request.GET.get('q', '')
@@ -362,11 +366,81 @@ def student_mock_tests(request):
     
     return render(request, 'mocktest/student_mock_tests.html', context)
 
+# Add this helper function to mocktest/views.py
+
+def get_question_image_url(question):
+    """
+    Helper function to get the correct image URL for a question
+    Handles various image filename formats and matches with QuestionImage model
+    """
+    if not question.image:
+        return None, None
+    
+    try:
+        from manageimage.models import QuestionImage
+        
+        image_filename = question.image.strip()
+        if not image_filename:
+            return None, None
+        
+        # Strategy 1: Exact filename match
+        try:
+            image_obj = QuestionImage.objects.get(filename=image_filename)
+            if image_obj.image:
+                return image_obj.image.url, image_obj.filename
+        except QuestionImage.DoesNotExist:
+            pass
+        
+        # Strategy 2: Match without extension
+        filename_no_ext = image_filename.rsplit('.', 1)[0] if '.' in image_filename else image_filename
+        
+        # Try to find by filename containing the base name
+        possible_matches = QuestionImage.objects.filter(
+            filename__icontains=filename_no_ext
+        )
+        
+        for match in possible_matches:
+            # Check if it's a close match
+            match_no_ext = match.filename.rsplit('.', 1)[0] if '.' in match.filename else match.filename
+            if match_no_ext.lower() == filename_no_ext.lower():
+                if match.image:
+                    return match.image.url, match.filename
+        
+        # Strategy 3: Partial matching (less strict)
+        if len(filename_no_ext) > 3:  # Only for reasonable length names
+            partial_matches = QuestionImage.objects.filter(
+                filename__icontains=filename_no_ext[:min(len(filename_no_ext), 10)]
+            )
+            
+            for match in partial_matches:
+                # Additional similarity check could be added here
+                if match.image:
+                    return match.image.url, match.filename
+        
+        # Strategy 4: Try adding common extensions
+        common_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+        for ext in common_extensions:
+            try:
+                test_filename = filename_no_ext + ext
+                image_obj = QuestionImage.objects.get(filename=test_filename)
+                if image_obj.image:
+                    return image_obj.image.url, image_obj.filename
+            except QuestionImage.DoesNotExist:
+                continue
+        
+    except ImportError:
+        # manageimage app not available
+        pass
+    except Exception as e:
+        print(f"Error loading image for question {question.id}: {str(e)}")
+    
+    return None, image_filename
 
 
+# Updated take_test view with better image handling
 @login_required
 def take_test(request, test_id):
-    """Student takes the test"""
+    """Student takes the test - Updated with improved image support"""
     test = get_object_or_404(MockTest, id=test_id)
     student = request.user
     
@@ -376,11 +450,6 @@ def take_test(request, test_id):
     print(f"DEBUG: Test end time: {test.end_datetime}")
     print(f"DEBUG: Current time: {timezone.now()}")
     
-    # REMOVED: User approval check - comment out if you don't need it
-    # if hasattr(student, 'approval_status') and student.approval_status != 'approved':
-    #     messages.error(request, "Your account must be approved to take tests.")
-    #     return redirect('student_mock_tests')
-    
     # Check if test is active - simplified check
     now = timezone.now()
     if test.status != 'live':
@@ -388,7 +457,7 @@ def take_test(request, test_id):
         print(f"DEBUG: Test blocked - status is {test.status}, not 'live'")
         return redirect('student_mock_tests')
     
-    # Optional: Check time bounds (you can comment this out if not needed)
+    # Optional: Check time bounds
     if now < test.start_datetime:
         messages.error(request, "This test has not started yet.")
         print(f"DEBUG: Test blocked - hasn't started yet")
@@ -398,18 +467,6 @@ def take_test(request, test_id):
         messages.error(request, "This test has already ended.")
         print(f"DEBUG: Test blocked - already ended")
         return redirect('student_mock_tests')
-    
-    # REMOVED: Degree/year matching checks since we want to allow all users
-    # user_degree = getattr(student, 'degree', None)
-    # user_year = getattr(student, 'year', None)
-    # 
-    # if test.degree and user_degree and student.degree != test.degree:
-    #     messages.error(request, "This test is not available for your degree program.")
-    #     return redirect('student_mock_tests')
-    # 
-    # if test.year and user_year and student.year != test.year:
-    #     messages.error(request, "This test is not available for your year.")
-    #     return redirect('student_mock_tests')
     
     # Check attempt limit
     existing_attempts = TestAttempt.objects.filter(
@@ -453,22 +510,60 @@ def take_test(request, test_id):
         print(f"DEBUG: Test blocked - no questions found")
         return redirect('student_mock_tests')
     
+    # Process questions with improved image handling
+    processed_questions = []
+    for tq in test_questions:
+        question_data = {
+            'id': tq.question.id,
+            'order': len(processed_questions) + 1,
+            'text': tq.question.question_text,
+            'options': {},
+            'has_image': bool(tq.question.image),
+            'image_url': None,
+            'image_filename': tq.question.image if tq.question.image else None
+        }
+        
+        # Handle image URL generation with improved matching
+        if tq.question.image:
+            image_url, actual_filename = get_question_image_url(tq.question)
+            if image_url:
+                question_data['image_url'] = image_url
+                question_data['image_filename'] = actual_filename
+                print(f"DEBUG: Found image for question {tq.question.id}: {image_url}")
+            else:
+                print(f"DEBUG: Image not found for question {tq.question.id}: {tq.question.image}")
+        
+        # Add options
+        if tq.question.option_a:
+            question_data['options']['A'] = tq.question.option_a
+        if tq.question.option_b:
+            question_data['options']['B'] = tq.question.option_b
+        if tq.question.option_c:
+            question_data['options']['C'] = tq.question.option_c
+        if tq.question.option_d:
+            question_data['options']['D'] = tq.question.option_d
+        if tq.question.option_e:
+            question_data['options']['E'] = tq.question.option_e
+        
+        processed_questions.append(question_data)
+    
     # Randomize if enabled
     if test.randomize_questions:
-        test_questions = list(test_questions)
-        random.shuffle(test_questions)
+        random.shuffle(processed_questions)
         print(f"DEBUG: Questions randomized")
     
     print(f"DEBUG: Proceeding to test page with attempt ID: {current_attempt.id}")
+    print(f"DEBUG: Processed {len(processed_questions)} questions with images")
     
     context = {
         'test': test,
         'attempt': current_attempt,
-        'test_questions': test_questions,
-        'total_questions': len(test_questions),  # <-- FIXED
+        'test_questions': processed_questions,  # Use processed questions
+        'total_questions': len(processed_questions),
     }
     
     return render(request, 'mocktest/take_test.html', context)
+
 @require_POST
 def submit_answer(request):
     """Save student's answer"""
@@ -540,6 +635,129 @@ def test_result(request, attempt_id):
     
     return render(request, 'mocktest/test_results.html', context)
 
+
+
+@require_POST
+def submit_answer(request):
+    """Save student's answer"""
+    attempt_id = request.POST.get('attempt_id')
+    question_id = request.POST.get('question_id')
+    answer = request.POST.get('answer')
+    
+    attempt = get_object_or_404(TestAttempt, id=attempt_id)
+    question = get_object_or_404(Question, id=question_id)
+    
+    # Save or update response
+    response, created = TestResponse.objects.update_or_create(
+        attempt=attempt,
+        question=question,
+        defaults={
+            'selected_answer': answer,
+        }
+    )
+    
+    # Check if answer is correct
+    response.check_answer()
+    response.save()
+    
+    return JsonResponse({'success': True})
+
+@require_POST
+def submit_test(request):
+    """Submit the complete test"""
+    attempt_id = request.POST.get('attempt_id')
+    attempt = get_object_or_404(TestAttempt, id=attempt_id)
+    
+    # Calculate score
+    total_questions = attempt.mock_test.total_questions
+    correct_answers = attempt.responses.filter(is_correct=True).count()
+    
+    attempt.score = correct_answers
+    attempt.percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
+    attempt.status = 'completed'
+    attempt.completed_at = timezone.now()
+    
+    # Calculate time taken
+    time_taken = (attempt.completed_at - attempt.started_at).total_seconds()
+    attempt.time_taken = int(time_taken)
+    
+    attempt.save()
+    
+    return JsonResponse({
+        'success': True,
+        'score': attempt.score,
+        'total': total_questions,
+        'percentage': float(attempt.percentage),
+        'passed': attempt.passed,
+    })
+
+@login_required
+def test_result(request, attempt_id):
+    """Show test results with enhanced data and security"""
+    attempt = get_object_or_404(TestAttempt, id=attempt_id)
+    
+    # Security check: Only allow the student who took the test to view results
+    if attempt.student != request.user:
+        messages.error(request, "You can only view your own test results.")
+        return redirect('student_mock_tests')
+    
+    # Ensure the test is actually completed
+    if attempt.status == 'in_progress':
+        messages.warning(request, "This test is still in progress.")
+        return redirect('take_test', test_id=attempt.mock_test.id)
+    
+    # Get all responses with questions, including unanswered ones
+    all_questions = attempt.mock_test.testquestion_set.all().select_related('question')
+    responses = []
+    
+    for test_question in all_questions:
+        try:
+            response = TestResponse.objects.get(
+                attempt=attempt,
+                question=test_question.question
+            )
+        except TestResponse.DoesNotExist:
+            # Create a dummy response for unanswered questions
+            response = TestResponse(
+                attempt=attempt,
+                question=test_question.question,
+                selected_answer=None,
+                is_correct=False
+            )
+        responses.append(response)
+    
+    # Calculate additional statistics
+    total_questions = len(responses)
+    answered_questions = len([r for r in responses if r.selected_answer])
+    unanswered_questions = total_questions - answered_questions
+    correct_answers = len([r for r in responses if r.is_correct])
+    incorrect_answers = answered_questions - correct_answers
+    
+    # Calculate time efficiency
+    time_efficiency = 0
+    if attempt.mock_test.duration_minutes > 0:
+        time_efficiency = min(100, (attempt.time_taken_minutes / attempt.mock_test.duration_minutes) * 100)
+    
+    context = {
+        'attempt': attempt,
+        'test': attempt.mock_test,
+        'responses': responses,
+        'passed': attempt.passed,
+        'user': request.user,
+        
+        # Additional statistics
+        'total_questions': total_questions,
+        'answered_questions': answered_questions,
+        'unanswered_questions': unanswered_questions,
+        'correct_answers': correct_answers,
+        'incorrect_answers': incorrect_answers,
+        'time_efficiency': round(time_efficiency, 1),
+        
+        # For template calculations
+        'current_year': timezone.now().year,
+    }
+    
+    return render(request, 'mocktest/test_results.html', context)
 @require_POST
 def report_warning(request):
     """Report tab switch warning"""

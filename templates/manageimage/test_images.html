@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-image { 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 1px solid #ddd; 
+        }
+        .test-image img { 
+            max-width: 200px; 
+            max-height: 200px; 
+            border: 2px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Image Test</h1>
+    
+    {% for image in images %}
+        <div class="test-image">
+            <h3>{{ image.filename }}</h3>
+            <p><strong>URL:</strong> {{ image.image.url }}</p>
+            <p><strong>Direct Link:</strong> <a href="{{ image.image.url }}" target="_blank">Open in new tab</a></p>
+            
+            <div>
+                <strong>Image:</strong><br>
+                <img src="{{ image.image.url }}" 
+                     alt="{{ image.filename }}"
+                     onload="this.style.border='2px solid green'; console.log('✅ Loaded:', '{{ image.filename }}');"
+                     onerror="this.style.border='2px solid red'; this.style.background='#ffebee'; console.error('❌ Failed:', '{{ image.filename }}', this.src);">
+            </div>
+        </div>
+    {% empty %}
+        <p>No images found. Upload some images first.</p>
+    {% endfor %}
+    
+    <div style="margin-top: 40px; padding: 20px; background: #f0f0f0;">
+        <h3>Direct Media Test</h3>
+        <p>Try these direct links:</p>
+        {% for image in images %}
+            <p><a href="/media/question_images/{{ image.filename }}" target="_blank">/media/question_images/{{ image.filename }}</a></p>
+        {% endfor %}
+    </div>
+</body>
+</html>

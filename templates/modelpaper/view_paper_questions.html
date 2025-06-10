@@ -1,0 +1,543 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - {{ paper_name }} Questions</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/MQstyles.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      
+<!-- Sidebar Navigation -->
+<aside class="sidebar">
+  <div class="logo-container">
+    <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+  </div>
+  <nav class="nav-menu">
+    <a href="{% url 'dashboard' %}" class="nav-item">
+      <i class="fas fa-th-large"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'questionbank' %}" class="nav-item">
+      <i class="fas fa-question-circle"></i>
+      <span>Manage Questions</span>
+    </a>
+    <a href="{% url 'manage_csv' %}" class="nav-item">
+      <i class="fas fa-file-csv"></i>
+      <span>Manage CSVs</span>
+    </a>
+    <a href="{% url 'managemodule' %}" class="nav-item">
+      <i class="fas fa-cubes"></i>
+      <span>Modules</span>
+    </a>
+    <a href="/admin/user_management/customuser/" class="nav-item">
+      <i class="fas fa-users"></i>
+      <span>Manage Users</span>
+    </a>
+    <a href="{% url 'mocktest_list' %}" class="nav-item">
+      <i class="fas fa-vial"></i>
+      <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'modelpaper_list' %}" class="nav-item active">
+      <i class="fas fa-file-alt"></i>
+      <span>Model Papers</span>
+    </a>
+    <a href="{% url 'analytics_report' %}" class="nav-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>Analytics & Reports</span>
+    </a>
+    <a href="{% url 'myaccount' %}" class="nav-item">
+      <i class="fas fa-user"></i>
+      <span>My Account</span>
+    </a>
+    <a href="{% url 'notification_center' %}" class="nav-item">
+      <i class="fas fa-bell"></i>
+      <span>Notifications</span>
+      <span class="notification-badge-sidebar"></span>
+    </a>
+    <a href="{% url 'logout' %}" class="nav-item">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+</aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>
+            <i class="fas fa-file-alt"></i>
+            Paper Questions: {{ paper_name }}
+          </h1>
+          <div class="user-menu">
+            <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Paper Questions Content -->
+        <div class="dashboard-content">
+          
+          <!-- Breadcrumb Navigation -->
+          <div class="breadcrumb-nav">
+            <a href="{% url 'modelpaper_list' %}" class="breadcrumb-link">
+              <i class="fas fa-file-alt"></i> Model Papers
+            </a>
+            <i class="fas fa-chevron-right"></i>
+            <span class="breadcrumb-current">
+              {{ paper_name }} Questions
+            </span>
+          </div>
+
+          <!-- Paper Info Section -->
+          <div class="paper-info-section">
+            <div class="paper-header">
+              <div class="paper-title">
+                <h2><i class="fas fa-copy"></i> {{ paper_name }}</h2>
+                <p class="paper-description">{{ total_questions }} question{{ total_questions|pluralize }} available</p>
+              </div>
+              <div class="paper-actions">
+                <a href="{% url 'create_paper' %}?paper_name={{ paper_name|urlencode }}" class="action-btn primary">
+                  <i class="fas fa-plus"></i> Create Paper from This Set
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions List -->
+          <div class="questions-section">
+            <div class="section-header">
+              <h3><i class="fas fa-list"></i> Questions List</h3>
+              <div class="section-actions">
+                <span class="results-info">
+                  Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_questions }} questions
+                </span>
+              </div>
+            </div>
+
+            <div class="questions-container">
+              {% for question in page_obj %}
+                <div class="question-card">
+                  <div class="question-header">
+                    <span class="question-number">Q{{ forloop.counter|add:page_obj.start_index|add:"-1" }}</span>
+                    <span class="difficulty-badge {{ question.difficulty|lower }}">{{ question.difficulty }}</span>
+                  </div>
+
+                  <div class="question-content">
+                    <div class="question-text">
+                      {{ question.question_text }}
+                    </div>
+
+                    <div class="options-list">
+                      <div class="option {% if question.correct_answer == 'A' %}correct{% endif %}">
+                        <strong>A)</strong> {{ question.option_a }}
+                        {% if question.correct_answer == 'A' %}<i class="fas fa-check-circle"></i>{% endif %}
+                      </div>
+                      
+                      <div class="option {% if question.correct_answer == 'B' %}correct{% endif %}">
+                        <strong>B)</strong> {{ question.option_b }}
+                        {% if question.correct_answer == 'B' %}<i class="fas fa-check-circle"></i>{% endif %}
+                      </div>
+                      
+                      <div class="option {% if question.correct_answer == 'C' %}correct{% endif %}">
+                        <strong>C)</strong> {{ question.option_c }}
+                        {% if question.correct_answer == 'C' %}<i class="fas fa-check-circle"></i>{% endif %}
+                      </div>
+                      
+                      <div class="option {% if question.correct_answer == 'D' %}correct{% endif %}">
+                        <strong>D)</strong> {{ question.option_d }}
+                        {% if question.correct_answer == 'D' %}<i class="fas fa-check-circle"></i>{% endif %}
+                      </div>
+
+                      {% if question.option_e %}
+                        <div class="option {% if question.correct_answer == 'E' %}correct{% endif %}">
+                          <strong>E)</strong> {{ question.option_e }}
+                          {% if question.correct_answer == 'E' %}<i class="fas fa-check-circle"></i>{% endif %}
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    {% if question.explanation %}
+                      <div class="explanation">
+                        <strong><i class="fas fa-lightbulb"></i> Explanation:</strong>
+                        {{ question.explanation }}
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% empty %}
+                <div class="empty-state">
+                  <i class="fas fa-question-circle"></i>
+                  <h3>No Questions Found</h3>
+                  <p>No questions are available for "{{ paper_name }}"</p>
+                  <a href="{% url 'modelpaper_list' %}" class="action-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Model Papers
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+              <div class="pagination-container">
+                <div class="pagination">
+                  {% if page_obj.has_previous %}
+                    <a href="?page=1" class="pagination-link">
+                      <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">
+                      <i class="fas fa-angle-left"></i> Prev
+                    </a>
+                  {% endif %}
+                  
+                  {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                      <span class="pagination-link active">{{ num }}</span>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                      <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">
+                      Next <i class="fas fa-angle-right"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link">
+                      Last <i class="fas fa-angle-double-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    
+    <style>
+      /* Paper Questions Specific Styles */
+      .paper-info-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #82272e;
+      }
+
+      .paper-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .paper-title h2 {
+        margin: 0 0 8px 0;
+        color: #82272e;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .paper-description {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      .paper-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
+        background: #82272e;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .action-btn:hover {
+        background: #651e26;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(130, 39, 46, 0.3);
+      }
+
+      .action-btn.secondary {
+        background: #6b7280;
+      }
+
+      .action-btn.secondary:hover {
+        background: #4b5563;
+      }
+
+      .action-btn.primary {
+        background: #82272e;
+      }
+
+      /* Questions Section */
+      .questions-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        border: 1px solid #e5e7eb;
+        border-top: 3px solid #10b981;
+      }
+
+      .section-header h3 {
+        margin: 0;
+        color: #10b981;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .results-info {
+        color: #6b7280;
+        font-size: 14px;
+      }
+
+      /* Question Cards - Simplified */
+      .question-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+      }
+
+      .question-header {
+        background: #82272e;
+        color: white;
+        padding: 12px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .question-number {
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .difficulty-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+
+      .difficulty-badge.easy {
+        background: #10b981;
+        color: white;
+      }
+
+      .difficulty-badge.medium {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .difficulty-badge.hard {
+        background: #ef4444;
+        color: white;
+      }
+
+      .question-content {
+        padding: 20px;
+      }
+
+      .question-text {
+        margin-bottom: 15px;
+        color: #1f2937;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      .options-list {
+        margin-bottom: 15px;
+      }
+
+      .option {
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .option.correct {
+        background: #f0fdf4;
+        border-color: #10b981;
+        color: #065f46;
+      }
+
+      .option strong {
+        color: #82272e;
+        margin-right: 8px;
+      }
+
+      .option.correct i {
+        color: #10b981;
+      }
+
+      .explanation {
+        background: #fffbeb;
+        border: 1px solid #fed7aa;
+        border-radius: 6px;
+        padding: 15px;
+        color: #92400e;
+        line-height: 1.5;
+      }
+
+      .explanation strong {
+        color: #92400e;
+      }
+
+      /* Empty State - Simplified */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+      }
+
+      .empty-state i {
+        font-size: 48px;
+        color: #d1d5db;
+        margin-bottom: 15px;
+      }
+
+      .empty-state h3 {
+        margin: 0 0 10px 0;
+        color: #6b7280;
+        font-size: 18px;
+      }
+
+      .empty-state p {
+        margin: 0 0 20px 0;
+        color: #9ca3af;
+      }
+
+      /* Pagination */
+      .pagination-container {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .pagination {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .pagination-link {
+        padding: 8px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .pagination-link:hover {
+        background: #82272e;
+        color: white;
+        border-color: #82272e;
+      }
+
+      .pagination-link.active {
+        background: #82272e;
+        color: white;
+        border-color: #82272e;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .paper-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 15px;
+        }
+
+        .paper-actions {
+          justify-content: stretch;
+        }
+
+        .action-btn {
+          flex: 1;
+          justify-content: center;
+        }
+
+        .question-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+        }
+
+        .question-content {
+          padding: 15px;
+        }
+
+        .pagination {
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+      }
+    </style>
+  </body>
+</html>

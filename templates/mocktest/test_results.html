@@ -31,7 +31,7 @@
             line-height: 1.6;
         }
 
-        /* Print Styles */
+        /* Enhanced Print Styles */
         @media print {
             .no-print {
                 display: none !important;
@@ -40,45 +40,132 @@
             body {
                 background: white !important;
                 color: black !important;
+                font-size: 12pt !important;
+                line-height: 1.4 !important;
             }
             
             .result-container {
                 max-width: none !important;
                 margin: 0 !important;
-                padding: 20px !important;
+                padding: 15pt !important;
             }
             
-            .summary-card, .review-section {
+            .summary-card, .performance-summary {
                 box-shadow: none !important;
-                border: 1px solid #ccc !important;
-                break-inside: avoid;
+                border: 1pt solid #ccc !important;
+                break-inside: avoid !important;
+                margin-bottom: 15pt !important;
+                padding: 15pt !important;
             }
             
             .score-display {
-                page-break-inside: avoid;
+                page-break-inside: avoid !important;
+                width: 120pt !important;
+                height: 120pt !important;
             }
             
             .print-header {
                 display: block !important;
-                margin-bottom: 30px !important;
-                text-align: center;
-                border-bottom: 2px solid #82272e;
-                padding-bottom: 20px;
+                margin-bottom: 20pt !important;
+                text-align: center !important;
+                border-bottom: 2pt solid #82272e !important;
+                padding-bottom: 15pt !important;
             }
             
             .print-header img {
-                height: 60px !important;
-                margin-bottom: 10px;
+                height: 40pt !important;
+                margin-bottom: 8pt !important;
+            }
+            
+            .print-header h1 {
+                font-size: 18pt !important;
+                color: #82272e !important;
+                margin: 8pt 0 !important;
             }
             
             .print-footer {
                 display: block !important;
-                margin-top: 30px;
-                text-align: center;
-                font-size: 12px;
-                color: #666;
-                border-top: 1px solid #ccc;
-                padding-top: 20px;
+                margin-top: 20pt !important;
+                text-align: center !important;
+                font-size: 9pt !important;
+                color: #666 !important;
+                border-top: 1pt solid #ccc !important;
+                padding-top: 15pt !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10pt !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .stat-card {
+                border: 1pt solid #ddd !important;
+                padding: 10pt !important;
+                text-align: center !important;
+                break-inside: avoid !important;
+            }
+            
+            .stat-value {
+                font-size: 16pt !important;
+                font-weight: bold !important;
+                color: #82272e !important;
+            }
+            
+            .performance-grid {
+                grid-template-columns: 1fr !important;
+                gap: 8pt !important;
+            }
+            
+            .performance-item {
+                border: 1pt solid #ddd !important;
+                padding: 8pt !important;
+                break-inside: avoid !important;
+            }
+            
+            .performance-bar {
+                height: 6pt !important;
+                background: #eee !important;
+                border: 1pt solid #ddd !important;
+            }
+            
+            .performance-fill {
+                height: 100% !important;
+                background: #82272e !important;
+            }
+            
+            .section-title {
+                font-size: 14pt !important;
+                color: #82272e !important;
+                margin-bottom: 10pt !important;
+                page-break-after: avoid !important;
+            }
+            
+            h1 { font-size: 18pt !important; }
+            h2 { font-size: 16pt !important; }
+            h3 { font-size: 14pt !important; }
+            h4 { font-size: 12pt !important; }
+            
+            .pass-status {
+                font-size: 14pt !important;
+                padding: 8pt 15pt !important;
+                border: 2pt solid currentColor !important;
+                border-radius: 15pt !important;
+                display: inline-block !important;
+            }
+            
+            .print-signature {
+                display: block !important;
+                margin-top: 30pt !important;
+                border-top: 1pt solid #ccc !important;
+                padding-top: 15pt !important;
+            }
+            
+            .score-text {
+                font-size: 24pt !important;
+                color: #82272e !important;
             }
         }
 
@@ -87,6 +174,10 @@
         }
 
         .print-footer {
+            display: none;
+        }
+
+        .print-signature {
             display: none;
         }
 
@@ -337,6 +428,41 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .review-filters {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: #f1f5f9;
+            border: 2px solid transparent;
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-light);
+            color: white;
         }
 
         .toggle-btn {
@@ -406,12 +532,32 @@
             color: #991b1b;
         }
 
+        .status-unanswered {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
         .question-text {
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 16px;
             color: var(--dark);
             font-weight: 500;
+        }
+
+        /* Question Image Support */
+        .question-image {
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
         }
 
         .options-list {
@@ -588,6 +734,15 @@
             .performance-grid {
                 grid-template-columns: 1fr;
             }
+
+            .review-toggle {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .review-filters {
+                justify-content: center;
+            }
         }
 
         /* Animations */
@@ -684,7 +839,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-clock"></i>
                     </div>
-                    <div class="stat-value">{{ attempt.time_taken|floatformat:0 }}m</div>
+                    <div class="stat-value">{{ attempt.time_taken_display }}</div>
                     <div class="stat-label">Time Taken</div>
                 </div>
                 <div class="stat-card">
@@ -720,7 +875,7 @@
                     <div class="performance-bar">
                         <div class="performance-fill" style="width: {% widthratio attempt.time_taken test.duration_minutes 100 %}%"></div>
                     </div>
-                    <small>{{ attempt.time_taken|floatformat:0 }} of {{ test.duration_minutes }} minutes used</small>
+                    <small>{{ attempt.time_taken_formatted }} of {{ test.duration_minutes }} minutes used</small>
                 </div>
                 
                 <div class="performance-item">
@@ -762,14 +917,14 @@
                 <div class="performance-item">
                     <h4>Attempt Details</h4>
                     <p><strong>Started:</strong> {{ attempt.started_at|date:"M j, Y g:i A" }}</p>
-                    <p><strong>Submitted:</strong> {{ attempt.submitted_at|date:"M j, Y g:i A" }}</p>
-                    <p><strong>Time Taken:</strong> {{ attempt.time_taken|floatformat:0 }} minutes</p>
+                    <p><strong>Submitted:</strong> {{ attempt.completed_at|date:"M j, Y g:i A" }}</p>
+                    <p><strong>Time Taken:</strong> {{ attempt.time_taken_formatted }}</p>
                     <p><strong>Warnings:</strong> {{ attempt.warning_count }}</p>
                 </div>
                 
                 <div class="performance-item">
                     <h4>Student Information</h4>
-                    <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                    <p><strong>Name:</strong> {{ user.get_full_name|default:"N/A" }}</p>
                     <p><strong>Email:</strong> {{ user.email }}</p>
                     {% if user.student_id %}
                     <p><strong>Student ID:</strong> {{ user.student_id }}</p>
@@ -798,7 +953,7 @@
             </div>
         </div>
 
-        <!-- Answers Review (Optional) -->
+        <!-- Enhanced Answers Review -->
         {% if test.show_explanations %}
         <div class="review-section fade-in no-print">
             <div class="review-toggle">
@@ -806,6 +961,22 @@
                     <i class="fas fa-clipboard-check"></i>
                     Detailed Answers Review
                 </h2>
+                
+                <div class="review-filters">
+                    <button class="filter-btn active" onclick="filterQuestions('all')" id="filter-all">
+                        <i class="fas fa-list"></i> All Questions
+                    </button>
+                    <button class="filter-btn" onclick="filterQuestions('correct')" id="filter-correct">
+                        <i class="fas fa-check"></i> Correct Only
+                    </button>
+                    <button class="filter-btn" onclick="filterQuestions('incorrect')" id="filter-incorrect">
+                        <i class="fas fa-times"></i> Incorrect Only
+                    </button>
+                    <button class="filter-btn" onclick="filterQuestions('unanswered')" id="filter-unanswered">
+                        <i class="fas fa-question"></i> Unanswered
+                    </button>
+                </div>
+                
                 <button class="toggle-btn" onclick="toggleReview()">
                     <i class="fas fa-eye" id="toggle-icon"></i>
                     <span id="toggle-text">Show Answers</span>
@@ -814,16 +985,26 @@
             
             <div id="review-content">
                 {% for response in responses %}
-                    <div class="question-review">
+                    <div class="question-review" data-status="{% if not response.selected_answer %}unanswered{% elif response.is_correct %}correct{% else %}incorrect{% endif %}">
                         <div class="review-header">
                             <div class="question-number">Question {{ forloop.counter }}</div>
-                            <span class="status-badge {% if response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
-                                <i class="fas fa-{% if response.is_correct %}check{% else %}times{% endif %}"></i>
-                                {% if response.is_correct %}Correct{% else %}Incorrect{% endif %}
+                            <span class="status-badge {% if not response.selected_answer %}status-unanswered{% elif response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
+                                <i class="fas fa-{% if not response.selected_answer %}question{% elif response.is_correct %}check{% else %}times{% endif %}"></i>
+                                {% if not response.selected_answer %}Unanswered{% elif response.is_correct %}Correct{% else %}Incorrect{% endif %}
                             </span>
                         </div>
                         
                         <div class="question-text">{{ response.question.question_text }}</div>
+                        
+                        <!-- Question Image Support -->
+                        {% if response.question.image %}
+                            <div class="question-image">
+                                {% load static %}
+                                <img src="{% get_media_prefix %}question_images/{{ response.question.image }}" 
+                                     alt="Question Image" 
+                                     onerror="this.style.display='none'">
+                            </div>
+                        {% endif %}
                         
                         <ul class="options-list">
                             {% if response.question.option_a %}
@@ -917,7 +1098,7 @@
                             {% endif %}
                         </ul>
                         
-                        {% if response.question.explanation and not response.is_correct %}
+                        {% if response.question.explanation %}
                             <div class="explanation-box">
                                 <div class="explanation-title">
                                     <i class="fas fa-lightbulb"></i>
@@ -948,13 +1129,48 @@
 
     <!-- Print Footer (only visible when printing) -->
     <div class="print-footer">
-        <p>&copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.</p>
+        <p>&copy; {{ "now"|date:"Y" }} PulsePrep Media Direct, LLC. All rights reserved.</p>
         <p>This is an official test result report generated on {{ "now"|date:"F j, Y g:i A" }}</p>
         <p>For verification, contact PulsePrep support with reference ID: TST-{{ attempt.id }}-{{ attempt.started_at|date:"Ymd" }}</p>
     </div>
 
+    <!-- Print Signature Section -->
+    <div class="print-signature">
+        <div style="display: flex; justify-content: space-between; margin-top: 40pt;">
+            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
+                <p style="margin: 0; font-size: 10pt;">Student Signature</p>
+            </div>
+            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
+                <p style="margin: 0; font-size: 10pt;">Date</p>
+            </div>
+            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
+                <p style="margin: 0; font-size: 10pt;">Authorized Official</p>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Prevent going back to test once completed
+        window.addEventListener('load', function() {
+            // Replace current history state
+            window.history.replaceState(null, null, window.location.href);
+            
+            // Prevent back button navigation
+            window.addEventListener('popstate', function(event) {
+                event.preventDefault();
+                window.history.pushState(null, null, window.location.href);
+                
+                // Show warning and redirect
+                if (confirm('You cannot go back to the test once submitted. Would you like to go to the dashboard instead?')) {
+                    window.location.href = "{% url 'student_dashboard' %}";
+                }
+            });
+            
+            // Push an extra state to prevent direct back navigation
+            window.history.pushState(null, null, window.location.href);
+        });
+
         // Draw score chart
         const ctx = document.getElementById('scoreChart').getContext('2d');
         const percentage = {{ attempt.percentage }};
@@ -988,35 +1204,85 @@
             }
         });
 
-        // Toggle detailed review
+        // Enhanced toggle and filter functionality
         let reviewVisible = false;
+        let currentFilter = 'all';
         
         function toggleReview() {
             const reviewContent = document.getElementById('review-content');
             const toggleIcon = document.getElementById('toggle-icon');
             const toggleText = document.getElementById('toggle-text');
-            const questions = document.querySelectorAll('.question-review');
             
             reviewVisible = !reviewVisible;
             
             if (reviewVisible) {
-                questions.forEach((question, index) => {
-                    setTimeout(() => {
-                        question.classList.add('show', 'slide-down');
-                    }, index * 100);
-                });
+                showQuestionsWithFilter(currentFilter);
                 toggleIcon.className = 'fas fa-eye-slash';
                 toggleText.textContent = 'Hide Answers';
             } else {
-                questions.forEach(question => {
-                    question.classList.remove('show', 'slide-down');
-                });
+                hideAllQuestions();
                 toggleIcon.className = 'fas fa-eye';
                 toggleText.textContent = 'Show Answers';
             }
         }
 
-        // Print summary only (without detailed questions)
+        function filterQuestions(filter) {
+            // Update filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`filter-${filter}`).classList.add('active');
+            
+            currentFilter = filter;
+            
+            // Apply filter if review is visible
+            if (reviewVisible) {
+                showQuestionsWithFilter(filter);
+            }
+        }
+
+        function showQuestionsWithFilter(filter) {
+            const questions = document.querySelectorAll('.question-review');
+            let delay = 0;
+            
+            questions.forEach((question, index) => {
+                const status = question.getAttribute('data-status');
+                let shouldShow = false;
+                
+                switch(filter) {
+                    case 'all':
+                        shouldShow = true;
+                        break;
+                    case 'correct':
+                        shouldShow = status === 'correct';
+                        break;
+                    case 'incorrect':
+                        shouldShow = status === 'incorrect';
+                        break;
+                    case 'unanswered':
+                        shouldShow = status === 'unanswered';
+                        break;
+                }
+                
+                if (shouldShow) {
+                    setTimeout(() => {
+                        question.classList.add('show', 'slide-down');
+                    }, delay);
+                    delay += 100;
+                } else {
+                    question.classList.remove('show', 'slide-down');
+                }
+            });
+        }
+
+        function hideAllQuestions() {
+            const questions = document.querySelectorAll('.question-review');
+            questions.forEach(question => {
+                question.classList.remove('show', 'slide-down');
+            });
+        }
+
+        // Enhanced print functionality with better formatting
         function printSummary() {
             // Hide detailed review before printing
             const reviewSection = document.querySelector('.review-section');
@@ -1026,10 +1292,30 @@
                 reviewSection.style.display = 'none';
             }
             
+            // Add print-specific styles
+            const printStyles = document.createElement('style');
+            printStyles.innerHTML = `
+                @media print {
+                    body { font-size: 11pt !important; }
+                    .result-container { padding: 10pt !important; }
+                    .summary-card { padding: 15pt !important; }
+                    .performance-summary { padding: 15pt !important; }
+                    .stats-grid { gap: 8pt !important; }
+                    .stat-card { padding: 8pt !important; }
+                    .performance-item { padding: 8pt !important; }
+                    h1 { font-size: 16pt !important; }
+                    h2 { font-size: 14pt !important; }
+                    .score-text { font-size: 20pt !important; }
+                    .stat-value { font-size: 14pt !important; }
+                }
+            `;
+            document.head.appendChild(printStyles);
+            
             // Print the page
             window.print();
             
-            // Restore review section display after printing
+            // Remove print styles and restore review section
+            document.head.removeChild(printStyles);
             if (reviewSection) {
                 reviewSection.style.display = originalDisplay;
             }
@@ -1065,19 +1351,52 @@
             observer.observe(card);
         });
 
-        // Prevent right-click on results
+        // Enhanced security measures
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
 
-        // Add security message for screenshots
         document.addEventListener('keydown', function(e) {
+            // Prevent common screenshot and copying shortcuts
             if (e.key === 'PrintScreen' || 
                 (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
-                (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
-                alert('Screenshots are not permitted. Please use the Print Summary feature for official records.');
+                (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4')) ||
+                (e.ctrlKey && e.key === 'a') ||
+                (e.ctrlKey && e.key === 'c') ||
+                (e.ctrlKey && e.key === 's')) {
+                
+                if (e.key === 'PrintScreen') {
+                    alert('Screenshots are not permitted. Please use the Print Summary feature for official records.');
+                } else {
+                    alert('Copying content is not allowed. Please use the Print Summary feature for official records.');
+                }
                 e.preventDefault();
             }
+            
+            // Prevent F12 and dev tools
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable text selection
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+
+        // Additional security for mobile devices
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+
+        // Prevent drag and drop
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
         });
     </script>
 </body>

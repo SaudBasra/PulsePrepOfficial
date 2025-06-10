@@ -94,6 +94,8 @@ class TestQuestion(models.Model):
     def __str__(self):
         return f"{self.mock_test.title} - Q{self.question_order}"
 
+# Add these properties to your existing TestAttempt model in mocktest/models.py
+# Just add the @property methods to your current model - no migration needed!
 
 class TestAttempt(models.Model):
     STATUS_CHOICES = [
@@ -133,6 +135,53 @@ class TestAttempt(models.Model):
         elapsed = (timezone.now() - self.started_at).total_seconds()
         total_seconds = self.mock_test.duration_minutes * 60
         return max(0, int(total_seconds - elapsed))
+
+    # ADD THESE NEW PROPERTIES - NO MIGRATION NEEDED
+    @property
+    def time_taken_formatted(self):
+        """Return formatted time taken in human readable format"""
+        if not self.time_taken:
+            return "0 seconds"
+        
+        seconds = self.time_taken
+        if seconds < 60:
+            return f"{seconds} second{'s' if seconds != 1 else ''}"
+        elif seconds < 3600:
+            minutes = seconds // 60
+            remaining_seconds = seconds % 60
+            if remaining_seconds == 0:
+                return f"{minutes} minute{'s' if minutes != 1 else ''}"
+            else:
+                return f"{minutes}m {remaining_seconds}s"
+        else:
+            hours = seconds // 3600
+            remaining_minutes = (seconds % 3600) // 60
+            remaining_seconds = seconds % 60
+            
+            result = f"{hours}h"
+            if remaining_minutes > 0:
+                result += f" {remaining_minutes}m"
+            if remaining_seconds > 0:
+                result += f" {remaining_seconds}s"
+            
+            return result
+    
+    @property
+    def time_taken_display(self):
+        """Return time in MM:SS format for displays"""
+        if not self.time_taken:
+            return "00:00"
+        
+        minutes = self.time_taken // 60
+        seconds = self.time_taken % 60
+        return f"{minutes:02d}:{seconds:02d}"
+    
+    @property
+    def time_taken_minutes(self):
+        """Return time taken in minutes (for calculations)"""
+        if not self.time_taken:
+            return 0
+        return round(self.time_taken / 60, 1)
 
 
 class TestResponse(models.Model):

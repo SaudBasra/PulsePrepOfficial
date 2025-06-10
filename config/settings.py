@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     'myaccount',
     'notifications',
     'setting',
+    'modelpaper',
+        'manageimage',  # ADD THIS LINE
+
 ]
 
 MIDDLEWARE = [

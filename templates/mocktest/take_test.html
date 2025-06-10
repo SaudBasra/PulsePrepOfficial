@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Test specific styles that complement DAstyles.css */
+        /* Enhanced responsive styles */
         :root {
             --primary: #82272e;
             --primary-light: #a53b47;
@@ -24,17 +24,23 @@
             --gray-light: #e2e8f0;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
             color: var(--dark);
             line-height: 1.6;
-            overflow: hidden;
+            margin: 0;
+            padding: 0;
             /* Disable text selection */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            overflow-x: hidden;
         }
 
         /* Screenshot protection overlay */
@@ -58,10 +64,11 @@
 
         .screenshot-warning {
             background: white;
-            padding: 40px;
+            padding: 20px;
             border-radius: 12px;
             text-align: center;
-            max-width: 400px;
+            max-width: 90vw;
+            width: 400px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
@@ -82,48 +89,52 @@
             margin-bottom: 20px;
         }
 
-        /* Test Container */
+        /* Test Container - Responsive Layout */
         .test-container {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
             background: white;
         }
 
-        /* Test Header */
+        /* Test Header - Always responsive */
         .test-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            padding: 16px 24px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 10;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .test-info h3 {
             margin: 0 0 4px;
-            font-size: 18px;
+            font-size: clamp(14px, 4vw, 18px);
             font-weight: 600;
         }
 
         .test-info span {
-            font-size: 14px;
+            font-size: clamp(12px, 3vw, 14px);
             opacity: 0.9;
         }
 
         .test-timer {
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 20px);
             font-weight: 700;
             background: rgba(255,255,255,0.2);
-            padding: 8px 20px;
-            border-radius: 30px;
+            padding: 6px 16px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
             backdrop-filter: blur(10px);
+            min-width: fit-content;
         }
 
         .test-timer.warning {
@@ -142,79 +153,160 @@
             100% { transform: scale(1); }
         }
 
-        /* Test Body */
+        /* Header Actions - Responsive */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .fullscreen-btn, .submit-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(12px, 3vw, 14px);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .submit-btn {
+            background: var(--secondary);
+        }
+
+        .fullscreen-btn:hover, .submit-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .submit-btn:hover {
+            background: #059669;
+        }
+
+        /* Test Body - Responsive Flex Layout */
         .test-body {
             flex: 1;
             display: flex;
-            overflow: hidden;
+            min-height: calc(100vh - 80px);
             background: #f8fafc;
         }
 
-        /* Question Panel - Static height for better UX */
+        /* Question Panel - Fully responsive */
         .question-panel {
             flex: 1;
-            padding: 24px;
+            padding: 16px;
             background: white;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            overflow-y: auto;
+            min-width: 0; /* Prevents flex item from growing beyond container */
         }
 
         .question-card {
             background: white;
             border-radius: 12px;
-            padding: 32px;
+            padding: 20px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-            max-width: 800px;
             width: 100%;
-            height: 100%;
-            max-height: calc(100vh - 200px);
+            max-width: 100%;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            margin: 0 auto;
         }
 
         .question-content {
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .question-number {
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
             color: var(--primary);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-weight: 600;
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
         .question-number::before {
             content: '';
-            width: 32px;
+            width: clamp(20px, 8vw, 32px);
             height: 3px;
             background: var(--primary);
             border-radius: 2px;
         }
 
         .question-text {
-            font-size: 18px;
-            line-height: 1.7;
-            margin-bottom: 28px;
+            font-size: clamp(16px, 4vw, 18px);
+            line-height: 1.6;
+            margin-bottom: 20px;
             color: var(--dark);
             font-weight: 500;
             flex-shrink: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        /* Fixed height options container */
+        /* Responsive Image styling */
+        .question-image {
+            margin: 16px 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: clamp(200px, 40vh, 400px);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            object-fit: contain;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .question-image .image-caption {
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .image-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: clamp(12px, 3vw, 14px);
+            margin: 16px 0;
+        }
+
+        .image-error i {
+            margin-right: 8px;
+        }
+
+        /* Options container - Responsive */
         .options-container {
             flex: 1;
-            display: flex;
-            align-items: center;
-            min-height: 300px;
+            width: 100%;
+            margin-top: 12px;
         }
 
         .options-list {
@@ -225,19 +317,23 @@
         }
 
         .option-item {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
+            width: 100%;
         }
 
         .option-label {
             display: flex;
             align-items: flex-start;
-            padding: 16px;
+            padding: 12px;
             background: #f8fafc;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
+            width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .option-label:hover {
@@ -246,11 +342,12 @@
         }
 
         .option-label input[type="radio"] {
-            margin-right: 16px;
+            margin-right: 12px;
             margin-top: 2px;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             accent-color: var(--primary);
+            flex-shrink: 0;
         }
 
         .option-label.selected {
@@ -260,45 +357,50 @@
         }
 
         .option-label span {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: clamp(14px, 3.5vw, 16px);
+            line-height: 1.5;
             color: #334155;
             flex: 1;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        /* Navigation Panel - Rearranged */
+        /* Navigation Panel - Responsive Sidebar */
         .navigation-panel {
-            width: 320px;
+            width: 280px;
+            min-width: 280px;
             background: white;
-            padding: 24px;
+            padding: 16px;
             border-left: 1px solid #e5e7eb;
             overflow-y: auto;
             box-shadow: -4px 0 16px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
-        /* Test Progress at top */
+        /* Test Progress - Compact */
         .test-progress {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
             border: 1px solid #bae6fd;
+            flex-shrink: 0;
         }
 
         .test-progress h5 {
-            margin: 0 0 12px;
+            margin: 0 0 8px;
             color: #0369a1;
-            font-size: 14px;
+            font-size: clamp(12px, 3vw, 14px);
             font-weight: 600;
         }
 
         .progress-item {
             display: flex;
             justify-content: space-between;
-            margin: 6px 0;
-            font-size: 13px;
+            margin: 4px 0;
+            font-size: clamp(11px, 2.5vw, 13px);
         }
 
         .progress-item span:first-child {
@@ -310,73 +412,81 @@
             font-weight: 600;
         }
 
-        /* Legend above navigation */
+        /* Legend - Compact */
         .legend {
             background: #f8fafc;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 24px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            flex-shrink: 0;
         }
 
         .legend h5 {
-            margin: 0 0 12px;
+            margin: 0 0 8px;
             color: var(--dark);
-            font-size: 14px;
+            font-size: clamp(12px, 3vw, 14px);
             font-weight: 600;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            font-size: 13px;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: clamp(10px, 2.5vw, 12px);
             color: var(--gray);
         }
 
         .legend-box {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
         }
 
-        /* Question navigation at bottom */
+        /* Question navigation - Responsive grid */
         .question-navigation {
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
 
         .navigation-panel h4 {
-            margin: 0 0 20px;
+            margin: 0 0 12px;
             color: var(--dark);
-            font-size: 16px;
+            font-size: clamp(12px, 3vw, 14px);
             font-weight: 600;
         }
 
         .question-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+            gap: 6px;
             flex: 1;
             align-content: start;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .question-nav-btn {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border: 2px solid #e2e8f0;
             background: white;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 14px;
+            font-size: clamp(10px, 2.5vw, 12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .question-nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .question-nav-btn.current {
@@ -397,28 +507,33 @@
             border-color: var(--warning);
         }
 
-        /* Action Buttons */
+        /* Action Buttons - Always visible and responsive */
         .action-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 24px;
-            padding-top: 20px;
+            margin-top: 16px;
+            padding-top: 16px;
             border-top: 1px solid #e5e7eb;
-            gap: 12px;
+            gap: 8px;
             flex-shrink: 0;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: clamp(12px, 3vw, 14px);
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -427,8 +542,8 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(130, 39, 46, 0.3);
         }
 
         .btn-secondary {
@@ -448,7 +563,7 @@
 
         .btn-success:hover {
             background: #059669;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .btn-warning {
@@ -466,33 +581,7 @@
             transform: none !important;
         }
 
-        /* Header Actions */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .fullscreen-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-        }
-
-        .fullscreen-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Modal styles */
+        /* Modal styles - Responsive */
         .modal {
             position: fixed;
             top: 0;
@@ -505,17 +594,20 @@
             justify-content: center;
             z-index: 9999;
             backdrop-filter: blur(5px);
+            padding: 20px;
         }
 
         .modal-content {
             background: white;
-            padding: 32px;
+            padding: 24px;
             border-radius: 12px;
             text-align: center;
-            max-width: 440px;
-            width: 90%;
+            max-width: 90vw;
+            width: 440px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             animation: modalSlideIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         @keyframes modalSlideIn {
@@ -532,7 +624,7 @@
         .modal-content h2 {
             color: var(--dark);
             margin-bottom: 16px;
-            font-size: 20px;
+            font-size: clamp(16px, 4vw, 20px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -540,7 +632,7 @@
         }
 
         .modal-content h2 i {
-            font-size: 24px;
+            font-size: clamp(20px, 5vw, 24px);
         }
 
         .warning-modal h2 {
@@ -549,8 +641,8 @@
 
         .modal-content p {
             color: var(--gray);
-            margin-bottom: 24px;
-            font-size: 15px;
+            margin-bottom: 20px;
+            font-size: clamp(13px, 3vw, 15px);
             line-height: 1.6;
         }
 
@@ -559,96 +651,205 @@
             gap: 12px;
             justify-content: center;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .question-card {
-                padding: 24px;
+        /* Mobile-First Responsive Design */
+        @media (max-width: 1200px) {
+            .navigation-panel {
+                width: 240px;
+                min-width: 240px;
             }
             
-            .navigation-panel {
-                width: 280px;
+            .question-grid {
+                grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+            }
+            
+            .question-nav-btn {
+                width: 28px;
+                height: 28px;
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .test-body {
                 flex-direction: column;
             }
             
-            .question-panel {
-                padding: 16px;
-            }
-            
-            .question-card {
-                padding: 20px;
-                height: auto;
-                max-height: none;
-            }
-            
             .navigation-panel {
                 width: 100%;
+                min-width: unset;
                 border-left: none;
                 border-top: 1px solid #e5e7eb;
                 order: 2;
-                padding: 20px;
-                max-height: 300px;
+                padding: 16px;
+                max-height: 250px;
+                flex-shrink: 0;
+            }
+            
+            .question-panel {
+                order: 1;
+                flex: 1;
+                min-height: calc(100vh - 330px);
             }
             
             .question-grid {
-                grid-template-columns: repeat(4, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+                max-height: 120px;
+            }
+            
+            .test-progress, .legend {
+                display: none; /* Hide on mobile to save space */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .test-header {
+                padding: 10px 12px;
+                gap: 6px;
+            }
+            
+            .question-panel {
+                padding: 12px;
+                min-height: calc(100vh - 280px);
+            }
+            
+            .question-card {
+                padding: 16px;
+            }
+            
+            .navigation-panel {
+                padding: 12px;
+                max-height: 200px;
+            }
+            
+            .question-grid {
+                grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+                gap: 4px;
+                max-height: 100px;
             }
             
             .action-buttons {
-                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 12px;
+                padding-top: 12px;
             }
             
             .btn {
-                flex: 1;
-                font-size: 13px;
-                padding: 10px 16px;
+                padding: 8px 12px;
+                min-width: 80px;
+                font-size: 12px;
             }
             
+            .header-actions {
+                gap: 4px;
+            }
+            
+            .fullscreen-btn, .submit-btn {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+
+            .question-image img {
+                max-height: clamp(150px, 30vh, 250px);
+            }
+        }
+
+        @media (max-width: 480px) {
             .test-header {
-                padding: 12px 16px;
+                padding: 8px 10px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
             }
             
-            .test-info h3 {
-                font-size: 16px;
+            .test-info, .test-timer, .header-actions {
+                text-align: center;
+                justify-content: center;
             }
             
-            .test-timer {
-                font-size: 18px;
-                padding: 6px 16px;
+            .question-panel {
+                padding: 10px;
+                min-height: calc(100vh - 220px);
+            }
+            
+            .question-card {
+                padding: 12px;
+            }
+            
+            .navigation-panel {
+                padding: 10px;
+                max-height: 160px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .question-grid {
+                grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+                max-height: 80px;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .modal-actions .btn {
+                width: 100%;
             }
 
-            .options-container {
-                min-height: auto;
+            .question-image img {
+                max-height: clamp(120px, 25vh, 200px);
             }
         }
 
-        /* Animations */
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Disable print screen styles */
-        @media print {
-            body {
-                display: none !important;
+        /* Landscape orientation for mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .test-header {
+                padding: 6px 12px;
+            }
+            
+            .navigation-panel {
+                max-height: 120px;
+            }
+            
+            .question-panel {
+                min-height: calc(100vh - 200px);
+            }
+            
+            .question-image img {
+                max-height: 150px;
+            }
+            
+            .question-grid {
+                max-height: 60px;
+                grid-template-columns: repeat(auto-fit, minmax(25px, 1fr));
+            }
+            
+            .question-nav-btn {
+                width: 25px;
+                height: 25px;
+                font-size: 10px;
             }
         }
 
-        /* Custom scrollbar */
+        /* Custom scrollbar - Responsive */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: clamp(6px, 2vw, 8px);
+            height: clamp(6px, 2vw, 8px);
         }
 
         ::-webkit-scrollbar-track {
@@ -662,6 +863,61 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary);
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Loading indicator */
+        .image-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Ensure content doesn't overflow */
+        .test-container * {
+            max-width: 100%;
+        }
+
+        /* Better touch targets for mobile */
+        @media (pointer: coarse) {
+            .question-nav-btn {
+                min-height: 36px;
+                min-width: 36px;
+            }
+            
+            .btn {
+                min-height: 40px;
+            }
+            
+            .option-label {
+                min-height: 48px;
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -694,9 +950,9 @@
             <div class="header-actions">
                 <button class="fullscreen-btn" onclick="toggleFullscreen()">
                     <i class="fas fa-expand" id="fullscreen-icon"></i>
-                    <span id="fullscreen-text">Fullscreen</span>
+                    <span id="fullscreen-text">Full</span>
                 </button>
-                <button class="btn btn-success" onclick="confirmSubmit()">
+                <button class="submit-btn" onclick="confirmSubmit()">
                     <i class="fas fa-paper-plane"></i> Submit
                 </button>
             </div>
@@ -715,25 +971,25 @@
                     
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn">
-                            <i class="fas fa-arrow-left"></i> Previous
+                            <i class="fas fa-arrow-left"></i> <span>Previous</span>
                         </button>
                         
                         <button class="btn btn-warning" onclick="markForReview()" id="mark-btn">
-                            <i class="fas fa-bookmark"></i> Mark for Review
+                            <i class="fas fa-bookmark"></i> <span>Mark</span>
                         </button>
                         
                         <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
-                            Next <i class="fas fa-arrow-right"></i>
+                            <span>Next</span> <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
                 </div>
             </div>
             
-            <!-- Navigation Panel - Rearranged -->
+            <!-- Navigation Panel -->
             <div class="navigation-panel">
-                <!-- Test Progress at top -->
+                <!-- Test Progress -->
                 <div class="test-progress">
-                    <h5>Test Progress</h5>
+                    <h5>Progress</h5>
                     <div class="progress-item">
                         <span>Answered:</span>
                         <strong id="answered-count">0</strong>
@@ -753,7 +1009,7 @@
                     <h5>Legend</h5>
                     <div class="legend-item">
                         <div class="legend-box" style="background: var(--primary);"></div>
-                        <span>Current Question</span>
+                        <span>Current</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-box" style="background: var(--secondary);"></div>
@@ -761,7 +1017,7 @@
                     </div>
                     <div class="legend-item">
                         <div class="legend-box" style="background: var(--warning);"></div>
-                        <span>Marked for Review</span>
+                        <span>Marked</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-box" style="background: white; border: 2px solid #e2e8f0;"></div>
@@ -769,11 +1025,11 @@
                     </div>
                 </div>
                 
-                <!-- Question Navigation at bottom -->
+                <!-- Question Navigation -->
                 <div class="question-navigation">
-                    <h4>Question Navigation</h4>
+                    <h4>Questions</h4>
                     <div class="question-grid" id="question-nav">
-                        {% for i in test_questions %}
+                        {% for question in test_questions %}
                             <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
                                     onclick="goToQuestion({{ forloop.counter }})"
                                     data-question="{{ forloop.counter }}">
@@ -813,33 +1069,36 @@
     </div>
 
     <script>
-        // Test data
+        // Test data - Updated for image support
         const testQuestions = [
-            {% for tq in test_questions %}
+            {% for question in test_questions %}
             {
-                id: {{ tq.question.id }},
-                order: {{ forloop.counter }},
-                text: `{{ tq.question.question_text|escapejs }}`,
+                id: {{ question.id }},
+                order: {{ question.order }},
+                text: `{{ question.text|escapejs }}`,
                 options: {
-                    {% if tq.question.option_a %}A: `{{ tq.question.option_a|escapejs }}`,{% endif %}
-                    {% if tq.question.option_b %}B: `{{ tq.question.option_b|escapejs }}`,{% endif %}
-                    {% if tq.question.option_c %}C: `{{ tq.question.option_c|escapejs }}`,{% endif %}
-                    {% if tq.question.option_d %}D: `{{ tq.question.option_d|escapejs }}`,{% endif %}
-                    {% if tq.question.option_e %}E: `{{ tq.question.option_e|escapejs }}`,{% endif %}
+                    {% for key, value in question.options.items %}
+                    {{ key }}: `{{ value|escapejs }}`,
+                    {% endfor %}
                 },
+                hasImage: {{ question.has_image|yesno:"true,false" }},
+                imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
+                imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
                 randomizeOptions: {{ test.randomize_options|yesno:"true,false" }}
             },
             {% endfor %}
         ];
         
+        // Updated timer variables - Fixed for seconds calculation
         const attemptId = {{ attempt.id }};
         const duration = {{ test.duration_minutes }};
         let currentQuestionIndex = 0;
         let answers = {};
         let markedQuestions = new Set();
-        let timeRemaining = duration * 60; // in seconds
+        let timeRemaining = duration * 60; // Convert minutes to seconds correctly
         let warningCount = {{ attempt.warning_count }};
         let visitedQuestions = new Set([1]); // Track visited questions
+        let timerInterval = null; // Store timer interval for better control
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -849,15 +1108,70 @@
             setupScreenshotProtection();
             updateProgress();
             updateNavigationState();
+            setupResponsiveHandlers();
             
             // Disable right-click
             document.addEventListener('contextmenu', e => e.preventDefault());
-            
-            // Auto request fullscreen
-            setTimeout(() => {
-                requestFullscreen();
-            }, 1000);
         });
+
+        // Responsive handlers
+        function setupResponsiveHandlers() {
+            // Handle orientation changes
+            window.addEventListener('orientationchange', function() {
+                setTimeout(() => {
+                    adjustLayoutForScreen();
+                }, 100);
+            });
+            
+            // Handle window resize
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    adjustLayoutForScreen();
+                }, 250);
+            });
+            
+            // Initial layout adjustment
+            adjustLayoutForScreen();
+        }
+
+        function adjustLayoutForScreen() {
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            // Adjust question navigation for very small screens
+            if (screenWidth <= 480) {
+                updateButtonLabels(true);
+            } else {
+                updateButtonLabels(false);
+            }
+            
+            // Adjust timer display for very small screens
+            if (screenWidth <= 360) {
+                const timerIcon = document.querySelector('.test-timer i');
+                if (timerIcon) timerIcon.style.display = 'none';
+            } else {
+                const timerIcon = document.querySelector('.test-timer i');
+                if (timerIcon) timerIcon.style.display = 'inline-block';
+            }
+        }
+
+        function updateButtonLabels(compact) {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const markBtn = document.getElementById('mark-btn');
+            
+            if (compact) {
+                prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i>';
+                nextBtn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+                markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+            } else {
+                prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i> <span>Previous</span>';
+                nextBtn.innerHTML = '<span>Next</span> <i class="fas fa-arrow-right"></i>';
+                updateMarkButtonState(); // Restore full mark button text
+            }
+        }
 
         // Screenshot protection
         function setupScreenshotProtection() {
@@ -974,14 +1288,14 @@
             
             if (document.fullscreenElement) {
                 icon.className = 'fas fa-compress';
-                text.textContent = 'Exit Fullscreen';
+                text.textContent = 'Exit';
             } else {
                 icon.className = 'fas fa-expand';
-                text.textContent = 'Fullscreen';
+                text.textContent = 'Full';
             }
         });
         
-        // Load question
+        // Load question - Updated with image support and responsive handling
         function loadQuestion(index) {
             const question = testQuestions[index];
             currentQuestionIndex = index;
@@ -989,6 +1303,28 @@
             
             // Update current question number
             document.getElementById('current-question').textContent = index + 1;
+            
+            // Create image HTML if question has image
+            let imageHtml = '';
+            if (question.hasImage && question.imageUrl) {
+                imageHtml = `
+                    <div class="question-image">
+                        <img src="${question.imageUrl}" 
+                             alt="Question Image" 
+                             loading="lazy"
+                             onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'><i class=\\'fas fa-exclamation-triangle\\'></i>Image failed to load: ${question.imageFilename || 'Unknown'}</div>'"
+                             onload="console.log('Image loaded successfully')">
+                        ${question.imageFilename ? `<div class="image-caption">Image: ${question.imageFilename}</div>` : ''}
+                    </div>
+                `;
+            } else if (question.hasImage && !question.imageUrl) {
+                imageHtml = `
+                    <div class="image-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Image not found: ${question.imageFilename || 'Unknown filename'}
+                    </div>
+                `;
+            }
             
             // Create options HTML
             let optionsHtml = '<div class="options-container"><ul class="options-list">';
@@ -1019,6 +1355,7 @@
             questionContainer.innerHTML = `
                 <div class="question-number">Question ${index + 1}</div>
                 <div class="question-text">${question.text}</div>
+                ${imageHtml}
                 ${optionsHtml}
             `;
             
@@ -1026,6 +1363,11 @@
             updateNavigation();
             updateNavigationState();
             updateMarkButtonState();
+            
+            // Scroll to top of question for mobile
+            if (window.innerWidth <= 1024) {
+                questionContainer.scrollTop = 0;
+            }
         }
         
         // Update navigation button states
@@ -1052,16 +1394,25 @@
             }
         }
         
-        // Update mark button state
+        // Update mark button state - Responsive
         function updateMarkButtonState() {
             const markBtn = document.getElementById('mark-btn');
             const question = testQuestions[currentQuestionIndex];
+            const isCompact = window.innerWidth <= 480;
             
             if (markedQuestions.has(question.id)) {
-                markBtn.innerHTML = '<i class="fas fa-bookmark"></i> Unmark';
+                if (isCompact) {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #64748b;"></i>';
+                } else {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Unmark</span>';
+                }
                 markBtn.style.backgroundColor = '#64748b';
             } else {
-                markBtn.innerHTML = '<i class="fas fa-bookmark"></i> Mark for Review';
+                if (isCompact) {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                } else {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Mark</span>';
+                }
                 markBtn.style.backgroundColor = 'var(--warning)';
             }
         }
@@ -1161,26 +1512,35 @@
             document.getElementById('remaining-count').textContent = remaining;
         }
         
-        // Timer
+        // Updated timer function to display time correctly in seconds
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            
+            // Format time as MM:SS
+            const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('time-remaining').textContent = timeDisplay;
+        }
+        
+        // Updated timer function - Fixed for proper seconds calculation
         function startTimer() {
-            const timerInterval = setInterval(() => {
-                timeRemaining--;
+            // Update display immediately
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--; // Decrease by 1 second
                 
-                const minutes = Math.floor(timeRemaining / 60);
-                const seconds = timeRemaining % 60;
-                
-                const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                document.getElementById('time-remaining').textContent = timeDisplay;
+                updateTimerDisplay();
                 
                 const timerElement = document.getElementById('timer');
                 
-                // Warning when 5 minutes left
+                // Warning when 5 minutes left (300 seconds)
                 if (timeRemaining === 300) {
                     timerElement.classList.add('warning');
                     showWarning('Only 5 minutes remaining!');
                 }
                 
-                // Danger when 1 minute left
+                // Danger when 1 minute left (60 seconds)
                 if (timeRemaining === 60) {
                     timerElement.classList.remove('warning');
                     timerElement.classList.add('danger');
@@ -1192,7 +1552,7 @@
                     clearInterval(timerInterval);
                     autoSubmit();
                 }
-            }, 1000);
+            }, 1000); // Run every 1000 milliseconds (1 second)
         }
         
         // Tab detection
@@ -1270,6 +1630,11 @@
         }
         
         function submitTest() {
+            // Clear timer before submitting
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
             fetch('{% url "submit_test" %}', {
                 method: 'POST',
                 headers: {
@@ -1313,7 +1678,7 @@
             window.history.go(1);
         };
         
-        // Keyboard shortcuts
+        // Enhanced keyboard shortcuts for responsive design
         document.addEventListener('keydown', function(e) {
             // Prevent common shortcuts that might be used for cheating
             if (e.altKey || e.ctrlKey || e.metaKey) {
@@ -1338,6 +1703,23 @@
                         markForReview();
                     }
                     break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        const optionKeys = ['1', '2', '3', '4', '5'];
+                        const answerKeys = ['A', 'B', 'C', 'D', 'E'];
+                        const index = optionKeys.indexOf(e.key);
+                        if (index !== -1) {
+                            const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
+                            if (radioButton) {
+                                radioButton.click();
+                            }
+                        }
+                    }
+                    break;
             }
         });
 
@@ -1359,7 +1741,7 @@
             reportScreenshotAttempt();
         });
 
-        // Detect zoom attempts
+        // Enhanced zoom detection for responsive design
         let lastWidth = window.innerWidth;
         let lastHeight = window.innerHeight;
 
@@ -1370,13 +1752,42 @@
             // Check if it's a zoom change (not window resize)
             if (Math.abs(currentWidth - lastWidth) > 100 || Math.abs(currentHeight - lastHeight) > 100) {
                 if (currentWidth < lastWidth * 0.9 || currentWidth > lastWidth * 1.1) {
-                    showWarning('Please do not zoom in or out during the test.');
+                    // Only show warning on desktop, not on mobile where resize is normal
+                    if (window.innerWidth > 768) {
+                        showWarning('Please do not zoom in or out during the test.');
+                    }
                 }
             }
             
             lastWidth = currentWidth;
             lastHeight = currentHeight;
         });
+
+        // Touch gesture prevention for mobile
+        if ('ontouchstart' in window) {
+            let lastTouchEnd = 0;
+            let lastScale = 1;
+            
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            document.addEventListener('gesturestart', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gesturechange', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gestureend', function (e) {
+                e.preventDefault();
+            });
+        }
     </script>
 </body>
 </html>

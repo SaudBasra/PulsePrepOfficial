@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 from questionbank.models import Question
 
 def managemodule(request):
@@ -72,9 +73,16 @@ def managemodule(request):
                     topic_name = topic['topic']
                     topic_questions_count = subject_questions.filter(topic=topic_name).count()
                     
+                    # Get image count for this topic
+                    topic_questions_with_images = subject_questions.filter(
+                        topic=topic_name
+                    ).exclude(Q(image__isnull=True) | Q(image__exact=''))
+                    topic_image_count = topic_questions_with_images.values('image').distinct().count()
+                    
                     topic_list.append({
                         'name': topic_name,
                         'questions_count': topic_questions_count,
+                        'image_count': topic_image_count,  # Add image count
                         'block': block_name,
                         'module': module_name,
                         'subject': subject_name,
@@ -128,7 +136,7 @@ def managemodule(request):
 
 
 def topic_questions(request):
-    """Display questions for a specific topic"""
+    """Display questions for a specific topic - Enhanced with image support"""
     # Get topic parameters from URL
     block = request.GET.get('block', '')
     module = request.GET.get('module', '')
@@ -137,7 +145,54 @@ def topic_questions(request):
     degree = request.GET.get('degree', '')
     year = request.GET.get('year', '')
     
-    # Get search parameter
+    # Handle AJAX requests for image data
+    ajax_type = request.GET.get('ajax', '')
+    
+    if ajax_type == 'image_count':
+        # Return image count for this topic
+        questions = Question.objects.filter(
+            block=block,
+            module=module,
+            subject=subject,
+            topic=topic,
+            degree=degree,
+            year=year
+        )
+        
+        # Count unique images
+        image_count = questions.exclude(image__isnull=True).exclude(image__exact='').values('image').distinct().count()
+        
+        return JsonResponse({'image_count': image_count})
+    
+    elif ajax_type == 'images':
+        # Return images for this topic
+        questions = Question.objects.filter(
+            block=block,
+            module=module,
+            subject=subject,
+            topic=topic,
+            degree=degree,
+            year=year
+        ).exclude(image__isnull=True).exclude(image__exact='')
+        
+        # Group by image filename and count usage
+        image_data = {}
+        for q in questions:
+            if q.image:
+                if q.image not in image_data:
+                    image_data[q.image] = {
+                        'filename': q.image,
+                        'question_count': 0
+                    }
+                image_data[q.image]['question_count'] += 1
+        
+        from django.conf import settings
+        return JsonResponse({
+            'images': list(image_data.values()),
+            'media_url': settings.MEDIA_URL
+        })
+    
+    # Regular page request (your existing logic)
     query = request.GET.get('q', '')
     
     # Filter questions for this specific topic
@@ -172,11 +227,45 @@ def topic_questions(request):
         'year': year,
     }
     
+    # Enhanced context with image statistics
+    total_questions = questions.count()
+    questions_with_images = questions.exclude(image__isnull=True).exclude(image__exact='').count()
+    unique_images = questions.exclude(image__isnull=True).exclude(image__exact='').values('image').distinct().count()
+    
     context = {
         'page_obj': page_obj,
         'breadcrumb': breadcrumb,
         'query': query,
-        'total_questions': questions.count(),
+        'total_questions': total_questions,
+        'questions_with_images': questions_with_images,
+        'unique_images': unique_images,
+        'image_percentage': round((questions_with_images / total_questions * 100), 1) if total_questions > 0 else 0,
     }
     
     return render(request, 'managemodule/topic_questions.html', context)
+
+
+# NEW: Image count API endpoint for AJAX calls
+def get_topic_image_count(request):
+    """API endpoint to get image count for a specific topic"""
+    block = request.GET.get('block', '')
+    module = request.GET.get('module', '')
+    subject = request.GET.get('subject', '')
+    topic = request.GET.get('topic', '')
+    degree = request.GET.get('degree', '')
+    year = request.GET.get('year', '')
+    
+    # Get questions for this topic
+    questions = Question.objects.filter(
+        block=block,
+        module=module,
+        subject=subject,
+        topic=topic,
+        degree=degree,
+        year=year
+    )
+    
+    # Count unique images
+    image_count = questions.exclude(image__isnull=True).exclude(image__exact='').values('image').distinct().count()
+    
+    return JsonResponse({'image_count': image_count})

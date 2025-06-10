@@ -236,7 +236,7 @@
         }
         
         // Validate password strength
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d@$!%*?&^#(){}\[\]<>=+~]{8,}$/;
         if (!passwordRegex.test(password.value)) {
           e.preventDefault();
           alert('Password does not meet the requirements!');
