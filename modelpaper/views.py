@@ -729,3 +729,461 @@ def export_paper_questions(request, paper_id):
         ])
     
     return response
+
+# Add these student views to your existing modelpaper/views.py file
+
+# STUDENT VIEWS - Add to existing modelpaper/views.py
+@login_required
+def student_model_papers(request):
+    """List available model papers for students - Enhanced version"""
+    user = request.user
+    now = timezone.now()
+    
+    # Update paper statuses first
+    all_papers_for_update = ModelPaper.objects.all()
+    for paper in all_papers_for_update:
+        if paper.status == 'scheduled' and now >= paper.start_datetime:
+            paper.status = 'live'
+            paper.save()
+        elif paper.status == 'live' and now > paper.end_datetime:
+            paper.status = 'completed'
+            paper.save()
+    
+    # Get active papers
+    papers = ModelPaper.objects.filter(status='live')
+    
+    # Get user's attempts
+    user_attempts = ModelPaperAttempt.objects.filter(student=user).values('model_paper_id', 'status').order_by('-started_at')
+    
+    # Create a dict of paper attempts
+    attempt_status = {}
+    attempt_count = {}
+    for attempt in user_attempts:
+        paper_id = attempt['model_paper_id']
+        if paper_id not in attempt_count:
+            attempt_count[paper_id] = 0
+        if attempt['status'] == 'completed':
+            attempt_count[paper_id] += 1
+            if paper_id not in attempt_status:
+                attempt_status[paper_id] = 'completed'
+    
+    # Add attempt info to papers
+    for paper in papers:
+        paper.user_attempts = attempt_count.get(paper.id, 0)
+        paper.can_attempt = paper.user_attempts < paper.max_attempts
+        paper.attempt_status = attempt_status.get(paper.id, 'not_started')
+    
+    # Get upcoming papers
+    upcoming_papers = ModelPaper.objects.filter(
+        start_datetime__gt=now
+    ).order_by('start_datetime')[:5]
+    
+    context = {
+        'active_papers': papers,
+        'upcoming_papers': upcoming_papers,
+        'user': user,
+    }
+    
+    return render(request, 'modelpaper/student_model_papers.html', context)
+
+
+def get_paper_question_image_url(paper_question):
+    """
+    Helper function to get the correct image URL for a paper question
+    Similar to mock test image handling
+    """
+    # For now, paper questions don't have images, but this is ready for future use
+    return None, None
+
+
+@login_required
+def take_paper(request, paper_id):
+    """Student takes the paper - Enhanced with image support"""
+    paper = get_object_or_404(ModelPaper, id=paper_id)
+    student = request.user
+    
+    print(f"DEBUG: User {student} trying to take paper: {paper.title}")
+    print(f"DEBUG: Paper status: {paper.status}")
+    print(f"DEBUG: Paper start time: {paper.start_datetime}")
+    print(f"DEBUG: Paper end time: {paper.end_datetime}")
+    print(f"DEBUG: Current time: {timezone.now()}")
+    
+    # Check if paper is active
+    now = timezone.now()
+    if paper.status != 'live':
+        messages.error(request, f"This paper is not currently available. Status: {paper.status}")
+        print(f"DEBUG: Paper blocked - status is {paper.status}, not 'live'")
+        return redirect('student_model_papers')
+    
+    # Check time bounds
+    if now < paper.start_datetime:
+        messages.error(request, "This paper has not started yet.")
+        print(f"DEBUG: Paper blocked - hasn't started yet")
+        return redirect('student_model_papers')
+    
+    if now > paper.end_datetime:
+        messages.error(request, "This paper has already ended.")
+        print(f"DEBUG: Paper blocked - already ended")
+        return redirect('student_model_papers')
+    
+    # Check attempt limit
+    existing_attempts = ModelPaperAttempt.objects.filter(
+        student=student, 
+        model_paper=paper,
+        status='completed'
+    ).count()
+    
+    print(f"DEBUG: User has {existing_attempts} completed attempts out of {paper.max_attempts} allowed")
+    
+    if existing_attempts >= paper.max_attempts:
+        messages.error(request, f"You have reached the maximum attempts ({paper.max_attempts}) for this paper.")
+        print(f"DEBUG: Paper blocked - max attempts reached")
+        return redirect('student_model_papers')
+    
+    # Get or create current attempt
+    current_attempt = ModelPaperAttempt.objects.filter(
+        student=student,
+        model_paper=paper,
+        status='in_progress'
+    ).first()
+    
+    if not current_attempt:
+        # Create new attempt
+        current_attempt = ModelPaperAttempt.objects.create(
+            student=student,
+            model_paper=paper,
+            status='in_progress',
+            started_at=timezone.now()
+        )
+        print(f"DEBUG: Created new attempt with ID: {current_attempt.id}")
+    else:
+        print(f"DEBUG: Found existing attempt with ID: {current_attempt.id}")
+    
+    # Get questions based on paper filters
+    paper_questions = paper.get_questions()
+    
+    if paper_questions.count() == 0:
+        messages.error(request, "This paper has no questions configured.")
+        print(f"DEBUG: Paper blocked - no questions found")
+        return redirect('student_model_papers')
+    
+    # Process questions with image handling (ready for future image support)
+    processed_questions = []
+    for pq in paper_questions:
+        question_data = {
+            'id': pq.id,
+            'order': len(processed_questions) + 1,
+            'text': pq.question_text,
+            'options': {},
+            'has_image': False,  # Paper questions don't have images yet
+            'image_url': None,
+            'image_filename': None
+        }
+        
+        # Add options
+        if pq.option_a:
+            question_data['options']['A'] = pq.option_a
+        if pq.option_b:
+            question_data['options']['B'] = pq.option_b
+        if pq.option_c:
+            question_data['options']['C'] = pq.option_c
+        if pq.option_d:
+            question_data['options']['D'] = pq.option_d
+        if pq.option_e:
+            question_data['options']['E'] = pq.option_e
+        
+        processed_questions.append(question_data)
+    
+    # Randomize if enabled
+    if paper.randomize_questions:
+        random.shuffle(processed_questions)
+        print(f"DEBUG: Questions randomized")
+    
+    print(f"DEBUG: Proceeding to paper page with attempt ID: {current_attempt.id}")
+    print(f"DEBUG: Processed {len(processed_questions)} questions")
+    
+    context = {
+        'paper': paper,
+        'attempt': current_attempt,
+        'paper_questions': processed_questions,
+        'total_questions': len(processed_questions),
+    }
+    
+    return render(request, 'modelpaper/take_paper.html', context)
+
+
+@require_POST
+def submit_paper_answer(request):
+    """Save student's answer for paper question"""
+    attempt_id = request.POST.get('attempt_id')
+    question_id = request.POST.get('question_id')
+    answer = request.POST.get('answer')
+    
+    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
+    paper_question = get_object_or_404(PaperQuestion, id=question_id)
+    
+    # Save or update response
+    response, created = ModelPaperResponse.objects.update_or_create(
+        attempt=attempt,
+        paper_question=paper_question,
+        defaults={
+            'selected_answer': answer,
+        }
+    )
+    
+    # Check if answer is correct
+    response.check_answer()
+    response.save()
+    
+    return JsonResponse({'success': True})
+
+
+@require_POST
+def submit_paper(request):
+    """Submit the complete paper"""
+    attempt_id = request.POST.get('attempt_id')
+    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
+    
+    # Calculate score
+    total_questions = attempt.model_paper.total_questions
+    correct_answers = attempt.responses.filter(is_correct=True).count()
+    
+    attempt.score = correct_answers
+    attempt.percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
+    attempt.status = 'completed'
+    attempt.completed_at = timezone.now()
+    
+    # Calculate time taken
+    time_taken = (attempt.completed_at - attempt.started_at).total_seconds()
+    attempt.time_taken = int(time_taken)
+    
+    attempt.save()
+    
+    return JsonResponse({
+        'success': True,
+        'score': attempt.score,
+        'total': total_questions,
+        'percentage': float(attempt.percentage),
+        'passed': attempt.passed,
+    })
+
+# Add this enhanced paper_result view to your existing modelpaper/views.py
+
+@login_required
+def paper_result(request, attempt_id):
+    """Show paper results with enhanced data and security - Enhanced Version"""
+    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
+    
+    # Security check: Only allow the student who took the paper to view results
+    if attempt.student != request.user:
+        messages.error(request, "You can only view your own paper results.")
+        return redirect('student_model_papers')
+    
+    # Ensure the paper is actually completed
+    if attempt.status == 'in_progress':
+        messages.warning(request, "This paper is still in progress.")
+        return redirect('take_paper', paper_id=attempt.model_paper.id)
+    
+    # Get all responses with questions, including unanswered ones
+    all_questions = attempt.model_paper.get_questions()
+    responses = []
+    
+    for paper_question in all_questions:
+        try:
+            response = ModelPaperResponse.objects.get(
+                attempt=attempt,
+                paper_question=paper_question
+            )
+        except ModelPaperResponse.DoesNotExist:
+            # Create a dummy response for unanswered questions
+            response = ModelPaperResponse(
+                attempt=attempt,
+                paper_question=paper_question,
+                selected_answer=None,
+                is_correct=False
+            )
+        responses.append(response)
+    
+    # Calculate additional statistics
+    total_questions = len(responses)
+    answered_questions = len([r for r in responses if r.selected_answer])
+    unanswered_questions = total_questions - answered_questions
+    correct_answers = len([r for r in responses if r.is_correct])
+    incorrect_answers = answered_questions - correct_answers
+    
+    # Calculate time efficiency
+    time_efficiency = 0
+    if attempt.model_paper.duration_minutes > 0:
+        time_taken_minutes = attempt.time_taken / 60 if attempt.time_taken else 0
+        time_efficiency = min(100, (time_taken_minutes / attempt.model_paper.duration_minutes) * 100)
+    
+    # Calculate grade based on percentage
+    def get_grade(percentage):
+        if percentage >= 90:
+            return 'A+'
+        elif percentage >= 80:
+            return 'A'
+        elif percentage >= 70:
+            return 'B'
+        elif percentage >= 60:
+            return 'C'
+        elif percentage >= 50:
+            return 'D'
+        else:
+            return 'F'
+    
+    # Add properties to attempt object for template compatibility
+    attempt.time_taken_display = f"{attempt.time_taken // 60}:{attempt.time_taken % 60:02d}" if attempt.time_taken else "0:00"
+    attempt.time_taken_formatted = f"{attempt.time_taken // 60} minutes {attempt.time_taken % 60} seconds" if attempt.time_taken else "0 seconds"
+    attempt.time_taken_minutes = attempt.time_taken / 60 if attempt.time_taken else 0
+    
+    context = {
+        'attempt': attempt,
+        'paper': attempt.model_paper,
+        'responses': responses,
+        'passed': attempt.passed,
+        'user': request.user,
+        
+        # Additional statistics
+        'total_questions': total_questions,
+        'answered_questions': answered_questions,
+        'unanswered_questions': unanswered_questions,
+        'correct_answers': correct_answers,
+        'incorrect_answers': incorrect_answers,
+        'time_efficiency': round(time_efficiency, 1),
+        'grade': get_grade(float(attempt.percentage)),
+        
+        # For template calculations
+        'current_year': timezone.now().year,
+    }
+    
+    return render(request, 'modelpaper/paper_results.html', context)
+
+@require_POST
+def report_paper_warning(request):
+    """Report tab switch warning for paper"""
+    attempt_id = request.POST.get('attempt_id')
+    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
+    
+    attempt.warning_count += 1
+    attempt.save()
+    
+    if attempt.warning_count >= 3:
+        # Auto-submit paper
+        attempt.status = 'abandoned'
+        attempt.completed_at = timezone.now()
+        attempt.save()
+        
+        return JsonResponse({
+            'success': True,
+            'auto_submit': True,
+            'message': 'Paper auto-submitted due to multiple tab switches.'
+        })
+    
+    return JsonResponse({
+        'success': True,
+        'warning_count': attempt.warning_count,
+        'remaining_warnings': 3 - attempt.warning_count
+    })
+
+
+@login_required
+def student_paper_progress(request):
+    """Student progress tracking for model papers"""
+    user = request.user
+    attempts = ModelPaperAttempt.objects.filter(student=user).select_related('model_paper').order_by('-started_at')
+    
+    # Calculate stats
+    completed_attempts = attempts.filter(status='completed')
+    total_papers = attempts.count()
+    best_score = completed_attempts.aggregate(Max('percentage'))['percentage__max'] or 0
+    avg_score = completed_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
+    avg_time = completed_attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
+    
+    # Calculate monthly progress
+    from datetime import datetime, timedelta
+    import calendar
+    
+    # Get last 6 months data
+    monthly_data = []
+    current_date = timezone.now()
+    
+    for i in range(6):
+        month_start = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if month_start.month == 1:
+            month_end = month_start.replace(month=12, year=month_start.year-1, day=31)
+        else:
+            next_month = month_start.replace(month=month_start.month-1)
+            month_end = next_month.replace(day=calendar.monthrange(next_month.year, next_month.month)[1])
+        
+        month_attempts = completed_attempts.filter(
+            completed_at__gte=month_end,
+            completed_at__lt=month_start
+        )
+        
+        month_avg = month_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
+        
+        monthly_data.append({
+            'month': month_end.strftime('%b %Y'),
+            'attempts': month_attempts.count(),
+            'avg_score': round(month_avg, 1)
+        })
+        
+        current_date = month_end
+    
+    monthly_data.reverse()  # Show oldest to newest
+    
+    # Get paper-wise performance (by paper name)
+    paper_performance = {}
+    for attempt in completed_attempts:
+        paper_name = attempt.model_paper.selected_paper_name or 'General'
+        if paper_name not in paper_performance:
+            paper_performance[paper_name] = {
+                'attempts': 0,
+                'total_score': 0,
+                'best_score': 0
+            }
+        
+        paper_performance[paper_name]['attempts'] += 1
+        paper_performance[paper_name]['total_score'] += attempt.percentage
+        paper_performance[paper_name]['best_score'] = max(
+            paper_performance[paper_name]['best_score'],
+            attempt.percentage
+        )
+    
+    # Calculate averages
+    for paper_name in paper_performance:
+        data = paper_performance[paper_name]
+        data['avg_score'] = round(data['total_score'] / data['attempts'], 1)
+    
+    # Get recent activity (last 10 attempts)
+    recent_attempts = attempts[:10]
+    
+    # Calculate improvement trend (comparing first half vs second half of attempts)
+    if completed_attempts.count() >= 4:
+        half_point = completed_attempts.count() // 2
+        recent_half = list(completed_attempts[:half_point])
+        older_half = list(completed_attempts[half_point:])
+        
+        recent_avg = sum(a.percentage for a in recent_half) / len(recent_half)
+        older_avg = sum(a.percentage for a in older_half) / len(older_half)
+        
+        improvement = recent_avg - older_avg
+    else:
+        improvement = 0
+    
+    context = {
+        'attempts': attempts,
+        'completed_attempts': completed_attempts,
+        'total_papers': total_papers,
+        'best_score': round(best_score, 1),
+        'avg_score': round(avg_score, 1),
+        'avg_time': round(avg_time / 60, 1) if avg_time else 0,  # Convert to minutes
+        'monthly_data': monthly_data,
+        'paper_performance': paper_performance,
+        'recent_attempts': recent_attempts,
+        'improvement': round(improvement, 1),
+        'user': user,
+    }
+    
+    return render(request, 'modelpaper/student_progress.html', context)

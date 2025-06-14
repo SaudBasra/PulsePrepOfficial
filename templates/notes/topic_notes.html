@@ -1,0 +1,700 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Topic Notes</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/manage-modules.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notes.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'student_mock_tests' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'student_model_papers' %}" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Model Papers</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Practice</span>
+          </a>
+          <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>My Notes</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notification_center' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Topic Notes</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="{% url 'notes_dashboard' %}">My Notes</a>
+          <i class="fas fa-chevron-right"></i>
+          <span>{{ breadcrumb }}</span>
+        </div>
+
+        <!-- Page Content Section -->
+        <div class="page-content">
+          <div class="content-card">
+            <!-- Header with controls -->
+            <div class="content-header">
+              <div class="header-left">
+                <h2>
+                  <i class="fas fa-sticky-note"></i>
+                  {{ breadcrumb }}
+                </h2>
+                <p class="header-subtitle">{{ total_notes }} note{{ total_notes|pluralize }} found</p>
+              </div>
+              <div class="header-right">
+                <a href="{% url 'notes_dashboard' %}" class="btn-secondary">
+                  <i class="fas fa-arrow-left"></i> Back to Notes
+                </a>
+                <a href="{% url 'add_note' %}{% if current_filters.block %}?block={{ current_filters.block }}&module={{ current_filters.module }}&subject={{ current_filters.subject }}&topic={{ current_filters.topic }}&degree={{ current_filters.degree }}&year={{ current_filters.year }}{% endif %}" class="btn-primary">
+                  <i class="fas fa-plus"></i> Add Note
+                </a>
+              </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="topic-controls">
+              <form method="GET" class="search-form">
+                <!-- Preserve current filters -->
+                {% for key, value in current_filters.items %}
+                  {% if value %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                  {% endif %}
+                {% endfor %}
+                
+                <div class="search-container">
+                  <input
+                    type="text"
+                    placeholder="Search notes..."
+                    class="search-input"
+                    name="q"
+                    value="{{ search_query }}"
+                  />
+                  <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Notes List -->
+            <div class="notes-list">
+              {% for note in notes %}
+                <div class="note-card" data-note-id="{{ note.id }}">
+                  <div class="note-header">
+                    <div class="note-title-section">
+                      <h3 class="note-title">
+                        <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a>
+                        {% if note.is_favorite %}
+                          <i class="fas fa-heart favorite-icon" title="Favorite"></i>
+                        {% endif %}
+                      </h3>
+                      <div class="note-meta">
+                        <span class="note-type-badge {{ note.note_type }}">
+                          {{ note.get_note_type_display }}
+                        </span>
+                        {% if note.difficulty_level %}
+                          <span class="difficulty-badge {{ note.difficulty_level }}">
+                            {{ note.get_difficulty_level_display }}
+                          </span>
+                        {% endif %}
+                        <span class="note-date">
+                          <i class="fas fa-clock"></i>
+                          Updated {{ note.updated_at|timesince }} ago
+                        </span>
+                      </div>
+                    </div>
+                    <div class="note-actions">
+                      <button 
+                        class="btn-icon favorite-btn" 
+                        onclick="toggleFavorite({{ note.id }})"
+                        title="{% if note.is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}"
+                      >
+                        <i class="{% if note.is_favorite %}fas{% else %}far{% endif %} fa-heart"></i>
+                      </button>
+                      <a href="{% url 'edit_note' note.id %}" class="btn-icon" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="{% url 'delete_note' note.id %}" class="btn-icon delete-btn" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="note-content-preview">
+                    {{ note.content|truncatechars:200|linebreaksbr }}
+                  </div>
+                  
+                  {% if note.question %}
+                    <div class="note-question-ref">
+                      <i class="fas fa-link"></i>
+                      <span>Related to: {{ note.question.question_text|truncatechars:60 }}</span>
+                    </div>
+                  {% endif %}
+                  
+                  {% if note.tag_list %}
+                    <div class="note-tags">
+                      {% for tag in note.tag_list %}
+                        <span class="tag">{{ tag }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  
+                  {% if note.images.exists %}
+                    <div class="note-images-preview">
+                      <div class="images-count">
+                        <i class="fas fa-images"></i>
+                        {{ note.images.count }} image{{ note.images.count|pluralize }}
+                      </div>
+                      <div class="images-thumbnails">
+                        {% for image in note.images.all|slice:":3" %}
+                          <div class="image-thumbnail">
+                            <img src="{{ image.image.url }}" alt="{{ image.caption }}" loading="lazy">
+                          </div>
+                        {% endfor %}
+                        {% if note.images.count > 3 %}
+                          <div class="more-images">+{{ note.images.count|add:"-3" }}</div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              {% empty %}
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <i class="fas fa-sticky-note"></i>
+                  </div>
+                  <h3>No Notes Found</h3>
+                  <p>No notes found for this topic. Start creating notes to build your study materials.</p>
+                  <a href="{% url 'add_note' %}{% if current_filters.block %}?block={{ current_filters.block }}&module={{ current_filters.module }}&subject={{ current_filters.subject }}&topic={{ current_filters.topic }}&degree={{ current_filters.degree }}&year={{ current_filters.year }}{% endif %}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Create First Note
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if notes.has_other_pages %}
+              <div class="pagination-container">
+                <div class="pagination">
+                  {% if notes.has_previous %}
+                    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ notes.previous_page_number }}" class="page-link">
+                      <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                  {% endif %}
+                  
+                  <span class="page-info">
+                    Page {{ notes.number }} of {{ notes.paginator.num_pages }}
+                    ({{ notes.paginator.count }} total notes)
+                  </span>
+                  
+                  {% if notes.has_next %}
+                    <a href="?{% if search_query %}q={{ search_query }}&{% endif %}{% for key, value in current_filters.items %}{% if value %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ notes.next_page_number }}" class="page-link">
+                      Next <i class="fas fa-chevron-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Toggle favorite status
+      function toggleFavorite(noteId) {
+        fetch(`/notes/toggle-favorite/${noteId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const btn = document.querySelector(`[onclick="toggleFavorite(${noteId})"] i`);
+            const card = document.querySelector(`[data-note-id="${noteId}"]`);
+            
+            if (data.is_favorite) {
+              btn.className = 'fas fa-heart';
+              btn.style.color = '#dc2626';
+              
+              // Add favorite icon to title if not exists
+              const titleSection = card.querySelector('.note-title');
+              if (!titleSection.querySelector('.favorite-icon')) {
+                const favoriteIcon = document.createElement('i');
+                favoriteIcon.className = 'fas fa-heart favorite-icon';
+                favoriteIcon.title = 'Favorite';
+                titleSection.appendChild(favoriteIcon);
+              }
+            } else {
+              btn.className = 'far fa-heart';
+              btn.style.color = '';
+              
+              // Remove favorite icon from title
+              const existingIcon = card.querySelector('.note-title .favorite-icon');
+              if (existingIcon) {
+                existingIcon.remove();
+              }
+            }
+            
+            // Update button title
+            btn.closest('.btn-icon').title = data.is_favorite ? 
+              'Remove from favorites' : 'Add to favorites';
+          }
+        })
+        .catch(error => {
+          console.error('Error toggling favorite:', error);
+        });
+      }
+      
+      // Confirm delete
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          if (!confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+            e.preventDefault();
+          }
+        });
+      });
+      
+      // Get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+      // Auto-submit search form on enter
+      document.querySelector('.search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          this.closest('form').submit();
+        }
+      });
+      
+      // Image thumbnail preview
+      document.querySelectorAll('.image-thumbnail img').forEach(img => {
+        img.addEventListener('click', function() {
+          // Create simple lightbox
+          const lightbox = document.createElement('div');
+          lightbox.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+          `;
+          
+          const fullImg = document.createElement('img');
+          fullImg.src = this.src;
+          fullImg.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+          `;
+          
+          lightbox.appendChild(fullImg);
+          document.body.appendChild(lightbox);
+          
+          lightbox.addEventListener('click', function() {
+            document.body.removeChild(this);
+          });
+        });
+      });
+    </script>
+    
+    <style>
+      /* Additional styles for topic notes page */
+      .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .header-left h2 {
+        margin: 0 0 4px 0;
+        color: #1f2937;
+        font-size: 1.5rem;
+      }
+      
+      .header-subtitle {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .header-right {
+        display: flex;
+        gap: 12px;
+      }
+      
+      .topic-controls {
+        margin-bottom: 24px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .search-form {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      
+      .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+      }
+      
+      .search-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 4px;
+      }
+      
+      .notes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      .note-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.2s;
+      }
+      
+      .note-card:hover {
+        border-color: #10b981;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+      }
+      
+      .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      
+      .note-title-section {
+        flex: 1;
+      }
+      
+      .note-title {
+        margin: 0 0 8px 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+      }
+      
+      .note-title a {
+        color: #1f2937;
+        text-decoration: none;
+      }
+      
+      .note-title a:hover {
+        color: #10b981;
+      }
+      
+      .note-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      
+      .difficulty-badge {
+        font-size: 0.6875rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+      
+      .difficulty-badge.easy {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      
+      .difficulty-badge.medium {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      
+      .difficulty-badge.hard {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      
+      .note-date {
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .note-actions {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .note-content-preview {
+        margin-bottom: 12px;
+        color: #374151;
+        line-height: 1.5;
+      }
+      
+      .note-question-ref {
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background: #f0f9ff;
+        border-left: 3px solid #3b82f6;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #1e40af;
+      }
+      
+      .note-images-preview {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #f3f4f6;
+      }
+      
+      .images-count {
+        font-size: 0.75rem;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      
+      .images-thumbnails {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      
+      .image-thumbnail {
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      
+      .image-thumbnail:hover {
+        transform: scale(1.1);
+      }
+      
+      .image-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .more-images {
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+      }
+      
+      .empty-icon {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 16px;
+      }
+      
+      .empty-state h3 {
+        margin: 0 0 8px 0;
+        color: #6b7280;
+        font-size: 1.25rem;
+      }
+      
+      .empty-state p {
+        margin: 0 0 20px 0;
+        color: #9ca3af;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .pagination-container {
+        margin-top: 24px;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .pagination {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .page-link {
+        color: #3b82f6;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      
+      .page-link:hover {
+        background: #e0f2fe;
+      }
+      
+      .page-info {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .content-header {
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        .header-right {
+          width: 100%;
+        }
+        
+        .note-header {
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .note-actions {
+          align-self: flex-end;
+        }
+        
+        .note-meta {
+          gap: 8px;
+        }
+        
+        .pagination {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,1633 @@
+{% comment %}
+    Security Protection Component
+    Usage: {% include 'includes/security_protection.html' with warning_enabled=True warning_limit=3 %}
+    
+    Parameters:
+    - warning_enabled: Enable warning system (default: True)
+    - warning_limit: Maximum warnings before action (default: 3)
+    - attempt_id: Required for warning tracking (optional)
+    - auto_submit_url: URL for auto-submit on violations (optional)
+    - warning_report_url: URL for reporting warnings (optional)
+{% endcomment %}
+
+<!-- Security Protection Styles -->
+<style>
+    /* Security Protection Overlay Styles */
+    .security-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(130, 39, 46, 0.95);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(20px);
+        animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    .security-overlay.active {
+        display: flex;
+    }
+
+    @keyframes overlayFadeIn {
+        from {
+            opacity: 0;
+            backdrop-filter: blur(0px);
+        }
+        to {
+            opacity: 1;
+            backdrop-filter: blur(20px);
+        }
+    }
+
+    .security-warning-modal {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        text-align: center;
+        max-width: 90vw;
+        width: 440px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid #ef4444;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .security-warning-modal .warning-icon {
+        font-size: 64px;
+        color: #ef4444;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .security-warning-modal h3 {
+        color: #dc2626;
+        margin-bottom: 16px;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .security-warning-modal p {
+        color: #374151;
+        margin-bottom: 20px;
+        line-height: 1.6;
+        font-size: 15px;
+    }
+
+    .warning-counter {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 16px 0;
+        font-weight: 600;
+        color: #dc2626;
+    }
+
+    .security-warning-modal .btn-acknowledge {
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px;
+        justify-content: center;
+    }
+
+    .security-warning-modal .btn-acknowledge:hover {
+        background: linear-gradient(135deg, #b91c1c, #991b1b);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    /* Global Security Styles */
+    .security-protected {
+        /* Disable text selection */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        
+        /* Disable highlighting */
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Print protection */
+    @media print {
+        .security-protected,
+        .security-protected * {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        body::before {
+            content: "Printing is not allowed for this content.";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #dc2626;
+            z-index: 9999;
+        }
+    }
+
+    /* Screenshot protection blur effect */
+    .security-blur {
+        filter: blur(20px) !important;
+        pointer-events: none !important;
+        transition: filter 0.3s ease;
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 480px) {
+        .security-warning-modal {
+            padding: 20px;
+            margin: 20px;
+            width: calc(100% - 40px);
+        }
+        
+        .security-warning-modal .warning-icon {
+            font-size: 48px;
+        }
+        
+        .security-warning-modal h3 {
+            font-size: 18px;
+        }
+        
+        .security-warning-modal p {
+            font-size: 14px;
+        }
+    }
+
+    /* Touch device specific protection */
+    @media (pointer: coarse) {
+        .security-protected {
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+    }
+</style>
+
+<!-- Security Protection Overlay -->
+<div class="security-overlay" id="security-overlay">
+    <div class="security-warning-modal">
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle" id="warning-icon"></i>
+        </div>
+        <h3 id="security-warning-title">Security Violation Detected!</h3>
+        <p id="security-warning-message">
+            Unauthorized action detected. This violation has been logged.
+        </p>
+        <div class="warning-counter" id="warning-counter" style="display: none;">
+            Warning <span id="current-warning">1</span> of <span id="max-warnings">3</span>
+        </div>
+        <button class="btn-acknowledge" onclick="SecurityProtection.hideWarning()">
+            <i class="fas fa-check"></i>
+            <span>I Understand</span>
+        </button>
+    </div>
+</div>
+
+<!-- Security Protection JavaScript -->
+<script>
+class SecurityProtection {
+    constructor(options = {}) {
+        this.warningEnabled = options.warningEnabled !== false;
+        this.warningLimit = options.warningLimit || 3;
+        this.attemptId = options.attemptId || null;
+        this.autoSubmitUrl = options.autoSubmitUrl || null;
+        this.warningReportUrl = options.warningReportUrl || null;
+        this.warningCount = 0;
+        this.violations = new Set();
+        this.isActive = true;
+        this.isScreenshotModalOpen = false;
+        this.metaKeyPressed = false;
+        
+        this.init();
+    }
+    
+    init() {
+        if (!this.isActive) return;
+        
+        this.setupAdvancedScreenshotProtection();
+        this.setupRobustCopyPasteProtection();
+        this.setupKeyboardProtection();
+        this.setupDevToolsProtection();
+        this.setupTabSwitchProtection();
+        this.setupTouchProtection();
+        this.setupPrintProtection();
+        this.setupDragDropProtection();
+        this.setupZoomProtection();
+        this.setupAdvancedMonitoring();
+        
+        // Apply security class to body
+        document.body.classList.add('security-protected');
+        
+        console.log('🔒 Enhanced Security Protection System Activated');
+    }
+    
+    setupAdvancedScreenshotProtection() {
+        // Global screenshot blocking with immediate response
+        this.blockAllScreenshotMethods();
+        this.setupContinuousScreenMonitoring();
+        this.blockScreenshotExtensions();
+        this.setupAdvancedKeyDetection();
+    }
+    
+    blockAllScreenshotMethods() {
+        // Override all possible screenshot methods
+        const blockScreenshot = () => {
+            this.immediateScreenBlock('Screenshot attempt blocked');
+            return false;
+        };
+        
+        // Block all keyboard events globally
+        document.addEventListener('keydown', (e) => {
+            const isScreenshotAttempt = (
+                e.key === 'PrintScreen' ||
+                (e.shiftKey && e.key === 'S' && (e.ctrlKey || e.metaKey || e.altKey)) ||
+                (e.metaKey && e.shiftKey && ['3', '4', '5', '6'].includes(e.key)) ||
+                (e.altKey && e.key === 'PrintScreen') ||
+                (e.ctrlKey && e.altKey && e.key === 'PrintScreen')
+            );
+            
+            if (isScreenshotAttempt) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                blockScreenshot();
+                return false;
+            }
+        }, true); // Use capture phase
+        
+        // Block keyup events too
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                e.preventDefault();
+                e.stopPropagation();
+                blockScreenshot();
+                return false;
+            }
+        }, true);
+        
+        // Block window events
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'PrintScreen' || 
+                (e.shiftKey && e.key === 'S' && (e.ctrlKey || e.metaKey))) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                blockScreenshot();
+                return false;
+            }
+        }, true);
+    }
+    
+    setupContinuousScreenMonitoring() {
+        // Monitor screen changes continuously
+        let lastScreenCheck = Date.now();
+        
+        setInterval(() => {
+            // Check for screen dimension changes (might indicate screenshot tools)
+            const now = Date.now();
+            if (document.hidden || !document.hasFocus()) {
+                if (now - lastScreenCheck < 1000) {
+                    this.immediateScreenBlock('Screen monitoring detected unusual activity');
+                }
+            }
+            lastScreenCheck = now;
+        }, 500);
+        
+        // Monitor for clipboard changes
+        this.setupClipboardMonitoring();
+    }
+    
+    setupClipboardMonitoring() {
+        let lastClipboardContent = '';
+        
+        setInterval(async () => {
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const clipboardText = await navigator.clipboard.readText();
+                    if (clipboardText !== lastClipboardContent && clipboardText.length > 0) {
+                        // Clear clipboard immediately
+                        await navigator.clipboard.writeText('');
+                        this.immediateScreenBlock('Clipboard content detected and cleared');
+                    }
+                    lastClipboardContent = '';
+                }
+            } catch (error) {
+                // Clipboard access restricted - good for security
+            }
+        }, 1000);
+    }
+    
+    immediateScreenBlock(reason) {
+        // Immediately hide all content
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            if (el.id !== 'screenshot-emergency-block') {
+                el.style.visibility = 'hidden';
+                el.style.opacity = '0';
+            }
+        });
+        
+        // Create emergency block overlay
+        this.createEmergencyBlock(reason);
+        
+        // Report violation
+        this.reportViolation('screenshot', reason);
+        
+        // Log console warnings
+        console.clear();
+        console.error('🚫 SCREENSHOT BLOCKED - CONTENT HIDDEN');
+        console.error('Reason:', reason);
+    }
+    
+    createEmergencyBlock(reason) {
+        // Remove existing blocks
+        const existing = document.getElementById('screenshot-emergency-block');
+        if (existing) existing.remove();
+        
+        // Create emergency overlay
+        const block = document.createElement('div');
+        block.id = 'screenshot-emergency-block';
+        block.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: #dc2626 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 2147483647 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-family: Arial, sans-serif !important;
+        `;
+        
+        block.innerHTML = `
+            <div style="
+                background: white !important;
+                padding: 40px !important;
+                border-radius: 15px !important;
+                text-align: center !important;
+                box-shadow: 0 0 50px rgba(0,0,0,0.5) !important;
+                max-width: 90vw !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            ">
+                <div style="font-size: 60px !important; margin-bottom: 20px !important;">🚫</div>
+                <h2 style="color: #dc2626 !important; margin-bottom: 15px !important; font-size: 24px !important;">
+                    SCREENSHOT BLOCKED
+                </h2>
+                <p style="color: #374151 !important; margin-bottom: 25px !important; font-size: 16px !important;">
+                    ${reason}<br><br>
+                    All content has been hidden for security.
+                </p>
+                <button onclick="SecurityProtection.restoreContent()" style="
+                    background: #dc2626 !important;
+                    color: white !important;
+                    border: none !important;
+                    padding: 12px 25px !important;
+                    border-radius: 8px !important;
+                    font-size: 16px !important;
+                    cursor: pointer !important;
+                ">Restore Content</button>
+            </div>
+        `;
+        
+        document.body.appendChild(block);
+        
+        // Auto-restore after 5 seconds
+        setTimeout(() => {
+            this.restoreContent();
+        }, 5000);
+    }
+    
+    static restoreContent() {
+        const block = document.getElementById('screenshot-emergency-block');
+        if (block) block.remove();
+        
+        // Restore all content
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(el => {
+            el.style.visibility = '';
+            el.style.opacity = '';
+        });
+        
+        console.log('🔓 Content restored');
+    }
+    
+    setupKeyboardProtection() {
+        // Enhanced keyboard protection with immediate blocking
+        document.addEventListener('keydown', (e) => {
+            // Screenshot shortcuts - Enhanced blocking
+            if (e.key === 'PrintScreen') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.immediateScreenBlock('Print Screen key detected');
+                return false;
+            }
+            
+            // Windows Snipping Tool shortcuts (Win + Shift + S, Ctrl + Shift + S)
+            if ((e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                (e.metaKey && e.shiftKey && (e.key === 'S' || e.key === 's'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.immediateScreenBlock('Snipping Tool shortcut detected');
+                return false;
+            }
+            
+            // Mac screenshot shortcuts
+            if (e.metaKey && e.shiftKey && ['3', '4', '5', '6'].includes(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.immediateScreenBlock('Mac screenshot shortcut detected');
+                return false;
+            }
+            
+            // Alt + Print Screen
+            if (e.altKey && e.key === 'PrintScreen') {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.immediateScreenBlock('Alt + Print Screen detected');
+                return false;
+            }
+            
+            // Developer tools shortcuts
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J')) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.reportViolation('devtools', 'Developer tools access attempt');
+                return false;
+            }
+            
+            // Copy/Paste shortcuts - Enhanced blocking
+            if ((e.ctrlKey || e.metaKey) && ['c', 'C', 'v', 'V', 'x', 'X', 'a', 'A'].includes(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.blockCopyPasteAttempt('Copy/Paste shortcut detected');
+                return false;
+            }
+            
+            // Refresh shortcuts
+            if ((e.ctrlKey && ['r', 'R'].includes(e.key)) || e.key === 'F5') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.reportViolation('refresh', 'Page refresh attempt');
+                return false;
+            }
+            
+            // Zoom shortcuts
+            if ((e.ctrlKey || e.metaKey) && ['+', '-', '0'].includes(e.key)) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.reportViolation('zoom', 'Zoom attempt detected');
+                return false;
+            }
+        }, true); // Use capture phase for immediate blocking
+        
+        // Additional keyup listener for screenshot keys
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen') {
+                e.preventDefault();
+                e.stopPropagation();
+                this.immediateScreenBlock('Print Screen key released');
+                return false;
+            }
+        }, true);
+        
+        // Window-level event blocking
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'PrintScreen' || 
+                (e.shiftKey && e.key === 'S' && (e.ctrlKey || e.metaKey))) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.immediateScreenBlock('Window-level screenshot attempt');
+                return false;
+            }
+        }, true);
+    }
+    
+    setupScreenshotProtection() {
+        // Block screenshot on window focus changes
+        let screenshotBlocked = false;
+        
+        // Enhanced screenshot detection
+        document.addEventListener('keydown', (e) => {
+            const isScreenshotKey = (
+                e.key === 'PrintScreen' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                (e.metaKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                (e.metaKey && e.shiftKey && ['3', '4', '5'].includes(e.key)) ||
+                (e.altKey && e.key === 'PrintScreen')
+            );
+            
+            if (isScreenshotKey) {
+                this.blockScreenshot('Screenshot attempt blocked');
+            }
+        });
+        
+        // Monitor clipboard for screenshot detection
+        this.monitorClipboard();
+        
+        // Detect external screenshot tools
+        this.detectExternalTools();
+        
+        // Block screen capture API
+        this.blockScreenCaptureAPI();
+        
+        // Visual deterrent overlay
+        this.createVisualDeterrent();
+        
+        // Monitor for window blur (potential screenshot tools)
+        let blurCount = 0;
+        let lastBlurTime = 0;
+        
+        window.addEventListener('blur', () => {
+            const now = Date.now();
+            if (now - lastBlurTime < 2000) { // Multiple blurs in 2 seconds
+                blurCount++;
+                if (blurCount > 1) {
+                    this.blockScreenshot('Multiple window focus changes detected (possible screenshot tool)');
+                }
+            } else {
+                blurCount = 1;
+            }
+            lastBlurTime = now;
+        });
+        
+        // Reset blur count periodically
+        setInterval(() => {
+            blurCount = Math.max(0, blurCount - 1);
+        }, 5000);
+        
+        // Disable drag and drop (can be used for screenshots)
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            this.blockScreenshot('Drag operation blocked');
+        });
+    }
+    
+    blockScreenshot(reason) {
+        // Immediately blur and block the content
+        document.body.style.filter = 'blur(50px)';
+        document.body.style.pointerEvents = 'none';
+        
+        // Show blocking overlay
+        this.showScreenshotBlock(reason);
+        
+        // Report the violation
+        this.reportViolation('screenshot', reason);
+        
+        // Clear clipboard to prevent screenshot capture
+        this.clearClipboard();
+        
+        // Log to console (will be cleared by protection)
+        console.error('🚫 SCREENSHOT BLOCKED:', reason);
+        
+        // Restore after delay (but keep monitoring)
+        setTimeout(() => {
+            if (!this.isScreenshotModalOpen) {
+                document.body.style.filter = 'none';
+                document.body.style.pointerEvents = 'auto';
+            }
+        }, 1000);
+    }
+    
+    showScreenshotBlock(reason) {
+        // Remove any existing screenshot block
+        const existingBlock = document.getElementById('screenshot-block-overlay');
+        if (existingBlock) {
+            existingBlock.remove();
+        }
+        
+        // Create blocking overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'screenshot-block-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(220, 38, 38, 0.98);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            backdrop-filter: blur(20px);
+            animation: screenshotBlockSlide 0.3s ease-out;
+        `;
+        
+        overlay.innerHTML = `
+            <div style="
+                background: white;
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                max-width: 90vw;
+                width: 500px;
+                box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+                border: 3px solid #dc2626;
+                animation: screenshotBlockPulse 0.5s ease-out;
+            ">
+                <div style="
+                    font-size: 80px;
+                    color: #dc2626;
+                    margin-bottom: 20px;
+                    animation: screenshotBlockShake 0.6s ease-in-out;
+                ">
+                    🚫
+                </div>
+                <h2 style="
+                    color: #dc2626;
+                    font-size: 24px;
+                    font-weight: 700;
+                    margin-bottom: 16px;
+                    font-family: 'Inter', sans-serif;
+                ">SCREENSHOT BLOCKED!</h2>
+                <p style="
+                    color: #374151;
+                    font-size: 16px;
+                    line-height: 1.6;
+                    margin-bottom: 24px;
+                    font-family: 'Inter', sans-serif;
+                ">${reason}<br><br>Screenshots are strictly prohibited and monitored.</p>
+                <button onclick="SecurityProtection.hideScreenshotBlock()" style="
+                    background: linear-gradient(135deg, #dc2626, #b91c1c);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    font-family: 'Inter', sans-serif;
+                ">
+                    I Understand - Continue
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        this.isScreenshotModalOpen = true;
+        
+        // Add animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes screenshotBlockSlide {
+                from { opacity: 0; transform: scale(0.8); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            @keyframes screenshotBlockPulse {
+                0% { transform: scale(0.8); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            @keyframes screenshotBlockShake {
+                0%, 100% { transform: rotate(0deg); }
+                25% { transform: rotate(-10deg); }
+                75% { transform: rotate(10deg); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Auto-hide after 10 seconds
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                this.hideScreenshotBlock();
+            }
+        }, 10000);
+    }
+    
+    static hideScreenshotBlock() {
+        const overlay = document.getElementById('screenshot-block-overlay');
+        if (overlay) {
+            overlay.style.animation = 'screenshotBlockSlide 0.3s ease-in reverse';
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.remove();
+                }
+            }, 300);
+        }
+        
+        // Restore page functionality
+        document.body.style.filter = 'none';
+        document.body.style.pointerEvents = 'auto';
+        
+        // Mark modal as closed
+        const instance = SecurityProtection.getInstance();
+        if (instance) {
+            instance.isScreenshotModalOpen = false;
+        }
+    }
+    
+    monitorClipboard() {
+        // Monitor clipboard changes that might indicate screenshots
+        let lastClipboardCheck = Date.now();
+        
+        setInterval(async () => {
+            try {
+                if (navigator.clipboard && navigator.clipboard.read) {
+                    const clipboardItems = await navigator.clipboard.read();
+                    for (const item of clipboardItems) {
+                        if (item.types.includes('image/png') || item.types.includes('image/jpeg')) {
+                            const now = Date.now();
+                            if (now - lastClipboardCheck < 5000) { // Image in clipboard within 5 seconds
+                                this.blockScreenshot('Image detected in clipboard (possible screenshot)');
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                // Clipboard access denied or not supported
+            }
+            lastClipboardCheck = Date.now();
+        }, 2000);
+    }
+    
+    detectExternalTools() {
+        // Monitor for common screenshot tool processes (limited in browser)
+        const originalOpen = window.open;
+        window.open = function(url, ...args) {
+            if (url && typeof url === 'string') {
+                const urlLower = url.toLowerCase();
+                if (urlLower.includes('screenshot') || urlLower.includes('capture') || 
+                    urlLower.includes('snip') || urlLower.includes('lightshot') ||
+                    urlLower.includes('greenshot') || urlLower.includes('snagit')) {
+                    const instance = SecurityProtection.getInstance();
+                    if (instance) {
+                        instance.blockScreenshot('Screenshot tool URL blocked');
+                    }
+                    return null;
+                }
+            }
+            return originalOpen.apply(this, arguments);
+        };
+        
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            // Check if any requests might be related to screenshot tools
+            if (args[0] && typeof args[0] === 'string') {
+                const url = args[0].toLowerCase();
+                if (url.includes('screenshot') || url.includes('capture') || url.includes('snip')) {
+                    const instance = SecurityProtection.getInstance();
+                    if (instance) {
+                        instance.blockScreenshot('External screenshot tool detected');
+                    }
+                }
+            }
+            return originalFetch.apply(this, args);
+        };
+    }
+    
+    blockScreenCaptureAPI() {
+        // Block modern screen capture APIs
+        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+            const originalGetDisplayMedia = navigator.mediaDevices.getDisplayMedia;
+            navigator.mediaDevices.getDisplayMedia = () => {
+                this.blockScreenshot('Screen capture API blocked');
+                return Promise.reject(new Error('Screen capture is not allowed'));
+            };
+        }
+        
+        // Block older screen capture methods
+        if (navigator.getUserMedia) {
+            const originalGetUserMedia = navigator.getUserMedia;
+            navigator.getUserMedia = (constraints, success, error) => {
+                if (constraints && (constraints.video === 'screen' || 
+                    (constraints.video && constraints.video.mediaSource === 'screen'))) {
+                    this.blockScreenshot('Legacy screen capture blocked');
+                    if (error) error(new Error('Screen capture is not allowed'));
+                    return;
+                }
+                return originalGetUserMedia.call(navigator, constraints, success, error);
+            };
+        }
+    }
+    
+    setupAdvancedMonitoring() {
+        // Advanced monitoring for bypass attempts
+        this.monitorDOMChanges();
+        this.monitorNetworkRequests();
+        this.setupConsoleProtection();
+    }
+    
+    monitorDOMChanges() {
+        // Monitor for attempts to modify security elements
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.removedNodes.forEach((node) => {
+                        if (node.id === 'screenshot-emergency-block' || 
+                            node.id === 'copypaste-block-notification') {
+                            this.reportViolation('tampering', 'Security element removal attempted');
+                        }
+                    });
+                }
+                
+                if (mutation.type === 'attributes') {
+                    const target = mutation.target;
+                    if (target.style && (
+                        target.style.userSelect !== 'none' ||
+                        target.style.webkitUserSelect !== 'none'
+                    )) {
+                        // Re-apply protection
+                        target.style.webkitUserSelect = 'none';
+                        target.style.mozUserSelect = 'none';
+                        target.style.msUserSelect = 'none';
+                        target.style.userSelect = 'none';
+                    }
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+    }
+    
+    monitorNetworkRequests() {
+        // Monitor for screenshot-related network activity
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            if (args[0] && typeof args[0] === 'string') {
+                const url = args[0].toLowerCase();
+                if (url.includes('screenshot') || url.includes('capture') || 
+                    url.includes('image') || url.includes('upload')) {
+                    const instance = SecurityProtection.getInstance();
+                    if (instance) {
+                        instance.reportViolation('network', 'Suspicious network request blocked');
+                    }
+                }
+            }
+            return originalFetch.apply(this, args);
+        };
+    }
+    
+    setupConsoleProtection() {
+        // Continuously clear console and show warnings
+        const clearConsole = () => {
+            console.clear();
+            console.log('%c🚫 SECURITY PROTECTED CONTENT', 
+                'color: red; font-size: 30px; font-weight: bold; background: yellow; padding: 10px;');
+            console.log('%cScreenshots and copying are monitored and blocked.', 
+                'color: red; font-size: 16px; font-weight: bold;');
+            console.log('%cAny violations will be logged and reported.', 
+                'color: red; font-size: 16px;');
+        };
+        
+        // Clear console every 2 seconds
+        setInterval(clearConsole, 2000);
+        
+        // Override console methods to prevent tampering
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = (...args) => {
+            if (args[0] && typeof args[0] === 'string' && 
+                args[0].toLowerCase().includes('security')) {
+                return; // Block security-related console modifications
+            }
+            return originalLog.apply(console, args);
+        };
+    }
+    blockScreenshotExtensions() {
+        // Block common screenshot browser extensions
+        const extensionPatterns = [
+            'chrome-extension://',
+            'moz-extension://',
+            'edge-extension://',
+            'screenshot',
+            'capture',
+            'snip',
+            'lightshot',
+            'awesome screenshot',
+            'fireshot',
+            'nimbus'
+        ];
+        
+        // Monitor for extension-related activity
+        const originalPostMessage = window.postMessage;
+        window.postMessage = function(message, ...args) {
+            if (typeof message === 'string') {
+                const msgLower = message.toLowerCase();
+                if (extensionPatterns.some(pattern => msgLower.includes(pattern))) {
+                    const instance = SecurityProtection.getInstance();
+                    if (instance) {
+                        instance.immediateScreenBlock('Screenshot extension detected');
+                    }
+                    return;
+                }
+            }
+            return originalPostMessage.apply(this, [message, ...args]);
+        };
+    }
+    
+    setupAdvancedKeyDetection() {
+        // Multiple layers of key detection
+        let keysPressed = new Set();
+        
+        // Track all key combinations
+        document.addEventListener('keydown', (e) => {
+            keysPressed.add(e.key.toLowerCase());
+            keysPressed.add(e.code.toLowerCase());
+            
+            // Check for dangerous combinations
+            const dangerousCombos = [
+                ['control', 'shift', 's'],
+                ['meta', 'shift', 's'],
+                ['alt', 'printscreen'],
+                ['printscreen'],
+                ['meta', 'shift', '3'],
+                ['meta', 'shift', '4'],
+                ['meta', 'shift', '5']
+            ];
+            
+            dangerousCombos.forEach(combo => {
+                if (combo.every(key => keysPressed.has(key))) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    this.immediateScreenBlock(`Dangerous key combination detected: ${combo.join('+')}`);
+                }
+            });
+        }, true);
+        
+        document.addEventListener('keyup', (e) => {
+            keysPressed.delete(e.key.toLowerCase());
+            keysPressed.delete(e.code.toLowerCase());
+        }, true);
+        
+        // Clear key tracking periodically
+        setInterval(() => {
+            keysPressed.clear();
+        }, 5000);
+    }
+    
+    blockContextMenus() {
+        // Enhanced context menu blocking
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            this.blockCopyPasteAttempt('Right-click context menu blocked');
+            return false;
+        }, true);
+        
+        // Block mouse events that could trigger context menus
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 2) { // Right mouse button
+                e.preventDefault();
+                e.stopPropagation();
+                this.blockCopyPasteAttempt('Right mouse button blocked');
+                return false;
+            }
+        }, true);
+        
+        document.addEventListener('mouseup', (e) => {
+            if (e.button === 2) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
+    }
+    
+    blockDragOperations() {
+        // Enhanced drag blocking
+        ['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'].forEach(event => {
+            document.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.blockCopyPasteAttempt(`Drag operation blocked: ${event}`);
+                return false;
+            }, true);
+        });
+        
+        // Block selection drag
+        document.addEventListener('mousedown', (e) => {
+            if (e.detail > 1) { // Multiple clicks (double, triple click)
+                e.preventDefault();
+                e.stopPropagation();
+                this.blockCopyPasteAttempt('Multi-click selection blocked');
+                return false;
+            }
+        }, true);
+    }
+    
+    clearClipboard() {
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText('');
+            }
+        } catch (error) {
+            // Clipboard access denied
+        }
+    }
+    
+    setupRobustCopyPasteProtection() {
+        // Comprehensive copy/paste blocking
+        this.blockAllTextSelection();
+        this.blockClipboardOperations();
+        this.blockContextMenus();
+        this.blockDragOperations();
+        
+        // Override all selection methods
+        document.onselectstart = () => false;
+        document.onmousedown = () => false;
+        document.ondragstart = () => false;
+        
+        // Block all copy/paste keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const isCopyPaste = (
+                (e.ctrlKey || e.metaKey) && ['c', 'C', 'v', 'V', 'x', 'X', 'a', 'A'].includes(e.key) ||
+                (e.ctrlKey && e.shiftKey && ['c', 'C', 'v', 'V']) ||
+                e.key === 'F12'
+            );
+            
+            if (isCopyPaste) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.blockCopyPasteAttempt('Copy/paste operation blocked');
+                return false;
+            }
+        }, true);
+        
+        // Block clipboard events
+        ['copy', 'cut', 'paste', 'selectstart', 'contextmenu'].forEach(event => {
+            document.addEventListener(event, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                this.blockCopyPasteAttempt(`${event} operation blocked`);
+                return false;
+            }, true);
+        });
+        
+        // Continuously clear selection
+        setInterval(() => {
+            if (window.getSelection) {
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    selection.removeAllRanges();
+                    this.blockCopyPasteAttempt('Text selection cleared');
+                }
+            }
+        }, 100);
+    }
+    
+    blockAllTextSelection() {
+        // Apply comprehensive selection blocking CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            *, *::before, *::after {
+                -webkit-user-select: none !important;
+                -moz-user-select: none !important;
+                -ms-user-select: none !important;
+                user-select: none !important;
+                -webkit-touch-callout: none !important;
+                -webkit-tap-highlight-color: transparent !important;
+            }
+            
+            /* Block text selection highlighting */
+            ::selection {
+                background: transparent !important;
+            }
+            ::-moz-selection {
+                background: transparent !important;
+            }
+            
+            /* Block drag and drop */
+            * {
+                -webkit-user-drag: none !important;
+                -khtml-user-drag: none !important;
+                -moz-user-drag: none !important;
+                -o-user-drag: none !important;
+                user-drag: none !important;
+                draggable: false !important;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Override selection methods on all elements
+        const observer = new MutationObserver(() => {
+            document.querySelectorAll('*').forEach(el => {
+                el.onselectstart = () => false;
+                el.onmousedown = () => false;
+                el.ondragstart = () => false;
+                el.style.webkitUserSelect = 'none';
+                el.style.mozUserSelect = 'none';
+                el.style.msUserSelect = 'none';
+                el.style.userSelect = 'none';
+                el.setAttribute('unselectable', 'on');
+                el.setAttribute('draggable', 'false');
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+    
+    blockClipboardOperations() {
+        // Override clipboard API
+        if (navigator.clipboard) {
+            const originalRead = navigator.clipboard.read;
+            const originalReadText = navigator.clipboard.readText;
+            const originalWrite = navigator.clipboard.write;
+            const originalWriteText = navigator.clipboard.writeText;
+            
+            navigator.clipboard.read = () => {
+                this.blockCopyPasteAttempt('Clipboard read blocked');
+                return Promise.reject(new Error('Clipboard access denied'));
+            };
+            
+            navigator.clipboard.readText = () => {
+                this.blockCopyPasteAttempt('Clipboard readText blocked');
+                return Promise.reject(new Error('Clipboard access denied'));
+            };
+            
+            navigator.clipboard.write = () => {
+                this.blockCopyPasteAttempt('Clipboard write blocked');
+                return Promise.reject(new Error('Clipboard access denied'));
+            };
+            
+            navigator.clipboard.writeText = () => {
+                this.blockCopyPasteAttempt('Clipboard writeText blocked');
+                return Promise.reject(new Error('Clipboard access denied'));
+            };
+        }
+        
+        // Block legacy clipboard methods
+        if (document.execCommand) {
+            const originalExecCommand = document.execCommand;
+            document.execCommand = (command, ...args) => {
+                if (['copy', 'cut', 'paste', 'selectAll'].includes(command)) {
+                    this.blockCopyPasteAttempt(`execCommand ${command} blocked`);
+                    return false;
+                }
+                return originalExecCommand.apply(document, [command, ...args]);
+            };
+        }
+    }
+    
+    blockCopyPasteAttempt(reason) {
+        // Show immediate feedback
+        this.showCopyPasteBlock(reason);
+        
+        // Clear any selections
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        }
+        
+        // Clear clipboard
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText('');
+            }
+        } catch (error) {
+            // Clipboard access denied - which is good for security
+        }
+        
+        // Report violation
+        this.reportViolation('copypaste', reason);
+    }
+    
+    showCopyPasteBlock(reason) {
+        // Remove existing notification
+        const existing = document.getElementById('copypaste-block-notification');
+        if (existing) existing.remove();
+        
+        // Create notification
+        const notification = document.createElement('div');
+        notification.id = 'copypaste-block-notification';
+        notification.style.cssText = `
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+            background: #dc2626 !important;
+            color: white !important;
+            padding: 15px 20px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+            z-index: 2147483646 !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 14px !important;
+            max-width: 300px !important;
+            animation: slideInRight 0.3s ease-out !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        `;
+        
+        notification.innerHTML = `
+            <div style="display: flex !important; align-items: center !important; gap: 10px !important;">
+                <span style="font-size: 20px !important;">🚫</span>
+                <div>
+                    <strong>Copy/Paste Blocked!</strong><br>
+                    <small>${reason}</small>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+        
+        // Add animation styles
+        if (!document.getElementById('copypaste-animations')) {
+            const animationStyle = document.createElement('style');
+            animationStyle.id = 'copypaste-animations';
+            animationStyle.textContent = `
+                @keyframes slideInRight {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOutRight {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(animationStyle);
+        }
+    }
+    
+    setupDevToolsProtection() {
+        // Detect developer tools
+        let devtools = { open: false };
+        const threshold = 160;
+        
+        setInterval(() => {
+            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+            
+            if ((heightThreshold || widthThreshold) && !devtools.open) {
+                devtools.open = true;
+                this.reportViolation('devtools', 'Developer tools detected');
+            } else if (!(heightThreshold || widthThreshold)) {
+                devtools.open = false;
+            }
+        }, 1000);
+        
+        // Monitor console usage
+        let consoleCheckInterval = setInterval(() => {
+            console.clear();
+            console.log('%cStop!', 'color: red; font-size: 50px; font-weight: bold;');
+            console.log('%cThis is a browser feature intended for developers. Content copying or screenshot attempts are monitored and logged.', 'color: red; font-size: 16px;');
+        }, 3000);
+    }
+    
+    setupTabSwitchProtection() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                document.body.classList.add('security-blur');
+                this.reportViolation('tabswitch', 'Tab switch or window focus lost');
+                
+                // Auto-blur content
+                setTimeout(() => {
+                    if (document.hidden) {
+                        document.body.style.filter = 'blur(20px)';
+                    }
+                }, 100);
+            } else {
+                document.body.classList.remove('security-blur');
+                document.body.style.filter = 'none';
+            }
+        });
+        
+        // Additional focus monitoring
+        window.addEventListener('blur', () => {
+            if (!document.hidden) {
+                setTimeout(() => {
+                    if (!document.hasFocus()) {
+                        this.reportViolation('focus', 'Window focus lost');
+                    }
+                }, 100);
+            }
+        });
+    }
+    
+    setupTouchProtection() {
+        if ('ontouchstart' in window) {
+            // Prevent pinch to zoom
+            document.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                    this.reportViolation('gesture', 'Multi-touch gesture detected');
+                }
+            });
+            
+            // Prevent double-tap zoom
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                    this.reportViolation('gesture', 'Double-tap zoom attempt');
+                }
+                lastTouchEnd = now;
+            });
+            
+            // Prevent gesture events
+            ['gesturestart', 'gesturechange', 'gestureend'].forEach(event => {
+                document.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    this.reportViolation('gesture', `Gesture event: ${event}`);
+                });
+            });
+        }
+    }
+    
+    setupPrintProtection() {
+        // Override print function
+        window.print = () => {
+            this.reportViolation('print', 'Print function called');
+        };
+        
+        // Monitor for Ctrl+P
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                this.reportViolation('print', 'Print shortcut detected');
+            }
+        });
+        
+        // Detect print media query changes
+        const printMediaQuery = window.matchMedia('print');
+        printMediaQuery.addEventListener('change', (e) => {
+            if (e.matches) {
+                this.reportViolation('print', 'Print mode activated');
+            }
+        });
+    }
+    
+    setupDragDropProtection() {
+        ['dragstart', 'dragover', 'drop'].forEach(event => {
+            document.addEventListener(event, (e) => {
+                e.preventDefault();
+                this.reportViolation('dragdrop', `Drag and drop blocked: ${event}`);
+            });
+        });
+    }
+    
+    setupZoomProtection() {
+        let lastZoom = window.devicePixelRatio;
+        
+        const checkZoom = () => {
+            const currentZoom = window.devicePixelRatio;
+            if (Math.abs(currentZoom - lastZoom) > 0.1) {
+                this.reportViolation('zoom', `Zoom change detected: ${lastZoom} → ${currentZoom}`);
+                lastZoom = currentZoom;
+            }
+        };
+        
+        // Check zoom periodically
+        setInterval(checkZoom, 1000);
+        
+        // Monitor wheel events for zoom
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                this.reportViolation('zoom', 'Zoom wheel gesture detected');
+            }
+        });
+    }
+    
+    reportViolation(type, details) {
+        if (!this.isActive) return;
+        
+        this.violations.add(type);
+        
+        console.warn('🚨 Security Violation:', type, details);
+        
+        if (this.warningEnabled) {
+            this.warningCount++;
+            this.showWarning(type, details);
+            
+            // Report to server if URL provided
+            if (this.warningReportUrl) {
+                this.sendWarningToServer(type, details);
+            }
+            
+            // Auto-submit if limit reached
+            if (this.warningCount >= this.warningLimit && this.autoSubmitUrl) {
+                this.handleMaxViolations();
+            }
+        }
+    }
+    
+    showWarning(type, details) {
+        const overlay = document.getElementById('security-overlay');
+        const title = document.getElementById('security-warning-title');
+        const message = document.getElementById('security-warning-message');
+        const counter = document.getElementById('warning-counter');
+        const currentWarning = document.getElementById('current-warning');
+        const maxWarnings = document.getElementById('max-warnings');
+        const icon = document.getElementById('warning-icon');
+        
+        // Update content based on violation type
+        const messages = {
+            screenshot: 'Screenshot attempt detected! Taking screenshots is strictly prohibited.',
+            copypaste: 'Copy/paste operation blocked! Content copying is not allowed.',
+            devtools: 'Developer tools detected! Inspection tools are prohibited.',
+            tabswitch: 'Tab switching detected! Please remain focused on this content.',
+            print: 'Printing attempt blocked! Printing is not permitted.',
+            zoom: 'Zoom change detected! Please maintain normal zoom level.',
+            gesture: 'Unauthorized gesture detected! Multi-touch operations are restricted.',
+            refresh: 'Page refresh blocked! Do not attempt to refresh the page.',
+            contextmenu: 'Right-click blocked! Context menu access is restricted.',
+            focus: 'Focus change detected! Please maintain focus on this window.'
+        };
+        
+        const icons = {
+            screenshot: 'fa-camera-retro',
+            copypaste: 'fa-copy',
+            devtools: 'fa-code',
+            tabswitch: 'fa-window-restore',
+            print: 'fa-print',
+            zoom: 'fa-search-plus',
+            gesture: 'fa-hand-paper',
+            refresh: 'fa-sync-alt',
+            contextmenu: 'fa-mouse-pointer',
+            focus: 'fa-eye'
+        };
+        
+        title.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Violation!`;
+        message.textContent = messages[type] || details;
+        icon.className = `fas ${icons[type] || 'fa-exclamation-triangle'}`;
+        
+        if (this.warningLimit > 1) {
+            counter.style.display = 'block';
+            currentWarning.textContent = this.warningCount;
+            maxWarnings.textContent = this.warningLimit;
+        }
+        
+        overlay.classList.add('active');
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            if (overlay.classList.contains('active')) {
+                this.hideWarning();
+            }
+        }, 5000);
+    }
+    
+    sendWarningToServer(type, details) {
+        if (!this.attemptId || !this.warningReportUrl) return;
+        
+        fetch(this.warningReportUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': this.getCookie('csrftoken')
+            },
+            body: new URLSearchParams({
+                attempt_id: this.attemptId,
+                violation_type: type,
+                details: details,
+                warning_count: this.warningCount,
+                timestamp: new Date().toISOString()
+            })
+        }).catch(error => {
+            console.error('Failed to report violation:', error);
+        });
+    }
+    
+    handleMaxViolations() {
+        alert(`Maximum violations (${this.warningLimit}) reached! The session will be terminated.`);
+        
+        if (this.autoSubmitUrl) {
+            window.location.href = this.autoSubmitUrl;
+        } else {
+            // Disable the interface
+            this.disable();
+        }
+    }
+    
+    static hideWarning() {
+        const overlay = document.getElementById('security-overlay');
+        overlay.classList.remove('active');
+    }
+    
+    disable() {
+        this.isActive = false;
+        document.body.classList.remove('security-protected');
+        console.log('🔓 Security Protection System Disabled');
+    }
+    
+    getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Public methods for external control
+    static getInstance() {
+        return window.securityProtection;
+    }
+    
+    static init(options = {}) {
+        if (!window.securityProtection) {
+            window.securityProtection = new SecurityProtection(options);
+        }
+        return window.securityProtection;
+    }
+}
+
+// Auto-initialize if options are provided via data attributes
+document.addEventListener('DOMContentLoaded', () => {
+    const securityElement = document.querySelector('[data-security-protection]');
+    if (securityElement) {
+        const options = {
+            warningEnabled: securityElement.dataset.warningEnabled !== 'false',
+            warningLimit: parseInt(securityElement.dataset.warningLimit) || 3,
+            attemptId: securityElement.dataset.attemptId || null,
+            autoSubmitUrl: securityElement.dataset.autoSubmitUrl || null,
+            warningReportUrl: securityElement.dataset.warningReportUrl || null
+        };
+        SecurityProtection.init(options);
+    }
+});
+
+// Prevent navigation away
+window.addEventListener('beforeunload', (e) => {
+    if (window.securityProtection && window.securityProtection.isActive) {
+        e.preventDefault();
+        e.returnValue = 'Are you sure you want to leave? Your progress may be lost.';
+        return e.returnValue;
+    }
+});
+
+// Export for global access
+window.SecurityProtection = SecurityProtection;
+</script>

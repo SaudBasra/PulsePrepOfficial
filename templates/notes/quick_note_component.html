@@ -1,0 +1,641 @@
+<!-- Fixed Quick Note Component Template - Replace your existing quick_note_component.html -->
+
+<!-- Quick Note Modal -->
+<div id="quick-note-modal" class="quick-note-modal" style="display: none;">
+  <div class="quick-note-content">
+    <div class="quick-note-header">
+      <h3><i class="fas fa-sticky-note"></i> Quick Note</h3>
+      <button class="close-quick-note" onclick="closeQuickNote()">&times;</button>
+    </div>
+    <div class="quick-note-body">
+      <form id="quick-note-form" class="quick-note-form">
+        {% csrf_token %}
+        <input type="hidden" id="note-question-id" name="question_id" />
+        
+        <div class="form-group">
+          <label for="note-title">Note Title (Optional)</label>
+          <input 
+            type="text" 
+            id="note-title" 
+            name="title" 
+            class="form-control" 
+            placeholder="Enter a title for your note..."
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="note-content">Note Content *</label>
+          <textarea 
+            id="note-content" 
+            name="content" 
+            class="form-control" 
+            rows="5" 
+            placeholder="Write your note here..."
+            required
+          ></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="note-type">Note Type</label>
+          <select id="note-type" name="note_type" class="form-control">
+            <option value="question_note">Question Note</option>
+            <option value="topic_note">Topic Note</option>
+            <option value="general_note">General Note</option>
+            <option value="revision_note">Revision Note</option>
+          </select>
+        </div>
+        
+        <!-- Display current question context (if any) -->
+        <div id="question-context" class="question-context" style="display: none;">
+          <div class="context-header">
+            <i class="fas fa-link"></i>
+            <strong>Question Context:</strong>
+          </div>
+          <div id="context-details" class="context-details">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="quick-note-actions">
+          <button type="button" class="btn-secondary" onclick="closeQuickNote()">Cancel</button>
+          <button type="submit" class="btn-primary">
+            <i class="fas fa-save"></i> Save Note
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Quick Note Modal Styles - Enhanced */
+.quick-note-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.quick-note-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.quick-note-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.quick-note-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.close-quick-note {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.close-quick-note:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.quick-note-body {
+  padding: 24px;
+}
+
+.quick-note-form .form-group {
+  margin-bottom: 20px;
+}
+
+.quick-note-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.quick-note-form .form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fafafa;
+}
+
+.quick-note-form .form-control:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background: white;
+}
+
+.quick-note-form textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* Question Context Styles */
+.question-context {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+}
+
+.context-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #1e40af;
+  font-size: 14px;
+}
+
+.context-details {
+  font-size: 13px;
+  color: #3730a3;
+  line-height: 1.4;
+}
+
+.context-hierarchy {
+  margin-top: 6px;
+  font-style: italic;
+  color: #6366f1;
+}
+
+.quick-note-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.quick-note-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+/* Quick Note Button Styles */
+.question-note-button {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.btn-note:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-note:active {
+  transform: translateY(0);
+}
+
+.btn-note i {
+  font-size: 0.875rem;
+}
+
+/* Success Indicator */
+.note-saved-indicator {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #10b981;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.note-saved-indicator.show {
+  display: block;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .quick-note-content {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .quick-note-header {
+    padding: 16px;
+  }
+  
+  .quick-note-header h3 {
+    font-size: 16px;
+  }
+  
+  .quick-note-body {
+    padding: 20px;
+  }
+  
+  .quick-note-actions {
+    flex-direction: column;
+  }
+  
+  .quick-note-actions button {
+    width: 100%;
+  }
+  
+  .btn-note {
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+  }
+  
+  .note-text {
+    display: none;
+  }
+}
+</style>
+
+<script>
+let currentQuestionId = null;
+let currentQuestionData = null;
+
+function openQuickNote(questionId) {
+  // Validate and clean questionId
+  if (!questionId || questionId === 'undefined' || questionId === null || questionId === 'null' || questionId === '') {
+    console.log('Opening quick note for general note (no question ID)');
+    questionId = null;
+  } else {
+    console.log('Opening quick note for question ID:', questionId);
+  }
+  
+  currentQuestionId = questionId;
+  
+  // Set question ID in form
+  const questionIdInput = document.getElementById('note-question-id');
+  if (questionIdInput) {
+    questionIdInput.value = questionId || '';
+  }
+  
+  // Get question data from the DOM if available
+  if (questionId && questionId !== 'undefined' && questionId !== null) {
+    const questionElement = document.querySelector(`[data-question-id="${questionId}"]`);
+    if (questionElement) {
+      currentQuestionData = extractQuestionData(questionElement, questionId);
+      updateQuestionContext(currentQuestionData);
+    }
+    
+    // Pre-fill form for question notes
+    document.getElementById('note-title').value = `Note for Question ${questionId}`;
+    document.getElementById('note-type').value = 'question_note';
+  } else {
+    // Clear context and set defaults for general notes
+    document.getElementById('question-context').style.display = 'none';
+    document.getElementById('note-title').value = '';
+    document.getElementById('note-title').placeholder = 'Enter a title for your note...';
+    document.getElementById('note-type').value = 'general_note';
+    currentQuestionData = null;
+  }
+  
+  // Show modal and focus on content
+  document.getElementById('quick-note-modal').style.display = 'flex';
+  document.getElementById('note-content').focus();
+}
+
+function extractQuestionData(questionElement, questionId) {
+  // Try to extract question data from various possible DOM structures
+  const questionText = questionElement.querySelector('.question-text')?.textContent?.trim() ||
+                      questionElement.querySelector('h3')?.textContent?.trim() ||
+                      questionElement.querySelector('p')?.textContent?.trim() ||
+                      `Question ${questionId}`;
+  
+  // Try to get hierarchy data from data attributes or other sources
+  const degree = questionElement.dataset.degree || 'MBBS';
+  const year = questionElement.dataset.year || '1st';
+  const block = questionElement.dataset.block || '';
+  const module = questionElement.dataset.module || '';
+  const subject = questionElement.dataset.subject || '';
+  const topic = questionElement.dataset.topic || '';
+  
+  return {
+    id: questionId,
+    text: questionText,
+    degree: degree,
+    year: year,
+    block: block,
+    module: module,
+    subject: subject,
+    topic: topic
+  };
+}
+
+function updateQuestionContext(questionData) {
+  if (!questionData) {
+    document.getElementById('question-context').style.display = 'none';
+    return;
+  }
+  
+  const contextElement = document.getElementById('question-context');
+  const detailsElement = document.getElementById('context-details');
+  
+  let contextHtml = `<div><strong>Question:</strong> ${questionData.text.substring(0, 60)}${questionData.text.length > 60 ? '...' : ''}</div>`;
+  
+  // Build hierarchy path
+  const hierarchyParts = [];
+  if (questionData.block) hierarchyParts.push(questionData.block);
+  if (questionData.module) hierarchyParts.push(questionData.module);
+  if (questionData.subject) hierarchyParts.push(questionData.subject);
+  if (questionData.topic) hierarchyParts.push(questionData.topic);
+  
+  if (hierarchyParts.length > 0) {
+    contextHtml += `<div class="context-hierarchy"><strong>Path:</strong> ${questionData.degree} - ${questionData.year} → ${hierarchyParts.join(' → ')}</div>`;
+  } else {
+    contextHtml += `<div class="context-hierarchy"><strong>Course:</strong> ${questionData.degree} - ${questionData.year}</div>`;
+  }
+  
+  detailsElement.innerHTML = contextHtml;
+  contextElement.style.display = 'block';
+}
+
+function closeQuickNote() {
+  document.getElementById('quick-note-modal').style.display = 'none';
+  
+  // Clear form and reset variables
+  document.getElementById('quick-note-form').reset();
+  document.getElementById('question-context').style.display = 'none';
+  currentQuestionId = null;
+  currentQuestionData = null;
+}
+
+// Enhanced form submission with better error handling and validation
+document.getElementById('quick-note-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const submitBtn = this.querySelector('button[type="submit"]');
+  const content = formData.get('content').trim();
+  
+  // Validate content
+  if (!content) {
+    showNotification('Please enter note content before saving.', 'warning');
+    document.getElementById('note-content').focus();
+    return;
+  }
+  
+  // Clean and validate question ID
+  let questionId = formData.get('question_id');
+  if (!questionId || questionId === 'undefined' || questionId === 'null' || questionId === '') {
+    formData.set('question_id', '');
+    console.log('Saving general note (no question link)');
+  } else {
+    console.log('Saving note linked to question:', questionId);
+  }
+  
+  // Show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  
+  fetch('{% url "quick_add_note" %}', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken')
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      console.log('Note saved successfully:', data.note_details);
+      closeQuickNote();
+      showNoteSavedIndicator();
+      
+      // Update note button if question-specific
+      if (currentQuestionId && currentQuestionId !== 'undefined' && currentQuestionId !== null) {
+        updateNoteButton(currentQuestionId, true);
+      }
+      
+      // Show success message with note details
+      const noteDetails = data.note_details || {};
+      let successMessage = 'Note saved successfully!';
+      if (noteDetails.hierarchy_path) {
+        successMessage += ` (${noteDetails.hierarchy_path})`;
+      }
+      showNotification(successMessage, 'success');
+      
+    } else {
+      throw new Error(data.error || 'Failed to save note');
+    }
+  })
+  .catch(error => {
+    console.error('Error saving note:', error);
+    showNotification(`Error saving note: ${error.message}`, 'error');
+  })
+  .finally(() => {
+    // Reset button state
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Note';
+  });
+});
+
+function showNoteSavedIndicator() {
+  let indicator = document.getElementById('note-saved-indicator');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.id = 'note-saved-indicator';
+    indicator.className = 'note-saved-indicator';
+    indicator.innerHTML = '<i class="fas fa-check"></i> Note saved successfully!';
+    document.body.appendChild(indicator);
+  }
+  
+  indicator.classList.add('show');
+  
+  setTimeout(() => {
+    indicator.classList.remove('show');
+  }, 3000);
+}
+
+function updateNoteButton(questionId, hasNote) {
+  const noteBtn = document.querySelector(`[onclick="openQuickNote(${questionId})"]`);
+  if (noteBtn && hasNote) {
+    noteBtn.style.background = '#059669';
+    noteBtn.innerHTML = '<i class="fas fa-sticky-note"></i> <span class="note-text">View Note</span>';
+    noteBtn.title = 'View/Edit Note';
+  }
+}
+
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  const colors = {
+    success: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6'
+  };
+  
+  notification.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 1002;
+    background: ${colors[type]}; color: white; padding: 16px 24px;
+    border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    animation: slideInRight 0.3s ease; max-width: 400px;
+  `;
+  notification.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <i class="fas fa-${type === 'error' ? 'times-circle' : type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOutRight 0.3s ease';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        document.body.removeChild(notification);
+      }
+    }, 300);
+  }, 5000);
+}
+
+// Close modal when clicking outside
+document.getElementById('quick-note-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeQuickNote();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('quick-note-modal').style.display === 'flex') {
+    closeQuickNote();
+  }
+});
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>

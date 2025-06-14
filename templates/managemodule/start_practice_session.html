@@ -1,0 +1,972 @@
+{% load static %}
+{% include 'user_management/security_protection.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Practice Session - PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Student Practice Specific Styles */
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --secondary-color: #3b82f6;
+            --accent-color: #f59e0b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        .practice-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Topic Information Card */
+        .topic-info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .topic-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .topic-details h2 {
+            margin: 0 0 8px 0;
+            color: var(--gray-800);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .breadcrumb .separator {
+            color: var(--gray-300);
+        }
+
+        .breadcrumb .current {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .topic-meta {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        /* Progress Summary */
+        .progress-summary {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+        }
+
+        .progress-item {
+            text-align: center;
+        }
+
+        .progress-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 4px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Configuration Card */
+        .config-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-200);
+        }
+
+        .config-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .config-header h3 {
+            margin: 0 0 8px 0;
+            color: var(--gray-800);
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .config-header p {
+            color: var(--gray-600);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .config-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .config-section {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-input {
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .input-group .form-input {
+            flex: 1;
+        }
+
+        .input-addon {
+            background: var(--gray-100);
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .help-text.dynamic {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Checkbox Styles */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-group:hover {
+            border-color: var(--primary-color);
+            background: rgba(16, 185, 129, 0.02);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-color);
+            margin: 0;
+        }
+
+        .checkbox-content {
+            flex: 1;
+        }
+
+        .checkbox-title {
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-description {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        /* Conditional Fields */
+        .conditional-field {
+            margin-top: 16px;
+            padding: 16px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .conditional-field.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 32px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+            transform: translateY(-1px);
+        }
+
+        /* Study Tips Card */
+        .study-tips-card {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #fbbf24;
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .tips-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tips-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--warning-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .tips-header h4 {
+            margin: 0;
+            color: #92400e;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+        }
+
+        .tip-icon {
+            color: var(--warning-color);
+            font-size: 16px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .tip-text {
+            font-size: 14px;
+            color: #92400e;
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .practice-container {
+                padding: 16px;
+            }
+
+            .topic-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 16px;
+            }
+
+            .topic-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .topic-details h2 {
+                font-size: 24px;
+            }
+
+            .progress-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .config-card {
+                padding: 24px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .breadcrumb {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .topic-meta {
+                justify-content: center;
+            }
+
+            .progress-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'student_dashboard' %}" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_practice_modules' %}" class="nav-item active">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'student_practice_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1><i class="fas fa-dumbbell"></i> Start Practice Session</h1>
+                <div class="user-menu">
+                    <div class="notification-container">
+                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
+                        <span class="notification-badge"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <div class="practice-container">
+                <!-- Topic Information Card -->
+                <div class="topic-info-card">
+                    <div class="topic-header">
+                        <div class="topic-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="topic-details">
+                            <h2>{{ topic }}</h2>
+                            <div class="breadcrumb">
+                                <span>{{ block }}</span>
+                                <span class="separator"><i class="fas fa-chevron-right"></i></span>
+                                <span>{{ module }}</span>
+                                <span class="separator"><i class="fas fa-chevron-right"></i></span>
+                                <span>{{ subject }}</span>
+                                <span class="separator"><i class="fas fa-chevron-right"></i></span>
+                                <span class="current">{{ topic }}</span>
+                            </div>
+                            <div class="topic-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>{{ degree }} - {{ year }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span id="total-questions-display">{{ total_questions }} Questions Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if previous_sessions > 0 %}
+                    <!-- Progress Summary -->
+                    <div class="progress-summary">
+                        <div class="progress-item">
+                            <div class="progress-value">{{ previous_sessions }}</div>
+                            <div class="progress-label">Sessions</div>
+                        </div>
+                        <div class="progress-item">
+                            <div class="progress-value">{{ best_accuracy }}%</div>
+                            <div class="progress-label">Best Score</div>
+                        </div>
+                        {% if last_practiced %}
+                        <div class="progress-item">
+                            <div class="progress-value">{{ last_practiced|timesince }}</div>
+                            <div class="progress-label">Last Practiced</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Configuration Card -->
+                <div class="config-card">
+                    <div class="config-header">
+                        <h3><i class="fas fa-sliders-h"></i> Customize Your Practice</h3>
+                        <p>Set up your practice session for optimal learning</p>
+                    </div>
+
+                    <form method="POST" action="{% url 'start_practice_session' %}" class="config-form" id="practice-form">
+                        {% csrf_token %}
+                        
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="degree" value="{{ degree }}">
+                        <input type="hidden" name="year" value="{{ year }}">
+                        <input type="hidden" name="block" value="{{ block }}">
+                        <input type="hidden" name="module" value="{{ module }}">
+                        <input type="hidden" name="subject" value="{{ subject }}">
+                        <input type="hidden" name="topic" value="{{ topic }}">
+
+                        <!-- Question Settings -->
+                        <div class="config-section">
+                            <div class="section-title">
+                                <i class="fas fa-list-ol"></i>
+                                Question Settings
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="difficulty_filter">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Difficulty Level
+                                </label>
+                                <select name="difficulty_filter" id="difficulty_filter" class="form-input form-select">
+                                    <option value="">All Difficulties ({{ total_questions }} questions)</option>
+                                    {% if easy_count > 0 %}
+                                    <option value="Easy">Easy ({{ easy_count }} questions)</option>
+                                    {% endif %}
+                                    {% if medium_count > 0 %}
+                                    <option value="Medium">Medium ({{ medium_count }} questions)</option>
+                                    {% endif %}
+                                    {% if hard_count > 0 %}
+                                    <option value="Hard">Hard ({{ hard_count }} questions)</option>
+                                    {% endif %}
+                                </select>
+                                <div class="help-text">Choose specific difficulty or practice all levels</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="total_questions">
+                                    <i class="fas fa-hashtag"></i>
+                                    Number of Questions
+                                </label>
+                                <div class="input-group">
+                                    <input type="number" 
+                                           name="total_questions" 
+                                           id="total_questions" 
+                                           class="form-input" 
+                                           value="10" 
+                                           min="1" 
+                                           max="{{ total_questions }}" 
+                                           required>
+                                    <div class="input-addon">
+                                        max <span id="max-questions">{{ total_questions }}</span>
+                                    </div>
+                                </div>
+                                <div class="help-text dynamic" id="questions-help">
+                                    Choose any number between 1 and <span id="max-available">{{ total_questions }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Practice Options -->
+                        <div class="config-section">
+                            <div class="section-title">
+                                <i class="fas fa-cogs"></i>
+                                Practice Options
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="show_explanations" id="show_explanations" checked>
+                                <div class="checkbox-content">
+                                    <div class="checkbox-title">
+                                        <i class="fas fa-lightbulb"></i>
+                                        Show Explanations
+                                    </div>
+                                    <div class="checkbox-description">
+                                        Display detailed explanations after each question to enhance learning
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="randomize_questions" id="randomize_questions" checked>
+                                <div class="checkbox-content">
+                                    <div class="checkbox-title">
+                                        <i class="fas fa-random"></i>
+                                        Randomize Questions
+                                    </div>
+                                    <div class="checkbox-description">
+                                        Shuffle question order for varied practice experience
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" name="timed_practice" id="timed_practice">
+                                <div class="checkbox-content">
+                                    <div class="checkbox-title">
+                                        <i class="fas fa-stopwatch"></i>
+                                        Timed Practice
+                                    </div>
+                                    <div class="checkbox-description">
+                                        Add time pressure to simulate exam conditions
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Conditional Timer Settings -->
+                            <div class="conditional-field" id="timer-settings">
+                                <div class="form-group">
+                                    <label class="form-label" for="time_per_question">
+                                        <i class="fas fa-clock"></i>
+                                        Time per Question (seconds)
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="number" 
+                                               name="time_per_question" 
+                                               id="time_per_question" 
+                                               class="form-input" 
+                                               value="60" 
+                                               min="10" 
+                                               max="300">
+                                        <div class="input-addon">seconds</div>
+                                    </div>
+                                    <div class="help-text">Recommended: 60-90 seconds per question</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-actions">
+                            <a href="{% url 'student_practice_modules' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Modules
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="start-btn">
+                                <i class="fas fa-play"></i>
+                                Start Practice
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Study Tips -->
+                <div class="study-tips-card">
+                    <div class="tips-header">
+                        <div class="tips-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h4>Study Smart Tips</h4>
+                    </div>
+                    <ul class="tips-list">
+                        <li class="tip-item">
+                            <i class="fas fa-target tip-icon"></i>
+                            <div class="tip-text">
+                                <strong>Focus on Learning:</strong> Take time to understand explanations rather than rushing through questions
+                            </div>
+                        </li>
+                        <li class="tip-item">
+                            <i class="fas fa-repeat tip-icon"></i>
+                            <div class="tip-text">
+                                <strong>Spaced Repetition:</strong> Return to challenging topics after a few days to reinforce learning
+                            </div>
+                        </li>
+                        <li class="tip-item">
+                            <i class="fas fa-chart-line tip-icon"></i>
+                            <div class="tip-text">
+                                <strong>Track Progress:</strong> Monitor your improvement over time to identify weak areas
+                            </div>
+                        </li>
+                        <li class="tip-item">
+                            <i class="fas fa-balance-scale tip-icon"></i>
+                            <div class="tip-text">
+                                <strong>Mix Difficulties:</strong> Practice all difficulty levels to build comprehensive understanding
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; {{ current_year|default:"2024" }} PulsePrep Media Direct, LLC. All rights reserved.
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const difficultySelect = document.getElementById('difficulty_filter');
+            const totalQuestionsInput = document.getElementById('total_questions');
+            const maxQuestionsSpan = document.getElementById('max-questions');
+            const maxAvailableSpan = document.getElementById('max-available');
+            const questionsHelp = document.getElementById('questions-help');
+            const totalQuestionsDisplay = document.getElementById('total-questions-display');
+            const timedPracticeCheckbox = document.getElementById('timed_practice');
+            const timerSettings = document.getElementById('timer-settings');
+            const form = document.getElementById('practice-form');
+
+            // Question counts by difficulty
+            const questionCounts = {
+                '': {{ total_questions }},
+                'Easy': {{ easy_count }},
+                'Medium': {{ medium_count }},
+                'Hard': {{ hard_count }}
+            };
+
+            // Update available questions when difficulty changes
+            difficultySelect.addEventListener('change', function() {
+                const selectedDifficulty = this.value;
+                const availableCount = questionCounts[selectedDifficulty];
+                
+                // Update max questions
+                totalQuestionsInput.max = availableCount;
+                maxQuestionsSpan.textContent = availableCount;
+                maxAvailableSpan.textContent = availableCount;
+                
+                // Update display text
+                const difficultyText = selectedDifficulty || 'All Difficulties';
+                totalQuestionsDisplay.textContent = `${availableCount} Questions Available (${difficultyText})`;
+                
+                // Adjust current value if it exceeds new max
+                if (parseInt(totalQuestionsInput.value) > availableCount) {
+                    totalQuestionsInput.value = Math.min(availableCount, 10);
+                }
+                
+                // Update help text
+                questionsHelp.innerHTML = `Choose any number between 1 and <span id="max-available">${availableCount}</span>`;
+            });
+
+            // Validate questions input
+            totalQuestionsInput.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                const max = parseInt(this.max);
+                const min = parseInt(this.min);
+                
+                if (value > max) {
+                    this.value = max;
+                } else if (value < min) {
+                    this.value = min;
+                }
+            });
+
+            // Toggle timer settings
+            timedPracticeCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    timerSettings.classList.add('active');
+                } else {
+                    timerSettings.classList.remove('active');
+                }
+            });
+
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const totalQuestions = parseInt(totalQuestionsInput.value);
+                const maxAvailable = parseInt(totalQuestionsInput.max);
+                
+                if (totalQuestions > maxAvailable) {
+                    e.preventDefault();
+                    alert(`Only ${maxAvailable} questions available for the selected difficulty level.`);
+                    return false;
+                }
+                
+                if (totalQuestions < 1) {
+                    e.preventDefault();
+                    alert('Please select at least 1 question.');
+                    return false;
+                }
+
+                // Show loading state
+                const startBtn = document.getElementById('start-btn');
+                startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+                startBtn.disabled = true;
+            });
+
+            // Animate cards on page load
+            const cards = document.querySelectorAll('.topic-info-card, .config-card, .study-tips-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            // Add hover effects
+            document.querySelectorAll('.checkbox-group').forEach(group => {
+                group.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.15)';
+                });
+                
+                group.addEventListener('mouseleave', function() {
+                    this.style.transform = '';
+                    this.style.boxShadow = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

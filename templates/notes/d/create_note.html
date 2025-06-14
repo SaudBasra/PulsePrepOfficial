@@ -1,0 +1,680 @@
+<!-- templates/notes/create_note.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Note | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Create Note Specific Styles */
+        .create-note-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .note-form {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section h3 {
+            color: #374151;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section h3 i {
+            color: #7c3aed;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .color-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .color-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .color-option:hover {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .color-option.selected {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+
+        .color-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .color-yellow { background: #fbbf24; }
+        .color-green { background: #10b981; }
+        .color-blue { background: #3b82f6; }
+        .color-pink { background: #ec4899; }
+        .color-purple { background: #8b5cf6; }
+        .color-orange { background: #f97316; }
+        .color-red { background: #ef4444; }
+        .color-gray { background: #6b7280; }
+
+        .color-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .note-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .type-option {
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            background: white;
+        }
+
+        .type-option:hover {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .type-option.selected {
+            border-color: #7c3aed;
+            background: rgba(124, 58, 237, 0.1);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+        }
+
+        .type-icon {
+            font-size: 24px;
+            color: #7c3aed;
+            margin-bottom: 8px;
+        }
+
+        .type-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .type-description {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+
+        .hierarchy-preview {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .hierarchy-path {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .hierarchy-separator {
+            color: #d1d5db;
+        }
+
+        .required {
+            color: #ef4444;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Auto-complete for hierarchy */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+
+        .autocomplete-item:hover {
+            background: #f8fafc;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .create-note-container {
+                padding: 16px;
+            }
+
+            .note-form {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .color-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .note-type-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_practice_modules' %}" class="nav-item">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>My Notes</span>
+                </a>
+                <a href="{% url 'student_practice_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1>Create Note</h1>
+                <div class="user-menu">
+                    <div class="notification-container">
+                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="avatar">
+                        <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="create-note-container">
+                    <!-- Form Header -->
+                    <div class="form-header">
+                        <h1><i class="fas fa-plus"></i> Create New Note</h1>
+                        <p>Add a new note to organize your study materials</p>
+                    </div>
+
+                    <!-- Note Form -->
+                    <form method="POST" class="note-form">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-edit"></i> Basic Information</h3>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="title">
+                                    Title <span class="required">*</span>
+                                </label>
+                                <input type="text" id="title" name="title" class="form-input" 
+                                       placeholder="Enter note title..." required maxlength="200">
+                                <div class="help-text">Give your note a descriptive title</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="content">
+                                    Content <span class="required">*</span>
+                                </label>
+                                <textarea id="content" name="content" class="form-textarea" 
+                                          placeholder="Write your note content here..." required></textarea>
+                                <div class="help-text">Add your study notes, explanations, or important points</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="tags">Tags</label>
+                                <input type="text" id="tags" name="tags" class="form-input" 
+                                       placeholder="anatomy, important, exam, review">
+                                <div class="help-text">Separate tags with commas for better organization</div>
+                            </div>
+                        </div>
+
+                        <!-- Note Type -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-tag"></i> Note Type</h3>
+                            <div class="note-type-grid">
+                                {% for value, label in note_types %}
+                                <div class="type-option {% if value == 'general' %}selected{% endif %}" 
+                                     onclick="selectNoteType('{{ value }}')">
+                                    <div class="type-icon">
+                                        {% if value == 'general' %}<i class="fas fa-sticky-note"></i>
+                                        {% elif value == 'question' %}<i class="fas fa-question-circle"></i>
+                                        {% elif value == 'topic' %}<i class="fas fa-book"></i>
+                                        {% elif value == 'practice' %}<i class="fas fa-dumbbell"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="type-title">{{ label }}</div>
+                                    <div class="type-description">
+                                        {% if value == 'general' %}Regular study notes
+                                        {% elif value == 'question' %}Notes for specific questions
+                                        {% elif value == 'topic' %}Topic summaries
+                                        {% elif value == 'practice' %}Practice session notes
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="note_type" name="note_type" value="general">
+                        </div>
+
+                        <!-- Color Selection -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-palette"></i> Note Color</h3>
+                            <div class="color-selector">
+                                {% for value, label in color_choices %}
+                                <div class="color-option {% if value == 'yellow' %}selected{% endif %}" 
+                                     onclick="selectColor('{{ value }}')">
+                                    <div class="color-dot color-{{ value }}"></div>
+                                    <div class="color-label">{{ label }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" id="color" name="color" value="yellow">
+                        </div>
+
+                        <!-- Hierarchy Information -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-sitemap"></i> Location <span class="required">*</span></h3>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="degree">Degree</label>
+                                    <select id="degree" name="degree" class="form-select" required>
+                                        <option value="">Select Degree</option>
+                                        {% for value, label in degree_choices %}
+                                            <option value="{{ value }}" {% if degree == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="year">Year</label>
+                                    <select id="year" name="year" class="form-select" required>
+                                        <option value="">Select Year</option>
+                                        {% for value, label in year_choices %}
+                                            <option value="{{ value }}" {% if year == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="block">Block</label>
+                                    <input type="text" id="block" name="block" class="form-input" 
+                                           placeholder="e.g., Block 1" value="{{ block }}" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="module">Module</label>
+                                    <input type="text" id="module" name="module" class="form-input" 
+                                           placeholder="e.g., Basic Sciences" value="{{ module }}" required>
+                                </div>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="subject">Subject</label>
+                                    <input type="text" id="subject" name="subject" class="form-input" 
+                                           placeholder="e.g., Anatomy" value="{{ subject }}" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" for="topic">Topic</label>
+                                    <input type="text" id="topic" name="topic" class="form-input" 
+                                           placeholder="e.g., Cardiovascular System" value="{{ topic }}" required>
+                                </div>
+                            </div>
+
+                            <!-- Hierarchy Preview -->
+                            <div class="hierarchy-preview" id="hierarchy-preview">
+                                <div class="hierarchy-path">
+                                    <span id="preview-degree">Select degree</span>
+                                    <span class="hierarchy-separator"><i class="fas fa-chevron-right"></i></span>
+                                    <span id="preview-year">Select year</span>
+                                    <span class="hierarchy-separator"><i class="fas fa-chevron-right"></i></span>
+                                    <span id="preview-block">Enter block</span>
+                                    <span class="hierarchy-separator"><i class="fas fa-chevron-right"></i></span>
+                                    <span id="preview-module">Enter module</span>
+                                    <span class="hierarchy-separator"><i class="fas fa-chevron-right"></i></span>
+                                    <span id="preview-subject">Enter subject</span>
+                                    <span class="hierarchy-separator"><i class="fas fa-chevron-right"></i></span>
+                                    <span id="preview-topic">Enter topic</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden field for question reference if provided -->
+                        {% if question_id %}
+                        <input type="hidden" name="question_id" value="{{ question_id }}">
+                        {% endif %}
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a href="{% url 'notes_dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Note
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        // Note type selection
+        function selectNoteType(type) {
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.closest('.type-option').classList.add('selected');
+            document.getElementById('note_type').value = type;
+        }
+
+        // Color selection
+        function selectColor(color) {
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            event.target.closest('.color-option').classList.add('selected');
+            document.getElementById('color').value = color;
+        }
+
+        // Hierarchy preview update
+        function updateHierarchyPreview() {
+            const degree = document.getElementById('degree').value || 'Select degree';
+            const year = document.getElementById('year').value || 'Select year';
+            const block = document.getElementById('block').value || 'Enter block';
+            const module = document.getElementById('module').value || 'Enter module';
+            const subject = document.getElementById('subject').value || 'Enter subject';
+            const topic = document.getElementById('topic').value || 'Enter topic';
+
+            document.getElementById('preview-degree').textContent = degree;
+            document.getElementById('preview-year').textContent = year;
+            document.getElementById('preview-block').textContent = block;
+            document.getElementById('preview-module').textContent = module;
+            document.getElementById('preview-subject').textContent = subject;
+            document.getElementById('preview-topic').textContent = topic;
+        }
+
+        // Add event listeners for hierarchy preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const hierarchyFields = ['degree', 'year', 'block', 'module', 'subject', 'topic'];
+            hierarchyFields.forEach(field => {
+                const element = document.getElementById(field);
+                if (element) {
+                    element.addEventListener('change', updateHierarchyPreview);
+                    element.addEventListener('keyup', updateHierarchyPreview);
+                }
+            });
+
+            // Initial preview update
+            updateHierarchyPreview();
+        });
+
+        // Character counter for title
+        document.getElementById('title').addEventListener('input', function() {
+            const maxLength = 200;
+            const currentLength = this.value.length;
+            const remaining = maxLength - currentLength;
+            
+            // You can add a character counter if needed
+            if (remaining < 20) {
+                this.style.borderColor = remaining < 0 ? '#ef4444' : '#f59e0b';
+            } else {
+                this.style.borderColor = '#e5e7eb';
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('content').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Form validation
+        document.querySelector('.note-form').addEventListener('submit', function(e) {
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const degree = document.getElementById('degree').value;
+            const year = document.getElementById('year').value;
+            const block = document.getElementById('block').value.trim();
+            const module = document.getElementById('module').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const topic = document.getElementById('topic').value.trim();
+
+            if (!title || !content || !degree || !year || !block || !module || !subject || !topic) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
+            }
+
+            // Show loading state
+            const submitBtn = document.querySelector('.btn-primary');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Note...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
+

@@ -1,4 +1,4 @@
-# views.py - Fixed version
+# mocktest/views.py - Complete Enhanced Version
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -15,11 +15,6 @@ import random
 from .models import MockTest, TestQuestion, TestAttempt, TestResponse
 from .forms import MockTestForm
 from questionbank.models import Question
-
-from mocktest.models import TestAttempt
-
-
-
 
 
 def mocktest_list(request):
@@ -68,7 +63,7 @@ def mocktest_list(request):
 
 @login_required
 def create_test(request):
-    """Create or edit mock test"""
+    """Enhanced create/edit mock test with availability checking"""
     test_id = request.GET.get('id')
     
     if test_id:
@@ -94,7 +89,15 @@ def create_test(request):
             
             # Handle question selection
             if test.selection_type == 'random':
-                generate_random_questions(test)
+                actual_count = generate_random_questions(test)
+                if actual_count < test.total_questions:
+                    messages.warning(
+                        request, 
+                        f"Test created with {actual_count} questions instead of {test.total_questions} "
+                        f"due to availability constraints."
+                    )
+                else:
+                    messages.success(request, f"Test created successfully with {actual_count} questions!")
             else:
                 # Manual selection
                 selected_questions = request.POST.get('selected_questions')
@@ -106,18 +109,34 @@ def create_test(request):
                     
                     # Add selected questions
                     for order, q_id in enumerate(question_ids, 1):
-                        question = Question.objects.get(id=q_id)
-                        TestQuestion.objects.create(
-                            mock_test=test,
-                            question=question,
-                            question_order=order
-                        )
+                        try:
+                            question = Question.objects.get(id=q_id)
+                            TestQuestion.objects.create(
+                                mock_test=test,
+                                question=question,
+                                question_order=order
+                            )
+                        except Question.DoesNotExist:
+                            continue
                     
                     # Update total questions
-                    test.total_questions = len(question_ids)
+                    actual_count = test.testquestion_set.count()
+                    test.total_questions = actual_count
                     test.save()
+                    
+                    messages.success(request, f"Test {'updated' if is_edit else 'created'} successfully with {actual_count} questions!")
+                else:
+                    messages.error(request, "No questions selected for manual test creation.")
+                    return render(request, 'mocktest/create_test.html', {
+                        'form': form,
+                        'test': test,
+                        'is_edit': is_edit,
+                        'blocks': Question.objects.values('block').distinct().order_by('block'),
+                        'modules': Question.objects.values('module').distinct().order_by('module'),
+                        'subjects': Question.objects.values('subject').distinct().order_by('subject'),
+                        'topics': Question.objects.values('topic').distinct().order_by('topic'),
+                    })
             
-            messages.success(request, f"Test {'updated' if is_edit else 'created'} successfully!")
             return redirect('mocktest_list')
     
     # Get hierarchy data for dropdowns
@@ -137,8 +156,9 @@ def create_test(request):
     }    
     return render(request, 'mocktest/create_test.html', context)
 
+
 def generate_random_questions(test):
-    """Generate random questions based on test criteria"""
+    """Enhanced random question generation with availability checking"""
     # Clear existing questions
     test.questions.clear()
     
@@ -163,6 +183,26 @@ def generate_random_questions(test):
     easy_count = int(total * test.easy_percentage / 100)
     medium_count = int(total * test.medium_percentage / 100)
     hard_count = total - easy_count - medium_count  # Remainder goes to hard
+    
+    # Check availability
+    available_easy = query.filter(difficulty='Easy').count()
+    available_medium = query.filter(difficulty='Medium').count()
+    available_hard = query.filter(difficulty='Hard').count()
+    
+    # Adjust counts based on availability
+    if easy_count > available_easy:
+        overflow = easy_count - available_easy
+        easy_count = available_easy
+        medium_count += overflow // 2
+        hard_count += overflow // 2 + overflow % 2
+    
+    if medium_count > available_medium:
+        overflow = medium_count - available_medium
+        medium_count = available_medium
+        hard_count += overflow
+    
+    if hard_count > available_hard:
+        hard_count = available_hard
     
     # Get questions by difficulty
     easy_questions = list(query.filter(difficulty='Easy').order_by('?')[:easy_count])
@@ -190,6 +230,13 @@ def generate_random_questions(test):
             question=question,
             question_order=order
         )
+    
+    # Update actual total questions
+    test.total_questions = len(all_questions)
+    test.save()
+    
+    return len(all_questions)
+
 
 @require_POST
 def delete_test(request, test_id):
@@ -199,14 +246,17 @@ def delete_test(request, test_id):
     messages.success(request, "Test deleted successfully!")
     return JsonResponse({'success': True})
 
+
 def get_filtered_questions(request):
-    """Get questions based on filters for manual selection"""
+    """Get questions based on filters for manual selection with pagination"""
     degree = request.GET.get('degree', '')
     year = request.GET.get('year', '')
     block = request.GET.get('block', '')
     module = request.GET.get('module', '')
     subject = request.GET.get('subject', '')
     topic = request.GET.get('topic', '')
+    page = int(request.GET.get('page', 1))
+    per_page = int(request.GET.get('per_page', 100))
     
     questions = Question.objects.filter(question_type='MCQ')
     
@@ -223,9 +273,16 @@ def get_filtered_questions(request):
     if topic:
         questions = questions.filter(topic=topic)
     
+    # Get total count before pagination
+    total_count = questions.count()
+    
+    # Apply pagination
+    paginator = Paginator(questions, per_page)
+    page_obj = paginator.get_page(page)
+    
     # Prepare data for JSON response
     question_list = []
-    for q in questions[:100]:  # Limit to 100 questions
+    for q in page_obj:
         question_list.append({
             'id': q.id,
             'text': q.question_text[:100] + '...' if len(q.question_text) > 100 else q.question_text,
@@ -236,7 +293,54 @@ def get_filtered_questions(request):
             'topic': q.topic,
         })
     
-    return JsonResponse({'questions': question_list})
+    return JsonResponse({
+        'questions': question_list,
+        'total_count': total_count,
+        'current_page': page,
+        'total_pages': paginator.num_pages,
+        'has_next': page_obj.has_next(),
+        'has_previous': page_obj.has_previous(),
+    })
+
+
+def check_question_availability(request):
+    """Check availability of questions for random selection"""
+    degree = request.GET.get('degree', '')
+    year = request.GET.get('year', '')
+    block = request.GET.get('block', '')
+    module = request.GET.get('module', '')
+    subject = request.GET.get('subject', '')
+    topic = request.GET.get('topic', '')
+    
+    # Build base query
+    query = Question.objects.filter(question_type='MCQ')
+    
+    if degree:
+        query = query.filter(degree=degree)
+    if year:
+        query = query.filter(year=year)
+    if block:
+        query = query.filter(block=block)
+    if module:
+        query = query.filter(module=module)
+    if subject:
+        query = query.filter(subject=subject)
+    if topic:
+        query = query.filter(topic=topic)
+    
+    # Count by difficulty
+    easy_count = query.filter(difficulty='Easy').count()
+    medium_count = query.filter(difficulty='Medium').count()
+    hard_count = query.filter(difficulty='Hard').count()
+    total_available = easy_count + medium_count + hard_count
+    
+    return JsonResponse({
+        'total_available': total_available,
+        'easy': easy_count,
+        'medium': medium_count,
+        'hard': hard_count,
+    })
+
 
 @require_POST
 def save_manual_questions(request):
@@ -264,6 +368,7 @@ def save_manual_questions(request):
     
     return JsonResponse({'success': True, 'message': f'{len(question_ids)} questions added to test'})
 
+
 def preview_test(request, test_id):
     """Preview test before publishing"""
     test = get_object_or_404(MockTest, id=test_id)
@@ -277,8 +382,9 @@ def preview_test(request, test_id):
     
     return render(request, 'mocktest/preview_test.html', context)
 
+
 def get_hierarchy_data(request):
-    """Get hierarchy data for dropdowns"""
+    """Enhanced hierarchy data endpoint"""
     field = request.GET.get('field')
     degree = request.GET.get('degree', '')
     year = request.GET.get('year', '')
@@ -310,9 +416,13 @@ def get_hierarchy_data(request):
     else:
         data = []
     
+    # Remove empty values
+    data = [item for item in data if item and item.strip()]
+    
     return JsonResponse({'data': data})
 
 
+# STUDENT VIEWS
 @login_required
 def student_mock_tests(request):
     """List available mock tests for students"""
@@ -353,7 +463,7 @@ def student_mock_tests(request):
         test.can_attempt = test.user_attempts < test.max_attempts
         test.attempt_status = attempt_status.get(test.id, 'not_started')
     
-    # Get upcoming tests - FIX: Don't filter by status='scheduled' after updating
+    # Get upcoming tests
     upcoming_tests = MockTest.objects.filter(
         start_datetime__gt=now
     ).order_by('start_datetime')[:5]
@@ -366,7 +476,6 @@ def student_mock_tests(request):
     
     return render(request, 'mocktest/student_mock_tests.html', context)
 
-# Add this helper function to mocktest/views.py
 
 def get_question_image_url(question):
     """
@@ -437,7 +546,6 @@ def get_question_image_url(question):
     return None, image_filename
 
 
-# Updated take_test view with better image handling
 @login_required
 def take_test(request, test_id):
     """Student takes the test - Updated with improved image support"""
@@ -564,6 +672,7 @@ def take_test(request, test_id):
     
     return render(request, 'mocktest/take_test.html', context)
 
+
 @require_POST
 def submit_answer(request):
     """Save student's answer"""
@@ -588,6 +697,7 @@ def submit_answer(request):
     response.save()
     
     return JsonResponse({'success': True})
+
 
 @require_POST
 def submit_test(request):
@@ -618,78 +728,6 @@ def submit_test(request):
         'passed': attempt.passed,
     })
 
-@login_required
-def test_result(request, attempt_id):
-    """Show test results"""
-    attempt = get_object_or_404(TestAttempt, id=attempt_id)
-    
-    # Get all responses with questions
-    responses = attempt.responses.all().select_related('question')
-    
-    context = {
-        'attempt': attempt,
-        'test': attempt.mock_test,
-        'responses': responses,
-        'passed': attempt.passed,
-    }
-    
-    return render(request, 'mocktest/test_results.html', context)
-
-
-
-@require_POST
-def submit_answer(request):
-    """Save student's answer"""
-    attempt_id = request.POST.get('attempt_id')
-    question_id = request.POST.get('question_id')
-    answer = request.POST.get('answer')
-    
-    attempt = get_object_or_404(TestAttempt, id=attempt_id)
-    question = get_object_or_404(Question, id=question_id)
-    
-    # Save or update response
-    response, created = TestResponse.objects.update_or_create(
-        attempt=attempt,
-        question=question,
-        defaults={
-            'selected_answer': answer,
-        }
-    )
-    
-    # Check if answer is correct
-    response.check_answer()
-    response.save()
-    
-    return JsonResponse({'success': True})
-
-@require_POST
-def submit_test(request):
-    """Submit the complete test"""
-    attempt_id = request.POST.get('attempt_id')
-    attempt = get_object_or_404(TestAttempt, id=attempt_id)
-    
-    # Calculate score
-    total_questions = attempt.mock_test.total_questions
-    correct_answers = attempt.responses.filter(is_correct=True).count()
-    
-    attempt.score = correct_answers
-    attempt.percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
-    attempt.status = 'completed'
-    attempt.completed_at = timezone.now()
-    
-    # Calculate time taken
-    time_taken = (attempt.completed_at - attempt.started_at).total_seconds()
-    attempt.time_taken = int(time_taken)
-    
-    attempt.save()
-    
-    return JsonResponse({
-        'success': True,
-        'score': attempt.score,
-        'total': total_questions,
-        'percentage': float(attempt.percentage),
-        'passed': attempt.passed,
-    })
 
 @login_required
 def test_result(request, attempt_id):
@@ -758,6 +796,8 @@ def test_result(request, attempt_id):
     }
     
     return render(request, 'mocktest/test_results.html', context)
+
+
 @require_POST
 def report_warning(request):
     """Report tab switch warning"""
@@ -784,8 +824,11 @@ def report_warning(request):
         'warning_count': attempt.warning_count,
         'remaining_warnings': 3 - attempt.warning_count
     })
+
+
 @login_required
-def student_progress(request):
+def mock_test_progress(request):
+    """Student progress tracking"""
     user = request.user
     attempts = TestAttempt.objects.filter(student=user).select_related('mock_test').order_by('-started_at')
     
@@ -796,12 +839,90 @@ def student_progress(request):
     avg_score = completed_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
     avg_time = completed_attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
     
+    # Calculate monthly progress
+    from datetime import datetime, timedelta
+    import calendar
+    
+    # Get last 6 months data
+    monthly_data = []
+    current_date = timezone.now()
+    
+    for i in range(6):
+        month_start = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        if month_start.month == 1:
+            month_end = month_start.replace(month=12, year=month_start.year-1, day=31)
+        else:
+            next_month = month_start.replace(month=month_start.month-1)
+            month_end = next_month.replace(day=calendar.monthrange(next_month.year, next_month.month)[1])
+        
+        month_attempts = completed_attempts.filter(
+            completed_at__gte=month_end,
+            completed_at__lt=month_start
+        )
+        
+        month_avg = month_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
+        
+        monthly_data.append({
+            'month': month_end.strftime('%b %Y'),
+            'attempts': month_attempts.count(),
+            'avg_score': round(month_avg, 1)
+        })
+        
+        current_date = month_end
+    
+    monthly_data.reverse()  # Show oldest to newest
+    
+    # Get subject-wise performance
+    subject_performance = {}
+    for attempt in completed_attempts:
+        test_subject = attempt.mock_test.subject or 'General'
+        if test_subject not in subject_performance:
+            subject_performance[test_subject] = {
+                'attempts': 0,
+                'total_score': 0,
+                'best_score': 0
+            }
+        
+        subject_performance[test_subject]['attempts'] += 1
+        subject_performance[test_subject]['total_score'] += attempt.percentage
+        subject_performance[test_subject]['best_score'] = max(
+            subject_performance[test_subject]['best_score'],
+            attempt.percentage
+        )
+    
+    # Calculate averages
+    for subject in subject_performance:
+        data = subject_performance[subject]
+        data['avg_score'] = round(data['total_score'] / data['attempts'], 1)
+    
+    # Get recent activity (last 10 attempts)
+    recent_attempts = attempts[:10]
+    
+    # Calculate improvement trend (comparing first half vs second half of attempts)
+    if completed_attempts.count() >= 4:
+        half_point = completed_attempts.count() // 2
+        recent_half = list(completed_attempts[:half_point])
+        older_half = list(completed_attempts[half_point:])
+        
+        recent_avg = sum(a.percentage for a in recent_half) / len(recent_half)
+        older_avg = sum(a.percentage for a in older_half) / len(older_half)
+        
+        improvement = recent_avg - older_avg
+    else:
+        improvement = 0
+    
     context = {
         'attempts': attempts,
-        'total_tests': total_tests,
-        'best_score': best_score,
-        'avg_score': avg_score,
-        'avg_time': avg_time,
         'completed_attempts': completed_attempts,
+        'total_tests': total_tests,
+        'best_score': round(best_score, 1),
+        'avg_score': round(avg_score, 1),
+        'avg_time': round(avg_time / 60, 1) if avg_time else 0,  # Convert to minutes
+        'monthly_data': monthly_data,
+        'subject_performance': subject_performance,
+        'recent_attempts': recent_attempts,
+        'improvement': round(improvement, 1),
+        'user': user,
     }
+    
     return render(request, 'mocktest/student_progress.html', context)

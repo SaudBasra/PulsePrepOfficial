@@ -1,0 +1,808 @@
+
+<!-- templates/notes/view_note.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ note.title }} | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* View Note Specific Styles */
+        .note-view-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .note-header {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .note-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50px, -50px);
+        }
+
+        .note-header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .note-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            opacity: 0.9;
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-link:hover {
+            color: white;
+        }
+
+        .note-meta-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .note-actions-header {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.pinned {
+            background: #fbbf24;
+        }
+
+        .note-content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+            border-left: 6px solid;
+        }
+
+        .note-content-card.color-yellow { border-left-color: #fbbf24; }
+        .note-content-card.color-green { border-left-color: #10b981; }
+        .note-content-card.color-blue { border-left-color: #3b82f6; }
+        .note-content-card.color-pink { border-left-color: #ec4899; }
+        .note-content-card.color-purple { border-left-color: #8b5cf6; }
+        .note-content-card.color-orange { border-left-color: #f97316; }
+        .note-content-card.color-red { border-left-color: #ef4444; }
+        .note-content-card.color-gray { border-left-color: #6b7280; }
+
+        .note-content {
+            padding: 32px;
+            line-height: 1.8;
+            font-size: 16px;
+            color: #374151;
+        }
+
+        .note-content p {
+            margin-bottom: 16px;
+        }
+
+        .note-content h1, .note-content h2, .note-content h3 {
+            color: #1f2937;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+
+        .note-content ul, .note-content ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        .note-content li {
+            margin-bottom: 8px;
+        }
+
+        .note-meta-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .meta-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #6b7280;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-value {
+            color: #374151;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .tag {
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .note-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .note-type-general {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .note-type-question {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .note-type-topic {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .note-type-practice {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .question-reference-card {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .question-icon {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .question-title {
+            font-weight: 600;
+            color: #1e40af;
+            font-size: 16px;
+        }
+
+        .question-preview {
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.6;
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .activity-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .activity-header h3 {
+            margin: 0;
+            color: #374151;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .activity-header i {
+            color: #7c3aed;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #e5e7eb;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .activity-icon.created {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .activity-icon.updated {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .activity-icon.pinned {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-description {
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .floating-actions {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .floating-btn {
+            width: 56px;
+            height: 56px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .floating-btn.edit {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .floating-btn.back {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .note-view-container {
+                padding: 16px;
+            }
+
+            .note-header {
+                padding: 24px;
+            }
+
+            .note-title {
+                font-size: 24px;
+            }
+
+            .note-content {
+                padding: 20px;
+                font-size: 15px;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .note-actions-header {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 16px;
+            }
+
+            .floating-actions {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            .floating-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_practice_modules' %}" class="nav-item">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>My Notes</span>
+                </a>
+                <a href="{% url 'student_practice_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1>View Note</h1>
+                <div class="user-menu">
+                    <div class="notification-container">
+                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="avatar">
+                        <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <div class="note-view-container">
+                    <!-- Note Header -->
+                    <div class="note-header">
+                        <div class="note-actions-header">
+                            <button class="action-btn {% if note.is_pinned %}pinned{% endif %}" 
+                                    onclick="togglePin({{ note.id }})" 
+                                    title="{% if note.is_pinned %}Unpin{% else %}Pin{% endif %}">
+                                <i class="fas fa-thumbtack"></i>
+                            </button>
+                            <button class="action-btn" onclick="archiveNote({{ note.id }})" title="Archive">
+                                <i class="fas fa-archive"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="note-header-content">
+                            <div class="note-breadcrumb">
+                                <a href="{% url 'notes_dashboard' %}" class="breadcrumb-link">
+                                    <i class="fas fa-sticky-note"></i> My Notes
+                                </a>
+                                <i class="fas fa-chevron-right"></i>
+                                <span>{{ note.block }}</span>
+                                <i class="fas fa-chevron-right"></i>
+                                <span>{{ note.module }}</span>
+                                <i class="fas fa-chevron-right"></i>
+                                <span>{{ note.subject }}</span>
+                                <i class="fas fa-chevron-right"></i>
+                                <span>{{ note.topic }}</span>
+                            </div>
+                            
+                            <h1 class="note-title">{{ note.title }}</h1>
+                            
+                            <div class="note-meta-header">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>{{ note.created_at|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>{{ note.updated_at|timesince }} ago</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-file-word"></i>
+                                    <span>{{ note.word_count }} words</span>
+                                </div>
+                                {% if note.is_pinned %}
+                                <div class="meta-item">
+                                    <i class="fas fa-thumbtack"></i>
+                                    <span>Pinned</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Reference (if note is linked to a question) -->
+                    {% if question %}
+                    <div class="question-reference-card">
+                        <div class="question-header">
+                            <div class="question-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="question-title">Linked Question</div>
+                        </div>
+                        <div class="question-preview">
+                            {{ question.question_text|truncatechars:200 }}
+                            {% if question.question_text|length > 200 %}
+                                <a href="#" style="color: #3b82f6; font-weight: 600;">Read more...</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Note Content -->
+                    <div class="note-content-card color-{{ note.color }}">
+                        <div class="note-content">
+                            {{ note.content|linebreaks }}
+                        </div>
+                    </div>
+
+                    <!-- Note Meta Information -->
+                    <div class="note-meta-card">
+                        <div class="meta-grid">
+                            <div class="meta-section">
+                                <span class="meta-label">Note Type</span>
+                                <span class="note-type-badge note-type-{{ note.note_type }}">
+                                    {% if note.note_type == 'general' %}<i class="fas fa-sticky-note"></i>
+                                    {% elif note.note_type == 'question' %}<i class="fas fa-question-circle"></i>
+                                    {% elif note.note_type == 'topic' %}<i class="fas fa-book"></i>
+                                    {% elif note.note_type == 'practice' %}<i class="fas fa-dumbbell"></i>
+                                    {% endif %}
+                                    {{ note.get_note_type_display }}
+                                </span>
+                            </div>
+                            
+                            <div class="meta-section">
+                                <span class="meta-label">Color</span>
+                                <span class="meta-value">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div class="color-dot color-{{ note.color }}" style="width: 16px; height: 16px; border-radius: 50%;"></div>
+                                        {{ note.get_color_display }}
+                                    </div>
+                                </span>
+                            </div>
+                            
+                            <div class="meta-section">
+                                <span class="meta-label">Location</span>
+                                <span class="meta-value">{{ note.degree }} - {{ note.year }}</span>
+                            </div>
+                            
+                            <div class="meta-section">
+                                <span class="meta-label">Subject</span>
+                                <span class="meta-value">{{ note.subject }}</span>
+                            </div>
+                            
+                            {% if note.tag_list %}
+                            <div class="meta-section" style="grid-column: 1 / -1;">
+                                <span class="meta-label">Tags</span>
+                                <div class="tags-container">
+                                    {% for tag in note.tag_list %}
+                                        <span class="tag">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    {% if activities %}
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <i class="fas fa-history"></i>
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-list">
+                            {% for activity in activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon {{ activity.activity_type }}">
+                                    {% if activity.activity_type == 'created' %}<i class="fas fa-plus"></i>
+                                    {% elif activity.activity_type == 'updated' %}<i class="fas fa-edit"></i>
+                                    {% elif activity.activity_type == 'pinned' %}<i class="fas fa-thumbtack"></i>
+                                    {% elif activity.activity_type == 'unpinned' %}<i class="fas fa-thumbtack"></i>
+                                    {% elif activity.activity_type == 'color_changed' %}<i class="fas fa-palette"></i>
+                                    {% else %}<i class="fas fa-info"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-description">{{ activity.description }}</div>
+                                    <div class="activity-time">{{ activity.created_at|timesince }} ago</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Floating Action Buttons -->
+            <div class="floating-actions">
+                <a href="{% url 'edit_note' note.id %}" class="floating-btn edit" title="Edit Note">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'topic_notes' %}?block={{ note.block }}&module={{ note.module }}&subject={{ note.subject }}&topic={{ note.topic }}&degree={{ note.degree }}&year={{ note.year }}" 
+                   class="floating-btn back" title="Back to Topic">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        function togglePin(noteId) {
+            fetch(`{% url 'toggle_pin_note' 0 %}`.replace('0', noteId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const button = document.querySelector('.action-btn');
+                    const metaItem = document.querySelector('.meta-item:has(.fa-thumbtack)');
+                    
+                    if (data.is_pinned) {
+                        button.classList.add('pinned');
+                        button.title = 'Unpin';
+                        if (!metaItem) {
+                            // Add pinned indicator to header if not present
+                            const newMetaItem = document.createElement('div');
+                            newMetaItem.className = 'meta-item';
+                            newMetaItem.innerHTML = '<i class="fas fa-thumbtack"></i><span>Pinned</span>';
+                            document.querySelector('.note-meta-header').appendChild(newMetaItem);
+                        }
+                    } else {
+                        button.classList.remove('pinned');
+                        button.title = 'Pin';
+                        if (metaItem) {
+                            metaItem.remove();
+                        }
+                    }
+                    
+                    showNotification(data.message, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error updating note', 'error');
+            });
+        }
+
+        function archiveNote(noteId) {
+            if (confirm('Are you sure you want to archive this note?')) {
+                fetch(`{% url 'archive_note' 0 %}`.replace('0', noteId), {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '{% url 'notes_dashboard' %}';
+                        }, 1500);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error archiving note', 'error');
+                });
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 1001;
+                background: ${type === 'success' ? '#10b981' : '#ef4444'}; 
+                color: white; padding: 12px 20px; border-radius: 8px;
+                font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

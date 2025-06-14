@@ -1,0 +1,1128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Session - {{ session.topic }} - PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #047857;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .practice-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: white;
+        }
+
+        /* Practice Header */
+        .practice-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .practice-info h3 {
+            margin: 0 0 4px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .practice-info span {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .practice-timer {
+            font-size: 16px;
+            font-weight: 700;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .show-explanation-btn, .end-session-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+        .end-session-btn {
+            background: var(--danger);
+        }
+
+        .show-explanation-btn:hover, .end-session-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .end-session-btn:hover {
+            background: #dc2626;
+        }
+
+        /* Practice Body */
+        .practice-body {
+            flex: 1;
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Question Panel */
+        .question-panel {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-number {
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .question-number::before {
+            content: '';
+            width: 32px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .difficulty-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .difficulty-badge.easy {
+            background: rgba(16, 185, 129, 0.1);
+            color: #047857;
+        }
+
+        .difficulty-badge.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+        }
+
+        .difficulty-badge.hard {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .question-image {
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+        }
+
+        .image-caption {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .options-container {
+            flex: 1;
+            margin-top: 20px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            margin-bottom: 15px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .option-label:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 12px;
+            margin-top: 2px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .option-label.selected {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .option-label.correct {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--success);
+        }
+
+        .option-label.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+
+        .option-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #334155;
+            flex: 1;
+        }
+
+        .option-indicator {
+            margin-left: 12px;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .option-label.correct .option-indicator {
+            opacity: 1;
+            color: var(--success);
+        }
+
+        .option-label.incorrect .option-indicator {
+            opacity: 1;
+            color: var(--danger);
+        }
+
+        /* Explanation Panel */
+        .explanation-panel {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+            display: none;
+        }
+
+        .explanation-panel.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+        }
+
+        .explanation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .explanation-text {
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .correct-answer-indicator {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-dark);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Navigation Panel */
+        .navigation-panel {
+            width: 300px;
+            background: white;
+            padding: 20px;
+            border-left: 1px solid #e5e7eb;
+            overflow-y: auto;
+            box-shadow: -4px 0 16px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .practice-progress {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #bae6fd;
+        }
+
+        .practice-progress h5 {
+            margin: 0 0 12px;
+            color: #0369a1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+
+        .progress-item strong {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .question-navigation {
+            flex: 1;
+        }
+
+        .navigation-panel h4 {
+            margin: 0 0 15px;
+            color: var(--dark);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 8px;
+        }
+
+        .question-nav-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .question-nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-nav-btn.current {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .question-nav-btn.answered {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .question-nav-btn.answered.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--dark);
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Feedback Toast */
+        .feedback-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            padding: 16px 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            min-width: 300px;
+        }
+
+        .feedback-toast.show {
+            transform: translateX(0);
+        }
+
+        .feedback-toast.incorrect {
+            border-left-color: var(--danger);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-icon.correct {
+            color: var(--success);
+        }
+
+        .toast-icon.incorrect {
+            color: var(--danger);
+        }
+
+        .toast-text {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .practice-body {
+                flex-direction: column;
+            }
+            
+            .navigation-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #e5e7eb;
+                order: 2;
+                max-height: 250px;
+            }
+            
+            .question-panel {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .practice-header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .question-panel {
+                padding: 16px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .navigation-panel {
+                padding: 16px;
+                max-height: 200px;
+            }
+            
+            .question-grid {
+                grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
+            }
+            
+            .question-nav-btn {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .feedback-toast {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="practice-container">
+        <!-- Practice Header -->
+        <div class="practice-header">
+            <div class="practice-info">
+                <h3>{{ session.topic }} Practice</h3>
+                <span>Question <span id="current-question">1</span> of {{ total_questions }}</span>
+            </div>
+            
+            <div class="practice-timer">
+                <i class="fas fa-clock"></i>
+                <span id="time-elapsed">00:00</span>
+            </div>
+            
+            <div class="header-actions">
+                {% if show_explanations %}
+                <button class="show-explanation-btn" onclick="toggleExplanation()" id="explanation-btn">
+                    <i class="fas fa-lightbulb"></i> Show Answer
+                </button>
+                {% endif %}
+                <button class="end-session-btn" onclick="confirmEndSession()">
+                    <i class="fas fa-stop"></i> End Session
+                </button>
+            </div>
+        </div>
+        
+        <!-- Practice Body -->
+        <div class="practice-body">
+            <!-- Question Panel -->
+            <div class="question-panel">
+                <div class="question-card">
+                    <div id="question-container">
+                        <!-- Questions will be loaded here -->
+                    </div>
+                    
+                    <div class="explanation-panel" id="explanation-panel">
+                        <div class="explanation-header">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Correct Answer & Explanation</span>
+                        </div>
+                        <div class="correct-answer-indicator" id="correct-answer-display">
+                            <!-- Correct answer will be shown here -->
+                        </div>
+                        <div class="explanation-text" id="explanation-text">
+                            <!-- Explanation will be shown here -->
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        
+                        <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
+                            Next <i class="fas fa-arrow-right"></i>
+                        </button>
+                        
+                        <button class="btn btn-success" onclick="finishSession()" id="finish-btn" style="display: none;">
+                            <i class="fas fa-flag-checkered"></i> Finish Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Panel -->
+            <div class="navigation-panel">
+                <!-- Practice Progress -->
+                <div class="practice-progress">
+                    <h5>Progress</h5>
+                    <div class="progress-item">
+                        <span>Answered:</span>
+                        <strong id="answered-count">0</strong>
+                    </div>
+                    <div class="progress-item">
+                        <span>Correct:</span>
+                        <strong id="correct-count">0</strong>
+                    </div>
+                    <div class="progress-item">
+                        <span>Accuracy:</span>
+                        <strong id="accuracy-display">0%</strong>
+                    </div>
+                </div>
+                
+                <!-- Question Navigation -->
+                <div class="question-navigation">
+                    <h4>Questions</h4>
+                    <div class="question-grid" id="question-nav">
+                        {% for question in questions %}
+                            <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
+                                    onclick="goToQuestion({{ forloop.counter }})"
+                                    data-question="{{ forloop.counter }}">
+                                {{ forloop.counter }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Toast -->
+    <div class="feedback-toast" id="feedback-toast">
+        <div class="toast-content">
+            <div class="toast-icon" id="toast-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="toast-text">
+                <div class="toast-title" id="toast-title">Correct!</div>
+                <div class="toast-message" id="toast-message">Well done!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Practice session data
+        const sessionData = {
+            id: {{ session.id }},
+            showExplanations: {{ show_explanations|yesno:"true,false" }},
+            questions: [
+                {% for question in questions %}
+                {
+                    id: {{ question.id }},
+                    order: {{ question.order }},
+                    text: `{{ question.text|escapejs }}`,
+                    options: {
+                        {% for key, value in question.options.items %}
+                        {{ key }}: `{{ value|escapejs }}`,
+                        {% endfor %}
+                    },
+                    correctAnswer: '{{ question.correct_answer }}',
+                    explanation: `{{ question.explanation|escapejs }}`,
+                    difficulty: '{{ question.difficulty }}',
+                    hasImage: {{ question.has_image|yesno:"true,false" }},
+                    imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
+                    imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %}
+                },
+                {% endfor %}
+            ]
+        };
+        
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let startTime = Date.now();
+        let questionStartTime = Date.now();
+        let timerInterval = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestion(0);
+            startTimer();
+            updateProgress();
+            updateNavigationState();
+        });
+        
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('time-elapsed').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function loadQuestion(index) {
+            const question = sessionData.questions[index];
+            currentQuestionIndex = index;
+            questionStartTime = Date.now();
+            
+            // Update current question number
+            document.getElementById('current-question').textContent = index + 1;
+            
+            // Hide explanation panel
+            document.getElementById('explanation-panel').classList.remove('show');
+            const explanationBtn = document.getElementById('explanation-btn');
+            if (explanationBtn) {
+                explanationBtn.innerHTML = '<i class="fas fa-lightbulb"></i> Show Answer';
+                explanationBtn.disabled = false;
+            }
+            
+            // Create image HTML
+            let imageHtml = '';
+            if (question.hasImage && question.imageUrl) {
+                imageHtml = `
+                    <div class="question-image">
+                        <img src="${question.imageUrl}" alt="Question Image" loading="lazy">
+                        ${question.imageFilename ? `<div class="image-caption">Image: ${question.imageFilename}</div>` : ''}
+                    </div>
+                `;
+            }
+            
+            // Create options HTML
+            let optionsHtml = '<div class="options-container"><ul class="options-list">';
+            
+            Object.entries(question.options).forEach(([key, value]) => {
+                const isChecked = answers[question.id] === key;
+                const isCorrect = key === question.correctAnswer;
+                const isSelected = answers[question.id] === key;
+                const showFeedback = answers[question.id] !== undefined;
+                
+                let optionClass = 'option-label';
+                let indicator = '';
+                
+                if (showFeedback) {
+                    if (isCorrect) {
+                        optionClass += ' correct';
+                        indicator = '<span class="option-indicator"><i class="fas fa-check"></i></span>';
+                    } else if (isSelected && !isCorrect) {
+                        optionClass += ' incorrect';
+                        indicator = '<span class="option-indicator"><i class="fas fa-times"></i></span>';
+                    }
+                } else if (isChecked) {
+                    optionClass += ' selected';
+                }
+                
+                optionsHtml += `
+                    <li class="option-item">
+                        <label class="${optionClass}">
+                            <input type="radio" name="answer" value="${key}" 
+                                   ${isChecked ? 'checked' : ''} 
+                                   ${showFeedback ? 'disabled' : ''}
+                                   onchange="saveAnswer('${key}')">
+                            <span class="option-text">${key}) ${value}</span>
+                            ${indicator}
+                        </label>
+                    </li>
+                `;
+            });
+            optionsHtml += '</ul></div>';
+            
+            // Load question content
+            document.getElementById('question-container').innerHTML = `
+                <div class="question-number">
+                    Question ${index + 1}
+                    <div class="difficulty-badge ${question.difficulty.toLowerCase()}">${question.difficulty}</div>
+                </div>
+                <div class="question-text">${question.text}</div>
+                ${imageHtml}
+                ${optionsHtml}
+            `;
+            
+            updateNavigationState();
+            updateButtonStates();
+        }
+        
+        function saveAnswer(answer) {
+            const question = sessionData.questions[currentQuestionIndex];
+            const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+            
+            answers[question.id] = answer;
+            
+            // Save to server
+            fetch('{% url "save_practice_answer" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `session_id=${sessionData.id}&question_id=${question.id}&answer=${answer}&time_spent=${timeSpent}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFeedback(data.is_correct, data.correct_answer, data.explanation);
+                    updateProgress();
+                    updateNavigation();
+                }
+            });
+        }
+        
+        function showFeedback(isCorrect, correctAnswer, explanation) {
+            // Show visual feedback in options
+            const options = document.querySelectorAll('.option-label');
+            options.forEach(option => {
+                const input = option.querySelector('input');
+                const key = input.value;
+                
+                if (key === correctAnswer) {
+                    option.classList.add('correct');
+                    option.innerHTML += '<span class="option-indicator"><i class="fas fa-check"></i></span>';
+                } else if (input.checked && !isCorrect) {
+                    option.classList.add('incorrect');
+                    option.innerHTML += '<span class="option-indicator"><i class="fas fa-times"></i></span>';
+                }
+                
+                input.disabled = true;
+            });
+            
+            // Show toast feedback
+            showToast(isCorrect, correctAnswer);
+            
+            // Update explanation button
+            const explanationBtn = document.getElementById('explanation-btn');
+            if (explanationBtn && sessionData.showExplanations) {
+                explanationBtn.innerHTML = '<i class="fas fa-eye"></i> View Explanation';
+            }
+        }
+        
+        function showToast(isCorrect, correctAnswer) {
+            const toast = document.getElementById('feedback-toast');
+            const icon = document.getElementById('toast-icon');
+            const title = document.getElementById('toast-title');
+            const message = document.getElementById('toast-message');
+            
+            if (isCorrect) {
+                toast.classList.remove('incorrect');
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                icon.className = 'toast-icon correct';
+                title.textContent = 'Correct!';
+                message.textContent = 'Well done! You got it right.';
+            } else {
+                toast.classList.add('incorrect');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                icon.className = 'toast-icon incorrect';
+                title.textContent = 'Incorrect';
+                message.textContent = `The correct answer is ${correctAnswer}.`;
+            }
+            
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        function toggleExplanation() {
+            const panel = document.getElementById('explanation-panel');
+            const question = sessionData.questions[currentQuestionIndex];
+            const btn = document.getElementById('explanation-btn');
+            
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                btn.innerHTML = '<i class="fas fa-lightbulb"></i> Show Answer';
+            } else {
+                // Load explanation content
+                document.getElementById('correct-answer-display').innerHTML = 
+                    `<i class="fas fa-check"></i> Correct Answer: ${question.correctAnswer}`;
+                document.getElementById('explanation-text').textContent = 
+                    question.explanation || 'No explanation available for this question.';
+                
+                panel.classList.add('show');
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Explanation';
+            }
+        }
+        
+        function updateProgress() {
+            const totalQuestions = sessionData.questions.length;
+            const answeredCount = Object.keys(answers).length;
+            const correctCount = Object.values(answers).filter((answer, index) => {
+                const questionId = sessionData.questions[index]?.id;
+                const question = sessionData.questions.find(q => q.id === questionId);
+                return question && answer === question.correctAnswer;
+            }).length;
+            
+            const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            
+            document.getElementById('answered-count').textContent = answeredCount;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('accuracy-display').textContent = accuracy + '%';
+        }
+        
+        function updateNavigation() {
+            document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
+                const question = sessionData.questions[index];
+                
+                btn.className = 'question-nav-btn';
+                
+                if (index === currentQuestionIndex) {
+                    btn.classList.add('current');
+                } else if (answers[question.id]) {
+                    const isCorrect = answers[question.id] === question.correctAnswer;
+                    btn.classList.add('answered');
+                    if (!isCorrect) {
+                        btn.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+        
+        function updateNavigationState() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const finishBtn = document.getElementById('finish-btn');
+            
+            // Previous button
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            // Next/Finish button logic
+            if (currentQuestionIndex === sessionData.questions.length - 1) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'flex';
+            } else {
+                nextBtn.style.display = 'flex';
+                finishBtn.style.display = 'none';
+            }
+        }
+        
+        function updateButtonStates() {
+            // Enable/disable explanation button based on whether question is answered
+            const explanationBtn = document.getElementById('explanation-btn');
+            const question = sessionData.questions[currentQuestionIndex];
+            
+            if (explanationBtn && !sessionData.showExplanations) {
+                explanationBtn.disabled = !answers[question.id];
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+        
+        function nextQuestion() {
+            if (currentQuestionIndex < sessionData.questions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+        
+        function goToQuestion(questionNumber) {
+            loadQuestion(questionNumber - 1);
+        }
+        
+        function finishSession() {
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            fetch('{% url "end_practice_session" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `session_id=${sessionData.id}&time_spent=${totalTime}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                }
+            });
+        }
+        
+        function confirmEndSession() {
+            if (confirm('Are you sure you want to end this practice session? Your progress will be saved.')) {
+                finishSession();
+            }
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Prevent accidental page leave
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your progress will be saved.';
+            return 'Are you sure you want to leave? Your progress will be saved.';
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        previousQuestion();
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        nextQuestion();
+                    }
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey) {
+                        const optionKeys = ['1', '2', '3', '4', '5'];
+                        const answerKeys = ['A', 'B', 'C', 'D', 'E'];
+                        const index = optionKeys.indexOf(e.key);
+                        if (index !== -1) {
+                            const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
+                            if (radioButton && !radioButton.disabled) {
+                                radioButton.click();
+                            }
+                        }
+                    }
+                    break;
+                case 'e':
+                case 'E':
+                    if (!e.ctrlKey && !e.altKey && !e.metaKey && sessionData.showExplanations) {
+                        toggleExplanation();
+                    }
+                    break;
+            }
+        });
+    </script>
+</body>
+</html>

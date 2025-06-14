@@ -80,6 +80,85 @@
         margin-bottom: 10px;
       }
       
+      .pagination-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        border-top: 1px solid #e0e0e0;
+        margin-top: 10px;
+      }
+      
+      .pagination-controls button {
+        padding: 5px 10px;
+        border: 1px solid #ddd;
+        background: white;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      
+      .pagination-controls button:hover:not(:disabled) {
+        background-color: #f5f5f5;
+      }
+      
+      .pagination-controls button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      .pagination-controls .current-page {
+        background-color: #2196f3;
+        color: white;
+      }
+      
+      .question-pool-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      
+      .questions-count {
+        font-size: 14px;
+        color: #666;
+      }
+      
+      .availability-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        display: none;
+      }
+      
+      .availability-warning.show {
+        display: block;
+      }
+      
+      .warning-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .warning-icon {
+        color: #f39c12;
+        font-size: 20px;
+        margin-top: 2px;
+      }
+      
+      .warning-text {
+        flex: 1;
+      }
+      
+      .warning-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      
       .hidden { display: none; }
     </style>
   </head>
@@ -172,11 +251,6 @@
                   <div class="form-group">
                     <label for="id_description">Description</label>
                     {{ form.description }}
-                  </div>
-                  
-                  <div class="form-group">
-                    <label for="id_instructions">Instructions</label>
-                    {{ form.instructions }}
                   </div>
                   
                   <div class="form-row">
@@ -292,6 +366,25 @@
                     </div>
                   </div>
                   
+                  <!-- Availability Warning for Random Selection -->
+                  <div id="availability-warning" class="availability-warning">
+                    <div class="warning-content">
+                      <i class="fas fa-exclamation-triangle warning-icon"></i>
+                      <div class="warning-text">
+                        <strong>Insufficient Questions Available</strong>
+                        <p id="warning-message"></p>
+                        <div class="warning-actions">
+                          <button type="button" id="proceed-with-available" class="action-button">
+                            Proceed with Available Questions
+                          </button>
+                          <button type="button" id="adjust-criteria" class="action-button secondary">
+                            Adjust Criteria
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <!-- Random Selection Options -->
                   <div id="random-options" class="{% if form.selection_type.value != 'random' %}hidden{% endif %}">
                     <div class="form-row">
@@ -311,6 +404,9 @@
                       </div>
                     </div>
                     <small class="text-muted">Note: Percentages must sum to 100%</small>
+                    <div id="availability-info" class="selection-stats">
+                      <span id="available-count">Checking availability...</span>
+                    </div>
                   </div>
                   
                   <!-- Manual Selection Button -->
@@ -398,18 +494,31 @@
               <button id="apply-filters" class="action-button primary">
                 <i class="fas fa-filter"></i> Apply Filters
               </button>
+              <button id="clear-filters" class="action-button secondary">
+                <i class="fas fa-times"></i> Clear Filters
+              </button>
             </div>
           </div>
           
           <!-- Question Selection -->
           <div class="question-selection-container">
             <div class="question-pool">
-              <h4>Available Questions</h4>
+              <div class="question-pool-header">
+                <h4>Available Questions</h4>
+                <div class="questions-count">
+                  Showing <span id="showing-count">0</span> of <span id="total-available">0</span> questions
+                </div>
+              </div>
               <div class="selection-stats">
-                <button id="select-all" class="action-button">Select All</button>
-                <button id="clear-all" class="action-button">Clear All</button>
+                <button id="select-all-page" class="action-button">Select All (This Page)</button>
+                <button id="clear-all-page" class="action-button">Clear All (This Page)</button>
               </div>
               <div id="available-questions"></div>
+              <div class="pagination-controls">
+                <button id="prev-page" disabled>Previous</button>
+                <span id="page-info">Page 1 of 1</span>
+                <button id="next-page" disabled>Next</button>
+              </div>
             </div>
             
             <div class="selected-questions">
@@ -428,6 +537,12 @@
     <script src="{% static 'js/DAscript.js' %}"></script>
     <script>
       let selectedQuestions = new Set();
+      let currentPage = 1;
+      let totalPages = 1;
+      let totalQuestions = 0;
+      let questionsPerPage = 100;
+      let currentFilters = {};
+      
       {% if test %}
         // If editing, load existing questions
         {% for tq in test.testquestion_set.all %}
@@ -444,12 +559,90 @@
           if (this.value === 'random') {
             document.getElementById('random-options').classList.remove('hidden');
             document.getElementById('manual-options').classList.add('hidden');
+            checkAvailability();
           } else {
             document.getElementById('random-options').classList.add('hidden');
             document.getElementById('manual-options').classList.remove('hidden');
+            document.getElementById('availability-warning').classList.remove('show');
           }
         });
       });
+      
+      // Check availability for random selection
+      function checkAvailability() {
+        const criteria = getCurrentCriteria();
+        const totalRequested = parseInt(document.getElementById('id_total_questions').value) || 0;
+        
+        if (totalRequested === 0) return;
+        
+        fetch(`{% url 'check_question_availability' %}?${new URLSearchParams(criteria)}`)
+          .then(response => response.json())
+          .then(data => {
+            const availableInfo = document.getElementById('available-count');
+            availableInfo.innerHTML = `
+              Available: <strong>${data.total_available}</strong> questions
+              (Easy: ${data.easy}, Medium: ${data.medium}, Hard: ${data.hard})
+            `;
+            
+            if (data.total_available < totalRequested) {
+              showAvailabilityWarning(data, totalRequested);
+            } else {
+              document.getElementById('availability-warning').classList.remove('show');
+            }
+          })
+          .catch(error => {
+            console.error('Error checking availability:', error);
+          });
+      }
+      
+      function showAvailabilityWarning(data, requested) {
+        const warning = document.getElementById('availability-warning');
+        const message = document.getElementById('warning-message');
+        
+        message.innerHTML = `
+          You requested <strong>${requested}</strong> questions, but only <strong>${data.total_available}</strong> are available with the current criteria.
+          <br><br>
+          Available breakdown:
+          <ul>
+            <li>Easy: ${data.easy} questions</li>
+            <li>Medium: ${data.medium} questions</li>
+            <li>Hard: ${data.hard} questions</li>
+          </ul>
+          Would you like to proceed with ${data.total_available} questions instead?
+        `;
+        
+        warning.classList.add('show');
+        
+        document.getElementById('proceed-with-available').onclick = function() {
+          document.getElementById('id_total_questions').value = data.total_available;
+          warning.classList.remove('show');
+        };
+        
+        document.getElementById('adjust-criteria').onclick = function() {
+          warning.classList.remove('show');
+        };
+      }
+      
+      function getCurrentCriteria() {
+        return {
+          degree: document.getElementById('id_degree').value,
+          year: document.getElementById('id_year').value,
+          block: document.getElementById('id_block').value,
+          module: document.getElementById('id_module').value,
+          subject: document.getElementById('id_subject').value,
+          topic: document.getElementById('id_topic').value,
+          total_questions: document.getElementById('id_total_questions').value,
+          easy_percentage: document.getElementById('id_easy_percentage').value,
+          medium_percentage: document.getElementById('id_medium_percentage').value,
+          hard_percentage: document.getElementById('id_hard_percentage').value,
+        };
+      }
+      
+      // Add event listeners for availability checking
+      document.getElementById('id_total_questions').addEventListener('input', checkAvailability);
+      document.getElementById('id_easy_percentage').addEventListener('input', checkAvailability);
+      document.getElementById('id_medium_percentage').addEventListener('input', checkAvailability);
+      document.getElementById('id_hard_percentage').addEventListener('input', checkAvailability);
       
       // Dynamic dropdowns
       const degreeSelect = document.getElementById('id_degree');
@@ -513,6 +706,11 @@
               });
             });
         }
+        
+        // Check availability if random selection is active
+        if (document.querySelector('input[name="selection_type"]:checked').value === 'random') {
+          checkAvailability();
+        }
       }
       
       degreeSelect.addEventListener('change', () => updateDropdowns('degree'));
@@ -528,6 +726,7 @@
       
       selectQuestionsBtn.addEventListener('click', function() {
         modal.classList.remove('hidden');
+        currentPage = 1;
         loadQuestions();
       });
       
@@ -537,7 +736,7 @@
         });
       });
       
-      // Load questions for manual selection
+      // Load questions for manual selection with pagination
       function loadQuestions() {
         const filters = {
           degree: document.getElementById('filter-degree').value,
@@ -546,7 +745,11 @@
           module: document.getElementById('filter-module').value,
           subject: document.getElementById('filter-subject').value,
           topic: document.getElementById('filter-topic').value,
+          page: currentPage,
+          per_page: questionsPerPage
         };
+        
+        currentFilters = filters;
         
         const queryString = Object.entries(filters)
           .filter(([key, value]) => value)
@@ -558,6 +761,18 @@
           .then(data => {
             const container = document.getElementById('available-questions');
             container.innerHTML = '';
+            
+            totalQuestions = data.total_count;
+            totalPages = Math.ceil(totalQuestions / questionsPerPage);
+            
+            // Update counters
+            document.getElementById('total-available').textContent = totalQuestions;
+            document.getElementById('showing-count').textContent = data.questions.length;
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            
+            // Update pagination buttons
+            document.getElementById('prev-page').disabled = currentPage <= 1;
+            document.getElementById('next-page').disabled = currentPage >= totalPages;
             
             data.questions.forEach(question => {
               const isSelected = selectedQuestions.has(question.id);
@@ -589,8 +804,28 @@
             });
             
             updateSelectedDisplay();
+          })
+          .catch(error => {
+            console.error('Error loading questions:', error);
+            document.getElementById('available-questions').innerHTML = 
+              '<p>Error loading questions. Please try again.</p>';
           });
       }
+      
+      // Pagination controls
+      document.getElementById('prev-page').addEventListener('click', function() {
+        if (currentPage > 1) {
+          currentPage--;
+          loadQuestions();
+        }
+      });
+      
+      document.getElementById('next-page').addEventListener('click', function() {
+        if (currentPage < totalPages) {
+          currentPage++;
+          loadQuestions();
+        }
+      });
       
       // Update selected questions display
       function updateSelectedDisplay() {
@@ -601,10 +836,43 @@
         if (document.querySelector('input[name="selection_type"]:checked').value === 'manual') {
           document.getElementById('id_total_questions').value = selectedQuestions.size;
         }
+        
+        // Update selected questions list
+        const selectedList = document.getElementById('selected-questions-list');
+        selectedList.innerHTML = '';
+        
+        if (selectedQuestions.size > 0) {
+          const selectedArray = Array.from(selectedQuestions);
+          selectedArray.forEach((questionId, index) => {
+            const div = document.createElement('div');
+            div.className = 'question-item';
+            div.innerHTML = `
+              <span>Question ID: ${questionId}</span>
+              <button type="button" class="remove-selected" data-id="${questionId}">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            
+            div.querySelector('.remove-selected').addEventListener('click', function() {
+              selectedQuestions.delete(parseInt(this.dataset.id));
+              updateSelectedDisplay();
+              // Update checkboxes on current page
+              const checkbox = document.querySelector(`input[value="${this.dataset.id}"]`);
+              if (checkbox) {
+                checkbox.checked = false;
+                checkbox.closest('.question-item').classList.remove('selected');
+              }
+            });
+            
+            selectedList.appendChild(div);
+          });
+        } else {
+          selectedList.innerHTML = '<p class="text-muted">No questions selected</p>';
+        }
       }
       
-      // Select all / Clear all
-      document.getElementById('select-all').addEventListener('click', function() {
+      // Select all / Clear all for current page
+      document.getElementById('select-all-page').addEventListener('click', function() {
         document.querySelectorAll('#available-questions input[type="checkbox"]').forEach(cb => {
           cb.checked = true;
           selectedQuestions.add(parseInt(cb.value));
@@ -613,7 +881,7 @@
         updateSelectedDisplay();
       });
       
-      document.getElementById('clear-all').addEventListener('click', function() {
+      document.getElementById('clear-all-page').addEventListener('click', function() {
         document.querySelectorAll('#available-questions input[type="checkbox"]').forEach(cb => {
           cb.checked = false;
           selectedQuestions.delete(parseInt(cb.value));
@@ -623,7 +891,22 @@
       });
       
       // Apply filters
-      document.getElementById('apply-filters').addEventListener('click', loadQuestions);
+      document.getElementById('apply-filters').addEventListener('click', function() {
+        currentPage = 1;
+        loadQuestions();
+      });
+      
+      // Clear filters
+      document.getElementById('clear-filters').addEventListener('click', function() {
+        document.getElementById('filter-degree').value = '';
+        document.getElementById('filter-year').value = '';
+        document.getElementById('filter-block').value = '';
+        document.getElementById('filter-module').value = '';
+        document.getElementById('filter-subject').value = '';
+        document.getElementById('filter-topic').value = '';
+        currentPage = 1;
+        loadQuestions();
+      });
       
       // Save selection
       document.getElementById('save-selection').addEventListener('click', function() {
@@ -648,14 +931,16 @@
       
       // Form submission
       document.getElementById('mock-test-form').addEventListener('submit', function(e) {
-        if (document.querySelector('input[name="selection_type"]:checked').value === 'manual' && selectedQuestions.size === 0) {
+        const selectionType = document.querySelector('input[name="selection_type"]:checked').value;
+        
+        if (selectionType === 'manual' && selectedQuestions.size === 0) {
           e.preventDefault();
           alert('Please select questions for the test.');
           return;
         }
         
         // Add selected questions to form if manual selection
-        if (document.querySelector('input[name="selection_type"]:checked').value === 'manual') {
+        if (selectionType === 'manual') {
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = 'selected_questions';
@@ -680,9 +965,44 @@
               filterBlock.innerHTML += `<option value="${item}">${item}</option>`;
             });
           });
+        
+        fetch(`{% url 'get_hierarchy_data' %}?field=modules`)
+          .then(response => response.json())
+          .then(data => {
+            const filterModule = document.getElementById('filter-module');
+            filterModule.innerHTML = '<option value="">All Modules</option>';
+            data.data.forEach(item => {
+              filterModule.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+          });
+        
+        fetch(`{% url 'get_hierarchy_data' %}?field=subjects`)
+          .then(response => response.json())
+          .then(data => {
+            const filterSubject = document.getElementById('filter-subject');
+            filterSubject.innerHTML = '<option value="">All Subjects</option>';
+            data.data.forEach(item => {
+              filterSubject.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+          });
+        
+        fetch(`{% url 'get_hierarchy_data' %}?field=topics`)
+          .then(response => response.json())
+          .then(data => {
+            const filterTopic = document.getElementById('filter-topic');
+            filterTopic.innerHTML = '<option value="">All Topics</option>';
+            data.data.forEach(item => {
+              filterTopic.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+          });
       }
       
       selectQuestionsBtn.addEventListener('click', initializeFilterDropdowns);
+      
+      // Initialize availability check on page load
+      if (document.querySelector('input[name="selection_type"]:checked').value === 'random') {
+        checkAvailability();
+      }
     </script>
 
     <style>
@@ -741,6 +1061,25 @@
       
       .required {
         color: #f44336;
+      }
+      
+      .remove-selected {
+        background: none;
+        border: none;
+        color: #f44336;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+      
+      .remove-selected:hover {
+        color: #d32f2f;
+      }
+      
+      .text-muted {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
       }
     </style>
   </body>

@@ -1,4 +1,4 @@
-# modelpaper/urls.py
+# modelpaper/urls.py - Updated with all necessary URLs
 from django.urls import path
 from . import views
 
@@ -10,7 +10,8 @@ urlpatterns = [
     path('preview/<int:paper_id>/', views.preview_paper, name='preview_paper'),
     path('export/<int:paper_id>/', views.export_paper_questions, name='export_paper_questions'),
     path('questions/<path:paper_name>/', views.view_paper_questions, name='view_paper_questions'),
-# CSV Import URLs
+    
+    # CSV Import URLs
     path('import-questions/', views.import_paper_questions, name='import_paper_questions'),
     
     # API URLs for filtering
@@ -24,5 +25,5 @@ urlpatterns = [
     path('submit-paper/', views.submit_paper, name='submit_paper'),
     path('result/<int:attempt_id>/', views.paper_result, name='paper_result'),
     path('report-warning/', views.report_warning, name='report_paper_warning'),
-    path('progress/', views.student_progress, name='student_paper_progress'),
+    path('progress/', views.student_paper_progress, name='student_paper_progress'),
 ]

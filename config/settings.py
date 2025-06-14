@@ -33,7 +33,9 @@ INSTALLED_APPS = [
     'notifications',
     'setting',
     'modelpaper',
-        'manageimage',  # ADD THIS LINE
+    'manageimage',
+    'notes',
+
 
 ]
 

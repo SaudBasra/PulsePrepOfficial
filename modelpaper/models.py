@@ -271,3 +271,55 @@ class PaperCSVImportHistory(models.Model):
         if self.total_rows == 0:
             return 0
         return round((self.successful_imports / self.total_rows) * 100, 1)
+    
+    # Add these properties to your ModelPaperAttempt model in modelpaper/models.py
+
+    @property
+    def passed(self):
+        return self.percentage >= self.model_paper.passing_percentage
+    
+    @property
+    def time_taken_formatted(self):
+        """Return formatted time taken in human readable format"""
+        if not self.time_taken:
+            return "0 seconds"
+        
+        seconds = self.time_taken
+        if seconds < 60:
+            return f"{seconds} second{'s' if seconds != 1 else ''}"
+        elif seconds < 3600:
+            minutes = seconds // 60
+            remaining_seconds = seconds % 60
+            if remaining_seconds == 0:
+                return f"{minutes} minute{'s' if minutes != 1 else ''}"
+            else:
+                return f"{minutes}m {remaining_seconds}s"
+        else:
+            hours = seconds // 3600
+            remaining_minutes = (seconds % 3600) // 60
+            remaining_seconds = seconds % 60
+            
+            result = f"{hours}h"
+            if remaining_minutes > 0:
+                result += f" {remaining_minutes}m"
+            if remaining_seconds > 0:
+                result += f" {remaining_seconds}s"
+            
+            return result
+    
+    @property
+    def time_taken_display(self):
+        """Return time in MM:SS format for displays"""
+        if not self.time_taken:
+            return "00:00"
+        
+        minutes = self.time_taken // 60
+        seconds = self.time_taken % 60
+        return f"{minutes:02d}:{seconds:02d}"
+    
+    @property
+    def time_taken_minutes(self):
+        """Return time taken in minutes (for calculations)"""
+        if not self.time_taken:
+            return 0
+        return round(self.time_taken / 60, 1)

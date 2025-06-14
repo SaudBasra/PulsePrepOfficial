@@ -1,0 +1,663 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - {{ note.title }}</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notes.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'student_mock_tests' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'student_model_papers' %}" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Model Papers</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Practice</span>
+          </a>
+          <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>My Notes</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notification_center' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Note Details</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="{% url 'notes_dashboard' %}">My Notes</a>
+          <i class="fas fa-chevron-right"></i>
+          <span>{{ note.title|truncatechars:30 }}</span>
+        </div>
+
+        <!-- Page Content Section -->
+        <div class="page-content">
+          <div class="note-detail-card">
+            <!-- Note Header -->
+            <div class="note-detail-header">
+              <div class="note-header-content">
+                <h1 class="note-detail-title">
+                  {{ note.title }}
+                  {% if note.is_favorite %}
+                    <i class="fas fa-heart favorite-icon" title="Favorite Note"></i>
+                  {% endif %}
+                </h1>
+                <div class="note-detail-meta">
+                  <span class="note-type-badge {{ note.note_type }}">
+                    {{ note.get_note_type_display }}
+                  </span>
+                  {% if note.difficulty_level %}
+                    <span class="difficulty-badge {{ note.difficulty_level }}">
+                      {{ note.get_difficulty_level_display }}
+                    </span>
+                  {% endif %}
+                  <span class="note-date">
+                    <i class="fas fa-calendar"></i>
+                    Created {{ note.created_at|date:"M d, Y" }}
+                  </span>
+                  <span class="note-updated">
+                    <i class="fas fa-clock"></i>
+                    Updated {{ note.updated_at|timesince }} ago
+                  </span>
+                </div>
+              </div>
+              <div class="note-actions">
+                <button 
+                  class="btn-icon favorite-btn" 
+                  onclick="toggleFavorite({{ note.id }})"
+                  title="{% if note.is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}"
+                >
+                  <i class="{% if note.is_favorite %}fas{% else %}far{% endif %} fa-heart"></i>
+                </button>
+                <a href="{% url 'edit_note' note.id %}" class="btn-secondary">
+                  <i class="fas fa-edit"></i> Edit Note
+                </a>
+                <a href="{% url 'delete_note' note.id %}" class="btn-danger" onclick="return confirm('Are you sure you want to delete this note?')">
+                  <i class="fas fa-trash"></i> Delete
+                </a>
+              </div>
+            </div>
+
+            <!-- Note Content -->
+            <div class="note-detail-content">
+              <!-- Hierarchy Information -->
+              {% if note.hierarchy_path != 'General Notes' %}
+                <div class="note-hierarchy">
+                  <h3><i class="fas fa-sitemap"></i> Hierarchy</h3>
+                  <div class="hierarchy-path">
+                    <span class="hierarchy-item">{{ note.degree }}</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="hierarchy-item">{{ note.year }}</span>
+                    {% if note.block %}
+                      <i class="fas fa-chevron-right"></i>
+                      <span class="hierarchy-item">{{ note.block }}</span>
+                    {% endif %}
+                    {% if note.module %}
+                      <i class="fas fa-chevron-right"></i>
+                      <span class="hierarchy-item">{{ note.module }}</span>
+                    {% endif %}
+                    {% if note.subject %}
+                      <i class="fas fa-chevron-right"></i>
+                      <span class="hierarchy-item">{{ note.subject }}</span>
+                    {% endif %}
+                    {% if note.topic %}
+                      <i class="fas fa-chevron-right"></i>
+                      <span class="hierarchy-item">{{ note.topic }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Related Question -->
+              {% if note.question %}
+                <div class="related-question">
+                  <h3><i class="fas fa-question-circle"></i> Related Question</h3>
+                  <div class="question-preview">
+                    <p class="question-text">{{ note.question.question_text }}</p>
+                    {% if note.question.question_type == 'MCQ' %}
+                      <div class="question-options">
+                        <div class="option">A) {{ note.question.option_a }}</div>
+                        <div class="option">B) {{ note.question.option_b }}</div>
+                        <div class="option">C) {{ note.question.option_c }}</div>
+                        <div class="option">D) {{ note.question.option_d }}</div>
+                        {% if note.question.option_e %}
+                          <div class="option">E) {{ note.question.option_e }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="correct-answer">
+                        <strong>Correct Answer: {{ note.question.correct_answer }}</strong>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Note Content -->
+              <div class="note-main-content">
+                <h3><i class="fas fa-file-text"></i> Note Content</h3>
+                <div class="note-content">
+                  {{ note.content|linebreaksbr }}
+                </div>
+              </div>
+
+              <!-- Tags -->
+              {% if note.tag_list %}
+                <div class="note-tags">
+                  <h3><i class="fas fa-tags"></i> Tags</h3>
+                  <div class="tags-list">
+                    {% for tag in note.tag_list %}
+                      <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Images -->
+              {% if note.images.exists %}
+                <div class="note-images">
+                  <h3><i class="fas fa-images"></i> Images ({{ note.images.count }})</h3>
+                  <div class="note-images-grid">
+                    {% for image in note.images.all %}
+                      <div class="note-image" onclick="openImageModal('{{ image.image.url }}', '{{ image.caption }}')">
+                        <img src="{{ image.image.url }}" alt="{{ image.caption }}" loading="lazy">
+                        {% if image.caption %}
+                          <div class="note-image-caption">{{ image.caption }}</div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              <!-- Revision History -->
+              {% if revisions %}
+                <div class="note-revisions">
+                  <h3><i class="fas fa-history"></i> Recent Revisions</h3>
+                  <div class="revisions-list">
+                    {% for revision in revisions %}
+                      <div class="revision-item">
+                        <div class="revision-meta">
+                          <span class="revision-date">{{ revision.created_at|date:"M d, Y H:i" }}</span>
+                          {% if revision.revision_reason %}
+                            <span class="revision-reason">{{ revision.revision_reason }}</span>
+                          {% endif %}
+                        </div>
+                        <div class="revision-preview">
+                          {{ revision.content_snapshot|truncatechars:150|linebreaksbr }}
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="modal" style="display: none;">
+      <div class="modal-content image-modal">
+        <div class="modal-header">
+          <h3 id="image-modal-title">Image</h3>
+          <button class="close-modal" onclick="closeImageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <img id="modal-image" src="" alt="" style="max-width: 100%; max-height: 80vh;">
+        </div>
+      </div>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Toggle favorite status
+      function toggleFavorite(noteId) {
+        fetch(`/notes/toggle-favorite/${noteId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const btn = document.querySelector('.favorite-btn i');
+            const title = document.querySelector('.note-detail-title');
+            
+            if (data.is_favorite) {
+              btn.className = 'fas fa-heart';
+              btn.style.color = '#dc2626';
+              
+              // Add favorite icon to title if not exists
+              if (!title.querySelector('.favorite-icon')) {
+                const favoriteIcon = document.createElement('i');
+                favoriteIcon.className = 'fas fa-heart favorite-icon';
+                favoriteIcon.title = 'Favorite Note';
+                title.appendChild(favoriteIcon);
+              }
+            } else {
+              btn.className = 'far fa-heart';
+              btn.style.color = '';
+              
+              // Remove favorite icon from title
+              const existingIcon = title.querySelector('.favorite-icon');
+              if (existingIcon) {
+                existingIcon.remove();
+              }
+            }
+            
+            // Update button title
+            btn.closest('.favorite-btn').title = data.is_favorite ? 
+              'Remove from favorites' : 'Add to favorites';
+          }
+        })
+        .catch(error => {
+          console.error('Error toggling favorite:', error);
+        });
+      }
+      
+      // Image modal functions
+      function openImageModal(imageUrl, caption) {
+        const modal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const modalTitle = document.getElementById('image-modal-title');
+        
+        modalImage.src = imageUrl;
+        modalImage.alt = caption || 'Note Image';
+        modalTitle.textContent = caption || 'Note Image';
+        modal.style.display = 'flex';
+      }
+      
+      function closeImageModal() {
+        document.getElementById('image-modal').style.display = 'none';
+      }
+      
+      // Close modal when clicking outside
+      document.getElementById('image-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeImageModal();
+        }
+      });
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && document.getElementById('image-modal').style.display === 'flex') {
+          closeImageModal();
+        }
+      });
+      
+      // Get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    </script>
+    
+    <style>
+      .note-detail-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+        margin-bottom: 24px;
+      }
+      
+      .note-detail-header {
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        padding: 32px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      
+      .note-detail-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 12px 0;
+        line-height: 1.2;
+      }
+      
+      .note-detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+      
+      .note-actions {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      
+      .note-detail-content {
+        padding: 32px;
+      }
+      
+      .note-detail-content h3 {
+        color: #374151;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .note-detail-content h3 i {
+        color: #10b981;
+      }
+      
+      .note-hierarchy {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        border-left: 4px solid #3b82f6;
+      }
+      
+      .hierarchy-path {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      
+      .hierarchy-item {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .related-question {
+        background: #eff6ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        border-left: 4px solid #3b82f6;
+      }
+      
+      .question-preview {
+        margin-top: 12px;
+      }
+      
+      .question-text {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 12px;
+      }
+      
+      .question-options {
+        margin: 12px 0;
+      }
+      
+      .option {
+        padding: 6px 0;
+        color: #374151;
+      }
+      
+      .correct-answer {
+        margin-top: 12px;
+        color: #059669;
+      }
+      
+      .note-main-content {
+        background: #fefefe;
+        padding: 24px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        border: 1px solid #f3f4f6;
+      }
+      
+      .note-content {
+        line-height: 1.7;
+        color: #374151;
+        font-size: 1rem;
+      }
+      
+      .note-tags {
+        margin-bottom: 24px;
+      }
+      
+      .tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      
+      .tag {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+      
+      .note-images {
+        margin-bottom: 24px;
+      }
+      
+      .note-images-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 12px;
+      }
+      
+      .note-image {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      
+      .note-image:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .note-image img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+      
+      .note-image-caption {
+        padding: 8px 12px;
+        font-size: 0.875rem;
+        color: #6b7280;
+        background: #f9fafb;
+      }
+      
+      .note-revisions {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 24px;
+      }
+      
+      .revisions-list {
+        margin-top: 12px;
+      }
+      
+      .revision-item {
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border-left: 3px solid #d1d5db;
+      }
+      
+      .revision-meta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 8px;
+        font-size: 0.875rem;
+      }
+      
+      .revision-date {
+        color: #6b7280;
+        font-weight: 500;
+      }
+      
+      .revision-reason {
+        color: #059669;
+        font-style: italic;
+      }
+      
+      .revision-preview {
+        color: #374151;
+        font-size: 0.875rem;
+        line-height: 1.5;
+      }
+      
+      /* Image modal styles */
+      .image-modal {
+        max-width: 90vw;
+        max-height: 90vh;
+      }
+      
+      .image-modal .modal-body {
+        text-align: center;
+        padding: 20px;
+      }
+      
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .note-detail-header {
+          flex-direction: column;
+          gap: 20px;
+          padding: 24px;
+        }
+        
+        .note-detail-content {
+          padding: 24px;
+        }
+        
+        .note-detail-title {
+          font-size: 1.5rem;
+        }
+        
+        .note-detail-meta {
+          flex-direction: column;
+          gap: 8px;
+        }
+        
+        .note-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+        
+        .hierarchy-path {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .note-images-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .note-images-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .note-actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </body>
+</html>

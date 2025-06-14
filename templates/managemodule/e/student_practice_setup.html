@@ -1,0 +1,721 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Setup - {{ topic }} - PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .setup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .setup-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .topic-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .topic-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .topic-breadcrumb {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .setup-section {
+            margin-bottom: 25px;
+        }
+
+        .setup-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .difficulty-breakdown {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-item {
+            flex: 1;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .difficulty-item.easy {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .difficulty-item.medium {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .difficulty-item.hard {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .setup-form {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #10b981;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .range-input {
+            flex: 1;
+        }
+
+        .range-value {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .previous-sessions {
+            margin-bottom: 20px;
+        }
+
+        .session-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-info {
+            flex: 1;
+        }
+
+        .session-date {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .session-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .accuracy-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .accuracy-badge.excellent {
+            background: #dcfdf7;
+            color: #047857;
+        }
+
+        .accuracy-badge.good {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .accuracy-badge.fair {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .accuracy-badge.poor {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .progress-overview {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .progress-stat {
+            text-align: center;
+        }
+
+        .progress-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .progress-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            color: #374151;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .setup-container {
+                padding: 15px;
+            }
+
+            .setup-card {
+                padding: 20px;
+            }
+
+            .topic-title {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .difficulty-breakdown {
+                flex-direction: column;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .session-stats {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Student Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_modules' %}" class="nav-item active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'student_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1>Practice Setup</h1>
+                <div class="user-menu">
+                    <div class="notification-container">
+                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="avatar">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="User Avatar" />
+                        {% else %}
+                            <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+
+            <div class="setup-container">
+                <!-- Topic Information -->
+                <div class="setup-card">
+                    <div class="topic-header">
+                        <h1 class="topic-title">{{ topic }}</h1>
+                        <div class="topic-breadcrumb">
+                            {{ degree }} • {{ year }} • {{ block }} • {{ module }} • {{ subject }}
+                        </div>
+                    </div>
+
+                    <!-- Topic Statistics -->
+                    <div class="setup-section">
+                        <h3><i class="fas fa-chart-pie"></i> Topic Overview</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">{{ total_questions }}</div>
+                                <div class="stat-label">Total Questions</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ difficulty_counts.Easy }}</div>
+                                <div class="stat-label">Easy</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ difficulty_counts.Medium }}</div>
+                                <div class="stat-label">Medium</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">{{ difficulty_counts.Hard }}</div>
+                                <div class="stat-label">Hard</div>
+                            </div>
+                        </div>
+
+                        <div class="difficulty-breakdown">
+                            <div class="difficulty-item easy">
+                                <div class="stat-value" style="color: #10b981;">{{ difficulty_counts.Easy }}</div>
+                                <div class="stat-label" style="color: #059669;">Easy Questions</div>
+                            </div>
+                            <div class="difficulty-item medium">
+                                <div class="stat-value" style="color: #f59e0b;">{{ difficulty_counts.Medium }}</div>
+                                <div class="stat-label" style="color: #d97706;">Medium Questions</div>
+                            </div>
+                            <div class="difficulty-item hard">
+                                <div class="stat-value" style="color: #ef4444;">{{ difficulty_counts.Hard }}</div>
+                                <div class="stat-label" style="color: #dc2626;">Hard Questions</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Overview -->
+                    {% if progress %}
+                    <div class="progress-overview">
+                        <div class="progress-title">
+                            <i class="fas fa-trophy"></i>
+                            Your Progress in {{ topic }}
+                        </div>
+                        <div class="progress-stats">
+                            <div class="progress-stat">
+                                <div class="progress-stat-value">{{ progress.overall_accuracy }}%</div>
+                                <div class="progress-stat-label">Best Accuracy</div>
+                            </div>
+                            <div class="progress-stat">
+                                <div class="progress-stat-value">{{ progress.total_sessions }}</div>
+                                <div class="progress-stat-label">Sessions</div>
+                            </div>
+                            <div class="progress-stat">
+                                <div class="progress-stat-value">{{ progress.total_questions_attempted }}</div>
+                                <div class="progress-stat-label">Questions Attempted</div>
+                            </div>
+                            <div class="progress-stat">
+                                <div class="progress-stat-value">{{ progress.mastery_level }}</div>
+                                <div class="progress-stat-label">Mastery Level</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Previous Sessions -->
+                    {% if previous_sessions %}
+                    <div class="setup-section">
+                        <h3><i class="fas fa-history"></i> Recent Practice Sessions</h3>
+                        <div class="previous-sessions">
+                            {% for session in previous_sessions %}
+                            <div class="session-item">
+                                <div class="session-info">
+                                    <div class="session-date">{{ session.completed_at|date:"M d, Y H:i" }}</div>
+                                </div>
+                                <div class="session-stats">
+                                    <span>{{ session.questions_attempted }} questions</span>
+                                    <span class="accuracy-badge {% if session.accuracy >= 90 %}excellent{% elif session.accuracy >= 75 %}good{% elif session.accuracy >= 60 %}fair{% else %}poor{% endif %}">
+                                        {{ session.accuracy }}%
+                                    </span>
+                                    <span>{{ session.time_spent_formatted }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Practice Configuration -->
+                    <div class="setup-section">
+                        <h3><i class="fas fa-cog"></i> Practice Configuration</h3>
+                        <form id="practice-form" class="setup-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="difficulty_filter">Difficulty Filter</label>
+                                <select id="difficulty_filter" name="difficulty_filter" class="form-control">
+                                    <option value="">All Difficulties</option>
+                                    <option value="Easy">Easy Only</option>
+                                    <option value="Medium">Medium Only</option>
+                                    <option value="Hard">Hard Only</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="total_questions">Number of Questions</label>
+                                <div class="range-group">
+                                    <input 
+                                        type="range" 
+                                        id="total_questions" 
+                                        name="total_questions" 
+                                        min="5" 
+                                        max="{{ total_questions }}" 
+                                        value="10" 
+                                        class="range-input"
+                                        oninput="updateQuestionCount(this.value)"
+                                    >
+                                    <div class="range-value" id="question-count">10</div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Practice Options</label>
+                                <div class="checkbox-group">
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="show_explanations" name="show_explanations" checked>
+                                        <label for="show_explanations">Show explanations during practice</label>
+                                    </div>
+                                    <div class="checkbox-item">
+                                        <input type="checkbox" id="randomize_questions" name="randomize_questions" checked>
+                                        <label for="randomize_questions">Randomize question order</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <a href="{% url 'student_modules' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Modules
+                        </a>
+                        <button onclick="startPractice()" class="btn btn-primary" id="start-btn">
+                            <i class="fas fa-play"></i> Start Practice Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; PulsePrep Media Direct, LLC. All rights reserved.
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        function updateQuestionCount(value) {
+            document.getElementById('question-count').textContent = value;
+        }
+
+        function startPractice() {
+            const form = document.getElementById('practice-form');
+            const formData = new FormData(form);
+            
+            const startBtn = document.getElementById('start-btn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+
+            const data = {
+                degree: '{{ degree }}',
+                year: '{{ year }}',
+                block: '{{ block }}',
+                module: '{{ module }}',
+                subject: '{{ subject }}',
+                topic: '{{ topic }}',
+                difficulty_filter: formData.get('difficulty_filter') || '',
+                total_questions: parseInt(formData.get('total_questions')),
+                show_explanations: formData.get('show_explanations') === 'on',
+                randomize_questions: formData.get('randomize_questions') === 'on'
+            };
+
+            fetch('{% url "start_practice_session" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert('Error starting practice session: ' + data.error);
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fas fa-play"></i> Start Practice Session';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                startBtn.disabled = false;
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Practice Session';
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Update max questions when difficulty filter changes
+        document.getElementById('difficulty_filter').addEventListener('change', function() {
+            const difficulty = this.value;
+            let maxQuestions = {{ total_questions }};
+            
+            if (difficulty === 'Easy') {
+                maxQuestions = {{ difficulty_counts.Easy }};
+            } else if (difficulty === 'Medium') {
+                maxQuestions = {{ difficulty_counts.Medium }};
+            } else if (difficulty === 'Hard') {
+                maxQuestions = {{ difficulty_counts.Hard }};
+            }
+            
+            const slider = document.getElementById('total_questions');
+            slider.max = maxQuestions;
+            
+            if (parseInt(slider.value) > maxQuestions) {
+                slider.value = maxQuestions;
+                updateQuestionCount(maxQuestions);
+            }
+        });
+
+        // Animate elements on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.setup-card, .stat-item, .session-item');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    el.style.transition = 'all 0.5s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

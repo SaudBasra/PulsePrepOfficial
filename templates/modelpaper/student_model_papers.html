@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Tests | PulsePrep</title>
+    <title>Model Papers | PulsePrep</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     {% include 'user_management/security_protection.html' %}
     
@@ -30,6 +30,7 @@
             --shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
             --shadow-hover: 0 16px 40px rgba(130, 39, 46, 0.15);
             --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-light));
+            --gradient-info: linear-gradient(135deg, var(--info), #2563eb);
         }
 
         * {
@@ -270,9 +271,9 @@
             object-fit: cover;
         }
 
-        /* Dashboard Content */
+        /* Dashboard Content - Compact */
         .dashboard-content {
-            padding: 20px 32px;
+            padding: 16px 24px;
             animation: fadeIn 0.8s ease-out;
         }
 
@@ -289,7 +290,7 @@
 
         /* Messages */
         .messages {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .message {
@@ -355,25 +356,25 @@
             background: rgba(0,0,0,0.1);
         }
 
-        /* Section Headers */
+        /* Section Headers - Compact */
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .section-title {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 24px;
+            gap: 8px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--dark);
         }
 
         .section-title i {
-            color: var(--primary);
+            color: var(--info);
         }
 
         .info-banner {
@@ -388,15 +389,15 @@
             border: 1px solid #93c5fd;
         }
 
-        /* Test Grid - More Compact */
-        .test-grid {
+        /* Paper Grid - Compact */
+        .paper-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
 
-        .test-card {
+        .paper-card {
             background: var(--white);
             border-radius: 12px;
             overflow: hidden;
@@ -406,10 +407,10 @@
             animation: fadeInUp 0.5s ease-out;
         }
 
-        .test-card:hover {
+        .paper-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-hover);
-            border-color: var(--primary);
+            border-color: var(--info);
         }
 
         @keyframes fadeInUp {
@@ -423,16 +424,16 @@
             }
         }
 
-        .test-card-header {
+        .paper-card-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--gray-light);
             position: relative;
-            background: var(--gradient-primary);
+            background: var(--gradient-info);
             color: white;
             overflow: hidden;
         }
 
-        .test-card-header::before {
+        .paper-card-header::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -448,7 +449,7 @@
             50% { transform: translate(-50%, -50%) rotate(180deg); }
         }
 
-        .test-title {
+        .paper-title {
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 6px;
@@ -457,7 +458,7 @@
             z-index: 1;
         }
 
-        .test-status {
+        .paper-status {
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -490,18 +491,43 @@
             border-color: rgba(245, 158, 11, 0.3);
         }
 
-        .test-card-body {
+        .paper-card-body {
             padding: 16px 20px;
         }
 
-        .test-description {
+        .paper-description {
             color: var(--gray);
             font-size: 13px;
             margin-bottom: 12px;
             line-height: 1.5;
         }
 
-        /* Meta Grid - More Compact */
+        /* Paper Info Container */
+        .paper-info-container {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+
+        .paper-name {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .paper-filters {
+            color: var(--gray);
+            font-size: 11px;
+        }
+
+        /* Meta Grid - Compact */
         .meta-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -521,7 +547,7 @@
         }
 
         .meta-item i {
-            color: var(--primary);
+            color: var(--info);
             width: 14px;
             text-align: center;
             font-size: 12px;
@@ -550,7 +576,7 @@
         }
 
         .schedule-item i {
-            color: var(--primary);
+            color: var(--info);
             width: 14px;
             text-align: center;
         }
@@ -596,8 +622,8 @@
             border: 1px solid #fde68a;
         }
 
-        /* Test Actions - Compact */
-        .test-actions {
+        /* Paper Actions - Compact */
+        .paper-actions {
             display: flex;
             gap: 8px;
             margin-top: 12px;
@@ -620,7 +646,7 @@
         }
 
         .btn-primary {
-            background: var(--gradient-primary);
+            background: var(--gradient-info);
             color: white;
             box-shadow: var(--shadow);
         }
@@ -634,15 +660,15 @@
 
         .btn-secondary {
             background: var(--white);
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            color: var(--info);
+            border: 1px solid var(--info);
         }
 
         .btn-secondary:hover {
-            background: rgba(130, 39, 46, 0.1);
+            background: rgba(59, 130, 246, 0.1);
             transform: translateY(-2px);
             text-decoration: none;
-            color: var(--primary);
+            color: var(--info);
         }
 
         .btn:disabled {
@@ -717,7 +743,7 @@
                 padding: 16px 20px;
             }
 
-            .test-grid {
+            .paper-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -727,7 +753,7 @@
                 gap: 12px;
             }
 
-            .test-actions {
+            .paper-actions {
                 flex-direction: column;
             }
 
@@ -737,7 +763,7 @@
         }
 
         @media (max-width: 1024px) {
-            .test-grid {
+            .paper-grid {
                 grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             }
         }
@@ -780,12 +806,12 @@
                     <span>Practice Modules</span>
                 </a>
                 
-                <a href="{% url 'student_mock_tests' %}" class="nav-item active">
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
                     <i class="fas fa-vial"></i>
                     <span>Mock Tests</span>
                 </a>
 
-                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                <a href="{% url 'student_model_papers' %}" class="nav-item active">
                     <i class="fas fa-file-alt"></i>
                     <span>Model Papers</span>
                 </a>
@@ -830,7 +856,7 @@
                             <i class="fas fa-bars"></i>
                         </button>
                     </div>
-                    <h1><i class="fas fa-vial"></i> Mock Tests</h1>
+                    <h1><i class="fas fa-file-alt"></i> Model Papers</h1>
                 </div>
                 
                 <div class="user-menu">
@@ -873,120 +899,117 @@
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- Available Tests Section -->
+                <!-- Available Papers Section -->
                 <section>
                     <div class="section-header">
                         <h2 class="section-title">
                             <i class="fas fa-clipboard-check"></i>
-                            Available Tests
+                            Available Model Papers
                         </h2>
                         <div class="info-banner">
                             <i class="fas fa-info-circle"></i>
-                            <span>Showing all available tests for students</span>
+                            <span>Past exam papers for practice</span>
                         </div>
                     </div>
                     
-                    {% if active_tests %}
-                        <div class="test-grid">
-                            {% for test in active_tests %}
-                                <div class="test-card">
-                                    <div class="test-card-header">
-                                        <h3 class="test-title">{{ test.title }}</h3>
-                                        {% if test.can_attempt %}
-                                            <span class="test-status status-available">
+                    {% if active_papers %}
+                        <div class="paper-grid">
+                            {% for paper in active_papers %}
+                                <div class="paper-card">
+                                    <div class="paper-card-header">
+                                        <h3 class="paper-title">{{ paper.title }}</h3>
+                                        {% if paper.can_attempt %}
+                                            <span class="paper-status status-available">
                                                 <i class="fas fa-check-circle"></i> Available
                                             </span>
                                         {% else %}
-                                            <span class="test-status status-completed">
+                                            <span class="paper-status status-completed">
                                                 <i class="fas fa-times-circle"></i> Max Attempts Reached
                                             </span>
                                         {% endif %}
                                     </div>
                                     
-                                    <div class="test-card-body">
-                                        {% if test.description %}
-                                            <p class="test-description">{{ test.description }}</p>
+                                    <div class="paper-card-body">
+                                        {% if paper.description %}
+                                            <p class="paper-description">{{ paper.description }}</p>
                                         {% endif %}
                                         
+                                        <!-- Paper Information -->
+                                        <div class="paper-info-container">
+                                            <div class="paper-name">
+                                                <i class="fas fa-file-alt"></i>
+                                                {{ paper.selected_paper_name }}
+                                            </div>
+                                            {% if paper.filter_degree or paper.filter_year or paper.filter_subject %}
+                                                <div class="paper-filters">
+                                                    {% if paper.filter_degree %}Degree: {{ paper.filter_degree }}{% endif %}
+                                                    {% if paper.filter_year %}{% if paper.filter_degree %} | {% endif %}Year: {{ paper.filter_year }}{% endif %}
+                                                    {% if paper.filter_subject %}{% if paper.filter_degree or paper.filter_year %} | {% endif %}Subject: {{ paper.filter_subject }}{% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
                                         <div class="meta-grid">
-                                            {% if test.degree %}
-                                                <div class="meta-item">
-                                                    <i class="fas fa-graduation-cap"></i>
-                                                    <span>{{ test.get_degree_display }}</span>
-                                                </div>
-                                            {% endif %}
-                                            {% if test.year %}
-                                                <div class="meta-item">
-                                                    <i class="fas fa-calendar-alt"></i>
-                                                    <span>{{ test.get_year_display }} Year</span>
-                                                </div>
-                                            {% endif %}
                                             <div class="meta-item">
                                                 <i class="fas fa-clock"></i>
-                                                <span>{{ test.duration_minutes }} minutes</span>
+                                                <span>{{ paper.duration_minutes }} minutes</span>
                                             </div>
                                             <div class="meta-item">
                                                 <i class="fas fa-question-circle"></i>
-                                                <span>{{ test.total_questions }} questions</span>
+                                                <span>{{ paper.total_questions }} questions</span>
                                             </div>
                                             <div class="meta-item">
                                                 <i class="fas fa-percentage"></i>
-                                                <span>Pass: {{ test.passing_percentage }}%</span>
+                                                <span>Pass: {{ paper.passing_percentage }}%</span>
                                             </div>
                                             <div class="meta-item">
                                                 <i class="fas fa-redo"></i>
-                                                <span>{{ test.max_attempts }} attempt(s)</span>
+                                                <span>{{ paper.max_attempts }} attempt(s)</span>
                                             </div>
                                         </div>
                                         
                                         <div class="schedule-container">
                                             <div class="schedule-item">
                                                 <i class="fas fa-play-circle"></i>
-                                                <span><strong>Start:</strong> {{ test.start_datetime|date:"M d, Y g:i A" }}</span>
+                                                <span><strong>Start:</strong> {{ paper.start_datetime|date:"M d, Y g:i A" }}</span>
                                             </div>
                                             <div class="schedule-item">
                                                 <i class="fas fa-stop-circle"></i>
-                                                <span><strong>End:</strong> {{ test.end_datetime|date:"M d, Y g:i A" }}</span>
+                                                <span><strong>End:</strong> {{ paper.end_datetime|date:"M d, Y g:i A" }}</span>
                                             </div>
                                         </div>
                                         
-                                        {% if test.block or test.module or test.subject %}
+                                        {% if paper.filter_module or paper.filter_topic %}
                                             <div class="meta-grid">
-                                                {% if test.block %}
-                                                    <div class="meta-item">
-                                                        <i class="fas fa-layer-group"></i>
-                                                        <span>{{ test.block }}</span>
-                                                    </div>
-                                                {% endif %}
-                                                {% if test.module %}
+                                                {% if paper.filter_module %}
                                                     <div class="meta-item">
                                                         <i class="fas fa-cube"></i>
-                                                        <span>{{ test.module }}</span>
+                                                        <span>{{ paper.filter_module }}</span>
                                                     </div>
                                                 {% endif %}
-                                                {% if test.subject %}
+                                                {% if paper.filter_topic %}
                                                     <div class="meta-item">
-                                                        <i class="fas fa-book"></i>
-                                                        <span>{{ test.subject }}</span>
+                                                        <i class="fas fa-tag"></i>
+                                                        <span>{{ paper.filter_topic }}</span>
                                                     </div>
                                                 {% endif %}
                                             </div>
                                         {% endif %}
                                         
                                         <div class="attempt-info">
-                                            <span><strong>Attempts:</strong> {{ test.user_attempts }}/{{ test.max_attempts }}</span>
-                                            {% if test.user_attempts > 0 %}
+                                            <span><strong>Attempts:</strong> {{ paper.user_attempts }}/{{ paper.max_attempts }}</span>
+                                            {% if paper.user_attempts > 0 %}
                                                 <span class="attempt-badge">
                                                     <i class="fas fa-check"></i> Attempted
                                                 </span>
                                             {% endif %}
                                         </div>
                                         
-                                        <div class="test-actions">
-                                            {% if test.can_attempt %}
-                                                <a href="{% url 'take_test' test.id %}" class="btn btn-primary">
+                                        <div class="paper-actions">
+                                            {% if paper.can_attempt %}
+                                                <a href="{% url 'take_paper' paper.id %}" class="btn btn-primary">
                                                     <i class="fas fa-play"></i>
-                                                    {% if test.user_attempts > 0 %}Retake Test{% else %}Start Test{% endif %}
+                                                    {% if paper.user_attempts > 0 %}Retake Paper{% else %}Start Paper{% endif %}
                                                 </a>
                                             {% else %}
                                                 <button class="btn btn-primary" disabled>
@@ -994,8 +1017,8 @@
                                                 </button>
                                             {% endif %}
                                             
-                                            {% if test.user_attempts > 0 %}
-                                                <a href='#' class="btn btn-secondary">
+                                            {% if paper.user_attempts > 0 %}
+                                                <a href="{% url 'student_paper_progress' %}" class="btn btn-secondary">
                                                     <i class="fas fa-chart-line"></i> View Progress
                                                 </a>
                                             {% endif %}
@@ -1006,64 +1029,67 @@
                         </div>
                     {% else %}
                         <div class="empty-state">
-                            <i class="fas fa-clipboard-list"></i>
-                            <h3>No Active Tests</h3>
-                            <p>There are no tests available at the moment. Check back later!</p>
+                            <i class="fas fa-file-alt"></i>
+                            <h3>No Active Papers</h3>
+                            <p>There are no model papers available at the moment. Check back later!</p>
                         </div>
                     {% endif %}
                 </section>
                 
-                <!-- Upcoming Tests Section -->
-                {% if upcoming_tests %}
+                <!-- Upcoming Papers Section -->
+                {% if upcoming_papers %}
                     <section style="margin-top: 48px;">
                         <div class="section-header">
                             <h2 class="section-title">
                                 <i class="fas fa-calendar-check"></i>
-                                Upcoming Tests
+                                Upcoming Model Papers
                             </h2>
                         </div>
                         
-                        <div class="test-grid">
-                            {% for test in upcoming_tests %}
-                                <div class="test-card">
-                                    <div class="test-card-header">
-                                        <h3 class="test-title">{{ test.title }}</h3>
-                                        <span class="test-status status-upcoming">
+                        <div class="paper-grid">
+                            {% for paper in upcoming_papers %}
+                                <div class="paper-card">
+                                    <div class="paper-card-header">
+                                        <h3 class="paper-title">{{ paper.title }}</h3>
+                                        <span class="paper-status status-upcoming">
                                             <i class="fas fa-clock"></i> Upcoming
                                         </span>
                                     </div>
                                     
-                                    <div class="test-card-body">
-                                        {% if test.description %}
-                                            <p class="test-description">{{ test.description }}</p>
+                                    <div class="paper-card-body">
+                                        {% if paper.description %}
+                                            <p class="paper-description">{{ paper.description }}</p>
                                         {% endif %}
                                         
+                                        <!-- Paper Information -->
+                                        <div class="paper-info-container">
+                                            <div class="paper-name">
+                                                <i class="fas fa-file-alt"></i>
+                                                {{ paper.selected_paper_name }}
+                                            </div>
+                                            {% if paper.filter_degree or paper.filter_year or paper.filter_subject %}
+                                                <div class="paper-filters">
+                                                    {% if paper.filter_degree %}Degree: {{ paper.filter_degree }}{% endif %}
+                                                    {% if paper.filter_year %}{% if paper.filter_degree %} | {% endif %}Year: {{ paper.filter_year }}{% endif %}
+                                                    {% if paper.filter_subject %}{% if paper.filter_degree or paper.filter_year %} | {% endif %}Subject: {{ paper.filter_subject }}{% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
                                         <div class="meta-grid">
-                                            {% if test.degree %}
-                                                <div class="meta-item">
-                                                    <i class="fas fa-graduation-cap"></i>
-                                                    <span>{{ test.get_degree_display }}</span>
-                                                </div>
-                                            {% endif %}
-                                            {% if test.year %}
-                                                <div class="meta-item">
-                                                    <i class="fas fa-calendar-alt"></i>
-                                                    <span>{{ test.get_year_display }} Year</span>
-                                                </div>
-                                            {% endif %}
                                             <div class="meta-item">
                                                 <i class="fas fa-clock"></i>
-                                                <span>{{ test.duration_minutes }} minutes</span>
+                                                <span>{{ paper.duration_minutes }} minutes</span>
                                             </div>
                                             <div class="meta-item">
                                                 <i class="fas fa-question-circle"></i>
-                                                <span>{{ test.total_questions }} questions</span>
+                                                <span>{{ paper.total_questions }} questions</span>
                                             </div>
                                         </div>
                                         
-                                        <div class="countdown" data-start="{{ test.start_datetime|date:'c' }}">
+                                        <div class="countdown" data-start="{{ paper.start_datetime|date:'c' }}">
                                             <i class="fas fa-calendar-alt"></i>
-                                            <span>Starts: {{ test.start_datetime|date:"M d, Y g:i A" }}</span>
+                                            <span>Starts: {{ paper.start_datetime|date:"M d, Y g:i A" }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1146,7 +1172,7 @@
                     updateCountdown(countdown, startDate);
                     setInterval(() => updateCountdown(countdown, startDate), 1000);
                 } else {
-                    countdown.innerHTML = '<i class="fas fa-check-circle"></i> <span>Test has started</span>';
+                    countdown.innerHTML = '<i class="fas fa-check-circle"></i> <span>Paper has started</span>';
                 }
             });
             
@@ -1155,7 +1181,7 @@
                 const diff = targetDate - now;
                 
                 if (diff <= 0) {
-                    element.innerHTML = '<i class="fas fa-check-circle"></i> <span>Test has started</span>';
+                    element.innerHTML = '<i class="fas fa-check-circle"></i> <span>Paper has started</span>';
                     return;
                 }
                 
@@ -1173,9 +1199,9 @@
                 element.innerHTML = `<i class="fas fa-clock"></i> <span>${countdownText}</span>`;
             }
 
-            // Initialize test card animations
-            const testCards = document.querySelectorAll('.test-card');
-            testCards.forEach((card, index) => {
+            // Initialize paper card animations
+            const paperCards = document.querySelectorAll('.paper-card');
+            paperCards.forEach((card, index) => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
                 setTimeout(() => {
@@ -1240,11 +1266,11 @@
             }, 5000);
         }
 
-        // Add hover effects to test cards
-        document.querySelectorAll('.test-card').forEach(card => {
+        // Add hover effects to paper cards
+        document.querySelectorAll('.paper-card').forEach(card => {
             card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px)';
-                this.style.boxShadow = '0 16px 40px rgba(130, 39, 46, 0.2)';
+                this.style.transform = 'translateY(-6px)';
+                this.style.boxShadow = '0 16px 40px rgba(59, 130, 246, 0.2)';
             });
             
             card.addEventListener('mouseleave', function() {
@@ -1253,7 +1279,7 @@
             });
         });
 
-        // Test action button interactions
+        // Paper action button interactions
         document.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('mouseenter', function() {
                 if (!this.disabled) {

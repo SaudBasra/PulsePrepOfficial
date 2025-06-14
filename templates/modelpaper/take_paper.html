@@ -5,19 +5,17 @@
     <meta charset="UTF-8">
     {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ test.title }} - PulsePrep</title>
+    <title>{{ paper.title }} - PulsePrep</title>
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Include Security Protection Component -->
     {% include 'user_management/security_protection.html' %}
-    
+
     <style>
-        /* Enhanced responsive styles */
+        /* Enhanced responsive styles for Model Papers */
         :root {
-            --primary: #82272e;
-            --primary-light: #a53b47;
-            --primary-dark: #6b1e24;
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -39,19 +37,70 @@
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            /* Disable text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
             overflow-x: hidden;
         }
 
-        /* Test Container - Responsive Layout */
-        .test-container {
+        /* Screenshot protection overlay */
+        .screenshot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 64, 175, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(20px);
+        }
+
+        .screenshot-overlay.active {
+            display: flex;
+        }
+
+        .screenshot-warning {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 90vw;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .screenshot-warning i {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .screenshot-warning h3 {
+            color: var(--dark);
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .screenshot-warning p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* Paper Container - Responsive Layout */
+        .paper-container {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             background: white;
         }
 
-        /* Test Header - Always responsive */
-        .test-header {
+        /* Paper Header - Always responsive */
+        .paper-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             padding: 12px 16px;
@@ -66,18 +115,18 @@
             gap: 8px;
         }
 
-        .test-info h3 {
+        .paper-info h3 {
             margin: 0 0 4px;
             font-size: clamp(14px, 4vw, 18px);
             font-weight: 600;
         }
 
-        .test-info span {
+        .paper-info span {
             font-size: clamp(12px, 3vw, 14px);
             opacity: 0.9;
         }
 
-        .test-timer {
+        .paper-timer {
             font-size: clamp(16px, 4vw, 20px);
             font-weight: 700;
             background: rgba(255,255,255,0.2);
@@ -90,12 +139,12 @@
             min-width: fit-content;
         }
 
-        .test-timer.warning {
+        .paper-timer.warning {
             background: rgba(245, 158, 11, 0.9);
             animation: pulse 1s infinite;
         }
 
-        .test-timer.danger {
+        .paper-timer.danger {
             background: rgba(239, 68, 68, 0.9);
             animation: pulse 0.5s infinite;
         }
@@ -142,8 +191,8 @@
             background: #059669;
         }
 
-        /* Test Body - Responsive Flex Layout */
-        .test-body {
+        /* Paper Body - Responsive Flex Layout */
+        .paper-body {
             flex: 1;
             display: flex;
             min-height: calc(100vh - 80px);
@@ -211,48 +260,23 @@
             overflow-wrap: break-word;
         }
 
-        /* Responsive Image styling */
-        .question-image {
-            margin: 16px 0;
-            text-align: center;
-            width: 100%;
+        /* Paper info section */
+        .paper-info-section {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
             flex-shrink: 0;
         }
 
-        .question-image img {
-            max-width: 100%;
-            width: auto;
-            height: auto;
-            max-height: clamp(200px, 40vh, 400px);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #e2e8f0;
-            object-fit: contain;
-            background: white;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .question-image .image-caption {
-            font-size: clamp(10px, 2.5vw, 12px);
-            color: var(--gray);
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        .image-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: clamp(12px, 3vw, 14px);
-            margin: 16px 0;
-        }
-
-        .image-error i {
-            margin-right: 8px;
+        .paper-name {
+            font-size: clamp(13px, 3vw, 14px);
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Options container - Responsive */
@@ -304,7 +328,7 @@
         }
 
         .option-label.selected {
-            background: rgba(130, 39, 46, 0.1);
+            background: rgba(30, 64, 175, 0.1);
             border-color: var(--primary);
             font-weight: 500;
         }
@@ -332,8 +356,8 @@
             position: relative;
         }
 
-        /* Test Progress - Compact */
-        .test-progress {
+        /* Paper Progress - Compact */
+        .paper-progress {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
             padding: 12px;
             border-radius: 8px;
@@ -342,7 +366,7 @@
             flex-shrink: 0;
         }
 
-        .test-progress h5 {
+        .paper-progress h5 {
             margin: 0 0 8px;
             color: #0369a1;
             font-size: clamp(12px, 3vw, 14px);
@@ -496,7 +520,7 @@
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(130, 39, 46, 0.3);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
         }
 
         .btn-secondary {
@@ -625,7 +649,7 @@
         }
 
         @media (max-width: 1024px) {
-            .test-body {
+            .paper-body {
                 flex-direction: column;
             }
             
@@ -651,13 +675,13 @@
                 max-height: 120px;
             }
             
-            .test-progress, .legend {
+            .paper-progress, .legend {
                 display: none;
             }
         }
 
         @media (max-width: 768px) {
-            .test-header {
+            .paper-header {
                 padding: 10px 12px;
                 gap: 6px;
             }
@@ -702,21 +726,17 @@
                 padding: 4px 8px;
                 font-size: 12px;
             }
-
-            .question-image img {
-                max-height: clamp(150px, 30vh, 250px);
-            }
         }
 
         @media (max-width: 480px) {
-            .test-header {
+            .paper-header {
                 padding: 8px 10px;
                 flex-direction: column;
                 align-items: stretch;
                 gap: 8px;
             }
             
-            .test-info, .test-timer, .header-actions {
+            .paper-info, .paper-timer, .header-actions {
                 text-align: center;
                 justify-content: center;
             }
@@ -763,15 +783,11 @@
             .modal-actions .btn {
                 width: 100%;
             }
-
-            .question-image img {
-                max-height: clamp(120px, 25vh, 200px);
-            }
         }
 
         /* Landscape orientation for mobile */
         @media (max-height: 500px) and (orientation: landscape) {
-            .test-header {
+            .paper-header {
                 padding: 6px 12px;
             }
             
@@ -781,10 +797,6 @@
             
             .question-panel {
                 min-height: calc(100vh - 200px);
-            }
-            
-            .question-image img {
-                max-height: 150px;
             }
             
             .question-grid {
@@ -818,6 +830,13 @@
             background: var(--primary);
         }
 
+        /* Print styles */
+        @media print {
+            body {
+                display: none !important;
+            }
+        }
+
         /* Animations */
         .fade-in {
             animation: fadeIn 0.3s ease-out;
@@ -828,24 +847,8 @@
             to { opacity: 1; }
         }
 
-        /* Loading indicator */
-        .image-loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-            margin: 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* Ensure content doesn't overflow */
-        .test-container * {
+        .paper-container * {
             max-width: 100%;
         }
 
@@ -867,24 +870,30 @@
         }
     </style>
 </head>
-<body data-security-protection 
-      data-warning-enabled="true" 
-      data-warning-limit="3" 
-      data-attempt-id="{{ attempt.id }}"
-      data-auto-submit-url="{% url 'test_result' attempt.id %}"
-      data-warning-report-url="{% url 'report_warning' %}">
+<body>
+    <!-- Screenshot Protection Overlay -->
+    <div class="screenshot-overlay" id="screenshot-overlay">
+        <div class="screenshot-warning">
+            <i class="fas fa-camera-retro"></i>
+            <h3>Screenshot Detected!</h3>
+            <p>Taking screenshots is not allowed during the paper. This action has been logged.</p>
+            <button class="btn btn-primary" onclick="hideScreenshotWarning()">
+                <i class="fas fa-check"></i> Continue Paper
+            </button>
+        </div>
+    </div>
 
-    <div class="test-container">
-        <!-- Test Header -->
-        <div class="test-header">
-            <div class="test-info">
-                <h3>{{ test.title }}</h3>
+    <div class="paper-container">
+        <!-- Paper Header -->
+        <div class="paper-header">
+            <div class="paper-info">
+                <h3>{{ paper.title }}</h3>
                 <span>Question <span id="current-question">1</span> of {{ total_questions }}</span>
             </div>
             
-            <div class="test-timer" id="timer">
+            <div class="paper-timer" id="timer">
                 <i class="fas fa-clock"></i>
-                <span id="time-remaining">{{ test.duration_minutes }}:00</span>
+                <span id="time-remaining">{{ paper.duration_minutes }}:00</span>
             </div>
             
             <div class="header-actions">
@@ -898,8 +907,8 @@
             </div>
         </div>
         
-        <!-- Test Body -->
-        <div class="test-body">
+        <!-- Paper Body -->
+        <div class="paper-body">
             <!-- Question Panel -->
             <div class="question-panel">
                 <div class="question-card fade-in" id="question-card">
@@ -927,8 +936,8 @@
             
             <!-- Navigation Panel -->
             <div class="navigation-panel">
-                <!-- Test Progress -->
-                <div class="test-progress">
+                <!-- Paper Progress -->
+                <div class="paper-progress">
                     <h5>Progress</h5>
                     <div class="progress-item">
                         <span>Answered:</span>
@@ -969,7 +978,7 @@
                 <div class="question-navigation">
                     <h4>Questions</h4>
                     <div class="question-grid" id="question-nav">
-                        {% for question in test_questions %}
+                        {% for question in paper_questions %}
                             <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
                                     onclick="goToQuestion({{ forloop.counter }})"
                                     data-question="{{ forloop.counter }}">
@@ -982,25 +991,36 @@
         </div>
     </div>
 
+    <!-- Warning Modal -->
+    <div class="modal" id="warning-modal">
+        <div class="modal-content warning-modal">
+            <h2><i class="fas fa-exclamation-triangle"></i> Warning!</h2>
+            <p id="warning-message">You have switched tabs. This is not allowed during the paper.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeWarning()">I Understand</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Submit Confirmation Modal -->
     <div class="modal" id="submit-modal">
         <div class="modal-content">
-            <h2><i class="fas fa-question-circle"></i> Submit Test?</h2>
-            <p>Are you sure you want to submit the test?</p>
+            <h2><i class="fas fa-question-circle"></i> Submit Paper?</h2>
+            <p>Are you sure you want to submit the paper?</p>
             <div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin: 16px 0;">
                 <p id="submit-summary" style="margin: 0; white-space: pre-line;"></p>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSubmitModal()">Cancel</button>
-                <button class="btn btn-success" onclick="submitTest()">Submit Test</button>
+                <button class="btn btn-success" onclick="submitPaper()">Submit Paper</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Test data - Updated for image support
-        const testQuestions = [
-            {% for question in test_questions %}
+        // Paper data
+        const paperQuestions = [
+            {% for question in paper_questions %}
             {
                 id: {{ question.id }},
                 order: {{ question.order }},
@@ -1013,14 +1033,15 @@
                 hasImage: {{ question.has_image|yesno:"true,false" }},
                 imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
                 imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
-                randomizeOptions: {{ test.randomize_options|yesno:"true,false" }}
+                randomizeOptions: {{ paper.randomize_options|yesno:"true,false" }}
             },
             {% endfor %}
         ];
         
-        // Test variables
+        // Paper variables
         const attemptId = {{ attempt.id }};
-        const duration = {{ test.duration_minutes }};
+        const duration = {{ paper.duration_minutes }};
+        const paperName = `{{ paper.selected_paper_name|escapejs }}`;
         let currentQuestionIndex = 0;
         let answers = {};
         let markedQuestions = new Set();
@@ -1033,41 +1054,17 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadQuestion(0);
             startTimer();
+            setupTabDetection();
+            setupScreenshotProtection();
             updateProgress();
             updateNavigationState();
             setupResponsiveHandlers();
             
-            // Initialize enhanced security with warning system
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                console.log('🔒 Enhanced Security System Active');
-                
-                // Override the tab switch handler to integrate with warning system
-                const originalTabSwitch = securityProtection.setupTabSwitchProtection;
-                securityProtection.setupTabSwitchProtection = function() {
-                    document.addEventListener('visibilitychange', () => {
-                        if (document.hidden) {
-                            document.body.classList.add('security-blur');
-                            handleTabSwitch(); // Use existing test warning system
-                            
-                            setTimeout(() => {
-                                if (document.hidden) {
-                                    document.body.style.filter = 'blur(20px)';
-                                }
-                            }, 100);
-                        } else {
-                            document.body.classList.remove('security-blur');
-                            document.body.style.filter = 'none';
-                        }
-                    });
-                };
-                
-                // Re-setup with new handler
-                securityProtection.setupTabSwitchProtection();
-            }
+            // Disable right-click
+            document.addEventListener('contextmenu', e => e.preventDefault());
         });
 
-        // Enhanced responsive handlers
+        // Responsive handlers
         function setupResponsiveHandlers() {
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
@@ -1096,10 +1093,10 @@
             }
             
             if (screenWidth <= 360) {
-                const timerIcon = document.querySelector('.test-timer i');
+                const timerIcon = document.querySelector('.paper-timer i');
                 if (timerIcon) timerIcon.style.display = 'none';
             } else {
-                const timerIcon = document.querySelector('.test-timer i');
+                const timerIcon = document.querySelector('.paper-timer i');
                 if (timerIcon) timerIcon.style.display = 'inline-block';
             }
         }
@@ -1118,6 +1115,79 @@
                 nextBtn.innerHTML = '<span>Next</span> <i class="fas fa-arrow-right"></i>';
                 updateMarkButtonState();
             }
+        }
+
+        // Screenshot protection
+        function setupScreenshotProtection() {
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'PrintScreen') {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                    reportScreenshotAttempt();
+                }
+                
+                if ((e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
+                    (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4'))) {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                    reportScreenshotAttempt();
+                }
+                
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                    showScreenshotWarning();
+                }
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    document.body.style.filter = 'blur(20px)';
+                } else {
+                    document.body.style.filter = 'none';
+                }
+            });
+
+            let devtools = {
+                open: false,
+                orientation: null
+            };
+            
+            const threshold = 160;
+            
+            setInterval(() => {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        showScreenshotWarning();
+                        reportScreenshotAttempt();
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+        }
+
+        function showScreenshotWarning() {
+            document.getElementById('screenshot-overlay').classList.add('active');
+        }
+
+        function hideScreenshotWarning() {
+            document.getElementById('screenshot-overlay').classList.remove('active');
+        }
+
+        function reportScreenshotAttempt() {
+            fetch('{% url "report_paper_warning" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `attempt_id=${attemptId}&violation_type=screenshot`
+            });
         }
         
         // Fullscreen functionality
@@ -1150,7 +1220,6 @@
             }
         }
         
-        // Update fullscreen button state
         document.addEventListener('fullscreenchange', function() {
             const icon = document.getElementById('fullscreen-icon');
             const text = document.getElementById('fullscreen-text');
@@ -1164,35 +1233,25 @@
             }
         });
         
-        // Load question with enhanced image support
+        // Load question
         function loadQuestion(index) {
-            const question = testQuestions[index];
+            const question = paperQuestions[index];
             currentQuestionIndex = index;
             visitedQuestions.add(index + 1);
             
             document.getElementById('current-question').textContent = index + 1;
             
-            let imageHtml = '';
-            if (question.hasImage && question.imageUrl) {
-                imageHtml = `
-                    <div class="question-image">
-                        <img src="${question.imageUrl}" 
-                             alt="Question Image" 
-                             loading="lazy"
-                             onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'><i class=\\'fas fa-exclamation-triangle\\'></i>Image failed to load: ${question.imageFilename || 'Unknown'}</div>'"
-                             onload="console.log('Image loaded successfully')">
-                        ${question.imageFilename ? `<div class="image-caption">Image: ${question.imageFilename}</div>` : ''}
+            // Create paper info HTML
+            let paperInfoHtml = `
+                <div class="paper-info-section">
+                    <div class="paper-name">
+                        <i class="fas fa-file-alt"></i>
+                        ${paperName}
                     </div>
-                `;
-            } else if (question.hasImage && !question.imageUrl) {
-                imageHtml = `
-                    <div class="image-error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Image not found: ${question.imageFilename || 'Unknown filename'}
-                    </div>
-                `;
-            }
+                </div>
+            `;
             
+            // Create options HTML
             let optionsHtml = '<div class="options-container"><ul class="options-list">';
             const options = Object.entries(question.options);
             
@@ -1219,7 +1278,7 @@
             questionContainer.innerHTML = `
                 <div class="question-number">Question ${index + 1}</div>
                 <div class="question-text">${question.text}</div>
-                ${imageHtml}
+                ${paperInfoHtml}
                 ${optionsHtml}
             `;
             
@@ -1244,7 +1303,7 @@
                 prevBtn.style.opacity = '1';
             }
             
-            if (currentQuestionIndex === testQuestions.length - 1) {
+            if (currentQuestionIndex === paperQuestions.length - 1) {
                 nextBtn.disabled = true;
                 nextBtn.style.opacity = '0.5';
             } else {
@@ -1255,7 +1314,7 @@
         
         function updateMarkButtonState() {
             const markBtn = document.getElementById('mark-btn');
-            const question = testQuestions[currentQuestionIndex];
+            const question = paperQuestions[currentQuestionIndex];
             const isCompact = window.innerWidth <= 480;
             
             if (markedQuestions.has(question.id)) {
@@ -1276,7 +1335,7 @@
         }
         
         function saveAnswer(answer) {
-            const question = testQuestions[currentQuestionIndex];
+            const question = paperQuestions[currentQuestionIndex];
             answers[question.id] = answer;
             
             document.querySelectorAll('.option-label').forEach(label => {
@@ -1284,7 +1343,7 @@
             });
             event.target.closest('.option-label').classList.add('selected');
             
-            fetch('{% url "submit_answer" %}', {
+            fetch('{% url "submit_paper_answer" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1304,7 +1363,7 @@
         }
         
         function nextQuestion() {
-            if (currentQuestionIndex < testQuestions.length - 1) {
+            if (currentQuestionIndex < paperQuestions.length - 1) {
                 loadQuestion(currentQuestionIndex + 1);
             }
         }
@@ -1314,22 +1373,13 @@
         }
         
         function markForReview() {
-            const question = testQuestions[currentQuestionIndex];
+            const question = paperQuestions[currentQuestionIndex];
             
             if (markedQuestions.has(question.id)) {
                 markedQuestions.delete(question.id);
             } else {
                 markedQuestions.add(question.id);
             }
-            
-            fetch('{% url "submit_test" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: `attempt_id=${attemptId}&question_id=${question.id}&marked=${markedQuestions.has(question.id)}`
-            });
             
             updateNavigation();
             updateProgress();
@@ -1338,7 +1388,7 @@
         
         function updateNavigation() {
             document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
-                const question = testQuestions[index];
+                const question = paperQuestions[index];
                 
                 btn.className = 'question-nav-btn';
                 
@@ -1355,7 +1405,7 @@
         function updateProgress() {
             const answered = Object.keys(answers).length;
             const marked = markedQuestions.size;
-            const remaining = testQuestions.length - answered;
+            const remaining = paperQuestions.length - answered;
             
             document.getElementById('answered-count').textContent = answered;
             document.getElementById('marked-count').textContent = marked;
@@ -1375,19 +1425,19 @@
             
             timerInterval = setInterval(() => {
                 timeRemaining--;
-                updateTimerDisplay();
+                
                 
                 const timerElement = document.getElementById('timer');
                 
                 if (timeRemaining === 300) {
                     timerElement.classList.add('warning');
-                    showTimerWarning('Only 5 minutes remaining!');
+                    showWarning('Only 5 minutes remaining!');
                 }
                 
                 if (timeRemaining === 60) {
                     timerElement.classList.remove('warning');
                     timerElement.classList.add('danger');
-                    showTimerWarning('Only 1 minute remaining! Test will auto-submit soon.');
+                    showWarning('Only 1 minute remaining! Paper will auto-submit soon.');
                 }
                 
                 if (timeRemaining <= 0) {
@@ -1397,52 +1447,58 @@
             }, 1000);
         }
         
-        function showTimerWarning(message) {
-            // Use security system to show warning if available
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                securityProtection.showWarning('timer', message);
-            } else {
-                alert(message);
-            }
+        function setupTabDetection() {
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    handleTabSwitch();
+                }
+            });
+            
+            window.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (!document.hasFocus()) {
+                        handleTabSwitch();
+                    }
+                }, 100);
+            });
         }
         
-        // Enhanced tab switch detection with proper warning counting
         function handleTabSwitch() {
             warningCount++;
             
-            fetch('{% url "report_warning" %}', {
+            fetch('{% url "report_paper_warning" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: `attempt_id=${attemptId}&violation_type=tabswitch&warning_count=${warningCount}`
+                body: `attempt_id=${attemptId}`
             })
             .then(response => response.json())
             .then(data => {
                 if (data.auto_submit) {
                     alert(data.message);
-                    window.location.href = '{% url "test_result" attempt.id %}';
+                    window.location.href = '{% url "paper_result" attempt.id %}';
                 } else {
-                    // Use security system warning if available
-                    const securityProtection = SecurityProtection.getInstance();
-                    if (securityProtection) {
-                        securityProtection.reportViolation('tabswitch', 
-                            `Warning ${warningCount}/3: Please do not switch tabs during the test!`);
-                    }
+                    showWarning(`Warning ${warningCount}/3: Please do not switch tabs during the paper!`);
                 }
-            })
-            .catch(error => {
-                console.error('Warning report failed:', error);
             });
+        }
+        
+        function showWarning(message) {
+            document.getElementById('warning-message').textContent = message;
+            document.getElementById('warning-modal').style.display = 'flex';
+        }
+        
+        function closeWarning() {
+            document.getElementById('warning-modal').style.display = 'none';
         }
         
         function confirmSubmit() {
             const answered = Object.keys(answers).length;
-            const unanswered = testQuestions.length - answered;
+            const unanswered = paperQuestions.length - answered;
             
-            let summary = `Total Questions: ${testQuestions.length}\n`;
+            let summary = `Total Questions: ${paperQuestions.length}\n`;
             summary += `Answered: ${answered}\n`;
             
             if (unanswered > 0) {
@@ -1461,18 +1517,12 @@
             document.getElementById('submit-modal').style.display = 'none';
         }
         
-        function submitTest() {
+        function submitPaper() {
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
             
-            // Disable security protection during submission
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                securityProtection.disable();
-            }
-            
-            fetch('{% url "submit_test" %}', {
+            fetch('{% url "submit_paper" %}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -1483,14 +1533,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '{% url "test_result" attempt.id %}';
+                    window.location.href = '{% url "paper_result" attempt.id %}';
                 }
             });
         }
         
         function autoSubmit() {
-            alert('Time is up! Your test will be submitted automatically.');
-            submitTest();
+            alert('Time is up! Your paper will be submitted automatically.');
+            submitPaper();
         }
         
         function getCookie(name) {
@@ -1516,7 +1566,10 @@
         
         // Enhanced keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Only allow test navigation keys, security system handles restrictions
+            if (e.altKey || e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+            }
+            
             switch(e.key) {
                 case 'ArrowLeft':
                     if (!e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -1553,6 +1606,68 @@
                     break;
             }
         });
+
+        // Additional security measures
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your paper progress will be lost.';
+            return 'Are you sure you want to leave? Your paper progress will be lost.';
+        });
+
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            showScreenshotWarning();
+            reportScreenshotAttempt();
+        });
+
+        // Enhanced zoom detection
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            const currentWidth = window.innerWidth;
+            const currentHeight = window.innerHeight;
+            
+            if (Math.abs(currentWidth - lastWidth) > 100 || Math.abs(currentHeight - lastHeight) > 100) {
+                if (currentWidth < lastWidth * 0.9 || currentWidth > lastWidth * 1.1) {
+                    if (window.innerWidth > 768) {
+                        showWarning('Please do not zoom in or out during the paper.');
+                    }
+                }
+            }
+            
+            lastWidth = currentWidth;
+            lastHeight = currentHeight;
+        });
+
+        // Touch gesture prevention for mobile
+        if ('ontouchstart' in window) {
+            let lastTouchEnd = 0;
+            
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            document.addEventListener('gesturestart', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gesturechange', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gestureend', function (e) {
+                e.preventDefault();
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,1939 @@
+{% load static %}
+
+<!-- Enhanced Practice Session Template with Notes Integration -->
+{% include 'notes/quick_note_component.html' %}
+{% include 'user_management/security_protection.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Session - {{ session.topic }} - PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Practice Session Enhanced Color Scheme - Matching System Design */
+        :root {
+            --primary: #82272e;
+            --primary-light: #a53b47;
+            --primary-dark: #6b1e24;
+            --practice-primary: #16a34a;       /* Green for practice mode */
+            --practice-primary-light: #22c55e;
+            --practice-primary-dark: #15803d;
+            --secondary: #10b981;
+            --accent: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --info: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --dark: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
+            color: var(--gray-800);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .practice-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--white);
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 0 50px rgba(22, 163, 74, 0.1);
+        }
+
+        /* Enhanced Practice Header - Green Theme for Practice */
+        .practice-header {
+            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
+            color: white;
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(22, 163, 74, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .practice-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        }
+
+        .practice-info {
+            flex: 1;
+        }
+
+        .practice-info h3 {
+            margin: 0 0 8px;
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .practice-info .breadcrumb {
+            font-size: 14px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .breadcrumb-separator {
+            opacity: 0.6;
+        }
+
+        .practice-progress {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            width: 240px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: 5px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .timer-display {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .complete-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .complete-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced Practice Body */
+        .practice-body {
+            flex: 1;
+            display: flex;
+            background: var(--gray-50);
+            min-height: calc(100vh - 100px);
+        }
+
+        /* Enhanced Question Panel */
+        .question-panel {
+            flex: 1;
+            padding: 32px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            margin: 16px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(22, 163, 74, 0.08);
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            /* Enhanced question card with data attributes for notes */
+            min-height: 300px;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--practice-primary), var(--practice-primary-light));
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .question-number {
+            font-size: 18px;
+            color: var(--practice-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .question-counter {
+            background: var(--practice-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .difficulty-badge {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .difficulty-easy {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .difficulty-medium {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fbbf24;
+        }
+
+        .difficulty-hard {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+        }
+
+        .question-text {
+            font-size: 20px;
+            line-height: 1.7;
+            margin-bottom: 24px;
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
+        /* Enhanced Question Image */
+        .question-image {
+            margin: 24px 0;
+            text-align: center;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .question-image img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border: 1px solid var(--gray-200);
+            transition: transform 0.3s ease;
+        }
+
+        .question-image img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Enhanced Options */
+        .options-container {
+            margin-bottom: 32px;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            width: 100%;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            min-height: 60px;
+            width: 100%;
+        }
+
+        .option-label:hover {
+            background: rgba(22, 163, 74, 0.05);
+            border-color: var(--practice-primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.1);
+        }
+
+        .option-label.selected {
+            background: rgba(22, 163, 74, 0.1);
+            border-color: var(--practice-primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .option-label.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .option-label.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .option-label input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 16px;
+            margin-top: 2px;
+            accent-color: var(--practice-primary);
+            flex-shrink: 0;
+        }
+
+        .option-text {
+            font-size: 16px;
+            line-height: 1.6;
+            flex: 1;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .option-feedback {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-label.correct .option-feedback,
+        .option-label.incorrect .option-feedback {
+            opacity: 1;
+        }
+
+        .feedback-correct {
+            color: var(--success);
+        }
+
+        .feedback-incorrect {
+            color: var(--danger);
+        }
+
+        /* Enhanced Question Context Info - Added for Notes Integration */
+        .question-context-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 16px 0;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .context-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .context-item i {
+            color: #10b981;
+            width: 14px;
+        }
+
+        /* Enhanced Question Actions with Notes Button */
+        .question-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #f3f4f6;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .question-utilities {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-utility {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .btn-utility:hover {
+            background: #e5e7eb;
+            color: #1f2937;
+            transform: translateY(-1px);
+        }
+
+        .btn-note {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+            font-weight: 500;
+        }
+
+        .btn-note:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-note:active {
+            transform: translateY(0);
+        }
+
+        .btn-note.has-note {
+            background: #059669;
+        }
+
+        .btn-note.has-note::after {
+            content: '✓';
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        /* Enhanced Answer Feedback */
+        .answer-feedback {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 1px solid #bae6fd;
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-feedback::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--info);
+        }
+
+        .answer-feedback.show {
+            display: block;
+            animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feedback-correct-answer::before {
+            background: var(--success);
+        }
+
+        .feedback-incorrect-answer::before {
+            background: var(--danger);
+        }
+
+        .feedback-correct-answer {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-color: #bbf7d0;
+        }
+
+        .feedback-incorrect-answer {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-color: #fecaca;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .feedback-header i {
+            font-size: 20px;
+        }
+
+        .explanation-text {
+            color: var(--gray-700);
+            line-height: 1.7;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+        }
+
+        /* Enhanced Navigation Panel */
+        .navigation-panel {
+            width: 320px;
+            background: white;
+            padding: 24px;
+            border-left: 1px solid var(--gray-200);
+            overflow-y: auto;
+            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.05);
+            margin: 16px 16px 16px 0;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .session-stats {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1px solid #bbf7d0;
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .session-stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--practice-primary);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .session-stats h5 {
+            margin: 0 0 16px;
+            color: #059669;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px 0;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 16px;
+        }
+
+        .accuracy-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .accuracy-bar {
+            width: 60px;
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .accuracy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--practice-primary), var(--practice-primary-light));
+            transition: width 0.3s ease;
+        }
+
+        /* Enhanced Question Navigation */
+        .question-navigation h4 {
+            margin: 0 0 16px;
+            color: var(--gray-800);
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .question-nav-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--gray-300);
+            background: white;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .question-nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-nav-btn.current {
+            background: var(--practice-primary);
+            color: white;
+            border-color: var(--practice-primary);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .question-nav-btn.answered {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .question-nav-btn.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .question-nav-btn.incorrect {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        /* Enhanced Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+            min-height: 48px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-300);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .correct-animation {
+            animation: correctPulse 0.6s ease;
+        }
+
+        .incorrect-animation {
+            animation: incorrectShake 0.6s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .navigation-panel {
+                width: 280px;
+            }
+            
+            .question-panel {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .practice-body {
+                flex-direction: column;
+            }
+            
+            .navigation-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--gray-200);
+                order: 2;
+                max-height: 300px;
+                margin: 0 16px 16px;
+                border-radius: 16px;
+            }
+            
+            .question-panel {
+                order: 1;
+                margin: 16px 16px 0;
+                min-height: calc(100vh - 400px);
+            }
+            
+            .session-stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .stat-item {
+                flex-direction: column;
+                text-align: center;
+                margin: 8px 0;
+            }
+
+            .question-actions {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .question-utilities {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .practice-header {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            
+            .practice-info h3 {
+                font-size: 20px;
+                text-align: center;
+            }
+            
+            .practice-progress {
+                justify-content: center;
+                font-size: 16px;
+            }
+            
+            .progress-bar {
+                width: 180px;
+            }
+            
+            .header-actions {
+                justify-content: center;
+            }
+            
+            .question-panel {
+                padding: 20px;
+                margin: 12px;
+            }
+            
+            .question-card {
+                padding: 24px;
+            }
+            
+            .navigation-panel {
+                padding: 16px;
+                margin: 0 12px 12px;
+                max-height: 250px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .option-label {
+                padding: 16px;
+            }
+
+            .question-context-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .question-utilities {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+
+            .btn-utility,
+            .btn-note {
+                padding: 6px 10px;
+                font-size: 0.8125rem;
+            }
+
+            .note-text {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .practice-header {
+                padding: 12px 16px;
+            }
+            
+            .practice-info h3 {
+                font-size: 18px;
+            }
+            
+            .question-panel {
+                padding: 16px;
+                margin: 8px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .navigation-panel {
+                padding: 12px;
+                margin: 0 8px 8px;
+                max-height: 200px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+            }
+            
+            .option-label {
+                padding: 12px;
+                min-height: auto;
+            }
+            
+            .option-text {
+                font-size: 14px;
+            }
+            
+            .question-grid {
+                grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+            }
+            
+            .question-nav-btn {
+                width: 32px;
+                height: 32px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--practice-primary-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--practice-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="practice-container">
+        <!-- Enhanced Practice Header -->
+        <div class="practice-header">
+            <div class="practice-info">
+                <h3>
+                    <i class="fas fa-dumbbell"></i>
+                    {{ session.topic }}
+                </h3>
+                <div class="breadcrumb">
+                    <span>{{ session.block }}</span>
+                    <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+                    <span>{{ session.module }}</span>
+                    <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+                    <span>{{ session.subject }}</span>
+                </div>
+            </div>
+            
+            <div class="practice-progress">
+                <div class="progress-indicator">
+                    <span id="current-question">1</span> / {{ total_questions }}
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                {% if session.timed_practice %}
+                <div class="timer-display" id="timer-display">
+                    <i class="fas fa-clock"></i>
+                    <span id="timer">--:--</span>
+                </div>
+                {% endif %}
+                <button class="complete-btn" onclick="completeSession()">
+                    <i class="fas fa-check-circle"></i>
+                    Complete Session
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Practice Body -->
+        <div class="practice-body">
+            <!-- Enhanced Question Panel -->
+            <div class="question-panel">
+                <div class="question-card" id="question-card">
+                    <div id="question-container">
+                        <!-- Questions will be loaded here with enhanced structure -->
+                    </div>
+                    
+                    <!-- Enhanced Answer Feedback -->
+                    <div class="answer-feedback" id="answer-feedback">
+                        <div class="feedback-header">
+                            <i id="feedback-icon"></i>
+                            <span id="feedback-title"></span>
+                        </div>
+                        <div id="feedback-content">
+                            <div class="explanation-text" id="explanation-text"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Enhanced Navigation Panel -->
+            <div class="navigation-panel">
+                <!-- Enhanced Session Stats -->
+                <div class="session-stats">
+                    <h5>
+                        <i class="fas fa-chart-line"></i>
+                        Session Progress
+                    </h5>
+                    <div class="stat-item">
+                        <span class="stat-label">Answered:</span>
+                        <span class="stat-value" id="answered-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Correct:</span>
+                        <span class="stat-value" id="correct-count">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Accuracy:</span>
+                        <div class="accuracy-indicator">
+                            <div class="accuracy-bar">
+                                <div class="accuracy-fill" id="accuracy-fill" style="width: 0%"></div>
+                            </div>
+                            <span class="stat-value" id="accuracy">0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Remaining:</span>
+                        <span class="stat-value" id="remaining-count">{{ total_questions }}</span>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Question Navigation -->
+                <div class="question-navigation">
+                    <h4>
+                        <i class="fas fa-list-ol"></i>
+                        Questions
+                    </h4>
+                    <div class="question-grid" id="question-nav">
+                        {% for question in questions %}
+                            <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
+                                    onclick="goToQuestion({{ forloop.counter }})"
+                                    data-question="{{ forloop.counter }}"
+                                    title="Question {{ forloop.counter }}">
+                                {{ forloop.counter }}
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Session Data
+        const sessionId = {{ session.id }};
+        const showExplanations = {{ session.show_explanations|yesno:"true,false" }};
+        const timedPractice = {{ session.timed_practice|yesno:"true,false" }};
+        const timePerQuestion = {{ session.time_per_question|default:"null" }};
+        
+        const questions = [
+            {% for question in questions %}
+            {
+                id: {{ question.id }},
+                order: {{ question.order }},
+                text: `{{ question.text|escapejs }}`,
+                options: {
+                    {% for key, value in question.options.items %}
+                    {{ key }}: `{{ value|escapejs }}`,
+                    {% endfor %}
+                },
+                correctAnswer: '{{ question.correct_answer }}',
+                explanation: `{{ question.explanation|escapejs }}`,
+                difficulty: '{{ question.difficulty }}',
+                hasImage: {{ question.has_image|yesno:"true,false" }},
+                imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
+                imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
+                // Enhanced question data for notes integration
+                degree: `{{ question.degree|default:"MBBS"|escapejs }}`,
+                year: `{{ question.year|default:"1st"|escapejs }}`,
+                block: `{{ question.block|default:""|escapejs }}`,
+                module: `{{ question.module|default:""|escapejs }}`,
+                subject: `{{ question.subject|default:""|escapejs }}`,
+                topic: `{{ question.topic|default:""|escapejs }}`
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+        
+        // Enhanced Session State
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let questionStartTime = Date.now();
+        let sessionStartTime = Date.now();
+        let questionTimer = null;
+        let currentQuestionTimeLeft = timePerQuestion;
+        
+        // Initialize Enhanced Practice Session
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestion(0);
+            updateProgress();
+            updateNavigationState();
+            
+            if (timedPractice && timePerQuestion) {
+                startQuestionTimer();
+            }
+            
+            // Add keyboard shortcuts
+            setupKeyboardNavigation();
+            
+            // Prevent accidental navigation away
+            setupNavigationWarning();
+            
+            // Auto-save progress periodically
+            setInterval(autoSaveProgress, 30000); // Every 30 seconds
+        });
+        
+        // Enhanced Question Loading with Better Image Support and Notes Integration
+        function loadQuestion(index) {
+            const question = questions[index];
+            currentQuestionIndex = index;
+            questionStartTime = Date.now();
+            
+            if (timedPractice && timePerQuestion) {
+                currentQuestionTimeLeft = timePerQuestion;
+                startQuestionTimer();
+            }
+            
+            // Update current question number
+            document.getElementById('current-question').textContent = index + 1;
+            
+            // Update progress bar with smooth animation
+            const progressPercent = (index / questions.length) * 100;
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            
+            // Create image HTML with better error handling
+            let imageHtml = '';
+            if (question.hasImage && question.imageUrl) {
+                imageHtml = `
+                    <div class="question-image">
+                        <img src="${question.imageUrl}" 
+                             alt="Question ${index + 1} Image" 
+                             loading="lazy"
+                             onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>Image unavailable</div>'"
+                             onload="this.style.opacity='1';"
+                             style="opacity: 0; transition: opacity 0.3s ease;">
+                    </div>
+                `;
+            }
+            
+            // Create enhanced options HTML
+            let optionsHtml = '<div class="options-container"><ul class="options-list">';
+            const options = Object.entries(question.options);
+            
+            options.forEach(([key, value]) => {
+                const isSelected = answers[question.id] && answers[question.id].answer === key;
+                const isAnswered = answers[question.id] !== undefined;
+                const isCorrect = isAnswered && question.correctAnswer === key;
+                const isUserAnswer = isAnswered && answers[question.id].answer === key;
+                
+                let optionClass = 'option-label';
+                let feedbackIcon = '';
+                
+                if (isAnswered) {
+                    if (isCorrect) {
+                        optionClass += ' correct';
+                        if (isUserAnswer) {
+                            feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                        }
+                    } else if (isUserAnswer && !isCorrect) {
+                        optionClass += ' incorrect';
+                        feedbackIcon = '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+                    } else if (isCorrect) {
+                        feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                    }
+                } else if (isSelected) {
+                    optionClass += ' selected';
+                }
+                
+                optionsHtml += `
+                    <li class="option-item">
+                        <label class="${optionClass}" data-option="${key}">
+                            <input type="radio" name="answer" value="${key}" 
+                                   ${isSelected ? 'checked' : ''} 
+                                   ${isAnswered ? 'disabled' : ''}
+                                   onchange="submitAnswer('${key}')">
+                            <span class="option-text">${key}) ${value}</span>
+                            ${feedbackIcon}
+                        </label>
+                    </li>
+                `;
+            });
+            optionsHtml += '</ul></div>';
+
+            // Enhanced question context info for notes integration
+            let contextHtml = '';
+            const hierarchyParts = [];
+            if (question.block) hierarchyParts.push(question.block);
+            if (question.module) hierarchyParts.push(question.module);
+            if (question.subject) hierarchyParts.push(question.subject);
+            if (question.topic) hierarchyParts.push(question.topic);
+
+            if (hierarchyParts.length > 0 || question.degree || question.year) {
+                contextHtml = `
+                    <div class="question-context-info">
+                        <div class="context-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>${question.degree} - ${question.year}</span>
+                        </div>
+                        ${hierarchyParts.length > 0 ? `
+                        <div class="context-item">
+                            <i class="fas fa-sitemap"></i>
+                            <span>${hierarchyParts.join(' → ')}</span>
+                        </div>
+                        ` : ''}
+                        ${question.difficulty ? `
+                        <div class="context-item">
+                            <i class="fas fa-signal"></i>
+                            <span>${question.difficulty} Difficulty</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            // Enhanced question actions with utilities and notes
+            const questionActionsHtml = `
+                <div class="question-actions">
+                    <div class="question-utilities">
+                        <button class="btn-utility" onclick="markForReview(${question.id})" title="Mark for Review">
+                            <i class="fas fa-bookmark"></i>
+                            <span>Mark</span>
+                        </button>
+                        
+                        <button class="btn-utility" onclick="showExplanation(${question.id})" title="Show Explanation">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Explain</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Enhanced Note Button with proper question data -->
+                    <button class="btn-note" onclick="openQuickNote(${question.id})" title="Add Note for this Question">
+                        <i class="fas fa-sticky-note"></i>
+                        <span class="note-text">Note</span>
+                    </button>
+                </div>
+            `;
+            
+            // Load question content with enhanced layout and data attributes for notes
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = `
+                <div class="question-header">
+                    <div class="question-number">
+                        <span class="question-counter">Question ${index + 1}</span>
+                    </div>
+                    <span class="difficulty-badge difficulty-${question.difficulty.toLowerCase()}">${question.difficulty}</span>
+                </div>
+                <div class="question-text">${question.text}</div>
+                ${imageHtml}
+                ${optionsHtml}
+                ${contextHtml}
+                ${questionActionsHtml}
+            `;
+
+            // Set enhanced data attributes on the question card for notes integration
+            const questionCard = document.getElementById('question-card');
+            questionCard.setAttribute('data-question-id', question.id);
+            questionCard.setAttribute('data-degree', question.degree);
+            questionCard.setAttribute('data-year', question.year);
+            questionCard.setAttribute('data-block', question.block);
+            questionCard.setAttribute('data-module', question.module);
+            questionCard.setAttribute('data-subject', question.subject);
+            questionCard.setAttribute('data-topic', question.topic);
+            
+            // Show feedback if question is already answered
+            if (answers[question.id] && showExplanations) {
+                showAnswerFeedback(question, answers[question.id]);
+            } else {
+                hideAnswerFeedback();
+            }
+            
+            updateNavigationState();
+            updateNavigation();
+            
+            // Scroll to top of question for mobile
+            questionContainer.scrollTop = 0;
+        }
+        
+        // Enhanced Answer Submission with Better Feedback
+        function submitAnswer(selectedAnswer) {
+            const question = questions[currentQuestionIndex];
+            const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+            
+            // Clear question timer if active
+            if (questionTimer) {
+                clearTimeout(questionTimer);
+            }
+            
+            // Save answer locally
+            const isCorrect = selectedAnswer === question.correctAnswer;
+            answers[question.id] = {
+                answer: selectedAnswer,
+                timeSpent: timeSpent,
+                isCorrect: isCorrect
+            };
+            
+            // Submit to server with enhanced error handling
+            fetch('{% url "submit_practice_answer" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `session_id=${sessionId}&question_id=${question.id}&answer=${selectedAnswer}&time_spent=${timeSpent}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI with enhanced feedback
+                    updateOptionsWithFeedback(question, selectedAnswer, data.is_correct);
+                    
+                    if (showExplanations) {
+                        showAnswerFeedback(question, {
+                            answer: selectedAnswer,
+                            isCorrect: data.is_correct,
+                            explanation: data.explanation
+                        });
+                    }
+                    
+                    // Update progress and navigation
+                    updateProgress();
+                    updateNavigation();
+                    
+                    // Enhanced animations
+                    const questionCard = document.getElementById('question-card');
+                    if (data.is_correct) {
+                        questionCard.classList.add('correct-animation');
+                        // Celebrate correct answer
+                        showCelebration(true);
+                    } else {
+                        questionCard.classList.add('incorrect-animation');
+                        showCelebration(false);
+                    }
+                    
+                    setTimeout(() => {
+                        questionCard.classList.remove('correct-animation', 'incorrect-animation');
+                    }, 600);
+                    
+                    // Auto-advance after delay for better UX
+                    if (currentQuestionIndex < questions.length - 1) {
+                        setTimeout(() => {
+                            const nextButton = document.getElementById('next-btn');
+                            if (nextButton && !nextButton.disabled) {
+                                nextButton.style.background = 'linear-gradient(135deg, #059669, #047857)';
+                                nextButton.style.transform = 'scale(1.05)';
+                                setTimeout(() => {
+                                    nextButton.style.background = '';
+                                    nextButton.style.transform = '';
+                                }, 300);
+                            }
+                        }, 1500);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting answer:', error);
+                showNotification('Error submitting answer. Please try again.', 'error');
+            });
+        }
+        
+        // Enhanced Visual Feedback
+        function updateOptionsWithFeedback(question, selectedAnswer, isCorrect) {
+            const optionLabels = document.querySelectorAll('.option-label');
+            
+            optionLabels.forEach(label => {
+                const optionKey = label.dataset.option;
+                const input = label.querySelector('input');
+                
+                // Disable all inputs
+                input.disabled = true;
+                
+                // Remove existing classes
+                label.classList.remove('selected', 'correct', 'incorrect');
+                
+                // Add appropriate classes with animations
+                if (optionKey === question.correctAnswer) {
+                    label.classList.add('correct');
+                    if (!label.querySelector('.option-feedback')) {
+                        label.innerHTML += '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                    }
+                } else if (optionKey === selectedAnswer && !isCorrect) {
+                    label.classList.add('incorrect');
+                    if (!label.querySelector('.option-feedback')) {
+                        label.innerHTML += '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+                    }
+                }
+            });
+        }
+        
+        // Enhanced Answer Feedback Display
+        function showAnswerFeedback(question, answerData) {
+            const feedbackDiv = document.getElementById('answer-feedback');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const explanationText = document.getElementById('explanation-text');
+            
+            if (answerData.isCorrect) {
+                feedbackDiv.className = 'answer-feedback show feedback-correct-answer';
+                feedbackIcon.className = 'fas fa-check-circle feedback-correct';
+                feedbackTitle.textContent = 'Excellent! Correct Answer';
+            } else {
+                feedbackDiv.className = 'answer-feedback show feedback-incorrect-answer';
+                feedbackIcon.className = 'fas fa-times-circle feedback-incorrect';
+                feedbackTitle.textContent = `Incorrect. The correct answer is ${question.correctAnswer}`;
+            }
+            
+            if (question.explanation && question.explanation.trim()) {
+                explanationText.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+            } else {
+                explanationText.innerHTML = '<em>No explanation available for this question.</em>';
+            }
+        }
+        
+        // Hide Answer Feedback
+        function hideAnswerFeedback() {
+            const feedbackDiv = document.getElementById('answer-feedback');
+            feedbackDiv.classList.remove('show');
+        }
+        
+        // Enhanced Timer for Timed Practice
+        function startQuestionTimer() {
+            if (!timedPractice || !timePerQuestion) return;
+            
+            if (questionTimer) {
+                clearTimeout(questionTimer);
+            }
+            
+            updateTimerDisplay();
+            
+            questionTimer = setTimeout(() => {
+                // Auto-submit random answer when time runs out
+                const question = questions[currentQuestionIndex];
+                if (!answers[question.id]) {
+                    const options = Object.keys(question.options);
+                    const randomAnswer = options[Math.floor(Math.random() * options.length)];
+                    submitAnswer(randomAnswer);
+                    showNotification('Time\'s up! Random answer submitted.', 'warning');
+                }
+            }, timePerQuestion * 1000);
+            
+            // Update timer display every second
+            const timerInterval = setInterval(() => {
+                currentQuestionTimeLeft--;
+                updateTimerDisplay();
+                
+                if (currentQuestionTimeLeft <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            if (!timedPractice) return;
+            
+            const minutes = Math.floor(currentQuestionTimeLeft / 60);
+            const seconds = currentQuestionTimeLeft % 60;
+            const timerElement = document.getElementById('timer');
+            
+            if (timerElement) {
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Change color when time is running low
+                const timerDisplay = document.getElementById('timer-display');
+                if (currentQuestionTimeLeft <= 10) {
+                    timerDisplay.style.background = 'rgba(239, 68, 68, 0.2)';
+                    timerDisplay.style.color = '#dc2626';
+                } else if (currentQuestionTimeLeft <= 30) {
+                    timerDisplay.style.background = 'rgba(245, 158, 11, 0.2)';
+                    timerDisplay.style.color = '#d97706';
+                } else {
+                    timerDisplay.style.background = 'rgba(255, 255, 255, 0.15)';
+                    timerDisplay.style.color = 'white';
+                }
+            }
+        }
+        
+        // Enhanced Navigation Functions
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+        
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+        
+        function goToQuestion(questionNumber) {
+            loadQuestion(questionNumber - 1);
+        }
+        
+        // Enhanced Navigation State Updates
+        function updateNavigationState() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+            
+            // Update button text for last question
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.innerHTML = 'Complete <i class="fas fa-check"></i>';
+                nextBtn.onclick = () => completeSession();
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+                nextBtn.onclick = () => nextQuestion();
+            }
+        }
+        
+        // Enhanced Question Navigation Grid
+        function updateNavigation() {
+            document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
+                const question = questions[index];
+                
+                btn.className = 'question-nav-btn';
+                
+                if (index === currentQuestionIndex) {
+                    btn.classList.add('current');
+                } else if (answers[question.id]) {
+                    if (answers[question.id].isCorrect) {
+                        btn.classList.add('correct');
+                    } else {
+                        btn.classList.add('incorrect');
+                    }
+                }
+            });
+        }
+        
+        // Enhanced Progress Updates
+        function updateProgress() {
+            const answeredCount = Object.keys(answers).length;
+            const correctCount = Object.values(answers).filter(a => a.isCorrect).length;
+            const remainingCount = questions.length - answeredCount;
+            const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            
+            document.getElementById('answered-count').textContent = answeredCount;
+            document.getElementById('correct-count').textContent = correctCount;
+            document.getElementById('remaining-count').textContent = remainingCount;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            // Update accuracy bar
+            const accuracyFill = document.getElementById('accuracy-fill');
+            if (accuracyFill) {
+                accuracyFill.style.width = accuracy + '%';
+            }
+        }
+
+        // Enhanced Question Utility Functions
+        function markForReview(questionId) {
+            const btn = event.target.closest('.btn-utility');
+            if (btn.classList.contains('marked')) {
+                btn.classList.remove('marked');
+                btn.style.background = '#f3f4f6';
+                btn.style.color = '#374151';
+                btn.title = 'Mark for Review';
+            } else {
+                btn.classList.add('marked');
+                btn.style.background = '#fbbf24';
+                btn.style.color = '#92400e';
+                btn.title = 'Remove Mark';
+            }
+        }
+
+        function showExplanation(questionId) {
+            // This will be handled by the answer feedback system
+            // when explanations are enabled
+            if (showExplanations && answers[questions[currentQuestionIndex].id]) {
+                const feedbackDiv = document.getElementById('answer-feedback');
+                if (feedbackDiv.classList.contains('show')) {
+                    hideAnswerFeedback();
+                } else {
+                    showAnswerFeedback(questions[currentQuestionIndex], answers[questions[currentQuestionIndex].id]);
+                }
+            } else {
+                showNotification('Answer the question first to see the explanation', 'info');
+            }
+        }
+        
+        // Enhanced Session Completion
+        function completeSession() {
+            const answeredCount = Object.keys(answers).length;
+            
+            if (answeredCount === 0) {
+                showNotification('Please answer at least one question before completing the session.', 'warning');
+                return;
+            }
+            
+            let confirmMessage = `Complete practice session?`;
+            if (answeredCount < questions.length) {
+                confirmMessage = `You have answered ${answeredCount} out of ${questions.length} questions. Complete session anyway?`;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Clear any active timers
+            if (questionTimer) {
+                clearTimeout(questionTimer);
+            }
+            
+            const totalTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+            
+            // Show loading state
+            const completeBtn = document.querySelector('.complete-btn');
+            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
+            completeBtn.disabled = true;
+            
+            fetch('{% url "complete_practice_session" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `session_id=${sessionId}&total_time=${totalTime}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Session completed successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = `{% url "practice_session_result" 0 %}`.replace('0', data.session_id);
+                    }, 1000);
+                } else {
+                    throw new Error('Server error');
+                }
+            })
+            .catch(error => {
+                console.error('Error completing session:', error);
+                showNotification('Error completing session. Please try again.', 'error');
+                completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Session';
+                completeBtn.disabled = false;
+            });
+        }
+        
+        // Enhanced Utility Functions
+        function showCelebration(isCorrect) {
+            // Simple celebration effect
+            const celebration = document.createElement('div');
+            celebration.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                font-size: 48px; z-index: 1000; pointer-events: none;
+                animation: celebrate 1s ease-out; color: ${isCorrect ? '#16a34a' : '#ef4444'};
+            `;
+            celebration.innerHTML = isCorrect ? '🎉' : '💭';
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 1000);
+            
+            // Add CSS animation
+            if (!document.getElementById('celebrate-style')) {
+                const style = document.createElement('style');
+                style.id = 'celebrate-style';
+                style.innerHTML = `
+                    @keyframes celebrate {
+                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+                        100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            const colors = {
+                success: '#16a34a',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#3b82f6'
+            };
+            
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 1000;
+                background: ${colors[type]}; color: white; padding: 16px 24px;
+                border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                animation: slideInRight 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+            
+            // Add CSS animations
+            if (!document.getElementById('notification-style')) {
+                const style = document.createElement('style');
+                style.id = 'notification-style';
+                style.innerHTML = `
+                    @keyframes slideInRight {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOutRight {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT') return; // Don't interfere with form inputs
+                
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        previousQuestion();
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        nextQuestion();
+                        break;
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                        e.preventDefault();
+                        const optionKeys = ['1', '2', '3', '4', '5'];
+                        const answerKeys = ['A', 'B', 'C', 'D', 'E'];
+                        const index = optionKeys.indexOf(e.key);
+                        if (index !== -1) {
+                            const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
+                            if (radioButton && !radioButton.disabled) {
+                                radioButton.click();
+                            }
+                        }
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (currentQuestionIndex < questions.length - 1) {
+                            nextQuestion();
+                        } else {
+                            completeSession();
+                        }
+                        break;
+                    case 'n':
+                    case 'N':
+                        // Quick note shortcut
+                        e.preventDefault();
+                        const currentQuestion = questions[currentQuestionIndex];
+                        if (currentQuestion) {
+                            openQuickNote(currentQuestion.id);
+                        }
+                        break;
+                }
+            });
+        }
+        
+        function setupNavigationWarning() {
+            window.addEventListener('beforeunload', function(e) {
+                const answeredCount = Object.keys(answers).length;
+                if (answeredCount > 0) {
+                    e.preventDefault();
+                    e.returnValue = 'Are you sure you want to leave? Your practice progress may be lost.';
+                    return e.returnValue;
+                }
+            });
+        }
+        
+        function autoSaveProgress() {
+            // Auto-save session progress (placeholder for future implementation)
+            console.log('Auto-saving progress...', Object.keys(answers).length, 'answers saved');
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Enhanced Notes Integration Functions
+        function checkExistingNotes() {
+            // Check which questions already have notes and update button states
+            questions.forEach((question, index) => {
+                // This could be enhanced with an AJAX call to check existing notes
+                // For now, this is a placeholder for future implementation
+                console.log(`Checking notes for question ${question.id}`);
+            });
+        }
+
+        function updateNoteButtonState(questionId, hasNotes) {
+            // Update note button to reflect if notes exist for this question
+            const noteBtn = document.querySelector(`[onclick="openQuickNote(${questionId})"]`);
+            if (noteBtn && hasNotes) {
+                noteBtn.classList.add('has-note');
+                noteBtn.innerHTML = '<i class="fas fa-sticky-note"></i> <span class="note-text">View Note</span>';
+                noteBtn.title = 'View/Edit Note for this Question';
+            }
+        }
+
+        // Initialize note checking when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingNotes();
+        });
+        </script>
+
+</body>
+</html>

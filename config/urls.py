@@ -17,6 +17,8 @@ urlpatterns = [
     path('notification/', include('notifications.urls')),
     path('modelpaper/', include('modelpaper.urls')),
     path('images/', include('manageimage.urls')),
+    path('notes/', include('notes.urls')),
+
 
 
 ]

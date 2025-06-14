@@ -1,0 +1,305 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Practice Modules</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/manage-modules.css' %}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* Simple Practice Button Styles */
+        .practice-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+        }
+
+        .practice-btn:hover {
+            background: #059669;
+            color: white;
+            text-decoration: none;
+        }
+
+        .topic-item-simple {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-info {
+            flex: 1;
+        }
+
+        .topic-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .topic-stats {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .topic-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Student Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+            </div>
+            <nav class="nav-menu">
+                <a href="{% url 'dashboard' %}" class="nav-item">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{% url 'student_modules' %}" class="nav-item active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
+                    <i class="fas fa-vial"></i>
+                    <span>Mock Tests</span>
+                </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'student_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
+                <a href="{% url 'myaccount' %}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>My Account</span>
+                </a>
+                <a href="{% url 'student_notifications' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+                <a href="{% url 'logout' %}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="mobile-menu">
+                    <button id="sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                <h1>Practice Modules</h1>
+                <div class="user-menu">
+                    <div class="notification-container">
+                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
+                        <span class="notification-badge"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content Section -->
+            <div class="page-content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h2>Welcome to Practice Mode, {{ user.first_name|default:user.email }}!</h2>
+                    <p>Choose any topic to start practicing. Get instant feedback and explanations.</p>
+                </div>
+
+                <!-- Debug Info -->
+                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #bae6fd;">
+                    <h4 style="margin: 0 0 10px; color: #0369a1;">Debug Information:</h4>
+                    <p style="margin: 5px 0; font-size: 14px; color: #0c4a6e;">
+                        <strong>Total Blocks:</strong> {{ block_module_map|length }}<br>
+                        <strong>Total Questions:</strong> {{ stats.total_questions }}<br>
+                        <strong>User:</strong> {{ user.email }}<br>
+                        <strong>Filters:</strong> Degree: "{{ filter_degree }}", Year: "{{ filter_year }}"
+                    </p>
+                </div>
+
+                <!-- Main Module Interface Card -->
+                <div class="content-card">
+                    <!-- Module Content -->
+                    <div class="tab-content">
+                        <!-- Simple Filters -->
+                        <div style="margin-bottom: 20px;">
+                            <form method="GET" action="{% url 'student_modules' %}" style="display: flex; gap: 10px; align-items: center;">
+                                <input type="text" placeholder="Search topics..." name="q" value="{{ query }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
+                                <select name="degree" onchange="this.form.submit()" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="">All Degrees</option>
+                                    {% for value, label in degree_choices %}
+                                        <option value="{{ value }}" {% if filter_degree == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <select name="year" onchange="this.form.submit()" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                                    <option value="">All Years</option>
+                                    {% for value, label in year_choices %}
+                                        <option value="{{ value }}" {% if filter_year == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" style="padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px;">Search</button>
+                            </form>
+                        </div>
+
+                        <!-- Topics List -->
+                        <div class="topics-container">
+                            {% for block_data in block_module_map %}
+                                <div style="margin-bottom: 30px;">
+                                    <h3 style="color: #10b981; margin-bottom: 15px; border-bottom: 2px solid #10b981; padding-bottom: 5px;">
+                                        <i class="fas fa-layer-group"></i> {{ block_data.block }}
+                                    </h3>
+                                    
+                                    {% for module in block_data.modules %}
+                                        <div style="margin-bottom: 20px; background: #f9fafb; padding: 15px; border-radius: 8px;">
+                                            <h4 style="color: #374151; margin-bottom: 10px;">
+                                                <i class="fas fa-cube"></i> {{ module.name }} ({{ module.degree }}, {{ module.year }})
+                                            </h4>
+                                            
+                                            {% for subject in module.subjects %}
+                                                <div style="margin-bottom: 15px;">
+                                                    <h5 style="color: #6b7280; margin-bottom: 8px;">
+                                                        <i class="fas fa-book"></i> {{ subject.name }}
+                                                    </h5>
+                                                    
+                                                    {% for topic in subject.topics %}
+                                                        <div class="topic-item-simple">
+                                                            <div class="topic-info">
+                                                                <div class="topic-name">{{ topic.name }}</div>
+                                                                <div class="topic-stats">
+                                                                    <i class="fas fa-question-circle"></i> {{ topic.questions_count }} Questions
+                                                                    {% if topic.image_count > 0 %}
+                                                                        | <i class="fas fa-image"></i> {{ topic.image_count }} Image{{ topic.image_count|pluralize }}
+                                                                    {% endif %}
+                                                                    {% if topic.progress %}
+                                                                        | <i class="fas fa-chart-line"></i> {{ topic.accuracy }}% Best Score
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="topic-actions">
+                                                                {% if topic.progress %}
+                                                                    <span style="background: #dcfdf7; color: #047857; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                                                                        {{ topic.accuracy }}% Best
+                                                                    </span>
+                                                                {% else %}
+                                                                    <span style="background: #f3f4f6; color: #6b7280; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">
+                                                                        Not Started
+                                                                    </span>
+                                                                {% endif %}
+                                                                
+                                                                <!-- SIMPLIFIED PRACTICE BUTTON -->
+                                                                <a href="{% url 'start_practice_directly' %}?block={{ topic.block|urlencode }}&module={{ topic.module|urlencode }}&subject={{ topic.subject|urlencode }}&topic={{ topic.name|urlencode }}&degree={{ topic.degree|urlencode }}&year={{ topic.year|urlencode }}" 
+                                                                   class="practice-btn"
+                                                                   onclick="console.log('Clicking practice button for topic: {{ topic.name }}');">
+                                                                    <i class="fas fa-play"></i> 
+                                                                    {% if topic.progress %}Continue{% else %}Start Practice{% endif %}
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% empty %}
+                                <div style="text-align: center; padding: 40px; background: #f9fafb; border-radius: 8px;">
+                                    <i class="fas fa-book-open" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                                    <h3 style="color: #6b7280; margin-bottom: 8px;">No Practice Modules Available</h3>
+                                    <p style="color: #9ca3af;">
+                                        {% if filter_degree or filter_year %}
+                                            No modules found for your selected filters. Try adjusting your search criteria.
+                                        {% else %}
+                                            Questions need to be imported before practice modules become available.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+                <div class="copyright">
+                    &copy; PulsePrep Media Direct, LLC. All rights reserved.
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+        // Debug script to track button clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded with {{ block_module_map|length }} blocks');
+            
+            // Add click handlers to practice buttons
+            document.querySelectorAll('.practice-btn').forEach(function(btn, index) {
+                console.log('Found practice button ' + (index + 1) + ':', btn.href);
+                
+                btn.addEventListener('click', function(e) {
+                    console.log('Practice button clicked!');
+                    console.log('URL:', this.href);
+                    
+                    // Add loading state
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+                    this.style.pointerEvents = 'none';
+                    
+                    // Let the link work normally
+                    return true;
+                });
+            });
+        });
+
+        // Log any JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript error:', e.error);
+        });
+    </script>
+</body>
+</html>

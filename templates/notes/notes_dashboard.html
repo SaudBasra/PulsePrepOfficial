@@ -1,0 +1,529 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - My Notes</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/manage-modules.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notes.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'student_mock_tests' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'student_model_papers' %}" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Model Papers</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Practice</span>
+          </a>
+          <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>My Notes</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notification_center' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>My Notes</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Page Content Section with Card Styling -->
+        <div class="page-content">
+          <!-- Main Notes Interface Card -->
+          <div class="content-card">
+            <!-- Tab Navigation -->
+            <div class="content-tabs">
+              <div class="tab active">My Notes</div>
+            </div>
+
+            <!-- Notes Content -->
+            <div class="tab-content">
+              <!-- Notes Controls -->
+              <div class="module-controls">
+                <div class="controls-left">
+                  <form method="GET" action="{% url 'notes_dashboard' %}" class="search-form">
+                    <div class="search-container">
+                      <input
+                        type="text"
+                        placeholder="Search notes, topics, content..."
+                        class="search-input"
+                        name="q"
+                        value="{{ query }}"
+                      />
+                      <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <div class="filter-container">
+                      <select class="filter-select" name="degree" onchange="this.form.submit()">
+                        <option value="" {% if not filter_degree %}selected{% endif %}>All Degrees</option>
+                        {% for value, label in degree_choices %}
+                          <option value="{{ value }}" {% if filter_degree == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="filter-container">
+                      <select class="filter-select" name="year" onchange="this.form.submit()">
+                        <option value="" {% if not filter_year %}selected{% endif %}>All Years</option>
+                        {% for value, label in year_choices %}
+                          <option value="{{ value }}" {% if filter_year == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="filter-container">
+                      <select class="filter-select" name="note_type" onchange="this.form.submit()">
+                        <option value="" {% if not filter_note_type %}selected{% endif %}>All Types</option>
+                        {% for value, label in note_type_choices %}
+                          <option value="{{ value }}" {% if filter_note_type == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </form>
+                </div>
+                <div class="controls-right">
+                  <button onclick="startStudySession()" class="btn-secondary" id="study-session-btn">
+                    <i class="fas fa-play"></i> Start Study Session
+                  </button>
+                  <a href="{% url 'add_note' %}" class="btn-primary">
+                    <i class="fas fa-plus"></i> Add Note
+                  </a>
+                </div>
+              </div>
+
+              <!-- Notes Overview -->
+              <div class="module-stats-row">
+                <div class="stat-card">
+                  <div class="stat-icon notes-stat">
+                    <i class="fas fa-sticky-note"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3>Total Notes</h3>
+                    <p class="stat-value">{{ stats.total_notes }}</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon modules-stat">
+                    <i class="fas fa-cube"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3>Modules</h3>
+                    <p class="stat-value">{{ stats.modules_count }}</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon subjects-stat">
+                    <i class="fas fa-book"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3>Subjects</h3>
+                    <p class="stat-value">{{ stats.subjects_count }}</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon favorites-stat">
+                    <i class="fas fa-heart"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3>Favorites</h3>
+                    <p class="stat-value">{{ stats.favorite_notes }}</p>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon recent-stat">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h3>Recent (7 days)</h3>
+                    <p class="stat-value">{{ stats.recent_notes }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes by Type -->
+              <div class="notes-type-overview">
+                <h3>Notes by Type</h3>
+                <div class="notes-type-grid">
+                  {% for note_type, data in stats.notes_by_type.items %}
+                    <div class="note-type-card">
+                      <div class="note-type-icon">
+                        {% if note_type == 'question_note' %}
+                          <i class="fas fa-question-circle"></i>
+                        {% elif note_type == 'topic_note' %}
+                          <i class="fas fa-file-alt"></i>
+                        {% elif note_type == 'general_note' %}
+                          <i class="fas fa-sticky-note"></i>
+                        {% elif note_type == 'revision_note' %}
+                          <i class="fas fa-redo"></i>
+                        {% endif %}
+                      </div>
+                      <div class="note-type-info">
+                        <h4>{{ data.label }}</h4>
+                        <p class="note-type-count">{{ data.count }}</p>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Notes Structure (Dynamic Hierarchy) -->
+              <div class="module-structure">
+                {% for block_data in block_module_map %}
+                  <div class="module-block-card notes-block-card">
+                    <div class="block-header">
+                      <div class="block-title">
+                        <i class="fas fa-layer-group"></i>
+                        <h2>{{ block_data.block }}</h2>
+                      </div>
+                    </div>
+                    <div class="block-content">
+                      {% for module in block_data.modules %}
+                        <div class="module-item">
+                          <div class="module-header" onclick="toggleModule(this)">
+                            <div class="module-indicator collapsed"></div>
+                            <div class="module-title">
+                              <i class="fas fa-cube module-icon-green"></i>
+                              <span>{{ module.name }} ({{ module.degree }}, {{ module.year }})</span>
+                            </div>
+                            <div class="module-meta">
+                              <span class="module-subjects">{{ module.subjects_count }} Subjects</span>
+                              <span class="module-notes">{{ module.notes_count }} Notes</span>
+                            </div>
+                          </div>
+                          <div class="module-content collapsed">
+                            {% for subject in module.subjects %}
+                              <div class="subject-item">
+                                <div class="subject-header" onclick="toggleSubject(this)">
+                                  <div class="subject-indicator collapsed"></div>
+                                  <div class="subject-title">
+                                    <i class="fas fa-book subject-icon-blue"></i>
+                                    <span>{{ subject.name }}</span>
+                                  </div>
+                                  <div class="subject-meta">
+                                    <span class="subject-topics">{{ subject.topics_count }} Topics</span>
+                                    <span class="subject-notes">{{ subject.notes_count }} Notes</span>
+                                  </div>
+                                </div>
+                                <div class="subject-content collapsed">
+                                  <div class="topic-list">
+                                    {% for topic in subject.topics %}
+                                      <div class="topic-item note-topic-item {% if topic.notes_count > 0 %}has-notes{% else %}no-notes{% endif %}">
+                                        <div class="topic-info" onclick="viewTopicNotes('{{ topic.block }}', '{{ topic.module }}', '{{ topic.subject }}', '{{ topic.name }}', '{{ topic.degree }}', '{{ topic.year }}')">
+                                          <i class="fas fa-file-alt topic-icon"></i>
+                                          <span>{{ topic.name }}</span>
+                                        </div>
+                                        <div class="topic-details">
+                                          <div class="topic-meta">
+                                            <span class="topic-notes">
+                                              <i class="fas fa-sticky-note"></i> {{ topic.notes_count }} Note{{ topic.notes_count|pluralize }}
+                                            </span>
+                                            <span class="topic-favorites">
+                                              <i class="fas fa-heart"></i> {{ topic.favorite_count }} Favorite{{ topic.favorite_count|pluralize }}
+                                            </span>
+                                            {% if topic.last_updated %}
+                                            <span class="topic-updated">
+                                              <i class="fas fa-clock"></i> Updated {{ topic.last_updated|timesince }} ago
+                                            </span>
+                                            {% endif %}
+                                          </div>
+                                          
+                                          <!-- Note Preview List -->
+                                          <div class="note-preview-list" style="display: none;" id="notes-preview-{{ topic.block|slugify }}-{{ topic.module|slugify }}-{{ topic.subject|slugify }}-{{ topic.name|slugify }}">
+                                            {% for note in topic.notes|slice:":3" %}
+                                              <div class="note-preview-item">
+                                                <div class="note-preview-header">
+                                                  <span class="note-title">{{ note.title|truncatechars:30 }}</span>
+                                                  {% if note.is_favorite %}
+                                                    <i class="fas fa-heart favorite-icon"></i>
+                                                  {% endif %}
+                                                  <span class="note-type-badge {{ note.note_type }}">{{ note.get_note_type_display }}</span>
+                                                </div>
+                                                <div class="note-preview-content">
+                                                  {{ note.content|truncatechars:80 }}
+                                                </div>
+                                                <div class="note-preview-actions">
+                                                  <a href="{% url 'note_detail' note.id %}" class="btn-sm btn-outline">View</a>
+                                                  <a href="{% url 'edit_note' note.id %}" class="btn-sm btn-primary">Edit</a>
+                                                </div>
+                                              </div>
+                                            {% endfor %}
+                                            {% if topic.notes_count > 3 %}
+                                              <div class="note-preview-more">
+                                                <a href="{% url 'topic_notes' %}?block={{ topic.block }}&module={{ topic.module }}&subject={{ topic.subject }}&topic={{ topic.name }}&degree={{ topic.degree }}&year={{ topic.year }}" class="btn-link">
+                                                  View all {{ topic.notes_count }} notes →
+                                                </a>
+                                              </div>
+                                            {% endif %}
+                                          </div>
+                                        </div>
+                                        <div class="topic-actions">
+                                          <button class="btn-icon" title="View Notes" onclick="viewTopicNotes('{{ topic.block }}', '{{ topic.module }}', '{{ topic.subject }}', '{{ topic.name }}', '{{ topic.degree }}', '{{ topic.year }}')">
+                                            <i class="fas fa-external-link-alt"></i>
+                                          </button>
+                                          <button class="btn-icon toggle-notes-btn" title="Toggle Note Preview" onclick="toggleNotePreview('{{ topic.block }}', '{{ topic.module }}', '{{ topic.subject }}', '{{ topic.name }}')">
+                                            <i class="fas fa-eye"></i>
+                                          </button>
+                                          <a href="{% url 'add_note' %}?block={{ topic.block }}&module={{ topic.module }}&subject={{ topic.subject }}&topic={{ topic.name }}&degree={{ topic.degree }}&year={{ topic.year }}" class="btn-icon" title="Add Note">
+                                            <i class="fas fa-plus"></i>
+                                          </a>
+                                        </div>
+                                      </div>
+                                    {% endfor %}
+                                  </div>
+                                </div>
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% empty %}
+                  <div class="module-block-card">
+                    <div class="block-content" style="padding: 40px; text-align: center;">
+                      <i class="fas fa-sticky-note" style="font-size: 48px; color: #d1d5db; margin-bottom: 16px;"></i>
+                      <h3 style="color: #6b7280; margin-bottom: 8px;">No Notes Found</h3>
+                      <p style="color: #9ca3af; margin-bottom: 16px;">Start creating notes during practice or add them manually.</p>
+                      <a href="{% url 'add_note' %}" class="btn-primary">
+                        <i class="fas fa-plus"></i> Create First Note
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      let studySessionActive = false;
+      let studySessionStartTime = null;
+      
+      // Toggle module function
+      function toggleModule(element) {
+        const indicator = element.querySelector('.module-indicator');
+        const content = element.parentElement.querySelector('.module-content');
+        
+        if (content.classList.contains('collapsed')) {
+          content.classList.remove('collapsed');
+          indicator.classList.remove('collapsed');
+          indicator.classList.add('expanded');
+        } else {
+          content.classList.add('collapsed');
+          indicator.classList.remove('expanded');
+          indicator.classList.add('collapsed');
+        }
+      }
+      
+      // Toggle subject function
+      function toggleSubject(element) {
+        const indicator = element.querySelector('.subject-indicator');
+        const content = element.parentElement.querySelector('.subject-content');
+        
+        if (content.classList.contains('collapsed')) {
+          content.classList.remove('collapsed');
+          indicator.classList.remove('collapsed');
+          indicator.classList.add('expanded');
+        } else {
+          content.classList.add('collapsed');
+          indicator.classList.remove('expanded');
+          indicator.classList.add('collapsed');
+        }
+      }
+      
+      // Navigate to topic notes
+      function viewTopicNotes(block, module, subject, topic, degree, year) {
+        const url = `{% url 'topic_notes' %}?block=${encodeURIComponent(block)}&module=${encodeURIComponent(module)}&subject=${encodeURIComponent(subject)}&topic=${encodeURIComponent(topic)}&degree=${encodeURIComponent(degree)}&year=${encodeURIComponent(year)}`;
+        window.location.href = url;
+      }
+      
+      // Toggle note preview
+      function toggleNotePreview(block, module, subject, topic) {
+        const previewId = `notes-preview-${block}-${module}-${subject}-${topic}`
+          .replace(/[^a-zA-Z0-9]/g, '-')
+          .replace(/-+/g, '-')
+          .toLowerCase();
+        
+        const previewElement = document.getElementById(previewId);
+        const toggleBtn = event.target.closest('.toggle-notes-btn');
+        
+        if (!previewElement) return;
+        
+        if (previewElement.style.display === 'none' || previewElement.style.display === '') {
+          previewElement.style.display = 'block';
+          toggleBtn.style.background = '#ecfdf5';
+          toggleBtn.querySelector('i').className = 'fas fa-eye-slash';
+        } else {
+          previewElement.style.display = 'none';
+          toggleBtn.style.background = 'transparent';
+          toggleBtn.querySelector('i').className = 'fas fa-eye';
+        }
+      }
+      
+      // Study session management
+      function startStudySession() {
+        if (!studySessionActive) {
+          fetch('{% url "study_session_start" %}', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              studySessionActive = true;
+              studySessionStartTime = new Date();
+              updateStudySessionButton();
+              startStudyTimer();
+            }
+          });
+        } else {
+          endStudySession();
+        }
+      }
+      
+      function endStudySession() {
+        fetch('{% url "study_session_end" %}', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            studySessionActive = false;
+            updateStudySessionButton();
+            clearInterval(window.studyTimer);
+            
+            // Show session summary
+            alert(`Study session completed! Duration: ${data.duration_minutes} minutes`);
+          }
+        });
+      }
+      
+      function updateStudySessionButton() {
+        const btn = document.getElementById('study-session-btn');
+        if (studySessionActive) {
+          btn.innerHTML = '<i class="fas fa-stop"></i> End Session';
+          btn.className = 'btn-warning';
+        } else {
+          btn.innerHTML = '<i class="fas fa-play"></i> Start Study Session';
+          btn.className = 'btn-secondary';
+        }
+      }
+      
+      function startStudyTimer() {
+        window.studyTimer = setInterval(() => {
+          if (studySessionActive && studySessionStartTime) {
+            const elapsed = Math.floor((new Date() - studySessionStartTime) / 1000 / 60);
+            const btn = document.getElementById('study-session-btn');
+            btn.innerHTML = `<i class="fas fa-stop"></i> End Session (${elapsed}m)`;
+          }
+        }, 60000); // Update every minute
+      }
+      
+      // Get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+      // Auto-end study session on page unload
+      window.addEventListener('beforeunload', function() {
+        if (studySessionActive) {
+          navigator.sendBeacon('{% url "study_session_end" %}', 
+            new URLSearchParams({
+              'csrfmiddlewaretoken': getCookie('csrftoken')
+            })
+          );
+        }
+      });
+    </script>
+  </body>
+</html>

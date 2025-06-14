@@ -1,0 +1,696 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - {% if is_edit %}Edit{% else %}Add{% endif %} Note</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notes.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'student_mock_tests' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'student_model_papers' %}" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Model Papers</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Practice</span>
+          </a>
+          <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>My Notes</span>
+          </a>
+          <a href="#" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notification_center' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>{% if is_edit %}Edit Note{% else %}Add New Note{% endif %}</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="{% url 'notes_dashboard' %}">My Notes</a>
+          <i class="fas fa-chevron-right"></i>
+          <span>{% if is_edit %}Edit Note{% else %}Add Note{% endif %}</span>
+        </div>
+
+        <!-- Page Content Section -->
+        <div class="page-content">
+          <div class="content-card">
+            <div class="note-form-container">
+              <div class="form-header">
+                <h2>
+                  <i class="fas fa-{% if is_edit %}edit{% else %}plus{% endif %}"></i>
+                  {% if is_edit %}Edit Note{% else %}Create New Note{% endif %}
+                </h2>
+                <p class="form-subtitle">
+                  {% if is_edit %}
+                    Update your note content and organization.
+                  {% else %}
+                    Create a new note to organize your study materials.
+                  {% endif %}
+                </p>
+              </div>
+
+              <form method="POST" enctype="multipart/form-data" class="note-form" id="note-form">
+                {% csrf_token %}
+                
+                <!-- Display form errors -->
+                {% if form.errors %}
+                  <div class="note-message error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Please correct the errors below:
+                    <ul>
+                      {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                          <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+
+                <!-- Basic Information -->
+                <div class="form-section">
+                  <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Basic Information
+                  </h3>
+                  
+                  <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+                    {{ form.title }}
+                    {% if form.title.help_text %}
+                      <small class="help-text">{{ form.title.help_text }}</small>
+                    {% endif %}
+                  </div>
+
+                  <div class="form-group">
+                    <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+                    {{ form.content }}
+                    {% if form.content.help_text %}
+                      <small class="help-text">{{ form.content.help_text }}</small>
+                    {% endif %}
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="{{ form.note_type.id_for_label }}">{{ form.note_type.label }}</label>
+                      {{ form.note_type }}
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="{{ form.difficulty_level.id_for_label }}">{{ form.difficulty_level.label }}</label>
+                      {{ form.difficulty_level }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Organization -->
+                <div class="form-section">
+                  <h3 class="section-title">
+                    <i class="fas fa-sitemap"></i>
+                    Organization & Categorization
+                  </h3>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="{{ form.degree.id_for_label }}">{{ form.degree.label }}</label>
+                      {{ form.degree }}
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="{{ form.year.id_for_label }}">{{ form.year.label }}</label>
+                      {{ form.year }}
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="{{ form.block.id_for_label }}">{{ form.block.label }}</label>
+                      {{ form.block }}
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="{{ form.module.id_for_label }}">{{ form.module.label }}</label>
+                      {{ form.module }}
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+                      {{ form.subject }}
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="{{ form.topic.id_for_label }}">{{ form.topic.label }}</label>
+                      {{ form.topic }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Preferences -->
+                <div class="form-section">
+                  <h3 class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Preferences
+                  </h3>
+                  
+                  <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                      {{ form.is_favorite }}
+                      <span class="checkmark"></span>
+                      Mark as favorite
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                  <a href="{% url 'notes_dashboard' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                  </a>
+                  <button type="submit" class="btn-primary" id="submit-btn">
+                    <i class="fas fa-save"></i>
+                    {% if is_edit %}Update Note{% else %}Create Note{% endif %}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Form enhancement
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('note-form');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // Add character counter for content
+        const contentTextarea = document.getElementById('{{ form.content.id_for_label }}');
+        if (contentTextarea) {
+          const counter = document.createElement('div');
+          counter.className = 'character-counter';
+          counter.style.textAlign = 'right';
+          counter.style.fontSize = '0.75rem';
+          counter.style.color = '#6b7280';
+          counter.style.marginTop = '4px';
+          
+          function updateCounter() {
+            const length = contentTextarea.value.length;
+            counter.textContent = `${length} characters`;
+            
+            if (length > 2000) {
+              counter.style.color = '#dc2626';
+            } else if (length > 1500) {
+              counter.style.color = '#f59e0b';
+            } else {
+              counter.style.color = '#6b7280';
+            }
+          }
+          
+          contentTextarea.addEventListener('input', updateCounter);
+          contentTextarea.parentNode.appendChild(counter);
+          updateCounter();
+        }
+        
+        // Auto-save draft functionality
+        let autoSaveTimeout;
+        const formInputs = form.querySelectorAll('input, textarea, select');
+        
+        formInputs.forEach(input => {
+          input.addEventListener('input', function() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(saveDraft, 2000); // Auto-save after 2 seconds of inactivity
+          });
+        });
+        
+        function saveDraft() {
+          const formData = new FormData(form);
+          formData.append('is_draft', 'true');
+          
+          // Show saving indicator
+          const indicator = document.createElement('div');
+          indicator.className = 'auto-save-indicator';
+          indicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving draft...';
+          indicator.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3b82f6;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            z-index: 1000;
+          `;
+          document.body.appendChild(indicator);
+          
+          setTimeout(() => {
+            if (document.body.contains(indicator)) {
+              indicator.innerHTML = '<i class="fas fa-check"></i> Draft saved';
+              indicator.style.background = '#10b981';
+              
+              setTimeout(() => {
+                document.body.removeChild(indicator);
+              }, 2000);
+            }
+          }, 1000);
+        }
+        
+        // Form submission handling
+        form.addEventListener('submit', function(e) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% if is_edit %}Updating...{% else %}Creating...{% endif %}';
+          
+          // Re-enable after 10 seconds in case of errors
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> {% if is_edit %}Update Note{% else %}Create Note{% endif %}';
+          }, 10000);
+        });
+        
+        // Image upload preview
+        const imageInput = document.getElementById('{{ form.images.id_for_label }}');
+        if (imageInput) {
+          imageInput.addEventListener('change', function() {
+            const files = this.files;
+            let preview = document.querySelector('.image-preview');
+            
+            if (!preview) {
+              preview = document.createElement('div');
+              preview.className = 'image-preview';
+              preview.innerHTML = '<h4>Selected Images:</h4><div class="preview-grid"></div>';
+              this.parentNode.appendChild(preview);
+            }
+            
+            const grid = preview.querySelector('.preview-grid');
+            grid.innerHTML = '';
+            
+            Array.from(files).forEach(file => {
+              if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                  const imgDiv = document.createElement('div');
+                  imgDiv.className = 'preview-item';
+                  imgDiv.innerHTML = `
+                    <img src="${e.target.result}" alt="${file.name}">
+                    <span class="preview-name">${file.name}</span>
+                  `;
+                  grid.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+              }
+            });
+          });
+        }
+        
+        // Tag input enhancement
+        const tagInput = document.getElementById('{{ form.tags.id_for_label }}');
+        if (tagInput) {
+          tagInput.addEventListener('input', function() {
+            // Show tag suggestions based on existing tags
+            // This could be enhanced with AJAX to fetch user's existing tags
+          });
+        }
+      });
+      
+      // Remove existing image function
+      function removeImage(imageId) {
+        if (confirm('Are you sure you want to remove this image?')) {
+          fetch(`/notes/remove-image/${imageId}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken'),
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Remove the image item from DOM
+              const imageItem = document.querySelector(`[onclick="removeImage(${imageId})"]`).closest('.existing-image-item');
+              imageItem.remove();
+              
+              // Show success message
+              showMessage('Image removed successfully', 'success');
+            } else {
+              showMessage('Error removing image: ' + data.error, 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error removing image', 'error');
+          });
+        }
+      }
+      
+      function showMessage(text, type) {
+        const message = document.createElement('div');
+        message.className = `note-message ${type}`;
+        message.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i> ${text}`;
+        
+        const form = document.getElementById('note-form');
+        form.insertBefore(message, form.firstChild);
+        
+        setTimeout(() => {
+          if (message.parentNode) {
+            message.parentNode.removeChild(message);
+          }
+        }, 5000);
+      }
+      
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    </script>
+    
+    <style>
+      /* Additional styles for note form */
+      .note-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      
+      .form-header {
+        margin-bottom: 32px;
+        text-align: center;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .form-header h2 {
+        margin: 0 0 8px 0;
+        color: #1f2937;
+        font-size: 1.75rem;
+      }
+      
+      .form-subtitle {
+        margin: 0;
+        color: #6b7280;
+        font-size: 1rem;
+      }
+      
+      .form-section {
+        margin-bottom: 32px;
+        padding: 24px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .section-title {
+        margin: 0 0 20px 0;
+        color: #374151;
+        font-size: 1.125rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .section-title i {
+        color: #10b981;
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+      }
+      
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #374151;
+      }
+      
+      .checkmark {
+        position: relative;
+      }
+      
+      .existing-images {
+        margin-top: 20px;
+        padding: 16px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .existing-images h4 {
+        margin: 0 0 12px 0;
+        color: #374151;
+        font-size: 1rem;
+      }
+      
+      .existing-images-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+      }
+      
+      .existing-image-item {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+        transition: all 0.2s;
+      }
+      
+      .existing-image-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      .existing-image-item img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+      }
+      
+      .image-actions {
+        padding: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .image-name {
+        font-size: 0.75rem;
+        color: #6b7280;
+        flex: 1;
+      }
+      
+      .btn-danger {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+      }
+      
+      .btn-danger:hover {
+        background: #b91c1c;
+        border-color: #b91c1c;
+      }
+      
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #e5e7eb;
+      }
+      
+      .character-counter {
+        font-family: monospace;
+      }
+      
+      .image-preview {
+        margin-top: 16px;
+        padding: 16px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .image-preview h4 {
+        margin: 0 0 12px 0;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+      
+      .preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 8px;
+      }
+      
+      .preview-item {
+        text-align: center;
+      }
+      
+      .preview-item img {
+        width: 80px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .preview-name {
+        display: block;
+        font-size: 0.6875rem;
+        color: #6b7280;
+        margin-top: 4px;
+        word-break: break-all;
+      }
+      
+      .help-text {
+        display: block;
+        margin-top: 4px;
+        color: #6b7280;
+        font-size: 0.75rem;
+      }
+      
+      .auto-save-indicator {
+        animation: slideInRight 0.3s ease;
+      }
+      
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .note-form-container {
+          padding: 16px;
+        }
+        
+        .form-section {
+          padding: 16px;
+        }
+        
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+          flex-direction: column;
+        }
+        
+        .existing-images-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        
+        .preview-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .form-header h2 {
+          font-size: 1.5rem;
+        }
+        
+        .existing-images-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .preview-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+  </body>
+</html>

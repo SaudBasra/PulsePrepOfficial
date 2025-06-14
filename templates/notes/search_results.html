@@ -1,0 +1,792 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    {% include 'includes/favicon.html' %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PulsePrep - Search Notes</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/manage-modules.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/notes.css' %}" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo-container">
+          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+        </div>
+        <nav class="nav-menu">
+          <a href="{% url 'dashboard' %}" class="nav-item">
+            <i class="fas fa-th-large"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="{% url 'student_mock_tests' %}" class="nav-item">
+            <i class="fas fa-vial"></i>
+            <span>Mock Tests</span>
+          </a>
+          <a href="{% url 'student_model_papers' %}" class="nav-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Model Papers</span>
+          </a>
+          <a href="{% url 'managemodule' %}" class="nav-item">
+            <i class="fas fa-cubes"></i>
+            <span>Practice</span>
+          </a>
+          <a href="{% url 'notes_dashboard' %}" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>My Notes</span>
+          </a>
+          <a href="{% url 'student_progress' %}" class="nav-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Progress</span>
+          </a>
+          <a href="{% url 'myaccount' %}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>My Account</span>
+          </a>
+          <a href="{% url 'notification_center' %}" class="nav-item">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <span class="notification-badge-sidebar"></span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-item">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="mobile-menu">
+            <button id="sidebar-toggle">
+              <i class="fas fa-bars"></i>
+            </button>
+          </div>
+          <h1>Search Notes</h1>
+          <div class="user-menu">
+            <div class="notification-container">
+              <a href="{% url 'notification_center' %}"><i class="fas fa-bell"></i></a>
+              <span class="notification-badge"></span>
+            </div>
+            <div class="avatar">
+              <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
+            </div>
+          </div>
+        </header>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="{% url 'notes_dashboard' %}">My Notes</a>
+          <i class="fas fa-chevron-right"></i>
+          <span>Search Results</span>
+        </div>
+
+        <!-- Page Content Section -->
+        <div class="page-content">
+          <div class="content-card">
+            <!-- Search Header -->
+            <div class="search-header">
+              <div class="search-info">
+                {% if query %}
+                  <h2>Search Results for "{{ query }}"</h2>
+                  <p class="search-summary">{{ total_results }} note{{ total_results|pluralize }} found</p>
+                {% else %}
+                  <h2>Advanced Search</h2>
+                  <p class="search-summary">Use the filters below to find specific notes</p>
+                {% endif %}
+              </div>
+              <div class="search-actions">
+                <a href="{% url 'notes_dashboard' %}" class="btn-secondary">
+                  <i class="fas fa-arrow-left"></i> Back to Notes
+                </a>
+              </div>
+            </div>
+
+            <!-- Advanced Search Form -->
+            <div class="advanced-search-form">
+              <form method="GET" class="search-form-advanced">
+                <div class="search-row">
+                  <div class="search-group">
+                    <label for="q">Search Text</label>
+                    <input
+                      type="text"
+                      id="q"
+                      name="q"
+                      value="{{ query }}"
+                      placeholder="Search in titles, content, and tags..."
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="search-group">
+                    <label for="note_type">Note Type</label>
+                    <select id="note_type" name="note_type" class="form-control">
+                      <option value="">All Types</option>
+                      <option value="question_note" {% if request.GET.note_type == 'question_note' %}selected{% endif %}>Question Note</option>
+                      <option value="topic_note" {% if request.GET.note_type == 'topic_note' %}selected{% endif %}>Topic Note</option>
+                      <option value="general_note" {% if request.GET.note_type == 'general_note' %}selected{% endif %}>General Note</option>
+                      <option value="revision_note" {% if request.GET.note_type == 'revision_note' %}selected{% endif %}>Revision Note</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="search-row">
+                  <div class="search-group">
+                    <label for="degree">Degree</label>
+                    <select id="degree" name="degree" class="form-control">
+                      <option value="">All Degrees</option>
+                      <option value="MBBS" {% if request.GET.degree == 'MBBS' %}selected{% endif %}>MBBS</option>
+                      <option value="BDS" {% if request.GET.degree == 'BDS' %}selected{% endif %}>BDS</option>
+                    </select>
+                  </div>
+                  <div class="search-group">
+                    <label for="year">Year</label>
+                    <select id="year" name="year" class="form-control">
+                      <option value="">All Years</option>
+                      <option value="1st" {% if request.GET.year == '1st' %}selected{% endif %}>1st Year</option>
+                      <option value="2nd" {% if request.GET.year == '2nd' %}selected{% endif %}>2nd Year</option>
+                      <option value="3rd" {% if request.GET.year == '3rd' %}selected{% endif %}>3rd Year</option>
+                      <option value="4th" {% if request.GET.year == '4th' %}selected{% endif %}>4th Year</option>
+                      <option value="5th" {% if request.GET.year == '5th' %}selected{% endif %}>5th Year</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="search-row">
+                  <div class="search-group">
+                    <label for="block">Block</label>
+                    <input
+                      type="text"
+                      id="block"
+                      name="block"
+                      value="{{ request.GET.block }}"
+                      placeholder="e.g., Cardiovascular"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="search-group">
+                    <label for="module">Module</label>
+                    <input
+                      type="text"
+                      id="module"
+                      name="module"
+                      value="{{ request.GET.module }}"
+                      placeholder="e.g., Physiology"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+
+                <div class="search-row">
+                  <div class="search-group">
+                    <label for="subject">Subject</label>
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value="{{ request.GET.subject }}"
+                      placeholder="e.g., Cardiology"
+                      class="form-control"
+                    />
+                  </div>
+                  <div class="search-group">
+                    <label for="topic">Topic</label>
+                    <input
+                      type="text"
+                      id="topic"
+                      name="topic"
+                      value="{{ request.GET.topic }}"
+                      placeholder="e.g., Heart Rate"
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+
+                <div class="search-row">
+                  <div class="search-group">
+                    <label for="difficulty_level">Difficulty</label>
+                    <select id="difficulty_level" name="difficulty_level" class="form-control">
+                      <option value="">All Difficulties</option>
+                      <option value="easy" {% if request.GET.difficulty_level == 'easy' %}selected{% endif %}>Easy</option>
+                      <option value="medium" {% if request.GET.difficulty_level == 'medium' %}selected{% endif %}>Medium</option>
+                      <option value="hard" {% if request.GET.difficulty_level == 'hard' %}selected{% endif %}>Hard</option>
+                    </select>
+                  </div>
+                  <div class="search-group checkbox-group">
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="is_favorite" value="true" {% if request.GET.is_favorite %}checked{% endif %}>
+                      <span class="checkmark"></span>
+                      Favorites Only
+                    </label>
+                  </div>
+                </div>
+
+                <div class="search-actions-row">
+                  <button type="submit" class="btn-primary">
+                    <i class="fas fa-search"></i> Search
+                  </button>
+                  <a href="{% url 'search_notes' %}" class="btn-secondary">
+                    <i class="fas fa-times"></i> Clear Filters
+                  </a>
+                </div>
+              </form>
+            </div>
+
+            <!-- Search Results -->
+            <div class="search-results">
+              {% if notes %}
+                <div class="results-header">
+                  <h3>Results ({{ total_results }})</h3>
+                  <div class="results-sort">
+                    <select class="form-control" onchange="sortResults(this.value)">
+                      <option value="updated">Recently Updated</option>
+                      <option value="created">Recently Created</option>
+                      <option value="title">Title A-Z</option>
+                      <option value="type">Note Type</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="notes-grid">
+                  {% for note in notes %}
+                    <div class="note-result-card" data-note-id="{{ note.id }}">
+                      <div class="note-result-header">
+                        <div class="note-title-section">
+                          <h4 class="note-result-title">
+                            <a href="{% url 'note_detail' note.id %}">{{ note.title }}</a>
+                            {% if note.is_favorite %}
+                              <i class="fas fa-heart favorite-icon"></i>
+                            {% endif %}
+                          </h4>
+                          <div class="note-result-meta">
+                            <span class="note-type-badge {{ note.note_type }}">
+                              {{ note.get_note_type_display }}
+                            </span>
+                            {% if note.difficulty_level %}
+                              <span class="difficulty-badge {{ note.difficulty_level }}">
+                                {{ note.get_difficulty_level_display }}
+                              </span>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <div class="note-result-actions">
+                          <button 
+                            class="btn-icon favorite-btn" 
+                            onclick="toggleFavorite({{ note.id }})"
+                            title="{% if note.is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}"
+                          >
+                            <i class="{% if note.is_favorite %}fas{% else %}far{% endif %} fa-heart"></i>
+                          </button>
+                          <a href="{% url 'edit_note' note.id %}" class="btn-icon" title="Edit">
+                            <i class="fas fa-edit"></i>
+                          </a>
+                        </div>
+                      </div>
+
+                      {% if note.hierarchy_path != 'General Notes' %}
+                        <div class="note-result-hierarchy">
+                          <i class="fas fa-sitemap"></i>
+                          <span>{{ note.hierarchy_path }}</span>
+                        </div>
+                      {% endif %}
+
+                      <div class="note-result-content">
+                        {{ note.content|truncatechars:150|linebreaksbr }}
+                      </div>
+
+                      {% if note.question %}
+                        <div class="note-result-question">
+                          <i class="fas fa-link"></i>
+                          <span>Related to: {{ note.question.question_text|truncatechars:60 }}</span>
+                        </div>
+                      {% endif %}
+
+                      {% if note.tag_list %}
+                        <div class="note-result-tags">
+                          {% for tag in note.tag_list|slice:":3" %}
+                            <span class="tag">{{ tag }}</span>
+                          {% endfor %}
+                          {% if note.tag_list|length > 3 %}
+                            <span class="tag-more">+{{ note.tag_list|length|add:"-3" }} more</span>
+                          {% endif %}
+                        </div>
+                      {% endif %}
+
+                      <div class="note-result-footer">
+                        <span class="note-result-date">
+                          <i class="fas fa-clock"></i>
+                          Updated {{ note.updated_at|timesince }} ago
+                        </span>
+                        {% if note.images.exists %}
+                          <span class="note-result-images">
+                            <i class="fas fa-images"></i>
+                            {{ note.images.count }} image{{ note.images.count|pluralize }}
+                          </span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if notes.has_other_pages %}
+                  <div class="pagination-container">
+                    <div class="pagination">
+                      {% if notes.has_previous %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ notes.previous_page_number }}" class="page-link">
+                          <i class="fas fa-chevron-left"></i> Previous
+                        </a>
+                      {% endif %}
+                      
+                      <span class="page-info">
+                        Page {{ notes.number }} of {{ notes.paginator.num_pages }}
+                      </span>
+                      
+                      {% if notes.has_next %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ notes.next_page_number }}" class="page-link">
+                          Next <i class="fas fa-chevron-right"></i>
+                        </a>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+
+              {% else %}
+                <div class="no-results">
+                  <div class="no-results-icon">
+                    <i class="fas fa-search"></i>
+                  </div>
+                  <h3>No Notes Found</h3>
+                  {% if query %}
+                    <p>No notes match your search for "{{ query }}". Try adjusting your search terms or filters.</p>
+                  {% else %}
+                    <p>Try entering some search terms or using the filters above to find your notes.</p>
+                  {% endif %}
+                  <div class="no-results-actions">
+                    <a href="{% url 'notes_dashboard' %}" class="btn-secondary">
+                      <i class="fas fa-arrow-left"></i> Back to All Notes
+                    </a>
+                    <a href="{% url 'add_note' %}" class="btn-primary">
+                      <i class="fas fa-plus"></i> Add New Note
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+          <div class="copyright">
+            &copy; PulsePrep Media Direct, LLC. All rights reserved.
+          </div>
+        </footer>
+      </main>
+    </div>
+
+    <script src="{% static 'js/DAscript.js' %}"></script>
+    <script>
+      // Toggle favorite status
+      function toggleFavorite(noteId) {
+        fetch(`/notes/toggle-favorite/${noteId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const card = document.querySelector(`[data-note-id="${noteId}"]`);
+            const btn = card.querySelector('.favorite-btn i');
+            const title = card.querySelector('.note-result-title');
+            
+            if (data.is_favorite) {
+              btn.className = 'fas fa-heart';
+              btn.style.color = '#dc2626';
+              
+              // Add favorite icon to title if not exists
+              if (!title.querySelector('.favorite-icon')) {
+                const favoriteIcon = document.createElement('i');
+                favoriteIcon.className = 'fas fa-heart favorite-icon';
+                title.appendChild(favoriteIcon);
+              }
+            } else {
+              btn.className = 'far fa-heart';
+              btn.style.color = '';
+              
+              // Remove favorite icon from title
+              const existingIcon = title.querySelector('.favorite-icon');
+              if (existingIcon) {
+                existingIcon.remove();
+              }
+            }
+            
+            // Update button title
+            btn.closest('.favorite-btn').title = data.is_favorite ? 
+              'Remove from favorites' : 'Add to favorites';
+          }
+        })
+        .catch(error => {
+          console.error('Error toggling favorite:', error);
+        });
+      }
+      
+      // Sort results
+      function sortResults(sortBy) {
+        const url = new URL(window.location);
+        url.searchParams.set('sort', sortBy);
+        window.location.href = url.toString();
+      }
+      
+      // Get CSRF token
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      
+      // Auto-submit form on enter in search field
+      document.getElementById('q').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          this.closest('form').submit();
+        }
+      });
+    </script>
+    
+    <style>
+      /* Search-specific styles */
+      .search-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 32px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .search-info h2 {
+        margin: 0 0 8px 0;
+        color: #1f2937;
+        font-size: 1.75rem;
+      }
+      
+      .search-summary {
+        margin: 0;
+        color: #6b7280;
+        font-size: 1rem;
+      }
+      
+      .advanced-search-form {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 32px;
+      }
+      
+      .search-form-advanced .search-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .search-group {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .search-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 6px;
+        font-size: 0.875rem;
+      }
+      
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        padding-top: 24px;
+      }
+      
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        color: #374151;
+        font-weight: 500;
+      }
+      
+      .search-actions-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+      }
+      
+      .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      
+      .results-header h3 {
+        margin: 0;
+        color: #1f2937;
+        font-size: 1.25rem;
+      }
+      
+      .results-sort select {
+        min-width: 150px;
+      }
+      
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+      }
+      
+      .note-result-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.2s;
+      }
+      
+      .note-result-card:hover {
+        border-color: #10b981;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        transform: translateY(-2px);
+      }
+      
+      .note-result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+      
+      .note-title-section {
+        flex: 1;
+      }
+      
+      .note-result-title {
+        margin: 0 0 8px 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+      }
+      
+      .note-result-title a {
+        color: #1f2937;
+        text-decoration: none;
+      }
+      
+      .note-result-title a:hover {
+        color: #10b981;
+      }
+      
+      .note-result-meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      
+      .note-result-actions {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .note-result-hierarchy {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        padding: 6px 10px;
+        background: #f0f9ff;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #0369a1;
+      }
+      
+      .note-result-content {
+        color: #374151;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        font-size: 0.9375rem;
+      }
+      
+      .note-result-question {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background: #f0fdf4;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        color: #065f46;
+        border-left: 3px solid #10b981;
+      }
+      
+      .note-result-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+      
+      .tag-more {
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        font-style: italic;
+      }
+      
+      .note-result-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8125rem;
+        color: #6b7280;
+        padding-top: 12px;
+        border-top: 1px solid #f3f4f6;
+      }
+      
+      .note-result-date, .note-result-images {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      
+      .no-results {
+        text-align: center;
+        padding: 60px 20px;
+      }
+      
+      .no-results-icon {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 24px;
+      }
+      
+      .no-results h3 {
+        margin: 0 0 12px 0;
+        color: #6b7280;
+        font-size: 1.5rem;
+      }
+      
+      .no-results p {
+        margin: 0 0 24px 0;
+        color: #9ca3af;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+      }
+      
+      .no-results-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+      }
+      
+      /* Mobile responsive */
+      @media (max-width: 768px) {
+        .search-header {
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        .search-form-advanced .search-row {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        
+        .checkbox-group {
+          padding-top: 16px;
+        }
+        
+        .search-actions-row {
+          flex-direction: column;
+        }
+        
+        .results-header {
+          flex-direction: column;
+          gap: 12px;
+          align-items: flex-start;
+        }
+        
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .note-result-header {
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .note-result-actions {
+          align-self: flex-end;
+        }
+        
+        .note-result-footer {
+          flex-direction: column;
+          gap: 8px;
+          align-items: flex-start;
+        }
+        
+        .no-results-actions {
+          flex-direction: column;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .advanced-search-form {
+          padding: 16px;
+        }
+        
+        .note-result-card {
+          padding: 16px;
+        }
+        
+        .note-result-meta {
+          flex-direction: column;
+          gap: 4px;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </body>
+</html>
