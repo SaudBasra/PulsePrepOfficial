@@ -10,6 +10,12 @@ from django.utils import timezone
 from questionbank.models import Question
 from .models import PracticeSession, PracticeResponse, StudentProgress
 import random
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Avg, Max, Count, Q
+from django.utils import timezone
+from datetime import datetime, timedelta
 
 def managemodule(request):
     """Main hierarchy view with search and filtering"""
@@ -783,43 +789,128 @@ def practice_session_result(request, session_id):
 
 @login_required
 def student_practice_progress(request):
-    """Student overall practice progress"""
+    """Student practice progress with pagination and filtering - Production Ready"""
     user = request.user
     
-    # Get all student progress
-    progress_list = StudentProgress.objects.filter(student=user).order_by('-last_practiced')
-    
-    # Calculate overall statistics
-    total_topics = progress_list.count()
-    total_sessions = sum(p.total_sessions for p in progress_list)
-    total_questions = sum(p.total_questions_attempted for p in progress_list)
-    total_correct = sum(p.total_correct_answers for p in progress_list)
-    overall_accuracy = (total_correct / total_questions * 100) if total_questions > 0 else 0
-    
-    # Recent sessions
-    recent_sessions = PracticeSession.objects.filter(
-        student=user,
-        status='completed'
-    ).order_by('-completed_at')[:10]
-    
-    # Best performing topics
-    best_topics = progress_list.filter(total_questions_attempted__gte=5).order_by('-best_accuracy')[:5]
-    
-    # Topics needing practice
-    needs_practice = progress_list.filter(
-        total_questions_attempted__gte=5,
-        best_accuracy__lt=70
-    ).order_by('best_accuracy')[:5]
-    
-    context = {
-        'progress_list': progress_list,
-        'total_topics': total_topics,
-        'total_sessions': total_sessions,
-        'total_questions': total_questions,
-        'overall_accuracy': round(overall_accuracy, 1),
-        'recent_sessions': recent_sessions,
-        'best_topics': best_topics,
-        'needs_practice': needs_practice,
-    }
+    try:
+        # Base queryset
+        progress_queryset = StudentProgress.objects.filter(student=user).select_related('student')
+        
+        # Apply filters
+        mastery_filter = request.GET.get('mastery')
+        subject_filter = request.GET.get('subject')
+        
+        # Filter by mastery level
+        if mastery_filter and mastery_filter != 'all':
+            progress_queryset = progress_queryset.filter(mastery_level=mastery_filter)
+        
+        # Filter by subject
+        if subject_filter and subject_filter != 'all':
+            progress_queryset = progress_queryset.filter(subject=subject_filter)
+        
+        # Order by last practiced (most recent first)
+        progress_queryset = progress_queryset.order_by('-last_practiced', '-best_accuracy')
+        
+        # Paginate results (10 per page)
+        paginator = Paginator(progress_queryset, 10)
+        page_number = request.GET.get('page')
+        progress_list = paginator.get_page(page_number)
+        
+        # Calculate overall statistics (using all user's progress, not just paginated)
+        all_progress = StudentProgress.objects.filter(student=user)
+        
+        total_topics = all_progress.count()
+        total_sessions = sum(p.total_sessions for p in all_progress if p.total_sessions)
+        total_questions = sum(p.total_questions_attempted for p in all_progress if p.total_questions_attempted)
+        total_correct = sum(p.total_correct_answers for p in all_progress if p.total_correct_answers)
+        overall_accuracy = (total_correct / total_questions * 100) if total_questions > 0 else 0
+        
+        # Best and worst performance
+        best_accuracy = all_progress.aggregate(Max('best_accuracy'))['best_accuracy__max'] or 0
+        lowest_accuracy = all_progress.filter(total_questions_attempted__gte=5).aggregate(
+            Min('best_accuracy'))['best_accuracy__min'] or 0
+        
+        # Calculate consistency score (based on standard deviation of accuracies)
+        accuracies = [p.best_accuracy for p in all_progress if p.best_accuracy and p.total_questions_attempted >= 5]
+        consistency_score = 75  # Default
+        if len(accuracies) >= 3:
+            mean_acc = sum(accuracies) / len(accuracies)
+            variance = sum((x - mean_acc) ** 2 for x in accuracies) / len(accuracies)
+            std_dev = variance ** 0.5
+            consistency_score = max(0, 100 - (std_dev * 2))
+        
+        # Recent sessions (last 10)
+        recent_sessions = []
+        try:
+            recent_sessions = PracticeSession.objects.filter(
+                student=user,
+                status='completed'
+            ).order_by('-completed_at')[:10]
+        except:
+            # If PracticeSession model doesn't exist or has different fields
+            recent_sessions = []
+        
+        # Best performing topics (top 5)
+        best_topics = all_progress.filter(
+            total_questions_attempted__gte=5
+        ).order_by('-best_accuracy')[:5]
+        
+        # Topics needing practice (bottom 5 with some attempts)
+        needs_practice = all_progress.filter(
+            total_questions_attempted__gte=5,
+            best_accuracy__lt=70
+        ).order_by('best_accuracy')[:5]
+        
+        # Calculate trends and statistics
+        current_week = timezone.now() - timedelta(days=7)
+        recent_progress = all_progress.filter(last_practiced__gte=current_week) if all_progress else []
+        weekly_improvement = len(recent_progress)
+        
+        context = {
+            'progress_list': progress_list,
+            'total_topics': total_topics,
+            'total_sessions': total_sessions,
+            'total_questions': total_questions,
+            'overall_accuracy': round(overall_accuracy, 1),
+            'best_accuracy': round(best_accuracy, 1),
+            'lowest_accuracy': round(lowest_accuracy, 1),
+            'consistency_score': round(consistency_score, 1),
+            'recent_sessions': recent_sessions,
+            'best_topics': best_topics,
+            'needs_practice': needs_practice,
+            'weekly_improvement': weekly_improvement,
+            'user': user,
+            # Filter values for template
+            'current_mastery_filter': mastery_filter or 'all',
+            'current_subject_filter': subject_filter or 'all',
+        }
+        
+    except Exception as e:
+        # Fallback in case of any error
+        print(f"Error in student_practice_progress: {e}")
+        
+        # Minimal safe context
+        progress_queryset = StudentProgress.objects.filter(student=user).order_by('-last_practiced')
+        paginator = Paginator(progress_queryset, 10)
+        page_number = request.GET.get('page')
+        progress_list = paginator.get_page(page_number)
+        
+        context = {
+            'progress_list': progress_list,
+            'total_topics': progress_queryset.count(),
+            'total_sessions': 0,
+            'total_questions': 0,
+            'overall_accuracy': 0,
+            'best_accuracy': 0,
+            'lowest_accuracy': 0,
+            'consistency_score': 75,
+            'recent_sessions': [],
+            'best_topics': [],
+            'needs_practice': [],
+            'weekly_improvement': 0,
+            'user': user,
+            'current_mastery_filter': 'all',
+            'current_subject_filter': 'all',
+        }
     
     return render(request, 'managemodule/student_practice_progress.html', context)

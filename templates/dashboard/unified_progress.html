@@ -10,11 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Enhanced Color Scheme and Variables */
+        /* Compact Color Scheme and Variables */
         :root {
             --primary: #82272e;
             --primary-light: #a53b47;
-            --primary-dark: #6b1e24;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -24,11 +23,10 @@
             --gray: #64748b;
             --gray-light: #e2e8f0;
             --white: #ffffff;
-            --success: #10b981;
-            --border-radius: 16px;
-            --border-radius-sm: 8px;
-            --shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
-            --shadow-hover: 0 16px 40px rgba(130, 39, 46, 0.15);
+            --border-radius: 8px;
+            --border-radius-sm: 6px;
+            --shadow: 0 2px 8px rgba(130, 39, 46, 0.08);
+            --shadow-hover: 0 4px 12px rgba(130, 39, 46, 0.12);
             --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-light));
         }
 
@@ -40,29 +38,28 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: #f9fafb;
             color: var(--dark);
-            line-height: 1.6;
-            min-height: 100vh;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
-        /* Dashboard Layout */
+        /* Compact Dashboard Layout */
         .dashboard-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 260px 1fr;
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        /* Compact Sidebar */
         .sidebar {
             background: var(--white);
             box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             height: 100vh;
-            z-index: 50;
-            transition: all 0.3s ease;
             border-right: 1px solid var(--gray-light);
+            overflow-y: auto;
         }
 
         .logo-container {
@@ -87,33 +84,32 @@
         }
 
         .nav-menu {
-            padding: 16px 0;
+            padding: 8px 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
+            gap: 10px;
+            padding: 8px 16px;
             color: var(--gray);
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.3s;
-            margin: 2px 8px;
+            font-size: 13px;
+            transition: all 0.2s;
+            margin: 1px 4px;
             border-radius: var(--border-radius-sm);
-            position: relative;
         }
 
         .nav-item i {
-            width: 24px;
+            width: 18px;
             text-align: center;
-            font-size: 18px;
+            font-size: 14px;
         }
 
         .nav-item:hover {
             color: var(--primary);
             background: rgba(130, 39, 46, 0.05);
-            transform: translateX(4px);
         }
 
         .nav-item.active {
@@ -121,103 +117,70 @@
             background: var(--gradient-primary);
             color: white;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.2);
-        }
-
-        .nav-item.active:hover {
-            color: white;
-            transform: translateX(0);
         }
 
         .notification-badge-sidebar {
             background: var(--danger);
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             margin-left: auto;
-            animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* Main Content */
+        /* Compact Main Content */
         .main-content {
             background: transparent;
             overflow-y: auto;
-            max-height: 100vh;
         }
 
-        /* Header */
+        /* Compact Header */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 32px;
+            padding: 12px 20px;
             background: var(--white);
-            color: var(--dark);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--gray-light);
             position: sticky;
             top: 0;
             z-index: 40;
-            border-bottom: 1px solid var(--gray-light);
         }
 
         .header h1 {
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 600;
             color: var(--dark);
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .header h1 i {
             color: var(--primary);
-        }
-
-        .mobile-menu {
-            display: none;
-        }
-
-        .mobile-menu button {
-            background: var(--gradient-primary);
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: var(--shadow);
+            font-size: 16px;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
         }
 
         .user-menu a {
             color: var(--gray);
-            font-size: 20px;
+            font-size: 16px;
             text-decoration: none;
-            transition: all 0.3s;
             position: relative;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
-        }
-
-        .user-menu a:hover {
-            color: var(--primary);
-            background: rgba(130, 39, 46, 0.1);
         }
 
         .notification-badge {
@@ -227,14 +190,13 @@
             background: var(--danger);
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
-            animation: pulse 2s infinite;
         }
 
         .avatar {
@@ -275,103 +237,69 @@
             font-weight: 700;
         }
 
-        /* Dashboard Content */
+        /* Compact Dashboard Content */
         .dashboard-content {
-            padding: 32px;
-            animation: fadeIn 0.8s ease-out;
+            padding: 16px 20px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Progress Header */
+        /* Compact Progress Header */
         .progress-header {
             background: var(--gradient-primary);
             border-radius: var(--border-radius);
-            padding: 40px;
-            margin-bottom: 32px;
+            padding: 20px;
+            margin-bottom: 16px;
             text-align: center;
             color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-hover);
-        }
-
-        .progress-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) rotate(180deg); }
+            box-shadow: var(--shadow);
         }
 
         .progress-header h1 {
-            margin: 0 0 12px;
-            font-size: 32px;
-            font-weight: 800;
-            position: relative;
-            z-index: 1;
+            margin: 0 0 6px;
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .progress-header p {
-            margin: 8px 0;
-            font-size: 16px;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.9;
         }
 
-        /* Overall Stats */
+        /* Compact Overall Stats */
         .overall-stats {
-            margin-bottom: 32px;
+            margin-bottom: 16px;
         }
 
-        .overall-stats h3 {
-            margin-bottom: 20px;
+        .section-title {
+            margin-bottom: 12px;
             color: var(--dark);
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .overall-stats h3 i {
+        .section-title i {
             color: var(--primary);
+            font-size: 14px;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
         }
 
         .stat-card {
             background: var(--white);
             border-radius: var(--border-radius);
-            padding: 24px;
+            padding: 16px;
             box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .stat-card::before {
@@ -380,75 +308,61 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: var(--gradient-primary);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
         }
 
         .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
             background: var(--gradient-primary);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            margin: 0 auto 16px;
+            font-size: 14px;
+            margin: 0 auto 8px;
         }
 
         .stat-value {
-            font-size: 28px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .stat-label {
             color: var(--gray);
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 500;
         }
 
-        /* Progress Categories */
+        /* Compact Progress Categories */
         .progress-categories {
-            margin-bottom: 32px;
-        }
-
-        .progress-categories h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .progress-categories h3 i {
-            color: var(--primary);
+            margin-bottom: 16px;
         }
 
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            gap: 16px;
         }
 
         .category-card {
             background: var(--white);
             border-radius: var(--border-radius);
-            padding: 32px;
+            padding: 20px;
             box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .category-card::before {
@@ -457,7 +371,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
 
         .category-card.mock-tests::before {
@@ -469,7 +384,7 @@
         }
 
         .category-card.practice-modules::before {
-            background: linear-gradient(90deg, var(--success), #059669);
+            background: linear-gradient(90deg, var(--secondary), #059669);
         }
 
         .category-card.notes::before {
@@ -477,27 +392,26 @@
         }
 
         .category-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-hover);
         }
 
         .category-header {
             display: flex;
             align-items: center;
-            justify-content: between;
-            margin-bottom: 20px;
-            gap: 16px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .category-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
+            font-size: 16px;
             flex-shrink: 0;
         }
 
@@ -510,7 +424,7 @@
         }
 
         .practice-modules .category-icon {
-            background: linear-gradient(135deg, var(--success), #059669);
+            background: linear-gradient(135deg, var(--secondary), #059669);
         }
 
         .notes .category-icon {
@@ -522,59 +436,59 @@
         }
 
         .category-title {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 600;
             color: var(--dark);
-            margin: 0 0 4px;
+            margin: 0 0 2px;
         }
 
         .category-subtitle {
             color: var(--gray);
-            font-size: 14px;
+            font-size: 12px;
             margin: 0;
         }
 
         .category-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .category-stat {
             text-align: center;
-            padding: 16px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
             background: var(--light);
         }
 
         .category-stat-value {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .category-stat-label {
-            font-size: 12px;
+            font-size: 10px;
             color: var(--gray);
             font-weight: 500;
         }
 
         .category-actions {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         .action-btn {
             flex: 1;
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
             text-decoration: none;
             text-align: center;
             font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
+            font-size: 12px;
+            transition: all 0.2s;
             border: none;
             cursor: pointer;
         }
@@ -587,13 +501,15 @@
         .btn-outline {
             background: transparent;
             color: var(--primary);
-            border: 2px solid var(--primary);
+            border: 1px solid var(--primary);
         }
 
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.2);
+            transform: translateY(-1px);
             text-decoration: none;
+        }
+
+        .btn-primary:hover {
             color: white;
         }
 
@@ -602,29 +518,15 @@
             color: white;
         }
 
-        /* Performance Trends */
+        /* Compact Performance Trends */
         .performance-trends {
-            margin-bottom: 32px;
-        }
-
-        .performance-trends h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .performance-trends h3 i {
-            color: var(--primary);
+            margin-bottom: 16px;
         }
 
         .trends-card {
             background: var(--white);
             border-radius: var(--border-radius);
-            padding: 32px;
+            padding: 16px;
             box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
         }
@@ -633,7 +535,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--gray-light);
         }
 
@@ -644,121 +546,125 @@
         .trend-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .trend-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .trend-details h4 {
-            margin: 0 0 4px;
-            font-size: 16px;
+            margin: 0 0 2px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--dark);
         }
 
         .trend-details p {
             margin: 0;
-            font-size: 14px;
+            font-size: 11px;
             color: var(--gray);
         }
 
         .trend-value {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             font-weight: 600;
+            font-size: 12px;
         }
 
-        .trend-up {
-            color: var(--success);
-        }
+        .trend-up { color: var(--secondary); }
+        .trend-down { color: var(--danger); }
+        .trend-neutral { color: var(--gray); }
 
-        .trend-down {
-            color: var(--danger);
-        }
-
-        .trend-neutral {
-            color: var(--gray);
-        }
-
-        /* Quick Actions */
+        /* Compact Quick Actions */
         .quick-actions {
-            margin-bottom: 32px;
-        }
-
-        .quick-actions h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .quick-actions h3 i {
-            color: var(--primary);
+            margin-bottom: 16px;
         }
 
         .quick-actions-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
         }
 
         .quick-action-card {
             background: var(--white);
-            padding: 20px;
+            padding: 12px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             text-decoration: none;
             color: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border: 1px solid var(--gray-light);
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
         }
 
         .quick-action-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
             text-decoration: none;
             color: inherit;
         }
 
         .quick-action-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 14px;
             flex-shrink: 0;
         }
 
         .quick-action-content h4 {
-            margin: 0 0 4px;
+            margin: 0 0 2px;
             color: var(--dark);
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 600;
         }
 
         .quick-action-content p {
             margin: 0;
             color: var(--gray);
-            font-size: 14px;
+            font-size: 11px;
+        }
+
+        /* Mobile Styles */
+        .mobile-menu {
+            display: none;
+        }
+
+        .mobile-menu button {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
         }
 
         /* Responsive Design */
@@ -779,7 +685,7 @@
 
             .sidebar {
                 position: fixed;
-                left: -280px;
+                left: -260px;
                 top: 0;
                 height: 100vh;
                 z-index: 100;
@@ -790,28 +696,32 @@
                 left: 0;
             }
 
+            .sidebar-overlay.show {
+                display: block;
+            }
+
             .mobile-menu {
                 display: block;
             }
 
             .header {
-                padding: 16px 20px;
+                padding: 10px 16px;
             }
 
             .header h1 {
-                font-size: 20px;
+                font-size: 16px;
             }
 
             .progress-header {
-                padding: 24px;
+                padding: 16px;
             }
 
             .progress-header h1 {
-                font-size: 24px;
+                font-size: 18px;
             }
 
             .dashboard-content {
-                padding: 20px;
+                padding: 12px 16px;
             }
 
             .stats-grid {
@@ -826,25 +736,15 @@
                 flex-direction: column;
             }
 
-            .categories-grid {
+            .quick-actions-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* Sidebar overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-        }
-
-        .sidebar-overlay.show {
-            display: block;
+            .quick-action-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
         }
     </style>
 </head>
@@ -863,32 +763,26 @@
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
-
                 <a href="{% url 'student_practice_modules' %}" class="nav-item">
                     <i class="fas fa-dumbbell"></i>
                     <span>Practice Modules</span>
                 </a>
-                
                 <a href="{% url 'student_mock_tests' %}" class="nav-item">
                     <i class="fas fa-vial"></i>
                     <span>Mock Tests</span>
                 </a>
-
                 <a href="{% url 'student_model_papers' %}" class="nav-item">
                     <i class="fas fa-file-alt"></i>
                     <span>Model Papers</span>
                 </a>
-
                 <a href="{% url 'unified_progress' %}" class="nav-item active">
                     <i class="fas fa-chart-line"></i>
                     <span>My Progress</span>
                 </a>
-
                 <a href="{% url 'notes_dashboard' %}" class="nav-item">
                     <i class="fas fa-sticky-note"></i>
                     <span>My Notes</span>
                 </a>
-
                 <a href="{% url 'my_profile' %}" class="nav-item">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
@@ -916,7 +810,7 @@
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-                <h1><i class="fas fa-chart-line"></i> My Progress Dashboard</h1>
+                <h1><i class="fas fa-chart-line"></i> My Progress</h1>
                 <div class="user-menu">
                     <a href="{% url 'student_notifications' %}">
                         <i class="fas fa-bell"></i>
@@ -926,9 +820,16 @@
                     </a>
                     <div class="avatar">
                         {% if user.profile_image %}
-                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" 
+                                 onload="this.style.display='block'" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="avatar-placeholder" style="display: none;">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
                         {% else %}
-                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            <div class="avatar-placeholder">
+                                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -939,12 +840,12 @@
                 <!-- Progress Header -->
                 <div class="progress-header">
                     <h1>Performance Analytics</h1>
-                    <p>Track your progress across all study methods and identify areas for improvement</p>
+                    <p>Track your progress and identify improvement areas</p>
                 </div>
 
                 <!-- Overall Stats -->
                 <div class="overall-stats">
-                    <h3><i class="fas fa-chart-bar"></i> Overall Statistics</h3>
+                    <h3 class="section-title"><i class="fas fa-chart-bar"></i> Overall Statistics</h3>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">
@@ -979,7 +880,7 @@
 
                 <!-- Progress Categories -->
                 <div class="progress-categories">
-                    <h3><i class="fas fa-layer-group"></i> Progress by Category</h3>
+                    <h3 class="section-title"><i class="fas fa-layer-group"></i> Progress by Category</h3>
                     <div class="categories-grid">
                         <!-- Mock Tests -->
                         <div class="category-card mock-tests">
@@ -1016,7 +917,7 @@
                                 </div>
                                 <div class="category-info">
                                     <h4 class="category-title">Model Papers</h4>
-                                    <p class="category-subtitle">Past year exam papers</p>
+                                    <p class="category-subtitle">Past year papers</p>
                                 </div>
                             </div>
                             <div class="category-stats">
@@ -1093,11 +994,11 @@
 
                 <!-- Performance Trends -->
                 <div class="performance-trends">
-                    <h3><i class="fas fa-trending-up"></i> Performance Trends</h3>
+                    <h3 class="section-title"><i class="fas fa-trending-up"></i> Performance Trends</h3>
                     <div class="trends-card">
                         <div class="trend-item">
                             <div class="trend-info">
-                                <div class="trend-icon mock-tests" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                                <div class="trend-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
                                     <i class="fas fa-vial"></i>
                                 </div>
                                 <div class="trend-details">
@@ -1112,7 +1013,7 @@
                         </div>
                         <div class="trend-item">
                             <div class="trend-info">
-                                <div class="trend-icon model-papers" style="background: var(--gradient-primary);">
+                                <div class="trend-icon" style="background: var(--gradient-primary);">
                                     <i class="fas fa-file-alt"></i>
                                 </div>
                                 <div class="trend-details">
@@ -1127,7 +1028,7 @@
                         </div>
                         <div class="trend-item">
                             <div class="trend-info">
-                                <div class="trend-icon practice-modules" style="background: linear-gradient(135deg, var(--success), #059669);">
+                                <div class="trend-icon" style="background: linear-gradient(135deg, var(--secondary), #059669);">
                                     <i class="fas fa-dumbbell"></i>
                                 </div>
                                 <div class="trend-details">
@@ -1145,7 +1046,7 @@
 
                 <!-- Quick Actions -->
                 <div class="quick-actions">
-                    <h3><i class="fas fa-rocket"></i> Quick Actions</h3>
+                    <h3 class="section-title"><i class="fas fa-rocket"></i> Quick Actions</h3>
                     <div class="quick-actions-grid">
                         <a href="{% url 'student_mock_tests' %}" class="quick-action-card">
                             <div class="quick-action-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
@@ -1157,7 +1058,7 @@
                             </div>
                         </a>
                         <a href="{% url 'student_practice_modules' %}" class="quick-action-card">
-                            <div class="quick-action-icon" style="background: linear-gradient(135deg, var(--success), #059669);">
+                            <div class="quick-action-icon" style="background: linear-gradient(135deg, var(--secondary), #059669);">
                                 <i class="fas fa-dumbbell"></i>
                             </div>
                             <div class="quick-action-content">
@@ -1190,7 +1091,7 @@
     </div>
 
     <script>
-        // Enhanced sidebar toggle functionality
+        // Sidebar toggle functionality
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
@@ -1231,62 +1132,50 @@
             }
         });
 
-        // Initialize progress dashboard with animations
+        // Initialize compact progress dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Unified progress dashboard loaded');
+            console.log('Compact progress dashboard loaded');
             
             // Animate stat cards on load
             const statCards = document.querySelectorAll('.stat-card');
             statCards.forEach((card, index) => {
                 card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
+                card.style.transform = 'translateY(10px)';
                 setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
+                    card.style.transition = 'all 0.4s ease';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, index * 150);
+                }, index * 100);
             });
 
             // Animate category cards
             const categoryCards = document.querySelectorAll('.category-card');
             categoryCards.forEach((card, index) => {
                 card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
+                card.style.transform = 'translateY(10px)';
                 setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
+                    card.style.transition = 'all 0.4s ease';
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
-                }, 300 + (index * 150));
+                }, 200 + (index * 100));
             });
 
-            // Animate trend items
-            const trendItems = document.querySelectorAll('.trend-item');
-            trendItems.forEach((item, index) => {
-                item.style.opacity = '0';
-                item.style.transform = 'translateX(-20px)';
-                setTimeout(() => {
-                    item.style.transition = 'all 0.6s ease';
-                    item.style.opacity = '1';
-                    item.style.transform = 'translateX(0)';
-                }, 600 + (index * 100));
-            });
-
-            // Add interactive effects to category cards
+            // Add interactive effects
             document.querySelectorAll('.category-card').forEach(card => {
                 card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                    this.style.transform = 'translateY(-4px)';
                 });
                 
                 card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.transform = 'translateY(0)';
                 });
             });
 
             // Add hover effects to quick action cards
             document.querySelectorAll('.quick-action-card').forEach(card => {
                 card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-4px)';
-                    this.querySelector('.quick-action-icon').style.transform = 'scale(1.1)';
+                    this.style.transform = 'translateY(-3px)';
+                    this.querySelector('.quick-action-icon').style.transform = 'scale(1.05)';
                 });
                 
                 card.addEventListener('mouseleave', function() {
@@ -1295,51 +1184,28 @@
                 });
             });
 
-            // Add pulse animation to notification badges
-            const badges = document.querySelectorAll('.notification-badge, .notification-badge-sidebar');
-            badges.forEach(badge => {
-                if (badge.textContent && parseInt(badge.textContent) > 0) {
-                    badge.style.animation = 'pulse 2s infinite';
+            // Add keyboard navigation support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && window.innerWidth <= 768) {
+                    closeSidebar();
                 }
             });
 
-            // Add loading state simulation for dynamic content
-            function simulateDataLoading() {
-                const dynamicElements = document.querySelectorAll('.stat-value, .category-stat-value');
-                dynamicElements.forEach(element => {
-                    if (element.textContent === '0' || element.textContent === '--') {
-                        element.style.opacity = '0.6';
-                        element.style.animation = 'pulse 1.5s infinite';
-                        
-                        // Remove loading state after 2 seconds
-                        setTimeout(() => {
-                            element.style.opacity = '1';
-                            element.style.animation = 'none';
-                        }, 2000);
-                    }
+            // Add focus management for accessibility
+            document.querySelectorAll('.action-btn, .quick-action-card').forEach(element => {
+                element.addEventListener('focus', function() {
+                    this.style.outline = '2px solid var(--primary)';
+                    this.style.outlineOffset = '2px';
                 });
-            }
-
-            // Simulate loading for demonstration
-            simulateDataLoading();
-
-            // Add smooth transitions for trend arrows
-            document.querySelectorAll('.trend-value').forEach(trendValue => {
-                const arrow = trendValue.querySelector('i');
-                if (arrow) {
-                    trendValue.addEventListener('mouseenter', function() {
-                        arrow.style.transform = 'translateX(4px)';
-                    });
-                    
-                    trendValue.addEventListener('mouseleave', function() {
-                        arrow.style.transform = 'translateX(0)';
-                    });
-                }
+                
+                element.addEventListener('blur', function() {
+                    this.style.outline = 'none';
+                });
             });
         });
 
-        // Enhanced notification system
-        function showNotification(message, type = 'info', duration = 5000) {
+        // Notification system
+        function showNotification(message, type = 'info', duration = 4000) {
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.innerHTML = `
@@ -1359,32 +1225,33 @@
                 styles.textContent = `
                     .notification {
                         position: fixed;
-                        top: 20px;
-                        right: 20px;
+                        top: 16px;
+                        right: 16px;
                         background: white;
-                        border-radius: 12px;
-                        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                        padding: 16px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        padding: 12px;
                         display: flex;
                         align-items: center;
-                        gap: 12px;
+                        gap: 8px;
                         z-index: 1000;
-                        max-width: 400px;
+                        max-width: 350px;
                         animation: slideInRight 0.3s ease;
-                        border-left: 4px solid var(--primary);
+                        border-left: 3px solid var(--primary);
+                        font-size: 13px;
                     }
-                    .notification-success { border-left-color: var(--success); }
+                    .notification-success { border-left-color: var(--secondary); }
                     .notification-error { border-left-color: var(--danger); }
                     .notification-info { border-left-color: var(--info); }
-                    .notification-content { display: flex; align-items: center; gap: 8px; flex: 1; }
+                    .notification-content { display: flex; align-items: center; gap: 6px; flex: 1; }
                     .notification-close { 
                         background: none; 
                         border: none; 
                         cursor: pointer; 
                         color: var(--gray);
-                        padding: 4px;
-                        border-radius: 4px;
-                        transition: all 0.2s;
+                        padding: 2px;
+                        border-radius: 3px;
+                        font-size: 12px;
                     }
                     .notification-close:hover {
                         background: var(--gray-light);
@@ -1399,7 +1266,7 @@
             
             document.body.appendChild(notification);
             
-            // Auto remove after specified duration
+            // Auto remove
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.style.animation = 'slideOutRight 0.3s ease';
@@ -1408,39 +1275,11 @@
             }, duration);
         }
 
-        // Example usage of notification system
-        function demonstrateNotifications() {
-            // This would be called from your Django views or AJAX responses
-            // showNotification('Progress data updated successfully!', 'success');
-            // showNotification('New achievement unlocked!', 'info');
-        }
-
-        // Add keyboard navigation support
-        document.addEventListener('keydown', function(e) {
-            // ESC key closes sidebar on mobile
-            if (e.key === 'Escape' && window.innerWidth <= 768) {
-                closeSidebar();
-            }
-        });
-
-        // Add focus management for accessibility
-        document.querySelectorAll('.action-btn, .quick-action-card').forEach(element => {
-            element.addEventListener('focus', function() {
-                this.style.outline = '2px solid var(--primary)';
-                this.style.outlineOffset = '2px';
-            });
-            
-            element.addEventListener('blur', function() {
-                this.style.outline = 'none';
-            });
-        });
-
-        // Performance monitoring for debugging
+        // Performance monitoring
         if (console && console.time) {
-            console.time('Dashboard Load Time');
+            console.time('Compact Dashboard Load');
             window.addEventListener('load', function() {
-                console.timeEnd('Dashboard Load Time');
-                console.log('All dashboard components loaded successfully');
+                console.timeEnd('Compact Dashboard Load');
             });
         }
     </script>

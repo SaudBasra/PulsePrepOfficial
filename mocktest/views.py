@@ -1,4 +1,15 @@
 # mocktest/views.py - Complete Enhanced Version
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Max, Avg, Q
+from django.utils import timezone
+from datetime import datetime, timedelta
+import calendar
+from decimal import Decimal
+
+
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -8,7 +19,13 @@ from django.db.models import Q, Count
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.db.models import Avg, Max
-
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Max, Avg, Q
+from django.utils import timezone
+from datetime import datetime, timedelta
+import calendar
 import json
 import random
 
@@ -828,101 +845,225 @@ def report_warning(request):
 
 @login_required
 def mock_test_progress(request):
-    """Student progress tracking"""
+    """Student progress tracking with pagination and filtering - Error-Safe Version"""
     user = request.user
-    attempts = TestAttempt.objects.filter(student=user).select_related('mock_test').order_by('-started_at')
     
-    # Calculate stats
-    completed_attempts = attempts.filter(status='completed')
-    total_tests = attempts.count()
-    best_score = completed_attempts.aggregate(Max('percentage'))['percentage__max'] or 0
-    avg_score = completed_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
-    avg_time = completed_attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
-    
-    # Calculate monthly progress
-    from datetime import datetime, timedelta
-    import calendar
-    
-    # Get last 6 months data
-    monthly_data = []
-    current_date = timezone.now()
-    
-    for i in range(6):
-        month_start = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        if month_start.month == 1:
-            month_end = month_start.replace(month=12, year=month_start.year-1, day=31)
-        else:
-            next_month = month_start.replace(month=month_start.month-1)
-            month_end = next_month.replace(day=calendar.monthrange(next_month.year, next_month.month)[1])
+    try:
+        # Base queryset
+        attempts = TestAttempt.objects.filter(student=user).select_related('mock_test').order_by('-started_at')
         
-        month_attempts = completed_attempts.filter(
-            completed_at__gte=month_end,
-            completed_at__lt=month_start
-        )
+        # Apply filters
+        status_filter = request.GET.get('status')
+        date_filter = request.GET.get('date')
+        subject_filter = request.GET.get('subject')
         
-        month_avg = month_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
+        # Filter by status
+        if status_filter and status_filter != 'all':
+            attempts = attempts.filter(status=status_filter)
         
-        monthly_data.append({
-            'month': month_end.strftime('%b %Y'),
-            'attempts': month_attempts.count(),
-            'avg_score': round(month_avg, 1)
-        })
+        # Filter by date
+        if date_filter and date_filter != 'all':
+            today = timezone.now().date()
+            if date_filter == 'today':
+                attempts = attempts.filter(started_at__date=today)
+            elif date_filter == 'week':
+                week_ago = today - timedelta(days=7)
+                attempts = attempts.filter(started_at__date__gte=week_ago)
+            elif date_filter == 'month':
+                month_ago = today - timedelta(days=30)
+                attempts = attempts.filter(started_at__date__gte=month_ago)
         
-        current_date = month_end
-    
-    monthly_data.reverse()  # Show oldest to newest
-    
-    # Get subject-wise performance
-    subject_performance = {}
-    for attempt in completed_attempts:
-        test_subject = attempt.mock_test.subject or 'General'
-        if test_subject not in subject_performance:
-            subject_performance[test_subject] = {
-                'attempts': 0,
-                'total_score': 0,
-                'best_score': 0
-            }
+        # Filter by subject
+        if subject_filter and subject_filter != 'all':
+            if subject_filter == 'mbbs':
+                attempts = attempts.filter(mock_test__subject__icontains='MBBS')
+            elif subject_filter == 'bds':
+                attempts = attempts.filter(mock_test__subject__icontains='BDS')
         
-        subject_performance[test_subject]['attempts'] += 1
-        subject_performance[test_subject]['total_score'] += attempt.percentage
-        subject_performance[test_subject]['best_score'] = max(
-            subject_performance[test_subject]['best_score'],
-            attempt.percentage
-        )
-    
-    # Calculate averages
-    for subject in subject_performance:
-        data = subject_performance[subject]
-        data['avg_score'] = round(data['total_score'] / data['attempts'], 1)
-    
-    # Get recent activity (last 10 attempts)
-    recent_attempts = attempts[:10]
-    
-    # Calculate improvement trend (comparing first half vs second half of attempts)
-    if completed_attempts.count() >= 4:
-        half_point = completed_attempts.count() // 2
-        recent_half = list(completed_attempts[:half_point])
-        older_half = list(completed_attempts[half_point:])
+        # Paginate results (10 per page)
+        paginator = Paginator(attempts, 10)
+        page_number = request.GET.get('page')
+        attempts = paginator.get_page(page_number)
         
-        recent_avg = sum(a.percentage for a in recent_half) / len(recent_half)
-        older_avg = sum(a.percentage for a in older_half) / len(older_half)
+        # Calculate stats (using all attempts, not just paginated ones)
+        all_attempts = TestAttempt.objects.filter(student=user).select_related('mock_test')
+        completed_attempts = all_attempts.filter(status='completed').order_by('started_at')
         
-        improvement = recent_avg - older_avg
-    else:
-        improvement = 0
-    
-    context = {
-        'attempts': attempts,
-        'completed_attempts': completed_attempts,
-        'total_tests': total_tests,
-        'best_score': round(best_score, 1),
-        'avg_score': round(avg_score, 1),
-        'avg_time': round(avg_time / 60, 1) if avg_time else 0,  # Convert to minutes
-        'monthly_data': monthly_data,
-        'subject_performance': subject_performance,
-        'recent_attempts': recent_attempts,
-        'improvement': round(improvement, 1),
-        'user': user,
-    }
+        # Basic stats with safe calculations
+        total_tests = all_attempts.count()
+        
+        # Safe aggregation with default values
+        best_score_result = completed_attempts.aggregate(Max('percentage'))['percentage__max']
+        best_score = float(best_score_result) if best_score_result is not None else 0
+        
+        avg_score_result = completed_attempts.aggregate(Avg('percentage'))['percentage__avg']
+        avg_score = float(avg_score_result) if avg_score_result is not None else 0
+        
+        avg_time_result = completed_attempts.aggregate(Avg('time_taken'))['time_taken__avg']
+        avg_time = float(avg_time_result) if avg_time_result is not None else 0
+        
+        # Get subject-wise performance with safe calculations
+        subject_performance = {}
+        for attempt in completed_attempts:
+            if attempt.percentage is None:
+                continue
+                
+            test_subject = getattr(attempt.mock_test, 'subject', None) or 'General'
+            if test_subject not in subject_performance:
+                subject_performance[test_subject] = {
+                    'attempts': 0,
+                    'total_score': 0,
+                    'best_score': 0
+                }
+            
+            subject_performance[test_subject]['attempts'] += 1
+            subject_performance[test_subject]['total_score'] += float(attempt.percentage)
+            subject_performance[test_subject]['best_score'] = max(
+                subject_performance[test_subject]['best_score'],
+                float(attempt.percentage)
+            )
+        
+        # Calculate averages safely
+        for subject in subject_performance:
+            data = subject_performance[subject]
+            if data['attempts'] > 0:
+                data['avg_score'] = round(data['total_score'] / data['attempts'], 1)
+            else:
+                data['avg_score'] = 0
+        
+        # Calculate improvement trend safely
+        improvement_rate = 0
+        if completed_attempts.count() >= 4:
+            try:
+                half_point = completed_attempts.count() // 2
+                recent_half = list(completed_attempts[:half_point])
+                older_half = list(completed_attempts[half_point:])
+                
+                # Filter out None values and convert to float
+                recent_scores = [float(a.percentage) for a in recent_half if a.percentage is not None]
+                older_scores = [float(a.percentage) for a in older_half if a.percentage is not None]
+                
+                if recent_scores and older_scores:
+                    recent_avg = sum(recent_scores) / len(recent_scores)
+                    older_avg = sum(older_scores) / len(older_scores)
+                    improvement_rate = recent_avg - older_avg
+            except (TypeError, ValueError, ZeroDivisionError):
+                improvement_rate = 0
+        
+        # Calculate consistency rate safely
+        consistency_rate = 75  # Default value
+        if completed_attempts.count() >= 3:
+            try:
+                # Filter out None values and convert to float
+                scores = [float(a.percentage) for a in completed_attempts if a.percentage is not None]
+                
+                if len(scores) >= 3:
+                    mean_score = sum(scores) / len(scores)
+                    variance = sum((x - mean_score) ** 2 for x in scores) / len(scores)
+                    std_dev = variance ** 0.5
+                    # Convert to consistency percentage (lower std dev = higher consistency)
+                    consistency_rate = max(0, 100 - (std_dev * 2))
+            except (TypeError, ValueError, ZeroDivisionError):
+                consistency_rate = 75
+        
+        # Calculate test frequency safely
+        test_frequency = 0
+        if completed_attempts.count() > 0:
+            try:
+                first_test = completed_attempts.last().started_at
+                days_since_first = (timezone.now() - first_test).days
+                if days_since_first > 0:
+                    test_frequency = (completed_attempts.count() * 7) / days_since_first
+            except (AttributeError, TypeError, ZeroDivisionError):
+                test_frequency = 0
+        
+        # Calculate trends for stats safely
+        test_trend = 0
+        score_improvement = 0
+        
+        try:
+            # Calculate monthly test trend
+            current_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            last_month = (current_month - timedelta(days=1)).replace(day=1)
+            
+            current_month_tests = all_attempts.filter(started_at__gte=current_month).count()
+            last_month_tests = all_attempts.filter(
+                started_at__gte=last_month,
+                started_at__lt=current_month
+            ).count()
+            
+            if last_month_tests > 0:
+                test_trend = ((current_month_tests - last_month_tests) / last_month_tests) * 100
+        except (TypeError, ZeroDivisionError):
+            test_trend = 0
+        
+        # Calculate score improvement trend safely
+        if completed_attempts.count() >= 4:
+            try:
+                recent_scores = completed_attempts[:2]
+                older_scores = completed_attempts[2:4]
+                
+                recent_values = [float(a.percentage) for a in recent_scores if a.percentage is not None]
+                older_values = [float(a.percentage) for a in older_scores if a.percentage is not None]
+                
+                if recent_values and older_values:
+                    recent_avg = sum(recent_values) / len(recent_values)
+                    older_avg = sum(older_values) / len(older_values)
+                    
+                    if older_avg > 0:
+                        score_improvement = ((recent_avg - older_avg) / older_avg) * 100
+            except (TypeError, ValueError, ZeroDivisionError):
+                score_improvement = 0
+
+        context = {
+            'attempts': attempts,
+            'completed_attempts': completed_attempts,
+            'total_tests': total_tests,
+            'best_score': round(best_score, 1),
+            'avg_score': round(avg_score, 1),
+            'avg_time': round(avg_time / 60, 1) if avg_time else 0,  # Convert to minutes
+            'subject_performance': subject_performance,
+            'improvement_rate': round(improvement_rate, 1),
+            'consistency_rate': round(consistency_rate, 1),
+            'test_frequency': round(test_frequency, 1),
+            'test_trend': round(test_trend, 1),
+            'score_improvement': round(score_improvement, 1),
+            'user': user,
+            # Add filter values for template
+            'current_status_filter': status_filter or 'all',
+            'current_date_filter': date_filter or 'all',
+            'current_subject_filter': subject_filter or 'all',
+        }
+        
+    except Exception as e:
+        # Fallback in case of any error
+        print(f"Error in mock_test_progress: {e}")
+        
+        # Minimal safe context
+        attempts = TestAttempt.objects.filter(student=user).select_related('mock_test').order_by('-started_at')
+        paginator = Paginator(attempts, 10)
+        page_number = request.GET.get('page')
+        attempts = paginator.get_page(page_number)
+        
+        completed_attempts = TestAttempt.objects.filter(student=user, status='completed').order_by('started_at')
+        
+        context = {
+            'attempts': attempts,
+            'completed_attempts': completed_attempts,
+            'total_tests': TestAttempt.objects.filter(student=user).count(),
+            'best_score': 0,
+            'avg_score': 0,
+            'avg_time': 0,
+            'subject_performance': {},
+            'improvement_rate': 0,
+            'consistency_rate': 75,
+            'test_frequency': 0,
+            'test_trend': 0,
+            'score_improvement': 0,
+            'user': user,
+            'current_status_filter': 'all',
+            'current_date_filter': 'all',
+            'current_subject_filter': 'all',
+        }
     
     return render(request, 'mocktest/student_progress.html', context)

@@ -5,15 +5,14 @@
     <meta charset="UTF-8">
     {% include 'includes/favicon.html' %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Progress | PulsePrep</title>
+    <title>Mock Test Progress | PulsePrep</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Progress specific styles that complement DAstyles.css */
+        /* Compact Design Variables */
         :root {
             --primary: #82272e;
             --primary-light: #a53b47;
-            --primary-dark: #6b1e24;
             --secondary: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -22,161 +21,176 @@
             --dark: #1e293b;
             --gray: #64748b;
             --gray-light: #e2e8f0;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --border-radius-sm: 6px;
+            --shadow: 0 2px 8px rgba(130, 39, 46, 0.08);
+            --shadow-hover: 0 4px 12px rgba(130, 39, 46, 0.12);
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-light));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f9fafb;
             color: var(--dark);
-            line-height: 1.6;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
-        /* Dashboard Layout */
+        /* Compact Dashboard Layout */
         .dashboard-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 260px 1fr;
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        /* Compact Sidebar */
         .sidebar {
-            background: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--white);
+            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             height: 100vh;
-            z-index: 50;
+            border-right: 1px solid var(--gray-light);
+            overflow-y: auto;
         }
 
         .logo-container {
-            padding: 24px;
+            padding: 20px;
             border-bottom: 1px solid var(--gray-light);
+            text-align: center;
         }
 
         .logo {
-            height: 40px;
+            height: 80px;
             width: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
 
         .nav-menu {
-            padding: 16px 0;
+            padding: 8px 0;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
+            gap: 10px;
+            padding: 8px 16px;
             color: var(--gray);
             text-decoration: none;
             font-weight: 500;
+            font-size: 13px;
             transition: all 0.2s;
-            margin: 4px 0;
+            margin: 1px 4px;
+            border-radius: var(--border-radius-sm);
         }
 
         .nav-item i {
-            width: 24px;
+            width: 18px;
             text-align: center;
+            font-size: 14px;
         }
 
         .nav-item:hover {
             color: var(--primary);
-            background-color: rgba(130, 39, 46, 0.1);
+            background: rgba(130, 39, 46, 0.05);
         }
 
         .nav-item.active {
             color: var(--primary);
-            background-color: rgba(130, 39, 46, 0.1);
-            border-right: 3px solid var(--primary);
+            background: var(--gradient-primary);
+            color: white;
+            font-weight: 600;
         }
 
-        /* Main Content */
+        /* Compact Main Content */
         .main-content {
-            background-color: #f9fafb;
+            background: transparent;
             overflow-y: auto;
-            max-height: 100vh;
         }
 
-        /* Header */
+        /* Compact Header */
         .header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.2);
+            padding: 12px 20px;
+            background: var(--white);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--gray-light);
             position: sticky;
             top: 0;
             z-index: 40;
         }
 
         .header h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            color: white;
+            color: var(--dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .mobile-menu {
-            display: none;
-        }
-
-        .mobile-menu button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
+        .header h1 i {
+            color: var(--primary);
+            font-size: 16px;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
         }
 
-        .user-menu .notification-bell {
+        .notification-bell {
+            color: var(--gray);
+            font-size: 16px;
+            text-decoration: none;
             position: relative;
-            color: rgba(255,255,255,0.8);
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .user-menu .notification-bell:hover {
-            color: white;
+            padding: 6px;
+            border-radius: 50%;
         }
 
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--danger);
+            top: -2px;
+            right: -2px;
+            background: var(--danger);
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
         }
 
         .avatar {
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             overflow: hidden;
-            background-color: rgba(255,255,255,0.2);
+            background: var(--gradient-primary);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 3px solid var(--gray-light);
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
         }
 
         .avatar img {
@@ -185,55 +199,107 @@
             object-fit: cover;
         }
 
-        /* Dashboard Content */
+        /* Compact Dashboard Content */
         .dashboard-content {
-            padding: 24px;
+            padding: 16px 20px;
         }
 
-        /* Progress Header */
+        /* Compact Progress Header */
         .progress-header {
-            margin-bottom: 32px;
+            background: var(--gradient-primary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
             text-align: center;
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
-            border: 1px solid var(--gray-light);
+            color: white;
+            box-shadow: var(--shadow);
         }
 
         .progress-header h1 {
-            color: var(--dark);
-            font-size: 32px;
+            margin: 0 0 6px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .progress-header p {
-            color: var(--gray);
-            font-size: 16px;
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.9;
         }
 
-        /* Stats Grid */
+        /* Compact Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .quick-action-card {
+            background: var(--white);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            border: 1px solid var(--gray-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .quick-action-content h4 {
+            margin: 0 0 2px;
+            color: var(--dark);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .quick-action-content p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 11px;
+        }
+
+        /* Compact Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
-            transition: all 0.3s ease;
+            text-align: center;
+            transition: all 0.2s ease;
             position: relative;
-            overflow: hidden;
         }
 
         .stat-card::before {
@@ -242,94 +308,73 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
         }
 
         .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 40px rgba(130, 39, 46, 0.15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
 
         .stat-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
+            background: var(--gradient-primary);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .stat-icon.primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-        }
-
-        .stat-icon.success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-
-        .stat-icon.warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-
-        .stat-icon.info {
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: white;
+            font-size: 14px;
+            margin: 0 auto 8px;
         }
 
         .stat-value {
-            font-size: 36px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 8px;
+            margin-bottom: 2px;
         }
 
         .stat-label {
             color: var(--gray);
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 500;
         }
 
         .stat-trend {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 600;
-            margin-top: 8px;
+            margin-top: 4px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            gap: 2px;
         }
 
-        .stat-trend.up {
-            color: var(--secondary);
-        }
+        .stat-trend.up { color: var(--secondary); }
+        .stat-trend.down { color: var(--danger); }
 
-        .stat-trend.down {
-            color: var(--danger);
-        }
-
-        /* Performance Overview */
+        /* Compact Performance Overview */
         .performance-overview {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        .chart-section {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+        .chart-section, .performance-summary {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
         }
 
         .chart-header {
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -338,21 +383,21 @@
         .chart-header h3 {
             margin: 0;
             color: var(--dark);
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
         }
 
         .chart-controls {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .chart-toggle {
-            padding: 6px 12px;
+            padding: 4px 8px;
             border: 1px solid var(--gray-light);
             background: white;
-            border-radius: 6px;
-            font-size: 12px;
+            border-radius: 4px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -365,21 +410,13 @@
 
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 240px;
         }
 
-        /* Performance Summary */
-        .performance-summary {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
-            border: 1px solid var(--gray-light);
-        }
-
+        /* Compact Performance Summary */
         .summary-item {
-            margin-bottom: 24px;
-            padding-bottom: 20px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--gray-light);
         }
 
@@ -391,82 +428,71 @@
 
         .summary-item h4 {
             color: var(--dark);
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .summary-item p {
             color: var(--gray);
-            font-size: 14px;
-            margin-bottom: 12px;
+            font-size: 12px;
+            margin-bottom: 8px;
         }
 
         .progress-bar {
-            height: 8px;
+            height: 6px;
             background: #f1f5f9;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 1s ease-in-out;
         }
 
-        .progress-fill.excellent {
-            background: linear-gradient(90deg, #10b981, #059669);
-        }
+        .progress-fill.excellent { background: linear-gradient(90deg, #10b981, #059669); }
+        .progress-fill.good { background: linear-gradient(90deg, #3b82f6, #2563eb); }
+        .progress-fill.average { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .progress-fill.poor { background: linear-gradient(90deg, #ef4444, #dc2626); }
 
-        .progress-fill.good {
-            background: linear-gradient(90deg, #3b82f6, #2563eb);
-        }
-
-        .progress-fill.average {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-        }
-
-        .progress-fill.poor {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
-        }
-
-        /* Test History */
+        /* Compact Test History */
         .history-section {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(130, 39, 46, 0.1);
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
             border: 1px solid var(--gray-light);
             overflow: hidden;
         }
 
         .section-header {
-            padding: 24px 32px;
+            padding: 16px 20px;
             border-bottom: 1px solid var(--gray-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            background: #f8fafc;
         }
 
         .section-header h2 {
             margin: 0;
             color: var(--dark);
-            font-size: 20px;
+            font-size: 16px;
             font-weight: 600;
         }
 
         .filter-controls {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
         .filter-select {
-            padding: 10px 16px;
+            padding: 6px 10px;
             border: 1px solid var(--gray-light);
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 12px;
             color: var(--gray);
             background: white;
             cursor: pointer;
@@ -477,32 +503,33 @@
         .filter-select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(130, 39, 46, 0.1);
+            box-shadow: 0 0 0 2px rgba(130, 39, 46, 0.1);
         }
 
-        /* Progress Table */
+        /* Compact Progress Table */
         .progress-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
         }
 
         .progress-table th {
             background: #f8fafc;
-            padding: 20px 32px;
+            padding: 12px 16px;
             text-align: left;
             font-weight: 600;
             color: var(--gray);
-            font-size: 13px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--gray-light);
         }
 
         .progress-table td {
-            padding: 20px 32px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--gray-light);
             color: var(--dark);
-            font-size: 15px;
+            font-size: 13px;
         }
 
         .progress-table tr:hover {
@@ -514,20 +541,20 @@
             color: var(--dark);
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 16px;
+            gap: 8px;
+            font-size: 14px;
         }
 
         .test-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 11px;
+            gap: 2px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
 
         .badge-mbbs {
@@ -542,55 +569,47 @@
 
         .date-time {
             color: var(--gray);
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .score-display {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 8px;
         }
 
         .score-bar {
-            width: 120px;
-            height: 8px;
+            width: 80px;
+            height: 6px;
             background: #e5e7eb;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .score-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.5s ease;
         }
 
-        .score-fill.high {
-            background: linear-gradient(90deg, #10b981, #059669);
-        }
-
-        .score-fill.medium {
-            background: linear-gradient(90deg, #f59e0b, #d97706);
-        }
-
-        .score-fill.low {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
-        }
+        .score-fill.high { background: linear-gradient(90deg, #10b981, #059669); }
+        .score-fill.medium { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .score-fill.low { background: linear-gradient(90deg, #ef4444, #dc2626); }
 
         .score-text {
             font-weight: 600;
-            font-size: 16px;
-            min-width: 45px;
+            font-size: 13px;
+            min-width: 35px;
             text-align: right;
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 600;
         }
 
@@ -617,13 +636,13 @@
         .action-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            gap: 4px;
+            padding: 6px 12px;
+            background: var(--gradient-primary);
             color: white;
-            border-radius: 8px;
+            border-radius: 6px;
             text-decoration: none;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             transition: all 0.2s;
             border: none;
@@ -631,8 +650,10 @@
         }
 
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(130, 39, 46, 0.3);
+            text-decoration: none;
+            color: white;
         }
 
         .action-btn.secondary {
@@ -642,38 +663,38 @@
 
         .action-btn.secondary:hover {
             background: #e2e8f0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: var(--primary);
         }
 
         .action-btn i {
-            font-size: 14px;
+            font-size: 10px;
         }
 
-        /* Empty State */
+        /* Compact Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 40px 20px;
             color: var(--gray);
         }
 
         .empty-state i {
-            font-size: 80px;
+            font-size: 48px;
             color: #cbd5e1;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .empty-state h3 {
-            font-size: 24px;
+            font-size: 18px;
             color: var(--gray);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         .empty-state p {
-            font-size: 16px;
+            font-size: 13px;
             color: #94a3b8;
-            margin-bottom: 32px;
-            max-width: 400px;
+            margin-bottom: 20px;
+            max-width: 300px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -681,76 +702,218 @@
         .empty-state .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 14px 28px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            gap: 6px;
+            padding: 10px 20px;
+            background: var(--gradient-primary);
             color: white;
-            border-radius: 8px;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
+            font-size: 12px;
             transition: all 0.2s;
         }
 
         .empty-state .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(130, 39, 46, 0.3);
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
-        .quick-action-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(130, 39, 46, 0.1);
-            border: 1px solid var(--gray-light);
-            text-align: center;
+            box-shadow: 0 6px 12px rgba(130, 39, 46, 0.3);
             text-decoration: none;
-            color: inherit;
-            transition: all 0.3s ease;
-        }
-
-        .quick-action-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(130, 39, 46, 0.15);
-        }
-
-        .quick-action-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: white;
+        }
+
+        /* Enhanced Pagination Styles */
+        .pagination-container {
+            padding: 16px 20px;
+            border-top: 1px solid var(--gray-light);
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+        }
+
+        .pagination-info {
+            color: var(--gray);
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .pagination-controls {
             display: flex;
             align-items: center;
+            gap: 4px;
+        }
+
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            margin: 0 auto 12px;
-            font-size: 20px;
-        }
-
-        .quick-action-title {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .quick-action-desc {
-            font-size: 13px;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            background: white;
             color: var(--gray);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        /* Responsive Design */
+        .pagination-btn:hover:not(.disabled):not(.active) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(130, 39, 46, 0.05);
+            text-decoration: none;
+        }
+
+        .pagination-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary);
+            font-weight: 700;
+        }
+
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .pagination-ellipsis {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .pagination-jump {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .page-jump-input {
+            width: 50px;
+            height: 32px;
+            padding: 0 6px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            font-size: 11px;
+            text-align: center;
+            background: white;
+            color: var(--dark);
+        }
+
+        .page-jump-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(130, 39, 46, 0.1);
+        }
+
+        /* Mobile Pagination */
+        @media (max-width: 768px) {
+            .pagination-container {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+
+            .pagination-info {
+                text-align: center;
+                min-width: auto;
+            }
+
+            .pagination-controls {
+                order: 2;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .pagination-jump {
+                order: 1;
+                justify-content: center;
+            }
+
+            .pagination-btn {
+                min-width: 28px;
+                height: 28px;
+                font-size: 10px;
+            }
+
+            .page-jump-input {
+                width: 45px;
+                height: 28px;
+            }
+        }
+
+        /* Results per page selector */
+        .results-per-page {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .results-per-page select {
+            padding: 4px 8px;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius-sm);
+            font-size: 11px;
+            background: white;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .results-per-page select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(130, 39, 46, 0.1);
+        }
+
+        /* Mobile Responsive */
+        .mobile-menu {
+            display: none;
+        }
+
+        .mobile-menu button {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
             .performance-overview {
                 grid-template-columns: 1fr;
             }
@@ -763,38 +926,57 @@
 
             .sidebar {
                 position: fixed;
-                left: -280px;
+                left: -260px;
                 top: 0;
                 height: 100vh;
                 z-index: 100;
                 transition: left 0.3s ease;
             }
 
-            .sidebar.active {
+            .sidebar.show {
                 left: 0;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
             }
 
             .mobile-menu {
                 display: block;
             }
 
-            .stats-grid {
+            .header {
+                padding: 10px 16px;
+            }
+
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .dashboard-content {
+                padding: 12px 16px;
+            }
+
+            .stats-grid,
+            .quick-actions {
                 grid-template-columns: 1fr;
             }
 
             .section-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 16px;
-                padding: 20px 24px;
+                gap: 10px;
+                padding: 12px 16px;
             }
 
             .filter-controls {
                 width: 100%;
+                flex-wrap: wrap;
             }
 
             .filter-select {
                 flex: 1;
+                min-width: 120px;
             }
 
             .progress-table {
@@ -805,60 +987,36 @@
 
             .progress-table th,
             .progress-table td {
-                padding: 16px 20px;
+                padding: 8px 12px;
             }
 
-            .dashboard-content {
+            .quick-action-card {
+                flex-direction: column;
+                text-align: center;
                 padding: 16px;
-            }
-
-            .progress-header {
-                padding: 24px;
-            }
-
-            .chart-section,
-            .performance-summary {
-                padding: 24px;
             }
         }
 
         /* Animations */
         @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .fade-in {
-            animation: fadeIn 0.6s ease-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         .slide-in-left {
-            animation: slideInLeft 0.6s ease-out;
+            animation: fadeIn 0.4s ease-out;
         }
 
         /* Loading Animation */
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(130, 39, 46, 0.3);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(130, 39, 46, 0.3);
             border-radius: 50%;
             border-top-color: var(--primary);
             animation: spin 1s ease-in-out infinite;
@@ -871,29 +1029,48 @@
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo-container">
                 <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
             </div>
             <nav class="nav-menu">
-                <a href="{% url 'student_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+                <a href="{% url 'student_dashboard' %}" class="nav-item">
                     <i class="fas fa-th-large"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{% url 'student_mock_tests' %}" class="nav-item {% if request.resolver_match.url_name == 'student_mock_tests' %}active{% endif %}">
+                <a href="{% url 'student_practice_modules' %}" class="nav-item">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Practice Modules</span>
+                </a>
+                <a href="{% url 'student_mock_tests' %}" class="nav-item">
                     <i class="fas fa-vial"></i>
                     <span>Mock Tests</span>
                 </a>
+                <a href="{% url 'student_model_papers' %}" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Model Papers</span>
+                </a>
+                <a href="{% url 'unified_progress' %}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Progress</span>
+                </a>
                 <a href="#" class="nav-item active">
                     <i class="fas fa-chart-bar"></i>
-                    <span>My Progress</span>
+                    <span>Mock Test Progress</span>
+                </a>
+                <a href="{% url 'notes_dashboard' %}" class="nav-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>My Notes</span>
                 </a>
                 <a href="{% url 'my_profile' %}" class="nav-item">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
                 </a>
-                <a href="{% url 'student_notifications' %}" class="nav-item {% if request.resolver_match.url_name == 'student_notifications' %}active{% endif %}">
+                <a href="{% url 'student_notifications' %}" class="nav-item">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                     {% if unread_count > 0 %}
@@ -916,14 +1093,14 @@
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-                <h1>My Progress Analytics</h1>
+                <h1><i class="fas fa-chart-bar"></i> Mock Test Progress</h1>
                 <div class="user-menu">
-                    <div class="notification-bell">
+                    <a href="{% url 'student_notifications' %}" class="notification-bell">
                         <i class="fas fa-bell"></i>
                         {% if unread_count > 0 %}
                         <span class="notification-badge">{{ unread_count }}</span>
                         {% endif %}
-                    </div>
+                    </a>
                     <div class="avatar">
                         {% if user.profile_image %}
                             <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" />
@@ -938,8 +1115,8 @@
             <div class="dashboard-content">
                 <!-- Progress Header -->
                 <div class="progress-header fade-in">
-                    <h1>Performance Dashboard</h1>
-                    <p>Track your test history, analyze your progress, and identify areas for improvement</p>
+                    <h1>Mock Test Analytics</h1>
+                    <p>Track your test history, analyze performance, and identify improvement areas</p>
                 </div>
 
                 <!-- Quick Actions -->
@@ -948,36 +1125,44 @@
                         <div class="quick-action-icon">
                             <i class="fas fa-play"></i>
                         </div>
-                        <div class="quick-action-title">Take New Test</div>
-                        <div class="quick-action-desc">Start a new mock test</div>
+                        <div class="quick-action-content">
+                            <h4>Take New Test</h4>
+                            <p>Start a new mock test</p>
+                        </div>
                     </a>
                     <a href="#test-history" class="quick-action-card">
                         <div class="quick-action-icon">
                             <i class="fas fa-history"></i>
                         </div>
-                        <div class="quick-action-title">Test History</div>
-                        <div class="quick-action-desc">View all attempts</div>
+                        <div class="quick-action-content">
+                            <h4>Test History</h4>
+                            <p>View all attempts</p>
+                        </div>
                     </a>
                     <a href="#performance-chart" class="quick-action-card">
                         <div class="quick-action-icon">
                             <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="quick-action-title">Progress Chart</div>
-                        <div class="quick-action-desc">Visual progress tracking</div>
+                        <div class="quick-action-content">
+                            <h4>Progress Chart</h4>
+                            <p>Visual progress tracking</p>
+                        </div>
                     </a>
                     <button onclick="exportProgress()" class="quick-action-card">
                         <div class="quick-action-icon">
                             <i class="fas fa-download"></i>
                         </div>
-                        <div class="quick-action-title">Export Data</div>
-                        <div class="quick-action-desc">Download your progress</div>
+                        <div class="quick-action-content">
+                            <h4>Export Data</h4>
+                            <p>Download your progress</p>
+                        </div>
                     </button>
                 </div>
                 
                 <!-- Statistics Cards -->
                 <div class="stats-grid slide-in-left">
                     <div class="stat-card">
-                        <div class="stat-icon primary">
+                        <div class="stat-icon">
                             <i class="fas fa-clipboard-check"></i>
                         </div>
                         <div class="stat-value">{{ total_tests }}</div>
@@ -991,7 +1176,7 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon success">
+                        <div class="stat-icon">
                             <i class="fas fa-trophy"></i>
                         </div>
                         <div class="stat-value">{{ best_score|floatformat:0 }}%</div>
@@ -1005,7 +1190,7 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon warning">
+                        <div class="stat-icon">
                             <i class="fas fa-chart-line"></i>
                         </div>
                         <div class="stat-value">{{ avg_score|floatformat:0 }}%</div>
@@ -1019,7 +1204,7 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon info">
+                        <div class="stat-icon">
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="stat-value">{{ avg_time|floatformat:0 }}m</div>
@@ -1049,8 +1234,8 @@
                             {% else %}
                                 <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--gray);">
                                     <div style="text-align: center;">
-                                        <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                                        <p>Take more tests to see your progress chart</p>
+                                        <i class="fas fa-chart-line" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
+                                        <p style="font-size: 13px;">Take more tests to see your progress chart</p>
                                     </div>
                                 </div>
                             {% endif %}
@@ -1059,7 +1244,7 @@
 
                     <!-- Performance Summary -->
                     <div class="performance-summary">
-                        <h3 style="margin-bottom: 24px; color: var(--dark); font-size: 20px; font-weight: 600;">Performance Insights</h3>
+                        <h3 style="margin-bottom: 16px; color: var(--dark); font-size: 16px; font-weight: 600;">Performance Insights</h3>
                         
                         <div class="summary-item">
                             <h4>Overall Performance</h4>
@@ -1068,7 +1253,7 @@
                                 <div class="progress-fill {% if avg_score >= 80 %}excellent{% elif avg_score >= 60 %}good{% elif avg_score >= 40 %}average{% else %}poor{% endif %}" 
                                      style="width: {{ avg_score }}%"></div>
                             </div>
-                            <small>{{ avg_score|floatformat:1 }}% average score</small>
+                            <small style="font-size: 11px; color: var(--gray);">{{ avg_score|floatformat:1 }}% average score</small>
                         </div>
                         
                         <div class="summary-item">
@@ -1078,7 +1263,7 @@
                                 <div class="progress-fill {% if consistency_rate >= 80 %}excellent{% elif consistency_rate >= 60 %}good{% elif consistency_rate >= 40 %}average{% else %}poor{% endif %}" 
                                      style="width: {{ consistency_rate|default:75 }}%"></div>
                             </div>
-                            <small>{{ consistency_rate|default:75|floatformat:0 }}% consistency</small>
+                            <small style="font-size: 11px; color: var(--gray);">{{ consistency_rate|default:75|floatformat:0 }}% consistency</small>
                         </div>
                         
                         <div class="summary-item">
@@ -1088,7 +1273,7 @@
                                 <div class="progress-fill {% if improvement_rate >= 15 %}excellent{% elif improvement_rate >= 5 %}good{% elif improvement_rate >= 0 %}average{% else %}poor{% endif %}" 
                                      style="width: {% if improvement_rate > 0 %}{{ improvement_rate|add:50 }}{% else %}25{% endif %}%"></div>
                             </div>
-                            <small>{% if improvement_rate > 0 %}+{{ improvement_rate|floatformat:1 }}% improvement{% elif improvement_rate < 0 %}{{ improvement_rate|floatformat:1 }}% decline{% else %}Stable performance{% endif %}</small>
+                            <small style="font-size: 11px; color: var(--gray);">{% if improvement_rate > 0 %}+{{ improvement_rate|floatformat:1 }}% improvement{% elif improvement_rate < 0 %}{{ improvement_rate|floatformat:1 }}% decline{% else %}Stable performance{% endif %}</small>
                         </div>
                         
                         <div class="summary-item">
@@ -1098,7 +1283,7 @@
                                 <div class="progress-fill {% if test_frequency >= 4 %}excellent{% elif test_frequency >= 2 %}good{% elif test_frequency >= 1 %}average{% else %}poor{% endif %}" 
                                      style="width: {% widthratio test_frequency|default:2 5 100 %}%"></div>
                             </div>
-                            <small>{{ test_frequency|default:2 }} tests per week</small>
+                            <small style="font-size: 11px; color: var(--gray);">{{ test_frequency|default:2 }} tests per week</small>
                         </div>
                     </div>
                 </div>
@@ -1143,38 +1328,41 @@
                                 </thead>
                                 <tbody id="test-table-body">
                                     {% for attempt in attempts %}
-                                    <tr class="attempt-row" data-status="{{ attempt.status }}" data-date="{{ attempt.started_at|date:'Y-m-d' }}" data-subject="{{ attempt.mock_test.degree|lower }}">
+                                    <tr class="attempt-row" data-status="{{ attempt.status }}" data-date="{{ attempt.started_at|date:'Y-m-d' }}" data-subject="{{ attempt.mock_test.subject|default:'general'|lower }}">
                                         <td>
                                             <div class="test-title">
-                                                {{ attempt.mock_test.title }}
-                                                {% if attempt.mock_test.degree %}
-                                                    <span class="test-badge badge-{{ attempt.mock_test.degree|lower }}">
-                                                        {{ attempt.mock_test.get_degree_display }}
+                                                {{ attempt.mock_test.title|truncatechars:30 }}
+                                                {% if attempt.mock_test.subject %}
+                                                    <span class="test-badge badge-{{ attempt.mock_test.subject|lower }}">
+                                                        {{ attempt.mock_test.subject }}
                                                     </span>
                                                 {% endif %}
                                             </div>
-                                            <div style="font-size: 13px; color: var(--gray); margin-top: 4px;">
-                                                {{ attempt.mock_test.total_questions }} Questions • {{ attempt.mock_test.duration_minutes }} min
+                                            <div style="font-size: 11px; color: var(--gray); margin-top: 2px;">
+                                                {% if attempt.mock_test.total_questions %}{{ attempt.mock_test.total_questions }} Questions{% endif %}
+                                                {% if attempt.mock_test.duration %}• {{ attempt.mock_test.duration }} min{% endif %}
                                             </div>
                                         </td>
                                         <td>
                                             <div class="date-time">
-                                                <div style="font-weight: 500;">{{ attempt.started_at|date:"M d, Y" }}</div>
-                                                <div style="color: #94a3b8; font-size: 13px;">{{ attempt.started_at|date:"g:i A" }}</div>
+                                                <div style="font-weight: 500; font-size: 12px;">{{ attempt.started_at|date:"M d, Y" }}</div>
+                                                <div style="color: #94a3b8; font-size: 11px;">{{ attempt.started_at|date:"g:i A" }}</div>
                                             </div>
                                         </td>
                                         <td>
                                             {% if attempt.time_taken %}
-                                                <div style="font-weight: 500;">{{ attempt.time_taken|floatformat:0 }}m</div>
-                                                <div style="color: #94a3b8; font-size: 13px;">
-                                                    {% if attempt.time_taken < attempt.mock_test.duration_minutes %}
-                                                        {{ attempt.mock_test.duration_minutes|floatformat:0|add:"-"|add:attempt.time_taken|floatformat:0 }}m saved
+                                                <div style="font-weight: 500; font-size: 12px;">{{ attempt.time_taken|floatformat:0 }}m</div>
+                                                {% if attempt.mock_test.duration %}
+                                                <div style="color: #94a3b8; font-size: 10px;">
+                                                    {% if attempt.time_taken < attempt.mock_test.duration %}
+                                                        {{ attempt.mock_test.duration|floatformat:0|add:"-"|add:attempt.time_taken|floatformat:0 }}m saved
                                                     {% else %}
                                                         Full time used
                                                     {% endif %}
                                                 </div>
+                                                {% endif %}
                                             {% else %}
-                                                <span style="color: #94a3b8;">-</span>
+                                                <span style="color: #94a3b8; font-size: 12px;">-</span>
                                             {% endif %}
                                         </td>
                                         <td>
@@ -1186,16 +1374,18 @@
                                                     </div>
                                                     <span class="score-text">{{ attempt.percentage|floatformat:0 }}%</span>
                                                 </div>
-                                                <div style="font-size: 12px; color: var(--gray); margin-top: 4px;">
-                                                    {{ attempt.score }}/{{ attempt.mock_test.total_questions }} correct
+                                                <div style="font-size: 10px; color: var(--gray); margin-top: 2px;">
+                                                    {% if attempt.correct_answers and attempt.mock_test.total_questions %}
+                                                        {{ attempt.correct_answers }}/{{ attempt.mock_test.total_questions }} correct
+                                                    {% endif %}
                                                 </div>
                                             {% else %}
-                                                <span style="color: #94a3b8;">Not completed</span>
+                                                <span style="color: #94a3b8; font-size: 12px;">Not completed</span>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if attempt.status == 'completed' %}
-                                                {% if attempt.passed %}
+                                                {% if attempt.percentage >= 60 %}
                                                     <span class="status-badge status-completed">
                                                         <i class="fas fa-check-circle"></i> Passed
                                                     </span>
@@ -1215,10 +1405,10 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <div style="display: flex; gap: 8px;">
+                                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                                 {% if attempt.status == 'completed' or attempt.status == 'abandoned' %}
                                                     <a href="{% url 'test_result' attempt.id %}" class="action-btn">
-                                                        <i class="fas fa-eye"></i> View Results
+                                                        <i class="fas fa-eye"></i> View
                                                     </a>
                                                 {% elif attempt.status == 'in_progress' %}
                                                     <a href="{% url 'take_test' attempt.mock_test.id %}" class="action-btn">
@@ -1236,21 +1426,62 @@
                             </table>
                         </div>
                         
-                        <!-- Pagination if needed -->
-                        {% if attempts.paginator.num_pages > 1 %}
-                        <div style="padding: 20px 32px; border-top: 1px solid var(--gray-light); display: flex; justify-content: center;">
-                            <div style="display: flex; gap: 8px; align-items: center;">
+                        <!-- Enhanced Pagination - Fixed -->
+                        {% if attempts.has_other_pages %}
+                        <div class="pagination-container">
+                            <div class="pagination-info">
+                                Showing {{ attempts.start_index }}-{{ attempts.end_index }} of {{ attempts.paginator.count }} results
+                            </div>
+                            <div class="pagination-controls">
                                 {% if attempts.has_previous %}
-                                    <a href="?page={{ attempts.previous_page_number }}" style="padding: 8px 12px; border: 1px solid var(--gray-light); border-radius: 6px; text-decoration: none; color: var(--gray);">Previous</a>
+                                    <a href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn" title="First page">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                    <a href="?page={{ attempts.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn" title="Previous page">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="pagination-btn disabled">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </span>
+                                    <span class="pagination-btn disabled">
+                                        <i class="fas fa-angle-left"></i>
+                                    </span>
                                 {% endif %}
-                                
-                                <span style="padding: 8px 12px; color: var(--gray);">
-                                    Page {{ attempts.number }} of {{ attempts.paginator.num_pages }}
-                                </span>
-                                
+
+                                <!-- Page numbers -->
+                                {% for page_num in attempts.paginator.page_range %}
+                                    {% if page_num == attempts.number %}
+                                        <span class="pagination-btn active">{{ page_num }}</span>
+                                    {% elif page_num <= attempts.number|add:3 and page_num >= attempts.number|add:-3 %}
+                                        <a href="?page={{ page_num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn">{{ page_num }}</a>
+                                    {% elif page_num == 1 or page_num == attempts.paginator.num_pages %}
+                                        <a href="?page={{ page_num }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn">{{ page_num }}</a>
+                                    {% elif page_num == attempts.number|add:-4 or page_num == attempts.number|add:4 %}
+                                        <span class="pagination-ellipsis">...</span>
+                                    {% endif %}
+                                {% endfor %}
+
                                 {% if attempts.has_next %}
-                                    <a href="?page={{ attempts.next_page_number }}" style="padding: 8px 12px; border: 1px solid var(--gray-light); border-radius: 6px; text-decoration: none; color: var(--gray);">Next</a>
+                                    <a href="?page={{ attempts.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn" title="Next page">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                    <a href="?page={{ attempts.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.date %}&date={{ request.GET.date }}{% endif %}{% if request.GET.subject %}&subject={{ request.GET.subject }}{% endif %}" class="pagination-btn" title="Last page">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                {% else %}
+                                    <span class="pagination-btn disabled">
+                                        <i class="fas fa-angle-right"></i>
+                                    </span>
+                                    <span class="pagination-btn disabled">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </span>
                                 {% endif %}
+                            </div>
+                            <div class="pagination-jump">
+                                <span>Go to page:</span>
+                                <input type="number" id="pageJump" min="1" max="{{ attempts.paginator.num_pages }}" value="{{ attempts.number }}" class="page-jump-input">
+                                <button onclick="jumpToPage()" class="pagination-btn">Go</button>
                             </div>
                         </div>
                         {% endif %}
@@ -1272,50 +1503,115 @@
     <script src="{% static 'js/DAscript.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Mobile sidebar toggle
-        document.getElementById('sidebar-toggle').addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            sidebarOverlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('show') ? 'hidden' : '';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+            sidebarOverlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Event listeners
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar when clicking on nav items on mobile
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeSidebar();
+                }
+            });
         });
 
-        // Filter functionality
-        document.getElementById('statusFilter').addEventListener('change', filterTable);
-        document.getElementById('dateFilter').addEventListener('change', filterTable);
-        document.getElementById('subjectFilter').addEventListener('change', filterTable);
-        
-        function filterTable() {
+        // Close sidebar on window resize if screen becomes large
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Enhanced pagination functionality - Fixed
+        function jumpToPage() {
+            const pageInput = document.getElementById('pageJump');
+            const pageNumber = parseInt(pageInput.value);
+            const maxPages = {{ attempts.paginator.num_pages|default:1 }};
+            
+            if (pageNumber >= 1 && pageNumber <= maxPages) {
+                // Preserve current filters
+                const urlParams = new URLSearchParams(window.location.search);
+                urlParams.set('page', pageNumber);
+                window.location.href = '?' + urlParams.toString();
+            } else {
+                alert(`Please enter a page number between 1 and ${maxPages}`);
+                pageInput.value = {{ attempts.number|default:1 }};
+            }
+        }
+
+        // Enter key support for page jump
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageJumpInput = document.getElementById('pageJump');
+            if (pageJumpInput) {
+                pageJumpInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        jumpToPage();
+                    }
+                });
+            }
+        });
+
+        // Fixed filter functionality with server-side filtering
+        function applyFilters() {
             const statusFilter = document.getElementById('statusFilter').value;
             const dateFilter = document.getElementById('dateFilter').value;
             const subjectFilter = document.getElementById('subjectFilter').value;
-            const today = new Date();
-            const weekAgo = new Date();
-            weekAgo.setDate(today.getDate() - 7);
-            const monthAgo = new Date();
-            monthAgo.setDate(today.getDate() - 30);
             
-            document.querySelectorAll('.attempt-row').forEach(row => {
-                const status = row.getAttribute('data-status');
-                const dateStr = row.getAttribute('data-date');
-                const subject = row.getAttribute('data-subject');
-                const attemptDate = new Date(dateStr);
-                
-                let statusMatch = statusFilter === 'all' || status === statusFilter;
-                let subjectMatch = subjectFilter === 'all' || subject === subjectFilter;
-                let dateMatch = true;
-                
-                if (dateFilter === 'today') {
-                    dateMatch = attemptDate.toDateString() === today.toDateString();
-                } else if (dateFilter === 'week') {
-                    dateMatch = attemptDate >= weekAgo;
-                } else if (dateFilter === 'month') {
-                    dateMatch = attemptDate >= monthAgo;
-                }
-                
-                if (statusMatch && dateMatch && subjectMatch) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
+            // Build URL with filters
+            const urlParams = new URLSearchParams();
+            if (statusFilter !== 'all') urlParams.set('status', statusFilter);
+            if (dateFilter !== 'all') urlParams.set('date', dateFilter);
+            if (subjectFilter !== 'all') urlParams.set('subject', subjectFilter);
+            urlParams.set('page', '1'); // Reset to first page when filtering
+            
+            // Navigate to filtered results
+            window.location.href = '?' + urlParams.toString();
+        }
+
+        // Initialize filters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up filter event listeners
+            const statusFilter = document.getElementById('statusFilter');
+            const dateFilter = document.getElementById('dateFilter');
+            const subjectFilter = document.getElementById('subjectFilter');
+            
+            if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+            if (dateFilter) dateFilter.addEventListener('change', applyFilters);
+            if (subjectFilter) subjectFilter.addEventListener('change', applyFilters);
+            
+            // Set filter values from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (statusFilter && urlParams.get('status')) {
+                statusFilter.value = urlParams.get('status');
+            }
+            if (dateFilter && urlParams.get('date')) {
+                dateFilter.value = urlParams.get('date');
+            }
+            if (subjectFilter && urlParams.get('subject')) {
+                subjectFilter.value = urlParams.get('subject');
+            }
         }
 
         // Chart period toggles
@@ -1323,38 +1619,33 @@
             button.addEventListener('click', function() {
                 document.querySelectorAll('.chart-toggle').forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
-                // Update chart based on period - implement as needed
                 updateChart(this.dataset.period);
             });
         });
 
         function updateChart(period) {
-            // Filter chart data based on period
             console.log('Updating chart for period:', period);
             // Implement chart filtering logic here
         }
 
         // Export progress function
         function exportProgress() {
-            // Show loading state
             const button = event.target.closest('.quick-action-card');
             const originalContent = button.innerHTML;
             button.innerHTML = `
                 <div class="quick-action-icon">
                     <div class="loading-spinner"></div>
                 </div>
-                <div class="quick-action-title">Exporting...</div>
-                <div class="quick-action-desc">Please wait</div>
+                <div class="quick-action-content">
+                    <h4>Exporting...</h4>
+                    <p>Please wait</p>
+                </div>
             `;
             
-            // Simulate export process
             setTimeout(() => {
-                // Reset button
                 button.innerHTML = originalContent;
-                
-                // Create and download CSV
                 const csvData = generateCSVData();
-                downloadCSV(csvData, 'progress-report.csv');
+                downloadCSV(csvData, 'mock-test-progress.csv');
             }, 2000);
         }
 
@@ -1389,10 +1680,41 @@
             document.body.removeChild(a);
         }
         
-        // Initialize filters
-        filterTable();
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize filters
+            filterTable();
         
-        // Score trend chart
+        // Initialize page functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize filters on page load (continued from above)
+            
+            // Animate stat cards on load
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animate progress bars
+            setTimeout(() => {
+                const progressFills = document.querySelectorAll('.progress-fill');
+                progressFills.forEach(fill => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 200);
+                });
+            }, 800);
+        });
+        
+        // Score trend chart - Restored from original template
         {% if completed_attempts|length > 1 %}
             const ctx = document.getElementById('scoreChart').getContext('2d');
             const attemptsData = [
@@ -1418,13 +1740,13 @@
                         backgroundColor: 'rgba(130, 39, 46, 0.1)',
                         borderWidth: 3,
                         tension: 0.4,
-                        pointRadius: 6,
+                        pointRadius: 5,
                         pointBackgroundColor: function(context) {
                             return attemptsData[context.dataIndex].passed ? '#10b981' : '#ef4444';
                         },
                         pointBorderColor: '#fff',
-                        pointBorderWidth: 3,
-                        pointHoverRadius: 8,
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 7,
                         fill: true
                     }]
                 },
@@ -1437,14 +1759,14 @@
                         },
                         tooltip: {
                             backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                            padding: 16,
-                            cornerRadius: 8,
+                            padding: 12,
+                            cornerRadius: 6,
                             titleFont: {
-                                size: 14,
+                                size: 12,
                                 weight: '600'
                             },
                             bodyFont: {
-                                size: 16,
+                                size: 14,
                                 weight: '700'
                             },
                             titleColor: '#fff',
@@ -1473,7 +1795,7 @@
                                     return value + '%';
                                 },
                                 font: {
-                                    size: 12,
+                                    size: 11,
                                     weight: '500'
                                 },
                                 color: '#64748b'
@@ -1486,7 +1808,7 @@
                         x: {
                             ticks: {
                                 font: {
-                                    size: 12,
+                                    size: 11,
                                     weight: '500'
                                 },
                                 color: '#64748b'
@@ -1505,20 +1827,6 @@
             
             const chart = new Chart(ctx, chartConfig);
         {% endif %}
-
-        // Animate progress bars on load
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                const progressFills = document.querySelectorAll('.progress-fill');
-                progressFills.forEach(fill => {
-                    const width = fill.style.width;
-                    fill.style.width = '0%';
-                    setTimeout(() => {
-                        fill.style.width = width;
-                    }, 200);
-                });
-            }, 800);
-        });
 
         // Smooth scrolling for quick actions
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
