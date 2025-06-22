@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Test Results specific styles that complement DAstyles.css */
         :root {
             --primary: #82272e;
             --primary-light: #a53b47;
@@ -29,156 +28,6 @@
             background-color: #f9fafb;
             color: var(--dark);
             line-height: 1.6;
-        }
-
-        /* Enhanced Print Styles */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            body {
-                background: white !important;
-                color: black !important;
-                font-size: 12pt !important;
-                line-height: 1.4 !important;
-            }
-            
-            .result-container {
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 15pt !important;
-            }
-            
-            .summary-card, .performance-summary {
-                box-shadow: none !important;
-                border: 1pt solid #ccc !important;
-                break-inside: avoid !important;
-                margin-bottom: 15pt !important;
-                padding: 15pt !important;
-            }
-            
-            .score-display {
-                page-break-inside: avoid !important;
-                width: 120pt !important;
-                height: 120pt !important;
-            }
-            
-            .print-header {
-                display: block !important;
-                margin-bottom: 20pt !important;
-                text-align: center !important;
-                border-bottom: 2pt solid #82272e !important;
-                padding-bottom: 15pt !important;
-            }
-            
-            .print-header img {
-                height: 40pt !important;
-                margin-bottom: 8pt !important;
-            }
-            
-            .print-header h1 {
-                font-size: 18pt !important;
-                color: #82272e !important;
-                margin: 8pt 0 !important;
-            }
-            
-            .print-footer {
-                display: block !important;
-                margin-top: 20pt !important;
-                text-align: center !important;
-                font-size: 9pt !important;
-                color: #666 !important;
-                border-top: 1pt solid #ccc !important;
-                padding-top: 15pt !important;
-                page-break-inside: avoid !important;
-            }
-            
-            .stats-grid {
-                display: grid !important;
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 10pt !important;
-                page-break-inside: avoid !important;
-            }
-            
-            .stat-card {
-                border: 1pt solid #ddd !important;
-                padding: 10pt !important;
-                text-align: center !important;
-                break-inside: avoid !important;
-            }
-            
-            .stat-value {
-                font-size: 16pt !important;
-                font-weight: bold !important;
-                color: #82272e !important;
-            }
-            
-            .performance-grid {
-                grid-template-columns: 1fr !important;
-                gap: 8pt !important;
-            }
-            
-            .performance-item {
-                border: 1pt solid #ddd !important;
-                padding: 8pt !important;
-                break-inside: avoid !important;
-            }
-            
-            .performance-bar {
-                height: 6pt !important;
-                background: #eee !important;
-                border: 1pt solid #ddd !important;
-            }
-            
-            .performance-fill {
-                height: 100% !important;
-                background: #82272e !important;
-            }
-            
-            .section-title {
-                font-size: 14pt !important;
-                color: #82272e !important;
-                margin-bottom: 10pt !important;
-                page-break-after: avoid !important;
-            }
-            
-            h1 { font-size: 18pt !important; }
-            h2 { font-size: 16pt !important; }
-            h3 { font-size: 14pt !important; }
-            h4 { font-size: 12pt !important; }
-            
-            .pass-status {
-                font-size: 14pt !important;
-                padding: 8pt 15pt !important;
-                border: 2pt solid currentColor !important;
-                border-radius: 15pt !important;
-                display: inline-block !important;
-            }
-            
-            .print-signature {
-                display: block !important;
-                margin-top: 30pt !important;
-                border-top: 1pt solid #ccc !important;
-                padding-top: 15pt !important;
-            }
-            
-            .score-text {
-                font-size: 24pt !important;
-                color: #82272e !important;
-            }
-        }
-
-        .print-header {
-            display: none;
-        }
-
-        .print-footer {
-            display: none;
-        }
-
-        .print-signature {
-            display: none;
         }
 
         /* Navigation Bar */
@@ -485,9 +334,13 @@
             transform: translateY(-2px);
         }
 
+        /* FIXED: Question Review Section */
         .question-review {
-            border-bottom: 1px solid var(--gray-light);
-            padding: 24px 0;
+            border: 1px solid var(--gray-light);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            background: white;
             display: none;
         }
 
@@ -495,21 +348,19 @@
             display: block;
         }
 
-        .question-review:last-child {
-            border-bottom: none;
-        }
-
         .review-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--gray-light);
         }
 
         .question-number {
             font-weight: 600;
             color: var(--dark);
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .status-badge {
@@ -537,27 +388,33 @@
             color: #6b7280;
         }
 
+        /* Question Text - FIXED: Preserve formatting */
         .question-text {
             font-size: 16px;
             line-height: 1.6;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             color: var(--dark);
             font-weight: 500;
-        }
-
-        /* Question Image Support */
-        .question-image {
-            margin: 16px 0;
-            text-align: center;
-        }
-
-        .question-image img {
-            max-width: 100%;
-            height: auto;
-            max-height: 300px;
+            padding: 16px;
+            background: #f8fafc;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary);
+            white-space: pre-wrap; /* FIXED: Preserve line breaks and formatting */
+        }
+
+        /* MCQ Options Section */
+        .mcq-options-section {
+            margin-bottom: 24px;
+        }
+
+        .section-subtitle {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 16px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .options-list {
@@ -567,40 +424,45 @@
         }
 
         .option-item {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .option-label {
             display: flex;
-            align-items: flex-start;
-            padding: 12px 16px;
+            align-items: center;
+            padding: 16px;
             background: #f8fafc;
-            border: 1px solid var(--gray-light);
+            border: 2px solid #e2e8f0;
             border-radius: 8px;
-            cursor: pointer;
             transition: all 0.2s ease;
+            min-height: 60px;
         }
 
         .option-label.correct {
             background: #d1fae5;
             border-color: var(--secondary);
+            font-weight: 600;
         }
 
         .option-label.incorrect {
             background: #fecaca;
             border-color: var(--danger);
+            font-weight: 600;
         }
 
         .option-label.selected {
             background: #fef3c7;
             border-color: var(--warning);
+            font-weight: 500;
         }
 
         .option-label input[type="radio"] {
-            margin-right: 12px;
-            margin-top: 4px;
+            margin-right: 16px;
+            width: 18px;
+            height: 18px;
             pointer-events: none;
             accent-color: var(--primary);
+            flex-shrink: 0;
         }
 
         .option-text {
@@ -608,34 +470,68 @@
             line-height: 1.5;
             color: var(--dark);
             flex: 1;
+            white-space: pre-wrap; /* FIXED: Preserve formatting in options */
         }
 
         .option-icon {
-            margin-left: auto;
-            font-size: 16px;
+            margin-left: 16px;
+            font-size: 18px;
+            width: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Explanation Section */
+        .explanation-section {
+            margin-top: 24px;
         }
 
         .explanation-box {
             background: #dbeafe;
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 16px;
+            padding: 20px;
+            border-radius: 12px;
             border-left: 4px solid var(--info);
         }
 
         .explanation-title {
             font-weight: 600;
             color: #1e40af;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 16px;
         }
 
         .explanation-text {
             font-size: 14px;
             line-height: 1.6;
             color: var(--dark);
+            margin-bottom: 16px;
+            white-space: pre-wrap; /* FIXED: Preserve formatting in explanations */
+        }
+
+        .explanation-image {
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        .explanation-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+        }
+
+        .image-caption {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
         }
 
         /* Action Buttons */
@@ -691,6 +587,57 @@
             transform: translateY(-2px);
         }
 
+        /* Back Warning Modal */
+        .back-warning-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            padding: 20px;
+        }
+
+        .back-warning-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 90vw;
+            width: 440px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .back-warning-content h2 {
+            color: var(--danger);
+            margin-bottom: 16px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .back-warning-content p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .back-warning-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .result-container {
@@ -743,6 +690,46 @@
             .review-filters {
                 justify-content: center;
             }
+
+            .back-warning-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .back-warning-actions .btn {
+                width: 100%;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 12pt !important;
+            }
+            
+            .result-container {
+                max-width: none !important;
+                margin: 0 !important;
+                padding: 15pt !important;
+            }
+        }
+
+        .print-header {
+            display: none;
+        }
+
+        .print-footer {
+            display: none;
+        }
+
+        .print-signature {
+            display: none;
         }
 
         /* Animations */
@@ -772,18 +759,28 @@
             }
             to {
                 opacity: 1;
-                max-height: 500px;
+                max-height: 1000px;
             }
+        }
+
+        /* Special character support - Enhanced typography */
+        .question-text,
+        .option-text,
+        .explanation-text {
+            font-feature-settings: "liga" 1, "kern" 1;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Support for mathematical symbols and special characters */
+        .special-chars {
+            font-family: "Times New Roman", "Cambria Math", serif;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
-    <!-- Print Header (only visible when printing) -->
-    <div class="print-header">
-        <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
-        <h1>Test Results Report</h1>
-        <p>{{ test.title }} • {{ attempt.started_at|date:"F j, Y g:i A" }}</p>
-    </div>
+    <!-- Include Security Template -->
+    {% include 'includes/security_protection.html' %}
 
     <!-- Navigation Bar -->
     <div class="nav-bar no-print">
@@ -832,7 +829,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-question-circle"></i>
                     </div>
-                    <div class="stat-value">{{ test.total_questions }}</div>
+                    <div class="stat-value">{{ total_questions }}</div>
                     <div class="stat-label">Total Questions</div>
                 </div>
                 <div class="stat-card">
@@ -866,7 +863,7 @@
                     <div class="performance-bar">
                         <div class="performance-fill" style="width: {{ attempt.percentage }}%"></div>
                     </div>
-                    <small>{{ attempt.percentage|floatformat:1 }}% ({{ attempt.score }}/{{ test.total_questions }})</small>
+                    <small>{{ attempt.percentage|floatformat:1 }}% ({{ attempt.score }}/{{ total_questions }})</small>
                 </div>
                 
                 <div class="performance-item">
@@ -910,7 +907,7 @@
                     <h4>Test Details</h4>
                     <p><strong>Subject:</strong> {{ test.subject|default:"General" }}</p>
                     <p><strong>Duration:</strong> {{ test.duration_minutes }} minutes</p>
-                    <p><strong>Total Questions:</strong> {{ test.total_questions }}</p>
+                    <p><strong>Total Questions:</strong> {{ total_questions }}</p>
                     <p><strong>Passing Score:</strong> {{ test.passing_percentage }}%</p>
                 </div>
                 
@@ -996,115 +993,131 @@
                         
                         <div class="question-text">{{ response.question.question_text }}</div>
                         
-                        <!-- Question Image Support -->
-                        {% if response.question.image %}
-                            <div class="question-image">
-                                {% load static %}
-                                <img src="{% get_media_prefix %}question_images/{{ response.question.image }}" 
-                                     alt="Question Image" 
-                                     onerror="this.style.display='none'">
+                        <!-- MCQ Options Section -->
+                        <div class="mcq-options-section">
+                            <div class="section-subtitle">
+                                <i class="fas fa-list-ol"></i>
+                                Answer Options
                             </div>
-                        {% endif %}
+                            <ul class="options-list">
+                                {% if response.question.option_a %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response.question.correct_answer == 'A' %}correct{% endif %}
+                                            {% if response.selected_answer == 'A' and not response.is_correct %}incorrect{% endif %}
+                                            {% if response.selected_answer == 'A' %}selected{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="A" 
+                                                {% if response.selected_answer == 'A' %}checked{% endif %}>
+                                            <span class="option-text">A) {{ response.question.option_a }}</span>
+                                            {% if response.question.correct_answer == 'A' %}
+                                                <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                            {% elif response.selected_answer == 'A' and not response.is_correct %}
+                                                <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response.question.option_b %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response.question.correct_answer == 'B' %}correct{% endif %}
+                                            {% if response.selected_answer == 'B' and not response.is_correct %}incorrect{% endif %}
+                                            {% if response.selected_answer == 'B' %}selected{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="B" 
+                                                {% if response.selected_answer == 'B' %}checked{% endif %}>
+                                            <span class="option-text">B) {{ response.question.option_b }}</span>
+                                            {% if response.question.correct_answer == 'B' %}
+                                                <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                            {% elif response.selected_answer == 'B' and not response.is_correct %}
+                                                <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response.question.option_c %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response.question.correct_answer == 'C' %}correct{% endif %}
+                                            {% if response.selected_answer == 'C' and not response.is_correct %}incorrect{% endif %}
+                                            {% if response.selected_answer == 'C' %}selected{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="C" 
+                                                {% if response.selected_answer == 'C' %}checked{% endif %}>
+                                            <span class="option-text">C) {{ response.question.option_c }}</span>
+                                            {% if response.question.correct_answer == 'C' %}
+                                                <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                            {% elif response.selected_answer == 'C' and not response.is_correct %}
+                                                <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response.question.option_d %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response.question.correct_answer == 'D' %}correct{% endif %}
+                                            {% if response.selected_answer == 'D' and not response.is_correct %}incorrect{% endif %}
+                                            {% if response.selected_answer == 'D' %}selected{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="D" 
+                                                {% if response.selected_answer == 'D' %}checked{% endif %}>
+                                            <span class="option-text">D) {{ response.question.option_d }}</span>
+                                            {% if response.question.correct_answer == 'D' %}
+                                                <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                            {% elif response.selected_answer == 'D' and not response.is_correct %}
+                                                <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response.question.option_e %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response.question.correct_answer == 'E' %}correct{% endif %}
+                                            {% if response.selected_answer == 'E' and not response.is_correct %}incorrect{% endif %}
+                                            {% if response.selected_answer == 'E' %}selected{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="E" 
+                                                {% if response.selected_answer == 'E' %}checked{% endif %}>
+                                            <span class="option-text">E) {{ response.question.option_e }}</span>
+                                            {% if response.question.correct_answer == 'E' %}
+                                                <i class="fas fa-check option-icon" style="color: #065f46;"></i>
+                                            {% elif response.selected_answer == 'E' and not response.is_correct %}
+                                                <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                         
-                        <ul class="options-list">
-                            {% if response.question.option_a %}
-                                <li class="option-item">
-                                    <label class="option-label 
-                                        {% if response.question.correct_answer == 'A' %}correct{% endif %}
-                                        {% if response.selected_answer == 'A' and not response.is_correct %}incorrect{% endif %}
-                                        {% if response.selected_answer == 'A' %}selected{% endif %}">
-                                        <input type="radio" name="q{{ forloop.counter }}" value="A" 
-                                            {% if response.selected_answer == 'A' %}checked{% endif %}>
-                                        <span class="option-text">A) {{ response.question.option_a }}</span>
-                                        {% if response.question.correct_answer == 'A' %}
-                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                                        {% elif response.selected_answer == 'A' and not response.is_correct %}
-                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
-                                        {% endif %}
-                                    </label>
-                                </li>
-                            {% endif %}
-                            
-                            {% if response.question.option_b %}
-                                <li class="option-item">
-                                    <label class="option-label 
-                                        {% if response.question.correct_answer == 'B' %}correct{% endif %}
-                                        {% if response.selected_answer == 'B' and not response.is_correct %}incorrect{% endif %}
-                                        {% if response.selected_answer == 'B' %}selected{% endif %}">
-                                        <input type="radio" name="q{{ forloop.counter }}" value="B" 
-                                            {% if response.selected_answer == 'B' %}checked{% endif %}>
-                                        <span class="option-text">B) {{ response.question.option_b }}</span>
-                                        {% if response.question.correct_answer == 'B' %}
-                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                                        {% elif response.selected_answer == 'B' and not response.is_correct %}
-                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
-                                        {% endif %}
-                                    </label>
-                                </li>
-                            {% endif %}
-                            
-                            {% if response.question.option_c %}
-                                <li class="option-item">
-                                    <label class="option-label 
-                                        {% if response.question.correct_answer == 'C' %}correct{% endif %}
-                                        {% if response.selected_answer == 'C' and not response.is_correct %}incorrect{% endif %}
-                                        {% if response.selected_answer == 'C' %}selected{% endif %}">
-                                        <input type="radio" name="q{{ forloop.counter }}" value="C" 
-                                            {% if response.selected_answer == 'C' %}checked{% endif %}>
-                                        <span class="option-text">C) {{ response.question.option_c }}</span>
-                                        {% if response.question.correct_answer == 'C' %}
-                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                                        {% elif response.selected_answer == 'C' and not response.is_correct %}
-                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
-                                        {% endif %}
-                                    </label>
-                                </li>
-                            {% endif %}
-                            
-                            {% if response.question.option_d %}
-                                <li class="option-item">
-                                    <label class="option-label 
-                                        {% if response.question.correct_answer == 'D' %}correct{% endif %}
-                                        {% if response.selected_answer == 'D' and not response.is_correct %}incorrect{% endif %}
-                                        {% if response.selected_answer == 'D' %}selected{% endif %}">
-                                        <input type="radio" name="q{{ forloop.counter }}" value="D" 
-                                            {% if response.selected_answer == 'D' %}checked{% endif %}>
-                                        <span class="option-text">D) {{ response.question.option_d }}</span>
-                                        {% if response.question.correct_answer == 'D' %}
-                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                                        {% elif response.selected_answer == 'D' and not response.is_correct %}
-                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
-                                        {% endif %}
-                                    </label>
-                                </li>
-                            {% endif %}
-                            
-                            {% if response.question.option_e %}
-                                <li class="option-item">
-                                    <label class="option-label 
-                                        {% if response.question.correct_answer == 'E' %}correct{% endif %}
-                                        {% if response.selected_answer == 'E' and not response.is_correct %}incorrect{% endif %}
-                                        {% if response.selected_answer == 'E' %}selected{% endif %}">
-                                        <input type="radio" name="q{{ forloop.counter }}" value="E" 
-                                            {% if response.selected_answer == 'E' %}checked{% endif %}>
-                                        <span class="option-text">E) {{ response.question.option_e }}</span>
-                                        {% if response.question.correct_answer == 'E' %}
-                                            <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                                        {% elif response.selected_answer == 'E' and not response.is_correct %}
-                                            <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
-                                        {% endif %}
-                                    </label>
-                                </li>
-                            {% endif %}
-                        </ul>
-                        
-                        {% if response.question.explanation %}
-                            <div class="explanation-box">
-                                <div class="explanation-title">
-                                    <i class="fas fa-lightbulb"></i>
-                                    <span>Explanation</span>
+                        <!-- Explanation Section - AFTER MCQ Options -->
+                        {% if response.question.explanation or response.question.image %}
+                            <div class="explanation-section">
+                                <div class="explanation-box">
+                                    {% if response.question.image %}
+                                        <div class="explanation-title">
+                                            <i class="fas fa-image"></i>
+                                            Question Image
+                                        </div>
+                                        <div class="explanation-image">
+                                            {% load static %}
+                                            <img src="{% get_media_prefix %}question_images/{{ response.question.image }}" 
+                                                 alt="Question Image" 
+                                                 onerror="this.style.display='none'">
+                                            <div class="image-caption">Image: {{ response.question.image }}</div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if response.question.explanation %}
+                                        <div class="explanation-title">
+                                            <i class="fas fa-lightbulb"></i>
+                                            Explanation
+                                        </div>
+                                        <div class="explanation-text">{{ response.question.explanation }}</div>
+                                    {% endif %}
                                 </div>
-                                <div class="explanation-text">{{ response.question.explanation }}</div>
                             </div>
                         {% endif %}
                     </div>
@@ -1127,49 +1140,88 @@
         </div>
     </div>
 
-    <!-- Print Footer (only visible when printing) -->
-    <div class="print-footer">
-        <p>&copy; {{ "now"|date:"Y" }} PulsePrep Media Direct, LLC. All rights reserved.</p>
-        <p>This is an official test result report generated on {{ "now"|date:"F j, Y g:i A" }}</p>
-        <p>For verification, contact PulsePrep support with reference ID: TST-{{ attempt.id }}-{{ attempt.started_at|date:"Ymd" }}</p>
-    </div>
-
-    <!-- Print Signature Section -->
-    <div class="print-signature">
-        <div style="display: flex; justify-content: space-between; margin-top: 40pt;">
-            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
-                <p style="margin: 0; font-size: 10pt;">Student Signature</p>
-            </div>
-            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
-                <p style="margin: 0; font-size: 10pt;">Date</p>
-            </div>
-            <div style="text-align: center; width: 200pt; border-top: 1pt solid #ccc; padding-top: 8pt;">
-                <p style="margin: 0; font-size: 10pt;">Authorized Official</p>
+    <!-- Back Button Prevention Modal -->
+    <div class="back-warning-modal" id="back-warning-modal">
+        <div class="back-warning-content">
+            <h2><i class="fas fa-exclamation-triangle"></i> Navigation Warning</h2>
+            <p><strong>You cannot go back to the test once submitted.</strong></p>
+            <p>The test has been completed and submitted. Going back is not allowed for security reasons.</p>
+            <p>Would you like to go to the dashboard instead?</p>
+            <div class="back-warning-actions">
+                <button class="btn btn-secondary" onclick="closeBackWarning()">Stay Here</button>
+                <a href="{% url 'student_dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Go to Dashboard
+                </a>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Prevent going back to test once completed
+        // Special character processing function - SAME AS MODEL PAPER
+        function processSpecialCharacters(text) {
+            if (!text) return text;
+            
+            // Convert common symbols and arrows
+            text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
+            text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
+            text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
+            text = text.replace(/⇌/g, '⇌'); // Reversible reaction
+            
+            // Greek letters
+            text = text.replace(/\balpha\b/gi, 'α');
+            text = text.replace(/\bbeta\b/gi, 'β');
+            text = text.replace(/\bgamma\b/gi, 'γ');
+            text = text.replace(/\bdelta\b/gi, 'δ');
+            text = text.replace(/\blambda\b/gi, 'λ');
+            text = text.replace(/\bmu\b/gi, 'μ');
+            text = text.replace(/\bpi\b/gi, 'π');
+            text = text.replace(/\bsigma\b/gi, 'σ');
+            text = text.replace(/\bomega\b/gi, 'ω');
+            
+            // Mathematical symbols
+            text = text.replace(/\+\/-/g, '±');
+            text = text.replace(/\+-/g, '±');
+            text = text.replace(/\<=\>/g, '⇔');
+            text = text.replace(/\<=/g, '≤');
+            text = text.replace(/\>=/g, '≥');
+            text = text.replace(/\!=/g, '≠');
+            text = text.replace(/\~=/g, '≈');
+            text = text.replace(/\infty/g, '∞');
+            text = text.replace(/\sqrt/g, '√');
+            
+            // Superscript numbers
+            text = text.replace(/\^2/g, '²');
+            text = text.replace(/\^3/g, '³');
+            text = text.replace(/\^1/g, '¹');
+            
+            // Common medical symbols
+            text = text.replace(/\bdegree\b/gi, '°');
+            text = text.replace(/\bdegrees\b/gi, '°');
+            
+            return text;
+        }
+
+        // ENHANCED BACK BUTTON PREVENTION
         window.addEventListener('load', function() {
-            // Replace current history state
             window.history.replaceState(null, null, window.location.href);
             
-            // Prevent back button navigation
             window.addEventListener('popstate', function(event) {
                 event.preventDefault();
                 window.history.pushState(null, null, window.location.href);
-                
-                // Show warning and redirect
-                if (confirm('You cannot go back to the test once submitted. Would you like to go to the dashboard instead?')) {
-                    window.location.href = "{% url 'student_dashboard' %}";
-                }
+                showBackWarning();
             });
             
-            // Push an extra state to prevent direct back navigation
             window.history.pushState(null, null, window.location.href);
         });
+
+        function showBackWarning() {
+            document.getElementById('back-warning-modal').style.display = 'flex';
+        }
+
+        function closeBackWarning() {
+            document.getElementById('back-warning-modal').style.display = 'none';
+        }
 
         // Draw score chart
         const ctx = document.getElementById('scoreChart').getContext('2d');
@@ -1204,7 +1256,7 @@
             }
         });
 
-        // Enhanced toggle and filter functionality
+        // Review functionality
         let reviewVisible = false;
         let currentFilter = 'all';
         
@@ -1227,7 +1279,6 @@
         }
 
         function filterQuestions(filter) {
-            // Update filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -1235,7 +1286,6 @@
             
             currentFilter = filter;
             
-            // Apply filter if review is visible
             if (reviewVisible) {
                 showQuestionsWithFilter(filter);
             }
@@ -1282,9 +1332,7 @@
             });
         }
 
-        // Enhanced print functionality with better formatting
         function printSummary() {
-            // Hide detailed review before printing
             const reviewSection = document.querySelector('.review-section');
             const originalDisplay = reviewSection ? reviewSection.style.display : '';
             
@@ -1292,30 +1340,8 @@
                 reviewSection.style.display = 'none';
             }
             
-            // Add print-specific styles
-            const printStyles = document.createElement('style');
-            printStyles.innerHTML = `
-                @media print {
-                    body { font-size: 11pt !important; }
-                    .result-container { padding: 10pt !important; }
-                    .summary-card { padding: 15pt !important; }
-                    .performance-summary { padding: 15pt !important; }
-                    .stats-grid { gap: 8pt !important; }
-                    .stat-card { padding: 8pt !important; }
-                    .performance-item { padding: 8pt !important; }
-                    h1 { font-size: 16pt !important; }
-                    h2 { font-size: 14pt !important; }
-                    .score-text { font-size: 20pt !important; }
-                    .stat-value { font-size: 14pt !important; }
-                }
-            `;
-            document.head.appendChild(printStyles);
-            
-            // Print the page
             window.print();
             
-            // Remove print styles and restore review section
-            document.head.removeChild(printStyles);
             if (reviewSection) {
                 reviewSection.style.display = originalDisplay;
             }
@@ -1333,71 +1359,69 @@
                     }, 300);
                 });
             }, 500);
+
+            // Process special characters in displayed text
+            processSpecialCharactersInDOM();
         });
 
-        // Add fade-in animation to cards
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                    }
-                });
-            },
-            { threshold: 0.1 }
-        );
+        // Process special characters in the DOM - ENHANCED VERSION
+        function processSpecialCharactersInDOM() {
+            // Process question texts
+            document.querySelectorAll('.question-text').forEach(element => {
+                element.innerHTML = processSpecialCharacters(element.innerHTML);
+            });
+            
+            // Process option texts
+            document.querySelectorAll('.option-text').forEach(element => {
+                element.innerHTML = processSpecialCharacters(element.innerHTML);
+            });
+            
+            // Process explanation texts
+            document.querySelectorAll('.explanation-text').forEach(element => {
+                element.innerHTML = processSpecialCharacters(element.innerHTML);
+            });
+        }
 
-        document.querySelectorAll('.summary-card, .performance-summary, .review-section').forEach(card => {
-            observer.observe(card);
-        });
-
-        // Enhanced security measures
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
+        // Enhanced browser navigation prevention
         document.addEventListener('keydown', function(e) {
-            // Prevent common screenshot and copying shortcuts
-            if (e.key === 'PrintScreen' || 
-                (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's')) ||
-                (e.metaKey && e.shiftKey && (e.key === '3' || e.key === '4')) ||
-                (e.ctrlKey && e.key === 'a') ||
-                (e.ctrlKey && e.key === 'c') ||
-                (e.ctrlKey && e.key === 's')) {
-                
-                if (e.key === 'PrintScreen') {
-                    alert('Screenshots are not permitted. Please use the Print Summary feature for official records.');
-                } else {
-                    alert('Copying content is not allowed. Please use the Print Summary feature for official records.');
-                }
+            if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
                 e.preventDefault();
+                showBackWarning();
             }
             
-            // Prevent F12 and dev tools
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-                (e.ctrlKey && e.key === 'U')) {
+            if (e.key === 'Backspace' && 
+                !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) &&
+                !document.activeElement.isContentEditable) {
                 e.preventDefault();
+                showBackWarning();
             }
         });
 
-        // Disable text selection
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-        });
-
-        // Additional security for mobile devices
-        document.addEventListener('touchstart', function(e) {
-            if (e.touches.length > 1) {
+        document.addEventListener('mouseup', function(e) {
+            if (e.button === 3 || e.button === 4) {
                 e.preventDefault();
+                showBackWarning();
             }
         });
 
-        // Prevent drag and drop
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-        });
+        // Touch gesture prevention for mobile
+        if ('ontouchstart' in window) {
+            let startX = 0;
+            let currentX = 0;
+            
+            document.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                currentX = e.touches[0].clientX;
+                
+                if (startX < 50 && currentX - startX > 100) {
+                    e.preventDefault();
+                    showBackWarning();
+                }
+            });
+        }
     </script>
 </body>
 </html>

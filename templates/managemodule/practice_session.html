@@ -1,1939 +1,3093 @@
 {% load static %}
 
-<!-- Enhanced Practice Session Template with Notes Integration -->
-{% include 'notes/quick_note_component.html' %}
 {% include 'user_management/security_protection.html' %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    {% include 'includes/favicon.html' %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice Session - {{ session.topic }} - PulsePrep</title>
-    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Practice Session Enhanced Color Scheme - Matching System Design */
-        :root {
-            --primary: #82272e;
-            --primary-light: #a53b47;
-            --primary-dark: #6b1e24;
-            --practice-primary: #16a34a;       /* Green for practice mode */
-            --practice-primary-light: #22c55e;
-            --practice-primary-dark: #15803d;
-            --secondary: #10b981;
-            --accent: #3b82f6;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --success: #10b981;
-            --info: #3b82f6;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --white: #ffffff;
-            --dark: #1e293b;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
-            color: var(--gray-800);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        .practice-container {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background: var(--white);
-            max-width: 1400px;
-            margin: 0 auto;
-            box-shadow: 0 0 50px rgba(22, 163, 74, 0.1);
-        }
-
-        /* Enhanced Practice Header - Green Theme for Practice */
-        .practice-header {
-            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
-            color: white;
-            padding: 20px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 8px 32px rgba(22, 163, 74, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-
-        .practice-header::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        }
-
-        .practice-info {
-            flex: 1;
-        }
-
-        .practice-info h3 {
-            margin: 0 0 8px;
-            font-size: 24px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .practice-info .breadcrumb {
-            font-size: 14px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .breadcrumb-separator {
-            opacity: 0.6;
-        }
-
-        .practice-progress {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            font-size: 18px;
-            font-weight: 600;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .progress-indicator {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 12px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-        }
-
-        .progress-bar {
-            width: 240px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-            border-radius: 5px;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .progress-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .timer-display {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .complete-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .complete-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Enhanced Practice Body */
-        .practice-body {
-            flex: 1;
-            display: flex;
-            background: var(--gray-50);
-            min-height: calc(100vh - 100px);
-        }
-
-        /* Enhanced Question Panel */
-        .question-panel {
-            flex: 1;
-            padding: 32px;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            margin: 16px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .question-card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            box-shadow: 0 8px 32px rgba(22, 163, 74, 0.08);
-            border: 1px solid rgba(22, 163, 74, 0.1);
-            margin-bottom: 24px;
-            position: relative;
-            overflow: hidden;
-            /* Enhanced question card with data attributes for notes */
-            min-height: 300px;
-        }
-
-        .question-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--practice-primary), var(--practice-primary-light));
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .question-number {
-            font-size: 18px;
-            color: var(--practice-primary);
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .question-counter {
-            background: var(--practice-primary);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .difficulty-badge {
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .difficulty-easy {
-            background: #d1fae5;
-            color: #059669;
-            border: 1px solid #a7f3d0;
-        }
-
-        .difficulty-medium {
-            background: #fef3c7;
-            color: #d97706;
-            border: 1px solid #fbbf24;
-        }
-
-        .difficulty-hard {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-        }
-
-        .question-text {
-            font-size: 20px;
-            line-height: 1.7;
-            margin-bottom: 24px;
-            color: var(--gray-800);
-            font-weight: 500;
-        }
-
-        /* Enhanced Question Image */
-        .question-image {
-            margin: 24px 0;
-            text-align: center;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .question-image img {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--gray-200);
-            transition: transform 0.3s ease;
-        }
-
-        .question-image img:hover {
-            transform: scale(1.02);
-        }
-
-        /* Enhanced Options */
-        .options-container {
-            margin-bottom: 32px;
-        }
-
-        .options-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-item {
-            width: 100%;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: flex-start;
-            padding: 20px;
-            background: var(--gray-50);
-            border: 2px solid var(--gray-200);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            min-height: 60px;
-            width: 100%;
-        }
-
-        .option-label:hover {
-            background: rgba(22, 163, 74, 0.05);
-            border-color: var(--practice-primary-light);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.1);
-        }
-
-        .option-label.selected {
-            background: rgba(22, 163, 74, 0.1);
-            border-color: var(--practice-primary);
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-        }
-
-        .option-label.correct {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--success);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-        }
-
-        .option-label.incorrect {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: var(--danger);
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
-
-        .option-label input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 16px;
-            margin-top: 2px;
-            accent-color: var(--practice-primary);
-            flex-shrink: 0;
-        }
-
-        .option-text {
-            font-size: 16px;
-            line-height: 1.6;
-            flex: 1;
-            color: var(--gray-700);
-            font-weight: 500;
-        }
-
-        .option-feedback {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 20px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .option-label.correct .option-feedback,
-        .option-label.incorrect .option-feedback {
-            opacity: 1;
-        }
-
-        .feedback-correct {
-            color: var(--success);
-        }
-
-        .feedback-incorrect {
-            color: var(--danger);
-        }
-
-        /* Enhanced Question Context Info - Added for Notes Integration */
-        .question-context-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin: 16px 0;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .context-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.875rem;
-            color: #64748b;
-        }
-
-        .context-item i {
-            color: #10b981;
-            width: 14px;
-        }
-
-        /* Enhanced Question Actions with Notes Button */
-        .question-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 1px solid #f3f4f6;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .question-utilities {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .btn-utility {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-            text-decoration: none;
-        }
-
-        .btn-utility:hover {
-            background: #e5e7eb;
-            color: #1f2937;
-            transform: translateY(-1px);
-        }
-
-        .btn-note {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
-            font-weight: 500;
-        }
-
-        .btn-note:hover {
-            background: #059669;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-note:active {
-            transform: translateY(0);
-        }
-
-        .btn-note.has-note {
-            background: #059669;
-        }
-
-        .btn-note.has-note::after {
-            content: '✓';
-            margin-left: 4px;
-            font-weight: bold;
-        }
-
-        /* Enhanced Answer Feedback */
-        .answer-feedback {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border: 1px solid #bae6fd;
-            border-radius: 16px;
-            padding: 24px;
-            margin-top: 24px;
-            display: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .answer-feedback::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--info);
-        }
-
-        .answer-feedback.show {
-            display: block;
-            animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .feedback-correct-answer::before {
-            background: var(--success);
-        }
-
-        .feedback-incorrect-answer::before {
-            background: var(--danger);
-        }
-
-        .feedback-correct-answer {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            border-color: #bbf7d0;
-        }
-
-        .feedback-incorrect-answer {
-            background: linear-gradient(135deg, #fef2f2, #fee2e2);
-            border-color: #fecaca;
-        }
-
-        .feedback-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .feedback-header i {
-            font-size: 20px;
-        }
-
-        .explanation-text {
-            color: var(--gray-700);
-            line-height: 1.7;
-            font-size: 15px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 16px;
-            border-radius: 8px;
-            border-left: 4px solid var(--info);
-        }
-
-        /* Enhanced Navigation Panel */
-        .navigation-panel {
-            width: 320px;
-            background: white;
-            padding: 24px;
-            border-left: 1px solid var(--gray-200);
-            overflow-y: auto;
-            box-shadow: -8px 0 32px rgba(0, 0, 0, 0.05);
-            margin: 16px 16px 16px 0;
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .session-stats {
-            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-            border: 1px solid #bbf7d0;
-            padding: 20px;
-            border-radius: 12px;
-            position: relative;
-        }
-
-        .session-stats::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--practice-primary);
-            border-radius: 12px 12px 0 0;
-        }
-
-        .session-stats h5 {
-            margin: 0 0 16px;
-            color: #059669;
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 12px 0;
-            padding: 8px 0;
-        }
-
-        .stat-label {
-            color: var(--gray-600);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-weight: 700;
-            color: var(--gray-800);
-            font-size: 16px;
-        }
-
-        .accuracy-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .accuracy-bar {
-            width: 60px;
-            height: 6px;
-            background: var(--gray-200);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .accuracy-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--practice-primary), var(--practice-primary-light));
-            transition: width 0.3s ease;
-        }
-
-        /* Enhanced Question Navigation */
-        .question-navigation h4 {
-            margin: 0 0 16px;
-            color: var(--gray-800);
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .question-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .question-nav-btn {
-            width: 36px;
-            height: 36px;
-            border: 2px solid var(--gray-300);
-            background: white;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .question-nav-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        .question-nav-btn.current {
-            background: var(--practice-primary);
-            color: white;
-            border-color: var(--practice-primary);
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        }
-
-        .question-nav-btn.answered {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .question-nav-btn.correct {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-
-        .question-nav-btn.incorrect {
-            background: var(--danger);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        /* Enhanced Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid var(--gray-200);
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            justify-content: center;
-            min-height: 48px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
-            color: white;
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--gray-700);
-            border: 2px solid var(--gray-200);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-50);
-            border-color: var(--gray-300);
-            transform: translateY(-1px);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* Animations */
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes correctPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes incorrectShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
-
-        .correct-animation {
-            animation: correctPulse 0.6s ease;
-        }
-
-        .incorrect-animation {
-            animation: incorrectShake 0.6s ease;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .navigation-panel {
-                width: 280px;
-            }
-            
-            .question-panel {
-                padding: 24px;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .practice-body {
-                flex-direction: column;
-            }
-            
-            .navigation-panel {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--gray-200);
-                order: 2;
-                max-height: 300px;
-                margin: 0 16px 16px;
-                border-radius: 16px;
-            }
-            
-            .question-panel {
-                order: 1;
-                margin: 16px 16px 0;
-                min-height: calc(100vh - 400px);
-            }
-            
-            .session-stats {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 12px;
-            }
-            
-            .stat-item {
-                flex-direction: column;
-                text-align: center;
-                margin: 8px 0;
-            }
-
-            .question-actions {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-
-            .question-utilities {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .practice-header {
-                padding: 16px 20px;
-                flex-direction: column;
-                gap: 16px;
-                align-items: stretch;
-            }
-            
-            .practice-info h3 {
-                font-size: 20px;
-                text-align: center;
-            }
-            
-            .practice-progress {
-                justify-content: center;
-                font-size: 16px;
-            }
-            
-            .progress-bar {
-                width: 180px;
-            }
-            
-            .header-actions {
-                justify-content: center;
-            }
-            
-            .question-panel {
-                padding: 20px;
-                margin: 12px;
-            }
-            
-            .question-card {
-                padding: 24px;
-            }
-            
-            .navigation-panel {
-                padding: 16px;
-                margin: 0 12px 12px;
-                max-height: 250px;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .question-text {
-                font-size: 18px;
-            }
-            
-            .option-label {
-                padding: 16px;
-            }
-
-            .question-context-info {
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .question-utilities {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-
-            .btn-utility,
-            .btn-note {
-                padding: 6px 10px;
-                font-size: 0.8125rem;
-            }
-
-            .note-text {
-                display: none;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .practice-header {
-                padding: 12px 16px;
-            }
-            
-            .practice-info h3 {
-                font-size: 18px;
-            }
-            
-            .question-panel {
-                padding: 16px;
-                margin: 8px;
-            }
-            
-            .question-card {
-                padding: 20px;
-            }
-            
-            .navigation-panel {
-                padding: 12px;
-                margin: 0 8px 8px;
-                max-height: 200px;
-            }
-            
-            .question-text {
-                font-size: 16px;
-            }
-            
-            .option-label {
-                padding: 12px;
-                min-height: auto;
-            }
-            
-            .option-text {
-                font-size: 14px;
-            }
-            
-            .question-grid {
-                grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
-            }
-            
-            .question-nav-btn {
-                width: 32px;
-                height: 32px;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--gray-100);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--practice-primary-light);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--practice-primary);
-        }
-    </style>
+<meta charset="UTF-8">
+{% include 'includes/favicon.html' %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Session - {{ session.topic }} - PulsePrep</title>
+<link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- NOTES MODAL - Embedded directly in practice session -->
+<div id="quick-note-modal" class="quick-note-modal" style="display: none;">
+    <div class="quick-note-content">
+        <div class="quick-note-header">
+            <h3><i class="fas fa-sticky-note"></i> Quick Note</h3>
+            <button class="close-quick-note" onclick="closeQuickNote()">&times;</button>
+        </div>
+        <div class="quick-note-body">
+            <form id="quick-note-form" class="quick-note-form">
+                {% csrf_token %}
+                <input type="hidden" id="note-session-id" name="session_id" value="{{ session.id }}" />
+                <input type="hidden" id="note-question-id" name="question_id" />
+                <input type="hidden" id="note-degree" name="degree" />
+                <input type="hidden" id="note-year" name="year" />
+                <input type="hidden" id="note-block" name="block" />
+                <input type="hidden" id="note-module" name="module" />
+                <input type="hidden" id="note-subject" name="subject" />
+                <input type="hidden" id="note-topic" name="topic" />
+                
+                <div class="form-group">
+                    <label for="note-content">Note Content *</label>
+                    <textarea 
+                        id="note-content" 
+                        name="note_text" 
+                        class="form-control" 
+                        rows="5" 
+                        placeholder="Write your note here..."
+                        required
+                    ></textarea>
+                </div>
+                
+                <div id="question-context" class="question-context" style="display: none;">
+                    <div class="context-header">
+                        <i class="fas fa-link"></i>
+                        <strong>Question Context:</strong>
+                    </div>
+                    <div id="context-details" class="context-details"></div>
+                </div>
+                
+                <div class="quick-note-actions">
+                    <button type="button" class="btn-secondary" onclick="closeQuickNote()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Note
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced responsive styles - Unified with Mock Test but GREEN theme */
+:root {
+--primary: #16a34a;           /* Green - Changed from red to green */
+--primary-light: #22c55e;     /* Light green */
+--primary-dark: #15803d;      /* Dark green */
+--secondary: #10b981;
+--danger: #ef4444;
+--warning: #f59e0b;
+--info: #3b82f6;
+--light: #f8fafc;
+--dark: #1e293b;
+--gray: #64748b;
+--gray-light: #e2e8f0;
+}
+
+* {
+box-sizing: border-box;
+}
+
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
+color: var(--dark);
+line-height: 1.6;
+margin: 0;
+padding: 0;
+overflow-x: hidden;
+}
+
+/* Practice Container - Same as Mock Test Container */
+.practice-container {
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+background: white;
+}
+
+/* Practice Header - Unified with Mock Test Header but GREEN */
+.practice-header {
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+padding: 12px 16px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+position: sticky;
+top: 0;
+z-index: 100;
+flex-wrap: wrap;
+gap: 8px;
+}
+
+.practice-info h3 {
+margin: 0 0 4px;
+font-size: clamp(14px, 4vw, 18px);
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.practice-info span {
+font-size: clamp(12px, 3vw, 14px);
+opacity: 0.9;
+}
+
+/* ADDED: Breadcrumb styling from old template */
+.practice-info .breadcrumb {
+font-size: clamp(12px, 3vw, 14px);
+opacity: 0.9;
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 4px;
+}
+
+.breadcrumb-separator {
+opacity: 0.6;
+}
+
+.mode-indicator {
+background: rgba(255, 255, 255, 0.2);
+padding: 4px 12px;
+border-radius: 12px;
+font-size: 12px;
+font-weight: 600;
+backdrop-filter: blur(10px);
+}
+
+/* Header Progress Bar - New Addition */
+.header-progress {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 6px;
+min-width: 200px;
+}
+
+.progress-info {
+display: flex;
+gap: 16px;
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+color: white;
+}
+
+.header-progress-bar {
+width: 200px;
+height: 8px;
+background: rgba(255, 255, 255, 0.2);
+border-radius: 4px;
+overflow: hidden;
+}
+
+.header-progress-fill {
+height: 100%;
+background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+border-radius: 4px;
+transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Timer Display - Same as Mock Test */
+.timer-display {
+background: rgba(255,255,255,0.2);
+padding: 6px 16px;
+border-radius: 20px;
+font-size: clamp(14px, 3vw, 16px);
+font-weight: 600;
+backdrop-filter: blur(10px);
+display: flex;
+align-items: center;
+gap: 8px;
+min-width: fit-content;
+}
+
+.timer-display.warning {
+background: rgba(245, 158, 11, 0.9);
+animation: pulse 1s infinite;
+}
+
+.timer-display.danger {
+background: rgba(239, 68, 68, 0.9);
+animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+0% { transform: scale(1); }
+50% { transform: scale(1.05); }
+100% { transform: scale(1); }
+}
+
+/* Header Actions - Same as Mock Test */
+.header-actions {
+display: flex;
+align-items: center;
+gap: 8px;
+flex-wrap: wrap;
+}
+
+.fullscreen-btn, .complete-btn {
+background: rgba(255,255,255,0.2);
+border: none;
+color: white;
+padding: 6px 12px;
+border-radius: 6px;
+cursor: pointer;
+font-size: clamp(12px, 3vw, 14px);
+display: flex;
+align-items: center;
+gap: 6px;
+backdrop-filter: blur(10px);
+transition: all 0.2s;
+white-space: nowrap;
+}
+
+.complete-btn {
+background: var(--secondary);
+}
+
+.fullscreen-btn:hover, .complete-btn:hover {
+background: rgba(255,255,255,0.3);
+}
+
+.complete-btn:hover {
+background: #059669;
+}
+
+/* Practice Body - Same as Mock Test Body */
+.practice-body {
+flex: 1;
+display: flex;
+min-height: calc(100vh - 80px);
+background: #f8fafc;
+}
+
+/* Question Panel - Unified with Mock Test */
+.question-panel {
+flex: 1;
+padding: 16px;
+background: white;
+display: flex;
+flex-direction: column;
+overflow-y: auto;
+min-width: 0;
+}
+
+.question-card {
+background: white;
+border-radius: 12px;
+padding: 20px;
+box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+width: 100%;
+max-width: 100%;
+flex: 1;
+display: flex;
+flex-direction: column;
+margin: 0 auto;
+}
+
+.question-content {
+flex: 1;
+display: flex;
+flex-direction: column;
+overflow-y: auto;
+}
+
+.question-number {
+font-size: clamp(14px, 3vw, 16px);
+color: var(--primary);
+margin-bottom: 16px;
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 12px;
+flex-shrink: 0;
+}
+
+.question-number::before {
+content: '';
+width: clamp(20px, 8vw, 32px);
+height: 3px;
+background: var(--primary);
+border-radius: 2px;
+}
+
+.difficulty-badge {
+padding: 6px 12px;
+border-radius: 16px;
+font-size: clamp(10px, 2.5vw, 12px);
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin-left: auto;
+}
+
+.difficulty-easy {
+background: #d1fae5;
+color: #059669;
+border: 1px solid #a7f3d0;
+}
+
+.difficulty-medium {
+background: #fef3c7;
+color: #d97706;
+border: 1px solid #fbbf24;
+}
+
+.difficulty-hard {
+background: #fee2e2;
+color: #dc2626;
+border: 1px solid #fca5a5;
+}
+
+.question-text {
+font-size: clamp(16px, 4vw, 18px);
+line-height: 1.6;
+margin-bottom: 20px;
+color: var(--dark);
+font-weight: 500;
+flex-shrink: 0;
+word-wrap: break-word;
+overflow-wrap: break-word;
+white-space: pre-wrap;
+}
+
+/* ADDED: Question Context Info from old template for better notes integration */
+.question-context-info {
+display: flex;
+flex-wrap: wrap;
+gap: 16px;
+margin: 16px 0;
+padding: 12px;
+background: #f8fafc;
+border-radius: 6px;
+border: 1px solid #e2e8f0;
+}
+
+.context-item {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 0.875rem;
+color: #64748b;
+}
+
+.context-item i {
+color: #10b981;
+width: 14px;
+}
+
+/* Options container - Same as Mock Test */
+.options-container {
+flex: 1;
+width: 100%;
+margin-top: 12px;
+}
+
+.options-list {
+list-style: none;
+padding: 0;
+margin: 0;
+width: 100%;
+}
+
+.option-item {
+margin-bottom: 12px;
+width: 100%;
+}
+
+.option-label {
+display: flex;
+align-items: flex-start;
+padding: 12px;
+background: #f8fafc;
+border: 2px solid #e2e8f0;
+border-radius: 8px;
+cursor: pointer;
+transition: all 0.2s ease;
+position: relative;
+width: 100%;
+word-wrap: break-word;
+overflow-wrap: break-word;
+}
+
+.option-label:hover {
+background: #f1f5f9;
+border-color: #cbd5e1;
+}
+
+.option-label input[type="radio"] {
+margin-right: 12px;
+margin-top: 2px;
+width: 16px;
+height: 16px;
+accent-color: var(--primary);
+flex-shrink: 0;
+}
+
+.option-label.selected {
+background: rgba(22, 163, 74, 0.1); /* Green theme */
+border-color: var(--primary);
+font-weight: 500;
+}
+
+.option-label.correct {
+background: rgba(16, 185, 129, 0.1);
+border-color: var(--secondary);
+box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.option-label.incorrect {
+background: rgba(239, 68, 68, 0.1);
+border-color: var(--danger);
+box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.option-label span {
+font-size: clamp(14px, 3.5vw, 16px);
+line-height: 1.5;
+color: #334155;
+flex: 1;
+word-wrap: break-word;
+overflow-wrap: break-word;
+white-space: pre-wrap;
+}
+
+.option-feedback {
+position: absolute;
+right: 16px;
+top: 50%;
+transform: translateY(-50%);
+font-size: 18px;
+opacity: 0;
+transition: opacity 0.3s ease;
+flex-shrink: 0;
+}
+
+.option-label.correct .option-feedback,
+.option-label.incorrect .option-feedback {
+opacity: 1;
+}
+
+.feedback-correct {
+color: var(--secondary);
+}
+
+.feedback-incorrect {
+color: var(--danger);
+}
+
+/* Student Mode Feedback - Enhanced */
+.student-feedback {
+margin-top: 20px;
+padding: 16px;
+background: #dbeafe;
+border-radius: 8px;
+border-left: 4px solid var(--info);
+display: none;
+}
+
+.student-feedback.show {
+display: block;
+animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.student-feedback.correct {
+background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+border-left-color: var(--secondary);
+}
+
+.student-feedback.incorrect {
+background: linear-gradient(135deg, #fef2f2, #fee2e2);
+border-left-color: var(--danger);
+}
+
+.feedback-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 16px;
+font-weight: 700;
+font-size: clamp(14px, 3.5vw, 16px);
+}
+
+.explanation-toggle-btn {
+background: var(--primary);
+color: white;
+border: none;
+padding: 10px 16px;
+border-radius: 8px;
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s ease;
+display: flex;
+align-items: center;
+gap: 8px;
+margin-top: 12px;
+}
+
+.explanation-toggle-btn:hover {
+background: var(--primary-dark);
+transform: translateY(-1px);
+}
+
+.explanation-content {
+display: none;
+margin-top: 16px;
+padding: 16px;
+background: rgba(255, 255, 255, 0.7);
+border-radius: 8px;
+border-left: 4px solid var(--primary);
+}
+
+.explanation-content.show {
+display: block;
+}
+
+.explanation-text {
+color: var(--gray);
+line-height: 1.6;
+font-size: 14px;
+white-space: pre-wrap;
+}
+
+/* Image in explanation - Same as Mock Test */
+.explanation-image {
+margin: 16px 0;
+text-align: center;
+width: 100%;
+}
+
+.explanation-image img {
+max-width: 100%;
+width: auto;
+height: auto;
+max-height: clamp(200px, 40vh, 400px);
+border-radius: 8px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+border: 1px solid #e2e8f0;
+object-fit: contain;
+background: white;
+display: block;
+margin: 0 auto;
+}
+
+.explanation-image .image-caption {
+font-size: clamp(10px, 2.5vw, 12px);
+color: var(--gray);
+margin-top: 8px;
+font-style: italic;
+}
+
+.image-error {
+background: #fef2f2;
+border: 1px solid #fecaca;
+color: #dc2626;
+padding: 12px;
+border-radius: 8px;
+text-align: center;
+font-size: clamp(12px, 3vw, 14px);
+margin: 16px 0;
+}
+
+.image-error i {
+margin-right: 8px;
+}
+
+/* Navigation Panel - Same as Mock Test */
+.navigation-panel {
+width: 280px;
+min-width: 280px;
+background: white;
+padding: 16px;
+border-left: 1px solid #e5e7eb;
+overflow-y: auto;
+box-shadow: -4px 0 16px rgba(0,0,0,0.04);
+display: flex;
+flex-direction: column;
+position: relative;
+}
+
+/* Session Stats - Updated for Practice - FIXED: Removed progress bar and synced font sizes */
+.session-stats {
+background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 16px;
+border: 1px solid #bae6fd;
+flex-shrink: 0;
+}
+
+.session-stats h5 {
+margin: 0 0 8px;
+color: #0369a1;
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+}
+
+.stat-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin: 4px 0;
+font-size: clamp(11px, 2.5vw, 13px);
+}
+
+.stat-label {
+color: var(--gray);
+font-size: clamp(11px, 2.5vw, 13px);
+}
+
+.stat-value {
+color: var(--dark);
+font-weight: 600;
+font-size: clamp(11px, 2.5vw, 13px); /* FIXED: Synced with other stat values */
+}
+
+/* Legend - Same as Mock Test - FIXED: Updated legend colors to match actual button states */
+.legend {
+background: #f8fafc;
+padding: 12px;
+border-radius: 8px;
+margin-bottom: 16px;
+flex-shrink: 0;
+}
+
+.legend h5 {
+margin: 0 0 8px;
+color: var(--dark);
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+}
+
+.legend-item {
+display: flex;
+align-items: center;
+gap: 8px;
+margin: 6px 0;
+font-size: clamp(10px, 2.5vw, 12px);
+color: var(--gray);
+}
+
+.legend-box {
+width: 16px;
+height: 16px;
+border-radius: 4px;
+flex-shrink: 0;
+border: 2px solid;
+}
+
+/* Question navigation - Same as Mock Test */
+.question-navigation {
+flex: 1;
+display: flex;
+flex-direction: column;
+min-height: 0;
+}
+
+.navigation-panel h4 {
+margin: 0 0 12px;
+color: var(--dark);
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+}
+
+.question-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+gap: 6px;
+flex: 1;
+align-content: start;
+max-height: 300px;
+overflow-y: auto;
+}
+
+.question-nav-btn {
+width: 32px;
+height: 32px;
+border: 2px solid #e2e8f0;
+background: white;
+border-radius: 6px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s;
+font-size: clamp(10px, 2.5vw, 12px);
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.question-nav-btn:hover {
+transform: translateY(-1px);
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-nav-btn.current {
+background: #16a34a;
+color: white;
+border-color: #16a34a;
+}
+
+.question-nav-btn.answered {
+background: #3b82f6;
+color: white;
+border-color: #3b82f6;
+}
+
+.question-nav-btn.correct {
+background: #10b981;
+color: white;
+border-color: #10b981;
+}
+
+.question-nav-btn.incorrect {
+background: #ef4444;
+color: white;
+border-color: #ef4444;
+}
+
+.question-nav-btn.marked {
+background: #f59e0b;
+color: white;
+border-color: #f59e0b;
+}
+
+/* Action Buttons - Same as Mock Test */
+.action-buttons {
+display: flex;
+justify-content: space-between;
+margin-top: 16px;
+padding-top: 16px;
+border-top: 1px solid #e5e7eb;
+gap: 8px;
+flex-shrink: 0;
+flex-wrap: wrap;
+}
+
+.btn {
+padding: 8px 16px;
+border: none;
+border-radius: 6px;
+font-size: clamp(12px, 3vw, 14px);
+font-weight: 600;
+cursor: pointer;
+transition: all 0.2s;
+display: flex;
+align-items: center;
+gap: 6px;
+flex: 1;
+min-width: 100px;
+justify-content: center;
+white-space: nowrap;
+}
+
+.btn-primary {
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+}
+
+.btn-primary:hover {
+transform: translateY(-1px);
+box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3);
+}
+
+.btn-secondary {
+background: #f1f5f9;
+color: var(--dark);
+border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+background: #e2e8f0;
+}
+
+.btn-success {
+background: var(--secondary);
+color: white;
+}
+
+.btn-success:hover {
+background: #059669;
+transform: translateY(-1px);
+}
+
+.btn-warning {
+background: var(--warning);
+color: white;
+}
+
+.btn-warning:hover {
+background: #d97706;
+}
+
+.btn:disabled {
+opacity: 0.5;
+cursor: not-allowed;
+transform: none !important;
+}
+
+/* ADDED: Enhanced Notes Button Styles from old template */
+.question-utilities {
+display: flex;
+gap: 8px;
+align-items: center;
+flex-wrap: wrap;
+margin-bottom: 16px;
+}
+
+.btn-utility {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 6px 12px;
+background: #f3f4f6;
+color: #374151;
+border: 1px solid #d1d5db;
+border-radius: 6px;
+font-size: clamp(11px, 2.5vw, 13px);
+cursor: pointer;
+transition: all 0.2s;
+font-weight: 500;
+text-decoration: none;
+white-space: nowrap;
+}
+
+.btn-utility:hover {
+background: #e5e7eb;
+color: #1f2937;
+transform: translateY(-1px);
+}
+
+.btn-utility.marked {
+background: var(--warning);
+color: white;
+border-color: var(--warning);
+}
+
+.btn-note {
+display: flex;
+align-items: center;
+gap: 6px;
+padding: 8px 12px;
+background: #10b981;
+color: white;
+border: none;
+border-radius: 6px;
+font-size: clamp(11px, 2.5vw, 13px);
+cursor: pointer;
+transition: all 0.2s;
+box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+font-weight: 500;
+}
+
+.btn-note:hover {
+background: #059669;
+transform: translateY(-1px);
+box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.btn-note:active {
+transform: translateY(0);
+}
+
+.btn-note.has-note {
+background: #059669;
+}
+
+.btn-note.has-note::after {
+content: '✓';
+margin-left: 4px;
+font-weight: bold;
+}
+
+/* Quick Note Modal Styles - Enhanced and Integrated */
+.quick-note-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0, 0, 0, 0.5);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+backdrop-filter: blur(4px);
+}
+
+.quick-note-content {
+background: white;
+border-radius: 12px;
+width: 90%;
+max-width: 500px;
+max-height: 90vh;
+overflow-y: auto;
+box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+}
+to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+}
+
+.quick-note-header {
+padding: 20px;
+border-bottom: 1px solid #e5e7eb;
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: linear-gradient(135deg, #10b981, #059669);
+color: white;
+border-radius: 12px 12px 0 0;
+}
+
+.quick-note-header h3 {
+margin: 0;
+font-size: 18px;
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+
+.close-quick-note {
+background: none;
+border: none;
+color: white;
+font-size: 24px;
+cursor: pointer;
+padding: 4px;
+border-radius: 4px;
+transition: background-color 0.2s;
+}
+
+.close-quick-note:hover {
+background: rgba(255, 255, 255, 0.2);
+}
+
+.quick-note-body {
+padding: 24px;
+}
+
+.quick-note-form .form-group {
+margin-bottom: 20px;
+}
+
+.quick-note-form label {
+display: block;
+margin-bottom: 6px;
+font-weight: 500;
+color: #374151;
+font-size: 14px;
+}
+
+.quick-note-form .form-control {
+width: 100%;
+padding: 10px 12px;
+border: 2px solid #e5e7eb;
+border-radius: 8px;
+font-size: 14px;
+transition: border-color 0.2s, box-shadow 0.2s;
+background: #fafafa;
+}
+
+.quick-note-form .form-control:focus {
+outline: none;
+border-color: #10b981;
+box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+background: white;
+}
+
+.quick-note-form textarea.form-control {
+resize: vertical;
+min-height: 100px;
+line-height: 1.5;
+}
+
+/* Question Context Styles */
+.question-context {
+margin-bottom: 20px;
+padding: 12px;
+background: #f0f9ff;
+border: 1px solid #bfdbfe;
+border-radius: 6px;
+}
+
+.context-header {
+display: flex;
+align-items: center;
+gap: 8px;
+margin-bottom: 8px;
+color: #1e40af;
+font-size: 14px;
+}
+
+.context-details {
+font-size: 13px;
+color: #3730a3;
+line-height: 1.4;
+}
+
+.context-hierarchy {
+margin-top: 6px;
+font-style: italic;
+color: #6366f1;
+}
+
+.quick-note-actions {
+display: flex;
+gap: 12px;
+justify-content: flex-end;
+margin-top: 24px;
+padding-top: 20px;
+border-top: 1px solid #e5e7eb;
+}
+
+.quick-note-actions button {
+padding: 10px 20px;
+border: none;
+border-radius: 8px;
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.2s;
+display: flex;
+align-items: center;
+gap: 6px;
+min-width: 100px;
+justify-content: center;
+}
+
+.quick-note-actions .btn-primary {
+background: linear-gradient(135deg, #10b981, #059669);
+color: white;
+box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.quick-note-actions .btn-primary:hover {
+transform: translateY(-1px);
+box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.quick-note-actions .btn-primary:disabled {
+opacity: 0.7;
+cursor: not-allowed;
+transform: none;
+}
+
+.quick-note-actions .btn-secondary {
+background: #f3f4f6;
+color: #6b7280;
+border: 1px solid #d1d5db;
+}
+
+.quick-note-actions .btn-secondary:hover {
+background: #e5e7eb;
+color: #4b5563;
+}
+
+/* Modal styles - Same as Mock Test */
+.modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.8);
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+backdrop-filter: blur(5px);
+padding: 20px;
+}
+
+.modal-content {
+background: white;
+padding: 24px;
+border-radius: 12px;
+text-align: center;
+max-width: 90vw;
+width: 440px;
+box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+animation: modalSlideIn 0.3s ease-out;
+max-height: 90vh;
+overflow-y: auto;
+}
+
+.modal-content h2 {
+color: var(--dark);
+margin-bottom: 16px;
+font-size: clamp(16px, 4vw, 20px);
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+}
+
+.warning-modal h2 {
+color: var(--danger);
+}
+
+.modal-content p {
+color: var(--gray);
+margin-bottom: 20px;
+font-size: clamp(13px, 3vw, 15px);
+line-height: 1.6;
+}
+
+.modal-actions {
+display: flex;
+gap: 12px;
+justify-content: center;
+margin-top: 20px;
+flex-wrap: wrap;
+}
+
+/* Responsive Design - Same breakpoints as Mock Test */
+@media (max-width: 1200px) {
+.navigation-panel {
+    width: 240px;
+    min-width: 240px;
+}
+
+.question-grid {
+    grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+}
+
+.question-nav-btn {
+    width: 28px;
+    height: 28px;
+}
+}
+
+@media (max-width: 1024px) {
+.practice-body {
+    flex-direction: column;
+}
+
+.navigation-panel {
+    width: 100%;
+    min-width: unset;
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    order: 2;
+    padding: 16px;
+    max-height: 250px;
+    flex-shrink: 0;
+}
+
+.question-panel {
+    order: 1;
+    flex: 1;
+    min-height: calc(100vh - 330px);
+}
+
+.question-grid {
+    grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+    max-height: 120px;
+}
+
+.session-stats, .legend {
+    display: none;
+}
+}
+
+@media (max-width: 768px) {
+.practice-header {
+    padding: 10px 12px;
+    gap: 6px;
+}
+
+.question-panel {
+    padding: 12px;
+    min-height: calc(100vh - 280px);
+}
+
+.question-card {
+    padding: 16px;
+}
+
+.navigation-panel {
+    padding: 12px;
+    max-height: 200px;
+}
+
+.question-grid {
+    grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+    gap: 4px;
+    max-height: 100px;
+}
+
+.action-buttons {
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+}
+
+.btn {
+    padding: 8px 12px;
+    min-width: 80px;
+    font-size: 12px;
+}
+
+.header-actions {
+    gap: 4px;
+}
+
+.fullscreen-btn, .complete-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.explanation-image img {
+    max-height: clamp(150px, 30vh, 250px);
+}
+
+.question-context-info {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.question-utilities {
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.btn-utility,
+.btn-note {
+    padding: 6px 10px;
+    font-size: 0.8125rem;
+}
+
+.note-text {
+    display: none;
+}
+
+.quick-note-content {
+    width: 95%;
+    margin: 10px;
+}
+
+.quick-note-header {
+    padding: 16px;
+}
+
+.quick-note-header h3 {
+    font-size: 16px;
+}
+
+.quick-note-body {
+    padding: 20px;
+}
+
+.quick-note-actions {
+    flex-direction: column;
+}
+
+.quick-note-actions button {
+    width: 100%;
+}
+}
+
+@media (max-width: 480px) {
+.practice-header {
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+}
+
+.practice-info, .practice-progress, .header-actions {
+    text-align: center;
+    justify-content: center;
+}
+
+.question-panel {
+    padding: 10px;
+    min-height: calc(100vh - 220px);
+}
+
+.question-card {
+    padding: 12px;
+}
+
+.navigation-panel {
+    padding: 10px;
+    max-height: 160px;
+}
+
+.action-buttons {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn {
+    width: 100%;
+    min-width: unset;
+}
+
+.question-grid {
+    grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+    max-height: 80px;
+}
+
+.modal-content {
+    padding: 20px;
+    margin: 10px;
+}
+
+.modal-actions {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.modal-actions .btn {
+    width: 100%;
+}
+
+.explanation-image img {
+    max-height: clamp(120px, 25vh, 200px);
+}
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+.practice-header {
+    padding: 6px 12px;
+}
+
+.navigation-panel {
+    max-height: 120px;
+}    
+
+.question-panel {
+    min-height: calc(100vh - 200px);
+}
+
+.explanation-image img {
+    max-height: 150px;
+}
+
+.question-grid {
+    max-height: 60px;
+    grid-template-columns: repeat(auto-fit, minmax(25px, 1fr));
+}
+
+.question-nav-btn {
+    width: 25px;
+    height: 25px;
+    font-size: 10px;
+}
+}
+
+/* Custom scrollbar - Same as Mock Test */
+::-webkit-scrollbar {
+width: clamp(6px, 2vw, 8px);
+height: clamp(6px, 2vw, 8px);
+}
+
+::-webkit-scrollbar-track {
+background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+background: var(--primary-light);
+border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: var(--primary);
+}
+
+/* Animations */
+.fade-in {
+animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; }
+to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+from {
+    opacity: 0;
+    transform: translateY(20px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+.correct-animation {
+animation: correctPulse 0.6s ease;
+}
+
+.incorrect-animation {
+animation: incorrectShake 0.6s ease;
+}
+
+@keyframes correctPulse {
+0% { transform: scale(1); }
+50% { transform: scale(1.02); }
+100% { transform: scale(1); }
+}
+
+@keyframes incorrectShake {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-4px); }
+75% { transform: translateX(4px); }
+}
+
+/* Loading indicator */
+.image-loading {
+display: inline-block;
+width: 20px;
+height: 20px;
+border: 2px solid #e2e8f0;
+border-radius: 50%;
+border-top-color: var(--primary);
+animation: spin 1s ease-in-out infinite;
+margin: 20px;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}
+
+/* Ensure content doesn't overflow */
+.practice-container * {
+max-width: 100%;
+}
+
+/* Better touch targets for mobile */
+@media (pointer: coarse) {
+.question-nav-btn {
+    min-height: 36px;
+    min-width: 36px;
+}
+
+.btn {
+    min-height: 40px;
+}
+
+.option-label {
+    min-height: 48px;
+    padding: 16px;
+}
+}
+
+/* Special character support - Enhanced typography */
+.question-text,
+.option-label span,
+.explanation-text {
+font-feature-settings: "liga" 1, "kern" 1;
+text-rendering: optimizeLegibility;
+}
+
+/* Support for mathematical symbols and special characters */
+.special-chars {
+font-family: "Times New Roman", "Cambria Math", serif;
+font-size: 1.1em;
+}
+
+/* Fullscreen mode */
+.fullscreen-mode .practice-container {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+z-index: 9999;
+max-width: none;
+}
+</style>
 </head>
 <body>
-    <div class="practice-container">
-        <!-- Enhanced Practice Header -->
-        <div class="practice-header">
-            <div class="practice-info">
-                <h3>
-                    <i class="fas fa-dumbbell"></i>
-                    {{ session.topic }}
-                </h3>
-                <div class="breadcrumb">
-                    <span>{{ session.block }}</span>
-                    <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
-                    <span>{{ session.module }}</span>
-                    <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
-                    <span>{{ session.subject }}</span>
-                </div>
-            </div>
-            
-            <div class="practice-progress">
-                <div class="progress-indicator">
-                    <span id="current-question">1</span> / {{ total_questions }}
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="header-actions">
-                {% if session.timed_practice %}
-                <div class="timer-display" id="timer-display">
-                    <i class="fas fa-clock"></i>
-                    <span id="timer">--:--</span>
-                </div>
-                {% endif %}
-                <button class="complete-btn" onclick="completeSession()">
-                    <i class="fas fa-check-circle"></i>
-                    Complete Session
-                </button>
-            </div>
-        </div>
+<div class="practice-container" id="practice-container">
+<!-- Practice Header - Unified Design with Progress Bar and ADDED Breadcrumb -->
+<div class="practice-header">
+<div class="practice-info">
+    <h3>
+        <i class="fas fa-dumbbell"></i>
+        {{ session.topic }}
+        <span class="mode-indicator">{{ session.practice_mode|title }} Mode</span>
+    </h3>
+    <span>Question <span id="current-question">1</span> of {{ total_questions }}</span>
+    <!-- ADDED: Breadcrumb from old template -->
+    <div class="breadcrumb">
+        <span>{{ session.block }}</span>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span>{{ session.module }}</span>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span>{{ session.subject }}</span>
+    </div>
+</div>
 
-        <!-- Enhanced Practice Body -->
-        <div class="practice-body">
-            <!-- Enhanced Question Panel -->
-            <div class="question-panel">
-                <div class="question-card" id="question-card">
-                    <div id="question-container">
-                        <!-- Questions will be loaded here with enhanced structure -->
-                    </div>
-                    
-                    <!-- Enhanced Answer Feedback -->
-                    <div class="answer-feedback" id="answer-feedback">
-                        <div class="feedback-header">
-                            <i id="feedback-icon"></i>
-                            <span id="feedback-title"></span>
-                        </div>
-                        <div id="feedback-content">
-                            <div class="explanation-text" id="explanation-text"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    
-                    <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
-                        Next <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
+<!-- Progress Bar in Header -->
+<div class="header-progress">
+    <div class="progress-info">
+        <span id="progress-fraction">1/{{ total_questions }}</span>
+        <span id="progress-accuracy">0% Accuracy</span>
+    </div>
+    <div class="header-progress-bar">
+        <div class="header-progress-fill" id="header-progress-fill" style="width: 0%"></div>
+    </div>
+</div>
+
+{% if session.timed_practice %}
+<div class="timer-display" id="timer-display">
+    <i class="fas fa-clock"></i>
+    <span id="timer">{{ session.time_per_question }}:00</span>
+</div>
+{% endif %}
+
+<div class="header-actions">
+    <button class="fullscreen-btn" onclick="toggleFullscreen()" id="fullscreen-btn">
+        <i class="fas fa-expand" id="fullscreen-icon"></i>
+        <span id="fullscreen-text">Full</span>
+    </button>
+    <button class="complete-btn" onclick="completeSession()">
+        <i class="fas fa-check-circle"></i> Complete
+    </button>
+</div>
+</div>
+
+<!-- Practice Body - Unified Layout -->
+<div class="practice-body">
+<!-- Question Panel -->
+<div class="question-panel">
+    <div class="question-card fade-in" id="question-card">
+        <div class="question-content">
+            <div id="question-container">
+                <!-- Questions will be loaded here -->
             </div>
             
-            <!-- Enhanced Navigation Panel -->
-            <div class="navigation-panel">
-                <!-- Enhanced Session Stats -->
-                <div class="session-stats">
-                    <h5>
-                        <i class="fas fa-chart-line"></i>
-                        Session Progress
-                    </h5>
-                    <div class="stat-item">
-                        <span class="stat-label">Answered:</span>
-                        <span class="stat-value" id="answered-count">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Correct:</span>
-                        <span class="stat-value" id="correct-count">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Accuracy:</span>
-                        <div class="accuracy-indicator">
-                            <div class="accuracy-bar">
-                                <div class="accuracy-fill" id="accuracy-fill" style="width: 0%"></div>
-                            </div>
-                            <span class="stat-value" id="accuracy">0%</span>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Remaining:</span>
-                        <span class="stat-value" id="remaining-count">{{ total_questions }}</span>
-                    </div>
+            <!-- Question Utilities - UPDATED with proper notes integration -->
+            <div class="question-utilities" id="question-utilities">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            
+            <!-- Student Mode Feedback -->
+            {% if session.practice_mode == 'student' %}
+            <div class="student-feedback" id="student-feedback">
+                <div class="feedback-header">
+                    <i id="feedback-icon"></i>
+                    <span id="feedback-title"></span>
                 </div>
-                
-                <!-- Enhanced Question Navigation -->
-                <div class="question-navigation">
-                    <h4>
-                        <i class="fas fa-list-ol"></i>
-                        Questions
-                    </h4>
-                    <div class="question-grid" id="question-nav">
-                        {% for question in questions %}
-                            <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
-                                    onclick="goToQuestion({{ forloop.counter }})"
-                                    data-question="{{ forloop.counter }}"
-                                    title="Question {{ forloop.counter }}">
-                                {{ forloop.counter }}
-                            </button>
-                        {% endfor %}
+                <div id="feedback-content">
+                    <button class="explanation-toggle-btn" onclick="toggleExplanation()">
+                        <i class="fas fa-lightbulb"></i>
+                        <span id="explanation-btn-text">Show Explanation</span>
+                    </button>
+                    <div class="explanation-content" id="explanation-content">
+                        <div class="explanation-text" id="explanation-text"></div>
+                        <div id="explanation-image-container"></div>
                     </div>
                 </div>
             </div>
+            {% endif %}
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="previousQuestion()" id="prev-btn">
+                <i class="fas fa-arrow-left"></i> <span>Previous</span>
+            </button>
+            
+            <button class="btn btn-warning" onclick="markForReview()" id="mark-btn">
+                <i class="fas fa-bookmark"></i> <span>Mark</span>
+            </button>
+            
+            <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">
+                <span>Next</span> <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Panel - Unified Design -->
+<div class="navigation-panel">
+    <!-- Session Stats - FIXED: Removed progress bar, synced accuracy font size -->
+    <div class="session-stats">
+        <h5>
+            <i class="fas fa-chart-line"></i>
+            Session Progress
+        </h5>
+        <div class="stat-item">
+            <span class="stat-label">Answered:</span>
+            <strong class="stat-value" id="answered-count">0</strong>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Correct:</span>
+            <strong class="stat-value" id="correct-count">0</strong>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Accuracy:</span>
+            <strong class="stat-value" id="accuracy">0%</strong>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Remaining:</span>
+            <strong class="stat-value" id="remaining-count">{{ total_questions }}</strong>
         </div>
     </div>
 
-    <script>
-        // Enhanced Session Data
-        const sessionId = {{ session.id }};
-        const showExplanations = {{ session.show_explanations|yesno:"true,false" }};
-        const timedPractice = {{ session.timed_practice|yesno:"true,false" }};
-        const timePerQuestion = {{ session.time_per_question|default:"null" }};
-        
-        const questions = [
+    <!-- Legend - FIXED: Proper color reflection -->
+    <div class="legend">
+        <h5>Legend</h5>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #16a34a; border-color: #16a34a;"></div>
+            <span>Current</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #3b82f6; border-color: #3b82f6;"></div>
+            <span>Answered</span>
+        </div>
+        {% if session.practice_mode == 'student' %}
+        <div class="legend-item">
+            <div class="legend-box" style="background: #10b981; border-color: #10b981;"></div>
+            <span>Correct</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: #ef4444; border-color: #ef4444;"></div>
+            <span>Incorrect</span>
+        </div>
+        {% endif %}
+        <div class="legend-item">
+            <div class="legend-box" style="background: #f59e0b; border-color: #f59e0b;"></div>
+            <span>Marked</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box" style="background: white; border-color: #e2e8f0;"></div>
+            <span>Not Answered</span>
+        </div>
+    </div>
+    
+    <!-- Question Navigation -->
+    <div class="question-navigation">
+        <h4>
+            <i class="fas fa-list-ol"></i>
+            Questions
+        </h4>
+        <div class="question-grid" id="question-nav">
             {% for question in questions %}
-            {
-                id: {{ question.id }},
-                order: {{ question.order }},
-                text: `{{ question.text|escapejs }}`,
-                options: {
-                    {% for key, value in question.options.items %}
-                    {{ key }}: `{{ value|escapejs }}`,
-                    {% endfor %}
-                },
-                correctAnswer: '{{ question.correct_answer }}',
-                explanation: `{{ question.explanation|escapejs }}`,
-                difficulty: '{{ question.difficulty }}',
-                hasImage: {{ question.has_image|yesno:"true,false" }},
-                imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
-                imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
-                // Enhanced question data for notes integration
-                degree: `{{ question.degree|default:"MBBS"|escapejs }}`,
-                year: `{{ question.year|default:"1st"|escapejs }}`,
-                block: `{{ question.block|default:""|escapejs }}`,
-                module: `{{ question.module|default:""|escapejs }}`,
-                subject: `{{ question.subject|default:""|escapejs }}`,
-                topic: `{{ question.topic|default:""|escapejs }}`
-            }{% if not forloop.last %},{% endif %}
+                <button class="question-nav-btn {% if forloop.first %}current{% endif %}" 
+                        onclick="goToQuestion({{ forloop.counter }})"
+                        data-question="{{ forloop.counter }}"
+                        title="Question {{ forloop.counter }}">
+                    {{ forloop.counter }}
+                </button>
             {% endfor %}
-        ];
-        
-        // Enhanced Session State
-        let currentQuestionIndex = 0;
-        let answers = {};
-        let questionStartTime = Date.now();
-        let sessionStartTime = Date.now();
-        let questionTimer = null;
-        let currentQuestionTimeLeft = timePerQuestion;
-        
-        // Initialize Enhanced Practice Session
-        document.addEventListener('DOMContentLoaded', function() {
-            loadQuestion(0);
-            updateProgress();
-            updateNavigationState();
-            
-            if (timedPractice && timePerQuestion) {
-                startQuestionTimer();
-            }
-            
-            // Add keyboard shortcuts
-            setupKeyboardNavigation();
-            
-            // Prevent accidental navigation away
-            setupNavigationWarning();
-            
-            // Auto-save progress periodically
-            setInterval(autoSaveProgress, 30000); // Every 30 seconds
-        });
-        
-        // Enhanced Question Loading with Better Image Support and Notes Integration
-        function loadQuestion(index) {
-            const question = questions[index];
-            currentQuestionIndex = index;
-            questionStartTime = Date.now();
-            
-            if (timedPractice && timePerQuestion) {
-                currentQuestionTimeLeft = timePerQuestion;
-                startQuestionTimer();
-            }
-            
-            // Update current question number
-            document.getElementById('current-question').textContent = index + 1;
-            
-            // Update progress bar with smooth animation
-            const progressPercent = (index / questions.length) * 100;
-            document.getElementById('progress-fill').style.width = progressPercent + '%';
-            
-            // Create image HTML with better error handling
-            let imageHtml = '';
-            if (question.hasImage && question.imageUrl) {
-                imageHtml = `
-                    <div class="question-image">
-                        <img src="${question.imageUrl}" 
-                             alt="Question ${index + 1} Image" 
-                             loading="lazy"
-                             onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>Image unavailable</div>'"
-                             onload="this.style.opacity='1';"
-                             style="opacity: 0; transition: opacity 0.3s ease;">
-                    </div>
-                `;
-            }
-            
-            // Create enhanced options HTML
-            let optionsHtml = '<div class="options-container"><ul class="options-list">';
-            const options = Object.entries(question.options);
-            
-            options.forEach(([key, value]) => {
-                const isSelected = answers[question.id] && answers[question.id].answer === key;
-                const isAnswered = answers[question.id] !== undefined;
-                const isCorrect = isAnswered && question.correctAnswer === key;
-                const isUserAnswer = isAnswered && answers[question.id].answer === key;
-                
-                let optionClass = 'option-label';
-                let feedbackIcon = '';
-                
-                if (isAnswered) {
-                    if (isCorrect) {
-                        optionClass += ' correct';
-                        if (isUserAnswer) {
-                            feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
-                        }
-                    } else if (isUserAnswer && !isCorrect) {
-                        optionClass += ' incorrect';
-                        feedbackIcon = '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
-                    } else if (isCorrect) {
-                        feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
-                    }
-                } else if (isSelected) {
-                    optionClass += ' selected';
-                }
-                
-                optionsHtml += `
-                    <li class="option-item">
-                        <label class="${optionClass}" data-option="${key}">
-                            <input type="radio" name="answer" value="${key}" 
-                                   ${isSelected ? 'checked' : ''} 
-                                   ${isAnswered ? 'disabled' : ''}
-                                   onchange="submitAnswer('${key}')">
-                            <span class="option-text">${key}) ${value}</span>
-                            ${feedbackIcon}
-                        </label>
-                    </li>
-                `;
-            });
-            optionsHtml += '</ul></div>';
+        </div>
+    </div>
+</div>
+</div>
+</div>
 
-            // Enhanced question context info for notes integration
-            let contextHtml = '';
-            const hierarchyParts = [];
-            if (question.block) hierarchyParts.push(question.block);
-            if (question.module) hierarchyParts.push(question.module);
-            if (question.subject) hierarchyParts.push(question.subject);
-            if (question.topic) hierarchyParts.push(question.topic);
+<!-- Complete Session Modal -->
+<div class="modal" id="complete-modal">
+<div class="modal-content">
+<h2><i class="fas fa-question-circle"></i> Complete Practice Session?</h2>
+<p>Are you sure you want to complete this practice session?</p>
+<div style="background: #f8fafc; padding: 16px; border-radius: 8px; margin: 16px 0;">
+    <p id="complete-summary" style="margin: 0; white-space: pre-line;"></p>
+</div>
+<div class="modal-actions">
+    <button class="btn btn-secondary" onclick="closeCompleteModal()">Cancel</button>
+    <button class="btn btn-success" onclick="submitSession()">Complete Session</button>
+</div>
+</div>
+</div>
 
-            if (hierarchyParts.length > 0 || question.degree || question.year) {
-                contextHtml = `
-                    <div class="question-context-info">
-                        <div class="context-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>${question.degree} - ${question.year}</span>
-                        </div>
-                        ${hierarchyParts.length > 0 ? `
-                        <div class="context-item">
-                            <i class="fas fa-sitemap"></i>
-                            <span>${hierarchyParts.join(' → ')}</span>
-                        </div>
-                        ` : ''}
-                        ${question.difficulty ? `
-                        <div class="context-item">
-                            <i class="fas fa-signal"></i>
-                            <span>${question.difficulty} Difficulty</span>
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
+<script>
 
-            // Enhanced question actions with utilities and notes
-            const questionActionsHtml = `
-                <div class="question-actions">
-                    <div class="question-utilities">
-                        <button class="btn-utility" onclick="markForReview(${question.id})" title="Mark for Review">
-                            <i class="fas fa-bookmark"></i>
-                            <span>Mark</span>
-                        </button>
-                        
-                        <button class="btn-utility" onclick="showExplanation(${question.id})" title="Show Explanation">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Explain</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Enhanced Note Button with proper question data -->
-                    <button class="btn-note" onclick="openQuickNote(${question.id})" title="Add Note for this Question">
-                        <i class="fas fa-sticky-note"></i>
-                        <span class="note-text">Note</span>
-                    </button>
-                </div>
-            `;
-            
-            // Load question content with enhanced layout and data attributes for notes
-            const questionContainer = document.getElementById('question-container');
-            questionContainer.innerHTML = `
-                <div class="question-header">
-                    <div class="question-number">
-                        <span class="question-counter">Question ${index + 1}</span>
-                    </div>
-                    <span class="difficulty-badge difficulty-${question.difficulty.toLowerCase()}">${question.difficulty}</span>
-                </div>
-                <div class="question-text">${question.text}</div>
-                ${imageHtml}
-                ${optionsHtml}
-                ${contextHtml}
-                ${questionActionsHtml}
-            `;
+// Complete Updated JavaScript for Practice Session Template
+// This replaces the entire <script> section in your practice_session.html
 
-            // Set enhanced data attributes on the question card for notes integration
-            const questionCard = document.getElementById('question-card');
-            questionCard.setAttribute('data-question-id', question.id);
-            questionCard.setAttribute('data-degree', question.degree);
-            questionCard.setAttribute('data-year', question.year);
-            questionCard.setAttribute('data-block', question.block);
-            questionCard.setAttribute('data-module', question.module);
-            questionCard.setAttribute('data-subject', question.subject);
-            questionCard.setAttribute('data-topic', question.topic);
-            
-            // Show feedback if question is already answered
-            if (answers[question.id] && showExplanations) {
-                showAnswerFeedback(question, answers[question.id]);
+// Initialize session data from Django template - UPDATED with question hierarchy data
+const sessionData = {
+    sessionId: {{ session.id }},
+    practiceMode: '{{ session.practice_mode|default:"student" }}',
+    showExplanations: {{ session.show_explanations|yesno:"true,false" }},
+    timedPractice: {{ session.timed_practice|yesno:"true,false" }},
+    timePerQuestion: {{ session.time_per_question|default:"null" }}
+};
+
+const questionsData = [
+    {% for question in questions %}
+    {
+        id: {{ question.id }},
+        order: {{ question.order }},
+        text: `{{ question.text|escapejs }}`,
+        options: {
+            {% for key, value in question.options.items %}
+            '{{ key }}': `{{ value|escapejs }}`,
+            {% endfor %}
+        },
+        correctAnswer: '{{ question.correct_answer }}',
+        explanation: `{{ question.explanation|escapejs }}`,
+        difficulty: '{{ question.difficulty }}',
+        hasImage: {{ question.has_image|yesno:"true,false" }},
+        imageUrl: {% if question.image_url %}'{{ question.image_url }}'{% else %}null{% endif %},
+        imageFilename: {% if question.image_filename %}'{{ question.image_filename|escapejs }}'{% else %}null{% endif %},
+        // Enhanced question data for notes integration
+        degree: `{{ question.degree|default:"MBBS"|escapejs }}`,
+        year: `{{ question.year|default:"1st"|escapejs }}`,
+        block: `{{ question.block|default:""|escapejs }}`,
+        module: `{{ question.module|default:""|escapejs }}`,
+        subject: `{{ question.subject|default:""|escapejs }}`,
+        topic: `{{ question.topic|default:""|escapejs }}`
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+// Session State Variables
+let currentQuestionIndex = 0;
+let answers = {};
+let markedQuestions = new Set();
+let questionStartTime = Date.now();
+let sessionStartTime = Date.now();
+let questionTimer = null;
+let currentQuestionTimeLeft = sessionData.timePerQuestion;
+let timerInterval = null;
+let questionNotesStatus = {}; // Track which questions have notes
+
+// Initialize Practice Session
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Initializing practice session...');
+
+    if (!sessionData.sessionId || !questionsData || questionsData.length === 0) {
+        alert('Error: Session data not loaded properly. Please refresh the page.');
+        return;
+    }
+
+    loadQuestion(0);
+    updateProgress();
+    updateNavigationState();
+
+    if (sessionData.timedPractice && sessionData.timePerQuestion) {
+        startQuestionTimer();
+    }
+
+    setupKeyboardNavigation();
+    setupNavigationWarning();
+    setupResponsiveHandlers();
+
+    // Initialize notes checking
+    checkExistingNotes();
+
+    console.log('Practice session initialized successfully');
+});
+
+// ================================
+// ENHANCED NOTES FUNCTIONALITY
+// ================================
+
+// ENHANCED: Function to check existing notes when questions load
+function checkExistingNotes() {
+    console.log('Checking existing notes for all questions...');
+    
+    questionsData.forEach((question, index) => {
+        // Check if this question has a note in the current session
+        fetch(`/managemodule/student/check-note/?session_id=${sessionData.sessionId}&question_id=${question.id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.has_note) {
+                questionNotesStatus[question.id] = {
+                    hasNote: true,
+                    noteText: data.note_text,
+                    noteLength: data.note_length
+                };
+                updateNoteButtonState(question.id, true);
+                console.log(`Question ${question.id} has existing note (${data.note_length} chars)`);
             } else {
-                hideAnswerFeedback();
+                questionNotesStatus[question.id] = { hasNote: false };
             }
-            
-            updateNavigationState();
-            updateNavigation();
-            
-            // Scroll to top of question for mobile
-            questionContainer.scrollTop = 0;
+        })
+        .catch(error => {
+            console.log(`Could not check note for question ${question.id}:`, error);
+            questionNotesStatus[question.id] = { hasNote: false };
+        });
+    });
+}
+
+// ENHANCED: Update note button state with better visual feedback
+function updateNoteButtonState(questionId, hasNote) {
+    const noteBtn = document.querySelector(`[onclick*="openQuickNote(${questionId})"]`);
+    if (noteBtn) {
+        if (hasNote) {
+            noteBtn.classList.add('has-note');
+            noteBtn.style.background = '#059669';
+            noteBtn.innerHTML = '<i class="fas fa-sticky-note"></i> <span class="note-text">View Note</span>';
+            noteBtn.title = 'View/Edit Note';
+        } else {
+            noteBtn.classList.remove('has-note');
+            noteBtn.style.background = '#10b981';
+            noteBtn.innerHTML = '<i class="fas fa-sticky-note"></i> <span class="note-text">Note</span>';
+            noteBtn.title = 'Add Note for this Question';
         }
-        
-        // Enhanced Answer Submission with Better Feedback
-        function submitAnswer(selectedAnswer) {
-            const question = questions[currentQuestionIndex];
-            const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
-            
-            // Clear question timer if active
-            if (questionTimer) {
-                clearTimeout(questionTimer);
+    }
+}
+
+// ENHANCED: Load existing note content when opening modal
+function openQuickNote(questionId) {
+    console.log('Opening quick note for question ID:', questionId);
+
+    const currentQuestion = questionsData[currentQuestionIndex];
+    if (!currentQuestion) {
+        console.error('No current question found');
+        return;
+    }
+
+    // Set all the form fields with current question data
+    document.getElementById('note-session-id').value = sessionData.sessionId;
+    document.getElementById('note-question-id').value = currentQuestion.id;
+    document.getElementById('note-degree').value = currentQuestion.degree || '';
+    document.getElementById('note-year').value = currentQuestion.year || '';
+    document.getElementById('note-block').value = currentQuestion.block || '';
+    document.getElementById('note-module').value = currentQuestion.module || '';
+    document.getElementById('note-subject').value = currentQuestion.subject || '';
+    document.getElementById('note-topic').value = currentQuestion.topic || '';
+
+    // Update question context display
+    updateQuestionContext(currentQuestion);
+
+    // Load existing note content if available
+    const noteContentField = document.getElementById('note-content');
+    const questionNoteStatus = questionNotesStatus[currentQuestion.id];
+    
+    if (questionNoteStatus && questionNoteStatus.hasNote) {
+        noteContentField.value = questionNoteStatus.noteText || '';
+        console.log('Loaded existing note content from cache');
+        showModal();
+    } else {
+        // Try to load from server
+        noteContentField.value = 'Loading...';
+        noteContentField.disabled = true;
+
+        fetch(`/managemodule/student/check-note/?session_id=${sessionData.sessionId}&question_id=${currentQuestion.id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.has_note) {
+                noteContentField.value = data.note_text;
+                questionNotesStatus[currentQuestion.id] = {
+                    hasNote: true,
+                    noteText: data.note_text,
+                    noteLength: data.note_length
+                };
+                console.log('Loaded existing note content from server');
+            } else {
+                noteContentField.value = '';
+                questionNotesStatus[currentQuestion.id] = { hasNote: false };
             }
-            
-            // Save answer locally
-            const isCorrect = selectedAnswer === question.correctAnswer;
-            answers[question.id] = {
-                answer: selectedAnswer,
-                timeSpent: timeSpent,
-                isCorrect: isCorrect
+        })
+        .catch(error => {
+            console.log('Could not load existing note:', error);
+            noteContentField.value = '';
+        })
+        .finally(() => {
+            noteContentField.disabled = false;
+            showModal();
+        });
+    }
+
+    function showModal() {
+        document.getElementById('quick-note-modal').style.display = 'flex';
+        noteContentField.focus();
+        // Move cursor to end of text
+        noteContentField.setSelectionRange(noteContentField.value.length, noteContentField.value.length);
+    }
+}
+
+function updateQuestionContext(questionData) {
+    if (!questionData) {
+        document.getElementById('question-context').style.display = 'none';
+        return;
+    }
+
+    const contextElement = document.getElementById('question-context');
+    const detailsElement = document.getElementById('context-details');
+
+    let contextHtml = `<div><strong>Question ${questionData.order}:</strong> ${questionData.text.substring(0, 80)}${questionData.text.length > 80 ? '...' : ''}</div>`;
+
+    // Build hierarchy path
+    const hierarchyParts = [];
+    if (questionData.block) hierarchyParts.push(questionData.block);
+    if (questionData.module) hierarchyParts.push(questionData.module);
+    if (questionData.subject) hierarchyParts.push(questionData.subject);
+    if (questionData.topic) hierarchyParts.push(questionData.topic);
+
+    if (hierarchyParts.length > 0) {
+        contextHtml += `<div class="context-hierarchy"><strong>Path:</strong> ${questionData.degree} - ${questionData.year} → ${hierarchyParts.join(' → ')}</div>`;
+    } else {
+        contextHtml += `<div class="context-hierarchy"><strong>Course:</strong> ${questionData.degree} - ${questionData.year}</div>`;
+    }
+
+    detailsElement.innerHTML = contextHtml;
+    contextElement.style.display = 'block';
+}
+
+function closeQuickNote() {
+    document.getElementById('quick-note-modal').style.display = 'none';
+    document.getElementById('question-context').style.display = 'none';
+}
+
+// ENHANCED: Form submission with proper practice session integration
+document.getElementById('quick-note-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const content = formData.get('note_text').trim();
+    const questionId = formData.get('question_id');
+    
+    // Validate content
+    if (!content) {
+        showNotification('Please enter note content before saving.', 'warning');
+        document.getElementById('note-content').focus();
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    // Use the correct URL pattern that matches your urls.py
+    fetch('{% url "save_practice_note" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Note save response:', data);
+        if (data.success) {
+            // Update local cache
+            questionNotesStatus[questionId] = {
+                hasNote: true,
+                noteText: content,
+                noteLength: content.length
             };
             
-            // Submit to server with enhanced error handling
-            fetch('{% url "submit_practice_answer" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: `session_id=${sessionId}&question_id=${question.id}&answer=${selectedAnswer}&time_spent=${timeSpent}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update UI with enhanced feedback
-                    updateOptionsWithFeedback(question, selectedAnswer, data.is_correct);
-                    
-                    if (showExplanations) {
-                        showAnswerFeedback(question, {
-                            answer: selectedAnswer,
-                            isCorrect: data.is_correct,
-                            explanation: data.explanation
-                        });
-                    }
-                    
-                    // Update progress and navigation
-                    updateProgress();
-                    updateNavigation();
-                    
-                    // Enhanced animations
-                    const questionCard = document.getElementById('question-card');
-                    if (data.is_correct) {
-                        questionCard.classList.add('correct-animation');
-                        // Celebrate correct answer
-                        showCelebration(true);
-                    } else {
-                        questionCard.classList.add('incorrect-animation');
-                        showCelebration(false);
-                    }
-                    
-                    setTimeout(() => {
-                        questionCard.classList.remove('correct-animation', 'incorrect-animation');
-                    }, 600);
-                    
-                    // Auto-advance after delay for better UX
-                    if (currentQuestionIndex < questions.length - 1) {
-                        setTimeout(() => {
-                            const nextButton = document.getElementById('next-btn');
-                            if (nextButton && !nextButton.disabled) {
-                                nextButton.style.background = 'linear-gradient(135deg, #059669, #047857)';
-                                nextButton.style.transform = 'scale(1.05)';
-                                setTimeout(() => {
-                                    nextButton.style.background = '';
-                                    nextButton.style.transform = '';
-                                }, 300);
-                            }
-                        }, 1500);
-                    }
+            closeQuickNote();
+            showNotification('Note saved successfully!', 'success');
+            
+            // Update note button state
+            updateNoteButtonState(questionId, true);
+            
+            // Log success details
+            if (data.note_details) {
+                console.log('Note details:', data.note_details);
+            }
+        } else {
+            throw new Error(data.error || 'Failed to save note');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving note:', error);
+        showNotification(`Error saving note: ${error.message}`, 'error');
+    })
+    .finally(() => {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Note';
+    });
+});
+
+// ================================
+// QUESTION LOADING AND NAVIGATION
+// ================================
+
+// UPDATED: Question Loading Function - Enhanced with proper notes integration
+function loadQuestion(index) {
+    if (index < 0 || index >= questionsData.length) {
+        console.error('Invalid question index:', index);
+        return;
+    }
+
+    const question = questionsData[index];
+    currentQuestionIndex = index;
+    questionStartTime = Date.now();
+
+    console.log('Loading question:', index + 1, 'of', questionsData.length);
+
+    // Update timer
+    if (sessionData.timedPractice && sessionData.timePerQuestion) {
+        currentQuestionTimeLeft = sessionData.timePerQuestion;
+        startQuestionTimer();
+    }
+
+    // Update progress indicators
+    const currentQuestionEl = document.getElementById('current-question');
+    if (currentQuestionEl) {
+        currentQuestionEl.textContent = index + 1;
+    }
+
+    // Update progress immediately when question loads
+    updateProgress();
+
+    // Build question HTML with unified styling
+    const processedQuestionText = processSpecialCharacters(question.text);
+
+    let optionsHtml = '<div class="options-container"><ul class="options-list">';
+    const options = Object.entries(question.options);
+
+    options.forEach(([key, value]) => {
+        const isSelected = answers[question.id] && answers[question.id].answer === key;
+        const isAnswered = answers[question.id] !== undefined;
+        const isCorrect = isAnswered && question.correctAnswer === key;
+        const isUserAnswer = isAnswered && answers[question.id].answer === key;
+        
+        let optionClass = 'option-label';
+        let feedbackIcon = '';
+        
+        if (sessionData.practiceMode === 'student' && isAnswered) {
+            if (isCorrect) {
+                optionClass += ' correct';
+                if (isUserAnswer) {
+                    feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
                 }
-            })
-            .catch(error => {
-                console.error('Error submitting answer:', error);
-                showNotification('Error submitting answer. Please try again.', 'error');
-            });
+            } else if (isUserAnswer && !isCorrect) {
+                optionClass += ' incorrect';
+                feedbackIcon = '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+            } else if (isCorrect) {
+                feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+            }
+        } else if (isSelected) {
+            optionClass += ' selected';
         }
         
-        // Enhanced Visual Feedback
-        function updateOptionsWithFeedback(question, selectedAnswer, isCorrect) {
-            const optionLabels = document.querySelectorAll('.option-label');
-            
-            optionLabels.forEach(label => {
-                const optionKey = label.dataset.option;
-                const input = label.querySelector('input');
-                
-                // Disable all inputs
-                input.disabled = true;
-                
-                // Remove existing classes
-                label.classList.remove('selected', 'correct', 'incorrect');
-                
-                // Add appropriate classes with animations
-                if (optionKey === question.correctAnswer) {
-                    label.classList.add('correct');
-                    if (!label.querySelector('.option-feedback')) {
-                        label.innerHTML += '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
-                    }
-                } else if (optionKey === selectedAnswer && !isCorrect) {
-                    label.classList.add('incorrect');
-                    if (!label.querySelector('.option-feedback')) {
-                        label.innerHTML += '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
-                    }
-                }
-            });
-        }
+        const processedOptionText = processSpecialCharacters(value);
         
-        // Enhanced Answer Feedback Display
-        function showAnswerFeedback(question, answerData) {
-            const feedbackDiv = document.getElementById('answer-feedback');
-            const feedbackIcon = document.getElementById('feedback-icon');
-            const feedbackTitle = document.getElementById('feedback-title');
-            const explanationText = document.getElementById('explanation-text');
+        optionsHtml += `
+            <li class="option-item">
+                <label class="${optionClass}" data-option="${key}">
+                    <input type="radio" name="answer" value="${key}" 
+                           ${isSelected ? 'checked' : ''} 
+                           ${isAnswered && sessionData.practiceMode === 'tutor' ? 'disabled' : ''}
+                           onchange="submitAnswer('${key}')">
+                    <span>${key}) ${processedOptionText}</span>
+                    ${feedbackIcon}
+                </label>
+            </li>
+        `;
+    });
+    optionsHtml += '</ul></div>';
+
+    // Enhanced question context info for notes integration
+    let contextHtml = '';
+    const hierarchyParts = [];
+    if (question.block) hierarchyParts.push(question.block);
+    if (question.module) hierarchyParts.push(question.module);
+    if (question.subject) hierarchyParts.push(question.subject);
+    if (question.topic) hierarchyParts.push(question.topic);
+
+    if (hierarchyParts.length > 0 || question.degree || question.year) {
+        contextHtml = `
+            <div class="question-context-info">
+                <div class="context-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>${question.degree} - ${question.year}</span>
+                </div>
+                ${hierarchyParts.length > 0 ? `
+                <div class="context-item">
+                    <i class="fas fa-sitemap"></i>
+                    <span>${hierarchyParts.join(' → ')}</span>
+                </div>
+                ` : ''}
+                ${question.difficulty ? `
+                <div class="context-item">
+                    <i class="fas fa-signal"></i>
+                    <span>${question.difficulty} Difficulty</span>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // Question utilities HTML - Enhanced notes integration
+    const hasNote = questionNotesStatus[question.id] && questionNotesStatus[question.id].hasNote;
+    const utilitiesHtml = `
+        ${sessionData.practiceMode === 'student' ? `
+        <button class="btn-utility" onclick="showExplanationDirectly(${question.id})" title="Show Explanation">
+            <i class="fas fa-lightbulb"></i>
+            <span>Explain</span>
+        </button>
+        ` : ''}
+        
+        <!-- Enhanced Note Button with proper question data -->
+        <button class="btn-note ${hasNote ? 'has-note' : ''}" onclick="openQuickNote(${question.id})" title="${hasNote ? 'View/Edit Note' : 'Add Note for this Question'}">
+            <i class="fas fa-sticky-note"></i>
+            <span class="note-text">${hasNote ? 'View Note' : 'Note'}</span>
+        </button>
+    `;
+
+    const questionContainer = document.getElementById('question-container');
+    if (questionContainer) {
+        questionContainer.innerHTML = `
+            <div class="question-number">
+                Question ${index + 1}
+                <span class="difficulty-badge difficulty-${question.difficulty.toLowerCase()}">${question.difficulty}</span>
+            </div>
+            <div class="question-text">${processedQuestionText}</div>
+            ${optionsHtml}
+            ${contextHtml}
+        `;
+    }
+
+    // Update utilities
+    const utilitiesContainer = document.getElementById('question-utilities');
+    if (utilitiesContainer) {
+        utilitiesContainer.innerHTML = utilitiesHtml;
+    }
+
+    // Set enhanced data attributes on the question card for notes integration
+    const questionCard = document.getElementById('question-card');
+    if (questionCard) {
+        questionCard.setAttribute('data-question-id', question.id);
+        questionCard.setAttribute('data-degree', question.degree);
+        questionCard.setAttribute('data-year', question.year);
+        questionCard.setAttribute('data-block', question.block);
+        questionCard.setAttribute('data-module', question.module);
+        questionCard.setAttribute('data-subject', question.subject);
+        questionCard.setAttribute('data-topic', question.topic);
+    }
+
+    // Show student feedback if already answered
+    if (answers[question.id] && sessionData.practiceMode === 'student') {
+        showStudentFeedback(question, answers[question.id]);
+    } else {
+        hideStudentFeedback();
+    }
+
+    updateNavigationState();
+    updateNavigation();
+    updateMarkButtonState();
+
+    // Scroll to top
+    if (questionContainer) {
+        questionContainer.scrollTop = 0;
+    }
+}
+
+// ================================
+// ANSWER SUBMISSION AND FEEDBACK
+// ================================
+
+// Answer Submission Function
+function submitAnswer(selectedAnswer) {
+    if (!selectedAnswer || currentQuestionIndex >= questionsData.length) {
+        console.error('Invalid answer submission');
+        return;
+    }
+
+    const question = questionsData[currentQuestionIndex];
+    const timeSpent = Math.floor((Date.now() - questionStartTime) / 1000);
+
+    console.log('Submitting answer:', selectedAnswer, 'for question:', question.id);
+
+    // Clear timers
+    if (questionTimer) {
+        clearTimeout(questionTimer);
+        questionTimer = null;
+    }
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    const isCorrect = selectedAnswer === question.correctAnswer;
+    answers[question.id] = {
+        answer: selectedAnswer,
+        timeSpent: timeSpent,
+        isCorrect: isCorrect
+    };
+
+    // Submit to server
+    fetch('/managemodule/student/submit-answer/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `session_id=${sessionData.sessionId}&question_id=${question.id}&answer=${selectedAnswer}&time_spent=${timeSpent}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            answers[question.id].isCorrect = data.is_correct;
             
-            if (answerData.isCorrect) {
-                feedbackDiv.className = 'answer-feedback show feedback-correct-answer';
-                feedbackIcon.className = 'fas fa-check-circle feedback-correct';
-                feedbackTitle.textContent = 'Excellent! Correct Answer';
+            if (sessionData.practiceMode === 'student') {
+                updateOptionsWithFeedback(question, selectedAnswer, data.is_correct);
+                showStudentFeedback(question, {
+                    answer: selectedAnswer,
+                    isCorrect: data.is_correct,
+                    explanation: data.explanation
+                });
             } else {
-                feedbackDiv.className = 'answer-feedback show feedback-incorrect-answer';
-                feedbackIcon.className = 'fas fa-times-circle feedback-incorrect';
-                feedbackTitle.textContent = `Incorrect. The correct answer is ${question.correctAnswer}`;
+                updateOptionsForTutorMode(question, selectedAnswer);
             }
             
+            updateProgress();
+            updateNavigation();
+            
+            const questionCard = document.getElementById('question-card');
+            if (questionCard) {
+                if (data.is_correct) {
+                    questionCard.classList.add('correct-animation');
+                } else {
+                    questionCard.classList.add('incorrect-animation');
+                }
+                
+                setTimeout(() => {
+                    questionCard.classList.remove('correct-animation', 'incorrect-animation');
+                }, 600);
+            }
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+    })
+    .catch(error => {
+        console.error('Error submitting answer:', error);
+        alert('Error submitting answer. Please try again.');
+        
+        // Reset answer if submission failed
+        delete answers[question.id];
+        
+        const radioButton = document.querySelector(`input[value="${selectedAnswer}"]`);
+        if (radioButton) {
+            radioButton.checked = false;
+            radioButton.disabled = false;
+        }
+    });
+}
+
+// Student Mode Feedback Functions
+function showStudentFeedback(question, answerData) {
+    const feedbackDiv = document.getElementById('student-feedback');
+    const feedbackIcon = document.getElementById('feedback-icon');
+    const feedbackTitle = document.getElementById('feedback-title');
+
+    if (!feedbackDiv || !feedbackIcon || !feedbackTitle) {
+        return;
+    }
+
+    if (answerData.isCorrect) {
+        feedbackDiv.className = 'student-feedback show correct';
+        feedbackIcon.className = 'fas fa-check-circle';
+        feedbackTitle.textContent = 'Excellent! Correct Answer';
+    } else {
+        feedbackDiv.className = 'student-feedback show incorrect';
+        feedbackIcon.className = 'fas fa-times-circle';
+        feedbackTitle.textContent = `Incorrect. The correct answer is ${question.correctAnswer}`;
+    }
+
+    const explanationContent = document.getElementById('explanation-content');
+    const explanationBtn = document.getElementById('explanation-btn-text');
+    if (explanationContent && explanationBtn) {
+        explanationContent.classList.remove('show');
+        explanationBtn.textContent = 'Show Explanation';
+    }
+}
+
+function hideStudentFeedback() {
+    const feedbackDiv = document.getElementById('student-feedback');
+    if (feedbackDiv) {
+        feedbackDiv.classList.remove('show');
+    }
+}
+
+function toggleExplanation() {
+    const explanationContent = document.getElementById('explanation-content');
+    const explanationBtn = document.getElementById('explanation-btn-text');
+    const question = questionsData[currentQuestionIndex];
+
+    if (!explanationContent || !explanationBtn || !question) {
+        return;
+    }
+
+    if (explanationContent.classList.contains('show')) {
+        explanationContent.classList.remove('show');
+        explanationBtn.textContent = 'Show Explanation';
+    } else {
+        const explanationText = document.getElementById('explanation-text');
+        const imageContainer = document.getElementById('explanation-image-container');
+        
+        if (explanationText) {
             if (question.explanation && question.explanation.trim()) {
-                explanationText.innerHTML = `<strong>Explanation:</strong> ${question.explanation}`;
+                const processedExplanation = processSpecialCharacters(question.explanation);
+                explanationText.innerHTML = processedExplanation;
             } else {
                 explanationText.innerHTML = '<em>No explanation available for this question.</em>';
             }
         }
         
-        // Hide Answer Feedback
-        function hideAnswerFeedback() {
-            const feedbackDiv = document.getElementById('answer-feedback');
-            feedbackDiv.classList.remove('show');
-        }
-        
-        // Enhanced Timer for Timed Practice
-        function startQuestionTimer() {
-            if (!timedPractice || !timePerQuestion) return;
-            
-            if (questionTimer) {
-                clearTimeout(questionTimer);
-            }
-            
-            updateTimerDisplay();
-            
-            questionTimer = setTimeout(() => {
-                // Auto-submit random answer when time runs out
-                const question = questions[currentQuestionIndex];
-                if (!answers[question.id]) {
-                    const options = Object.keys(question.options);
-                    const randomAnswer = options[Math.floor(Math.random() * options.length)];
-                    submitAnswer(randomAnswer);
-                    showNotification('Time\'s up! Random answer submitted.', 'warning');
-                }
-            }, timePerQuestion * 1000);
-            
-            // Update timer display every second
-            const timerInterval = setInterval(() => {
-                currentQuestionTimeLeft--;
-                updateTimerDisplay();
-                
-                if (currentQuestionTimeLeft <= 0) {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
-        }
-        
-        function updateTimerDisplay() {
-            if (!timedPractice) return;
-            
-            const minutes = Math.floor(currentQuestionTimeLeft / 60);
-            const seconds = currentQuestionTimeLeft % 60;
-            const timerElement = document.getElementById('timer');
-            
-            if (timerElement) {
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                // Change color when time is running low
-                const timerDisplay = document.getElementById('timer-display');
-                if (currentQuestionTimeLeft <= 10) {
-                    timerDisplay.style.background = 'rgba(239, 68, 68, 0.2)';
-                    timerDisplay.style.color = '#dc2626';
-                } else if (currentQuestionTimeLeft <= 30) {
-                    timerDisplay.style.background = 'rgba(245, 158, 11, 0.2)';
-                    timerDisplay.style.color = '#d97706';
-                } else {
-                    timerDisplay.style.background = 'rgba(255, 255, 255, 0.15)';
-                    timerDisplay.style.color = 'white';
-                }
-            }
-        }
-        
-        // Enhanced Navigation Functions
-        function previousQuestion() {
-            if (currentQuestionIndex > 0) {
-                loadQuestion(currentQuestionIndex - 1);
-            }
-        }
-        
-        function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
-                loadQuestion(currentQuestionIndex + 1);
-            }
-        }
-        
-        function goToQuestion(questionNumber) {
-            loadQuestion(questionNumber - 1);
-        }
-        
-        // Enhanced Navigation State Updates
-        function updateNavigationState() {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            
-            prevBtn.disabled = currentQuestionIndex === 0;
-            nextBtn.disabled = currentQuestionIndex === questions.length - 1;
-            
-            // Update button text for last question
-            if (currentQuestionIndex === questions.length - 1) {
-                nextBtn.innerHTML = 'Complete <i class="fas fa-check"></i>';
-                nextBtn.onclick = () => completeSession();
-            } else {
-                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
-                nextBtn.onclick = () => nextQuestion();
-            }
-        }
-        
-        // Enhanced Question Navigation Grid
-        function updateNavigation() {
-            document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
-                const question = questions[index];
-                
-                btn.className = 'question-nav-btn';
-                
-                if (index === currentQuestionIndex) {
-                    btn.classList.add('current');
-                } else if (answers[question.id]) {
-                    if (answers[question.id].isCorrect) {
-                        btn.classList.add('correct');
-                    } else {
-                        btn.classList.add('incorrect');
-                    }
-                }
-            });
-        }
-        
-        // Enhanced Progress Updates
-        function updateProgress() {
-            const answeredCount = Object.keys(answers).length;
-            const correctCount = Object.values(answers).filter(a => a.isCorrect).length;
-            const remainingCount = questions.length - answeredCount;
-            const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
-            
-            document.getElementById('answered-count').textContent = answeredCount;
-            document.getElementById('correct-count').textContent = correctCount;
-            document.getElementById('remaining-count').textContent = remainingCount;
-            document.getElementById('accuracy').textContent = accuracy + '%';
-            
-            // Update accuracy bar
-            const accuracyFill = document.getElementById('accuracy-fill');
-            if (accuracyFill) {
-                accuracyFill.style.width = accuracy + '%';
-            }
-        }
-
-        // Enhanced Question Utility Functions
-        function markForReview(questionId) {
-            const btn = event.target.closest('.btn-utility');
-            if (btn.classList.contains('marked')) {
-                btn.classList.remove('marked');
-                btn.style.background = '#f3f4f6';
-                btn.style.color = '#374151';
-                btn.title = 'Mark for Review';
-            } else {
-                btn.classList.add('marked');
-                btn.style.background = '#fbbf24';
-                btn.style.color = '#92400e';
-                btn.title = 'Remove Mark';
-            }
-        }
-
-        function showExplanation(questionId) {
-            // This will be handled by the answer feedback system
-            // when explanations are enabled
-            if (showExplanations && answers[questions[currentQuestionIndex].id]) {
-                const feedbackDiv = document.getElementById('answer-feedback');
-                if (feedbackDiv.classList.contains('show')) {
-                    hideAnswerFeedback();
-                } else {
-                    showAnswerFeedback(questions[currentQuestionIndex], answers[questions[currentQuestionIndex].id]);
-                }
-            } else {
-                showNotification('Answer the question first to see the explanation', 'info');
-            }
-        }
-        
-        // Enhanced Session Completion
-        function completeSession() {
-            const answeredCount = Object.keys(answers).length;
-            
-            if (answeredCount === 0) {
-                showNotification('Please answer at least one question before completing the session.', 'warning');
-                return;
-            }
-            
-            let confirmMessage = `Complete practice session?`;
-            if (answeredCount < questions.length) {
-                confirmMessage = `You have answered ${answeredCount} out of ${questions.length} questions. Complete session anyway?`;
-            }
-            
-            if (!confirm(confirmMessage)) {
-                return;
-            }
-            
-            // Clear any active timers
-            if (questionTimer) {
-                clearTimeout(questionTimer);
-            }
-            
-            const totalTime = Math.floor((Date.now() - sessionStartTime) / 1000);
-            
-            // Show loading state
-            const completeBtn = document.querySelector('.complete-btn');
-            completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
-            completeBtn.disabled = true;
-            
-            fetch('{% url "complete_practice_session" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: `session_id=${sessionId}&total_time=${totalTime}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Session completed successfully!', 'success');
-                    setTimeout(() => {
-                        window.location.href = `{% url "practice_session_result" 0 %}`.replace('0', data.session_id);
-                    }, 1000);
-                } else {
-                    throw new Error('Server error');
-                }
-            })
-            .catch(error => {
-                console.error('Error completing session:', error);
-                showNotification('Error completing session. Please try again.', 'error');
-                completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Session';
-                completeBtn.disabled = false;
-            });
-        }
-        
-        // Enhanced Utility Functions
-        function showCelebration(isCorrect) {
-            // Simple celebration effect
-            const celebration = document.createElement('div');
-            celebration.style.cssText = `
-                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                font-size: 48px; z-index: 1000; pointer-events: none;
-                animation: celebrate 1s ease-out; color: ${isCorrect ? '#16a34a' : '#ef4444'};
-            `;
-            celebration.innerHTML = isCorrect ? '🎉' : '💭';
-            document.body.appendChild(celebration);
-            
-            setTimeout(() => {
-                document.body.removeChild(celebration);
-            }, 1000);
-            
-            // Add CSS animation
-            if (!document.getElementById('celebrate-style')) {
-                const style = document.createElement('style');
-                style.id = 'celebrate-style';
-                style.innerHTML = `
-                    @keyframes celebrate {
-                        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-                        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-                        100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
-                    }
+        if (imageContainer) {
+            if (question.hasImage && question.imageUrl) {
+                imageContainer.innerHTML = `
+                    <div class="explanation-image">
+                        <img src="${question.imageUrl}" 
+                             alt="Question ${currentQuestionIndex + 1} Image" 
+                             loading="lazy"
+                             onerror="handleImageError(this, '${question.imageFilename || 'Unknown'}')"
+                             onload="handleImageLoad(this)"
+                             style="opacity: 0; transition: opacity 0.3s ease;">
+                        ${question.imageFilename ? `<div class="image-caption">Image: ${question.imageFilename}</div>` : ''}
+                    </div>
                 `;
-                document.head.appendChild(style);
+            } else {
+                imageContainer.innerHTML = '';
             }
         }
         
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            const colors = {
-                success: '#16a34a',
-                error: '#ef4444',
-                warning: '#f59e0b',
-                info: '#3b82f6'
-            };
-            
-            notification.style.cssText = `
-                position: fixed; top: 20px; right: 20px; z-index: 1000;
-                background: ${colors[type]}; color: white; padding: 16px 24px;
-                border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                animation: slideInRight 0.3s ease;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOutRight 0.3s ease';
+        explanationContent.classList.add('show');
+        explanationBtn.textContent = 'Hide Explanation';
+    }
+}
+
+// ================================
+// NAVIGATION FUNCTIONS
+// ================================
+
+function previousQuestion() {
+    if (currentQuestionIndex > 0) {
+        loadQuestion(currentQuestionIndex - 1);
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < questionsData.length - 1) {
+        loadQuestion(currentQuestionIndex + 1);
+    }
+}
+
+function goToQuestion(questionNumber) {
+    const index = questionNumber - 1;
+    if (index >= 0 && index < questionsData.length) {
+        loadQuestion(index);
+    }
+}
+
+function updateNavigationState() {
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (prevBtn) {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        prevBtn.style.opacity = currentQuestionIndex === 0 ? '0.5' : '1';
+    }
+
+    if (nextBtn) {
+        nextBtn.disabled = currentQuestionIndex === questionsData.length - 1;
+        nextBtn.style.opacity = currentQuestionIndex === questionsData.length - 1 ? '0.5' : '1';
+    }
+}
+
+function updateNavigation() {
+    document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
+        if (index >= questionsData.length) return;
+        
+        const question = questionsData[index];
+        
+        btn.className = 'question-nav-btn';
+        
+        if (index === currentQuestionIndex) {
+            btn.classList.add('current');
+        } else if (markedQuestions.has(question.id)) {
+            btn.classList.add('marked');
+        } else if (answers[question.id]) {
+            if (sessionData.practiceMode === 'student') {
+                if (answers[question.id].isCorrect) {
+                    btn.classList.add('correct');
+                } else {
+                    btn.classList.add('incorrect');
+                }
+            } else {
+                btn.classList.add('answered');
+            }
+        }
+    });
+}
+
+// Update progress function - fixed
+function updateProgress() {
+    const answeredCount = Object.keys(answers).length;
+    const correctCount = Object.values(answers).filter(a => a.isCorrect).length;
+    const remainingCount = questionsData.length - answeredCount;
+    const accuracy = answeredCount > 0 ? (correctCount / answeredCount) * 100 : 0;
+
+    const answeredEl = document.getElementById('answered-count');
+    const correctEl = document.getElementById('correct-count');
+    const remainingEl = document.getElementById('remaining-count');
+    const accuracyEl = document.getElementById('accuracy');
+
+    if (answeredEl) answeredEl.textContent = answeredCount;
+    if (correctEl) correctEl.textContent = correctCount;
+    if (remainingEl) remainingEl.textContent = remainingCount;
+    if (accuracyEl) accuracyEl.textContent = accuracy.toFixed(0) + '%';
+
+    // Update header progress bar and info
+    const progressFraction = document.getElementById('progress-fraction');
+    const progressAccuracy = document.getElementById('progress-accuracy');
+    const headerProgressFill = document.getElementById('header-progress-fill');
+
+    if (progressFraction) {
+        progressFraction.textContent = `${currentQuestionIndex + 1}/${questionsData.length}`;
+    }
+
+    if (progressAccuracy) {
+        progressAccuracy.textContent = `${accuracy.toFixed(0)}% Accuracy`;
+    }
+
+    if (headerProgressFill) {
+        const progressPercent = ((currentQuestionIndex + 1) / questionsData.length) * 100;
+        headerProgressFill.style.width = progressPercent + '%';
+    }
+}
+
+// ================================
+// MARK FOR REVIEW FUNCTIONS
+// ================================
+
+function markForReview() {
+    const question = questionsData[currentQuestionIndex];
+    markQuestionForReview(question.id);
+}
+
+function markQuestionForReview(questionId) {
+    if (markedQuestions.has(questionId)) {
+        markedQuestions.delete(questionId);
+    } else {
+        markedQuestions.add(questionId);
+    }
+
+    // Save to server
+    fetch('/managemodule/student/mark-for-review/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `session_id=${sessionData.sessionId}&question_id=${questionId}&marked=${markedQuestions.has(questionId)}`
+    })
+    .catch(error => {
+        console.error('Error marking question:', error);
+    });
+
+    updateNavigation();
+    updateProgress();
+    updateMarkButtonState();
+
+    // Update utility button if visible
+    const utilityBtn = document.querySelector('.btn-utility[onclick*="markQuestionForReview"]');
+    if (utilityBtn) {
+        if (markedQuestions.has(questionId)) {
+            utilityBtn.classList.add('marked');
+        } else {
+            utilityBtn.classList.remove('marked');
+        }
+    }
+}
+
+function updateMarkButtonState() {
+    const markBtn = document.getElementById('mark-btn');
+    const question = questionsData[currentQuestionIndex];
+    const isCompact = window.innerWidth <= 480;
+
+    if (markedQuestions.has(question.id)) {
+        if (isCompact) {
+            markBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #64748b;"></i>';
+        } else {
+            markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Unmark</span>';
+        }
+        markBtn.style.backgroundColor = '#64748b';
+    } else {
+        if (isCompact) {
+            markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+        } else {
+            markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Mark</span>';
+        }
+        markBtn.style.backgroundColor = 'var(--warning)';
+    }
+}
+
+// ================================
+// TIMER FUNCTIONS
+// ================================
+
+function startQuestionTimer() {
+    if (!sessionData.timedPractice || !sessionData.timePerQuestion) return;
+
+    if (questionTimer) {
+        clearTimeout(questionTimer);
+    }
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    currentQuestionTimeLeft = sessionData.timePerQuestion;
+    updateTimerDisplay();
+
+    timerInterval = setInterval(() => {
+        currentQuestionTimeLeft--;
+        updateTimerDisplay();
+        
+        if (currentQuestionTimeLeft <= 0) {
+            clearInterval(timerInterval);
+            const question = questionsData[currentQuestionIndex];
+            if (!answers[question.id]) {
+                const options = Object.keys(question.options);
+                const randomAnswer = options[Math.floor(Math.random() * options.length)];
+                submitAnswer(randomAnswer);
+                alert('Time\'s up! Random answer submitted.');
+            }
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    if (!sessionData.timedPractice || currentQuestionTimeLeft === undefined) return;
+
+    const minutes = Math.floor(Math.abs(currentQuestionTimeLeft) / 60);
+    const seconds = Math.abs(currentQuestionTimeLeft) % 60;
+    const timerElement = document.getElementById('timer');
+
+    if (timerElement) {
+        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        const timerDisplay = document.getElementById('timer-display');
+        if (timerDisplay) {
+            timerDisplay.classList.remove('warning', 'danger');
+            if (currentQuestionTimeLeft <= 10) {
+                timerDisplay.classList.add('danger');
+            } else if (currentQuestionTimeLeft <= 30) {
+                timerDisplay.classList.add('warning');
+            }
+        }
+    }
+}
+
+// ================================
+// FULLSCREEN FUNCTIONS
+// ================================
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        requestFullscreen();
+    } else {
+        exitFullscreen();
+    }
+}
+
+function requestFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
+}
+
+function exitFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+}
+
+document.addEventListener('fullscreenchange', function() {
+    const icon = document.getElementById('fullscreen-icon');
+    const text = document.getElementById('fullscreen-text');
+
+    if (document.fullscreenElement) {
+        if (icon) icon.className = 'fas fa-compress';
+        if (text) text.textContent = 'Exit';
+        document.body.classList.add('fullscreen-mode');
+    } else {
+        if (icon) icon.className = 'fas fa-expand';
+        if (text) text.textContent = 'Full';
+        document.body.classList.remove('fullscreen-mode');
+    }
+});
+
+// ================================
+// COMPLETE SESSION FUNCTIONS
+// ================================
+
+function completeSession() {
+    const answeredCount = Object.keys(answers).length;
+
+    if (answeredCount === 0) {
+        alert('Please answer at least one question before completing the session.');
+        return;
+    }
+
+    let summary = `Total Questions: ${questionsData.length}\n`;
+    summary += `Answered: ${answeredCount}\n`;
+
+    if (answeredCount < questionsData.length) {
+        summary += `Unanswered: ${questionsData.length - answeredCount}\n`;
+    }
+
+    if (markedQuestions.size > 0) {
+        summary += `Marked for Review: ${markedQuestions.size}`;
+    }
+
+    document.getElementById('complete-summary').textContent = summary;
+    document.getElementById('complete-modal').style.display = 'flex';
+}
+
+function closeCompleteModal() {
+    document.getElementById('complete-modal').style.display = 'none';
+}
+
+function submitSession() {
+    // Clear timers
+    if (questionTimer) {
+        clearTimeout(questionTimer);
+        questionTimer = null;
+    }
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    const totalTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+
+    const completeBtn = document.querySelector('.complete-btn');
+    if (completeBtn) {
+        const originalContent = completeBtn.innerHTML;
+        completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
+        completeBtn.disabled = true;
+        
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+        
+        fetch('/managemodule/student/complete-session/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: `session_id=${sessionData.sessionId}&total_time=${totalTime}`
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Session completed successfully!');
+                
+                window.sessionCompleted = true;
+                
                 setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
+                    if (data.redirect_url) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        window.location.href = `/managemodule/student/session/${data.session_id}/result/`;
                     }
-                }, 300);
-            }, 3000);
+                }, 1000);
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            console.error('Error completing session:', error);
+            alert('Error completing session. Please try again.');
+            completeBtn.innerHTML = originalContent;
+            completeBtn.disabled = false;
             
-            // Add CSS animations
-            if (!document.getElementById('notification-style')) {
-                const style = document.createElement('style');
-                style.id = 'notification-style';
-                style.innerHTML = `
-                    @keyframes slideInRight {
-                        from { transform: translateX(100%); opacity: 0; }
-                        to { transform: translateX(0); opacity: 1; }
-                    }
-                    @keyframes slideOutRight {
-                        from { transform: translateX(0); opacity: 1; }
-                        to { transform: translateX(100%); opacity: 0; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-        
-        function setupKeyboardNavigation() {
-            document.addEventListener('keydown', function(e) {
-                if (e.target.tagName === 'INPUT') return; // Don't interfere with form inputs
-                
-                switch(e.key) {
-                    case 'ArrowLeft':
-                        e.preventDefault();
-                        previousQuestion();
-                        break;
-                    case 'ArrowRight':
-                        e.preventDefault();
-                        nextQuestion();
-                        break;
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                        e.preventDefault();
-                        const optionKeys = ['1', '2', '3', '4', '5'];
-                        const answerKeys = ['A', 'B', 'C', 'D', 'E'];
-                        const index = optionKeys.indexOf(e.key);
-                        if (index !== -1) {
-                            const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
-                            if (radioButton && !radioButton.disabled) {
-                                radioButton.click();
-                            }
-                        }
-                        break;
-                    case 'Enter':
-                        e.preventDefault();
-                        if (currentQuestionIndex < questions.length - 1) {
-                            nextQuestion();
-                        } else {
-                            completeSession();
-                        }
-                        break;
-                    case 'n':
-                    case 'N':
-                        // Quick note shortcut
-                        e.preventDefault();
-                        const currentQuestion = questions[currentQuestionIndex];
-                        if (currentQuestion) {
-                            openQuickNote(currentQuestion.id);
-                        }
-                        break;
-                }
-            });
-        }
-        
-        function setupNavigationWarning() {
-            window.addEventListener('beforeunload', function(e) {
-                const answeredCount = Object.keys(answers).length;
-                if (answeredCount > 0) {
-                    e.preventDefault();
-                    e.returnValue = 'Are you sure you want to leave? Your practice progress may be lost.';
-                    return e.returnValue;
-                }
-            });
-        }
-        
-        function autoSaveProgress() {
-            // Auto-save session progress (placeholder for future implementation)
-            console.log('Auto-saving progress...', Object.keys(answers).length, 'answers saved');
-        }
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        // Enhanced Notes Integration Functions
-        function checkExistingNotes() {
-            // Check which questions already have notes and update button states
-            questions.forEach((question, index) => {
-                // This could be enhanced with an AJAX call to check existing notes
-                // For now, this is a placeholder for future implementation
-                console.log(`Checking notes for question ${question.id}`);
-            });
-        }
-
-        function updateNoteButtonState(questionId, hasNotes) {
-            // Update note button to reflect if notes exist for this question
-            const noteBtn = document.querySelector(`[onclick="openQuickNote(${questionId})"]`);
-            if (noteBtn && hasNotes) {
-                noteBtn.classList.add('has-note');
-                noteBtn.innerHTML = '<i class="fas fa-sticky-note"></i> <span class="note-text">View Note</span>';
-                noteBtn.title = 'View/Edit Note for this Question';
-            }
-        }
-
-        // Initialize note checking when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            checkExistingNotes();
+            window.addEventListener('beforeunload', beforeUnloadHandler);
         });
-        </script>
+    }
+}
+
+// ================================
+// HELPER FUNCTIONS
+// ================================
+
+function updateOptionsForTutorMode(question, selectedAnswer) {
+    const optionLabels = document.querySelectorAll('.option-label');
+
+    optionLabels.forEach(label => {
+        const input = label.querySelector('input');
+        if (input) {
+            input.disabled = true;
+        }
+        
+        if (label.dataset.option === selectedAnswer) {
+            label.classList.add('selected');
+        }
+    });
+}
+
+function updateOptionsWithFeedback(question, selectedAnswer, isCorrect) {
+    const optionLabels = document.querySelectorAll('.option-label');
+
+    optionLabels.forEach(label => {
+        const optionKey = label.dataset.option;
+        const input = label.querySelector('input');
+        
+        if (input) {
+            input.disabled = true;
+        }
+        
+        label.classList.remove('selected', 'correct', 'incorrect');
+        
+        if (optionKey === question.correctAnswer) {
+            label.classList.add('correct');
+            if (!label.querySelector('.option-feedback')) {
+                label.innerHTML += '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+            }
+        } else if (optionKey === selectedAnswer && !isCorrect) {
+            label.classList.add('incorrect');
+            if (!label.querySelector('.option-feedback')) {
+                label.innerHTML += '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+            }
+        }
+    });
+}
+
+function showExplanationDirectly(questionId) {
+    if (sessionData.practiceMode === 'student') {
+        const question = questionsData[currentQuestionIndex];
+        if (answers[question.id]) {
+            toggleExplanation();
+        } else {
+            alert('Answer the question first to see the explanation');
+        }
+    }
+}
+
+function handleImageError(img, filename) {
+    if (img && img.parentElement) {
+        img.parentElement.innerHTML = `
+            <div class="image-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                Image unavailable: ${filename}
+            </div>
+        `;
+    }
+}
+
+function handleImageLoad(img) {
+    if (img) {
+        img.style.opacity = '1';
+    }
+}
+
+// ================================
+// SPECIAL CHARACTER PROCESSING
+// ================================
+
+function processSpecialCharacters(text) {
+    if (!text) return text;
+
+    // Convert common symbols and arrows
+    text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
+    text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
+    text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
+    text = text.replace(/⇌/g, '⇌');
+
+    // Greek letters
+    text = text.replace(/\balpha\b/gi, 'α');
+    text = text.replace(/\bbeta\b/gi, 'β');
+    text = text.replace(/\bgamma\b/gi, 'γ');
+    text = text.replace(/\bdelta\b/gi, 'δ');
+    text = text.replace(/\blambda\b/gi, 'λ');
+    text = text.replace(/\bmu\b/gi, 'μ');
+    text = text.replace(/\bpi\b/gi, 'π');
+    text = text.replace(/\bsigma\b/gi, 'σ');
+    text = text.replace(/\bomega\b/gi, 'ω');
+
+    // Mathematical symbols
+    text = text.replace(/\+\/-/g, '±');
+    text = text.replace(/\+-/g, '±');
+    text = text.replace(/\<=\>/g, '⇔');
+    text = text.replace(/\<=/g, '≤');
+    text = text.replace(/\>=/g, '≥');
+    text = text.replace(/\!=/g, '≠');
+    text = text.replace(/\~=/g, '≈');
+    text = text.replace(/\infty/g, '∞');
+    text = text.replace(/\sqrt/g, '√');
+
+    // Superscript numbers
+    text = text.replace(/\^2/g, '²');
+    text = text.replace(/\^3/g, '³');
+    text = text.replace(/\^1/g, '¹');
+
+    // Common medical symbols
+    text = text.replace(/\bdegree\b/gi, '°');
+    text = text.replace(/\bdegrees\b/gi, '°');
+
+    return text;
+}
+
+// ================================
+// KEYBOARD NAVIGATION
+// ================================
+
+function setupKeyboardNavigation() {
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        
+        switch(e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                previousQuestion();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                nextQuestion();
+                break;
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+                e.preventDefault();
+                const optionKeys = ['1', '2', '3', '4', '5'];
+                const answerKeys = ['A', 'B', 'C', 'D', 'E'];
+                const index = optionKeys.indexOf(e.key);
+                if (index !== -1) {
+                    const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
+                    if (radioButton && !radioButton.disabled) {
+                        radioButton.click();
+                    }
+                }
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (currentQuestionIndex < questionsData.length - 1) {
+                    nextQuestion();
+                } else {
+                    completeSession();
+                }
+                break;
+            case 'm':
+            case 'M':
+                e.preventDefault();
+                markForReview();
+                break;
+            case 'f':
+            case 'F':
+                e.preventDefault();
+                toggleFullscreen();
+                break;
+            case 'n':
+            case 'N':
+                // Quick note shortcut
+                e.preventDefault();
+                const currentQuestion = questionsData[currentQuestionIndex];
+                if (currentQuestion) {
+                    openQuickNote(currentQuestion.id);
+                }
+                break;
+        }
+    });
+}
+
+// ================================
+// RESPONSIVE DESIGN HANDLERS
+// ================================
+
+function setupResponsiveHandlers() {
+    window.addEventListener('orientationchange', function() {
+        setTimeout(() => {
+            adjustLayoutForScreen();
+        }, 100);
+    });
+
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            adjustLayoutForScreen();
+        }, 250);
+    });
+
+    adjustLayoutForScreen();
+}
+
+function adjustLayoutForScreen() {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 480) {
+        updateButtonLabels(true);
+    } else {
+        updateButtonLabels(false);
+    }
+
+    if (screenWidth <= 360) {
+        const timerIcon = document.querySelector('.timer-display i');
+        if (timerIcon) timerIcon.style.display = 'none';
+    } else {
+        const timerIcon = document.querySelector('.timer-display i');
+        if (timerIcon) timerIcon.style.display = 'inline-block';
+    }
+}
+
+function updateButtonLabels(compact) {
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const markBtn = document.getElementById('mark-btn');
+
+    if (compact) {
+        prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        nextBtn.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+    } else {
+        prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i> <span>Previous</span>';
+        nextBtn.innerHTML = '<span>Next</span> <i class="fas fa-arrow-right"></i>';
+        updateMarkButtonState();
+    }
+}
+
+// ================================
+// NAVIGATION WARNING
+// ================================
+
+function beforeUnloadHandler(e) {
+    if (window.sessionCompleted) {
+        return;
+    }
+
+    const answeredCount = Object.keys(answers).length;
+    if (answeredCount > 0) {
+        e.preventDefault();
+        e.returnValue = 'Are you sure you want to leave? Your practice progress may be lost.';
+        return e.returnValue;
+    }
+}
+
+function setupNavigationWarning() {
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+}
+
+// ================================
+// NOTIFICATION SYSTEM
+// ================================
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        warning: '#f59e0b',
+        info: '#3b82f6'
+    };
+
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 1002;
+        background: ${colors[type]}; color: white; padding: 16px 24px;
+        border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        animation: slideInRight 0.3s ease; max-width: 400px;
+    `;
+    notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-${type === 'error' ? 'times-circle' : type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
+}
+
+// ================================
+// UTILITY FUNCTIONS
+// ================================
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// ================================
+// MODAL EVENT HANDLERS
+// ================================
+
+// Close modal when clicking outside
+document.getElementById('quick-note-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeQuickNote();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('quick-note-modal').style.display === 'flex') {
+        closeQuickNote();
+    }
+});
+
+// ================================
+// CSS ANIMATIONS FOR NOTIFICATIONS
+// ================================
+
+// Add CSS animations for notifications
+if (!document.getElementById('notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.innerHTML = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+}</script>
 
 </body>
 </html>
+

@@ -1,8 +1,9 @@
-# modelpaper/views.py
+# modelpaper/views.py - Updated with image support and all fixes
 import csv
 import io
 import json
 import random
+import html
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -19,6 +20,76 @@ from .models import ModelPaper, PaperQuestion, ModelPaperAttempt, ModelPaperResp
 from .forms import ModelPaperForm, PaperQuestionImportForm
 
 User = get_user_model()
+
+def get_paper_question_image_url(paper_question):
+    """
+    Helper function to get the correct image URL for a paper question
+    Reuses the same logic as mock test image handling
+    """
+    if not paper_question.image:
+        return None, None
+    
+    try:
+        from manageimage.models import QuestionImage
+        
+        image_filename = paper_question.image.strip()
+        if not image_filename:
+            return None, None
+        
+        # Strategy 1: Exact filename match
+        try:
+            image_obj = QuestionImage.objects.get(filename=image_filename)
+            if image_obj.image:
+                return image_obj.image.url, image_obj.filename
+        except QuestionImage.DoesNotExist:
+            pass
+        
+        # Strategy 2: Match without extension
+        filename_no_ext = image_filename.rsplit('.', 1)[0] if '.' in image_filename else image_filename
+        
+        # Try to find by filename containing the base name
+        possible_matches = QuestionImage.objects.filter(
+            filename__icontains=filename_no_ext
+        )
+        
+        for match in possible_matches:
+            # Check if it's a close match
+            match_no_ext = match.filename.rsplit('.', 1)[0] if '.' in match.filename else match.filename
+            if match_no_ext.lower() == filename_no_ext.lower():
+                if match.image:
+                    return match.image.url, match.filename
+        
+        # Strategy 3: Partial matching (less strict)
+        if len(filename_no_ext) > 3:  # Only for reasonable length names
+            partial_matches = QuestionImage.objects.filter(
+                filename__icontains=filename_no_ext[:min(len(filename_no_ext), 10)]
+            )
+            
+            for match in partial_matches:
+                # Additional similarity check could be added here
+                if match.image:
+                    return match.image.url, match.filename
+        
+        # Strategy 4: Try adding common extensions
+        common_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+        for ext in common_extensions:
+            try:
+                test_filename = filename_no_ext + ext
+                image_obj = QuestionImage.objects.get(filename=test_filename)
+                if image_obj.image:
+                    return image_obj.image.url, image_obj.filename
+            except QuestionImage.DoesNotExist:
+                continue
+        
+    except ImportError:
+        # manageimage app not available
+        pass
+    except Exception as e:
+        print(f"Error loading image for paper question {paper_question.id}: {str(e)}")
+    
+    return None, image_filename
+
+
 def modelpaper_list(request):
     """List all model papers with filtering"""
     query = request.GET.get('q', '')
@@ -77,10 +148,11 @@ def modelpaper_list(request):
         'degree_filter': degree_filter,
         'paper_filter': paper_filter,
         'paper_names': paper_names,
-        'paper_stats': paper_stats,  # Added this line
+        'paper_stats': paper_stats,
     }
     
     return render(request, 'modelpaper/modelpaper_list.html', context)
+
 
 from urllib.parse import unquote
 
@@ -119,6 +191,8 @@ def view_paper_questions(request, paper_name):
     }
     
     return render(request, 'modelpaper/view_paper_questions.html', context)
+
+
 @login_required
 def create_paper(request):
     """Create or edit model paper"""
@@ -188,7 +262,7 @@ def preview_paper(request, paper_id):
 
 
 def import_paper_questions(request):
-    """Import paper questions from CSV"""
+    """Import paper questions from CSV with image support"""
     if request.method == 'POST':
         form = PaperQuestionImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -285,6 +359,9 @@ def import_paper_questions(request):
                         else:
                             difficulty = 'Medium'
                         
+                        # Handle image field
+                        image = str(row.get('image', '') or row.get('Image', '') or '').strip()
+                        
                         # Enhanced duplicate detection within same paper name
                         is_duplicate, duplicate_reason = enhanced_duplicate_detection(
                             paper_name, question_text, option_a, option_b, option_c, option_d, option_e
@@ -312,6 +389,7 @@ def import_paper_questions(request):
                             topic=str(row.get('topic', '')).strip(),
                             difficulty=difficulty,
                             explanation=str(row.get('explanation', '')).strip() or None,
+                            image=image or None,
                             marks=int(row.get('marks', 1)) if str(row.get('marks', '')).isdigit() else 1,
                             created_by=request.user if request.user.is_authenticated else None
                         )
@@ -444,361 +522,7 @@ def student_model_papers(request):
 
 @login_required
 def take_paper(request, paper_id):
-    """Student takes the paper"""
-    paper = get_object_or_404(ModelPaper, id=paper_id)
-    student = request.user
-    
-    # Check if paper is active
-    now = timezone.now()
-    if paper.status != 'live':
-        messages.error(request, f"This paper is not currently available. Status: {paper.status}")
-        return redirect('student_model_papers')
-    
-    if now < paper.start_datetime:
-        messages.error(request, "This paper has not started yet.")
-        return redirect('student_model_papers')
-    
-    if now > paper.end_datetime:
-        messages.error(request, "This paper has already ended.")
-        return redirect('student_model_papers')
-    
-    # Check attempt limit
-    existing_attempts = ModelPaperAttempt.objects.filter(
-        student=student, 
-        model_paper=paper,
-        status='completed'
-    ).count()
-    
-    if existing_attempts >= paper.max_attempts:
-        messages.error(request, f"You have reached the maximum attempts ({paper.max_attempts}) for this paper.")
-        return redirect('student_model_papers')
-    
-    # Get or create current attempt
-    current_attempt = ModelPaperAttempt.objects.filter(
-        student=student,
-        model_paper=paper,
-        status='in_progress'
-    ).first()
-    
-    if not current_attempt:
-        # Create new attempt
-        current_attempt = ModelPaperAttempt.objects.create(
-            student=student,
-            model_paper=paper,
-            status='in_progress',
-            started_at=timezone.now()
-        )
-    
-    # Get questions based on paper filters
-    paper_questions = paper.get_questions()
-    
-    if paper_questions.count() == 0:
-        messages.error(request, "This paper has no questions configured.")
-        return redirect('student_model_papers')
-    
-    # Convert to list and randomize if enabled
-    paper_questions = list(paper_questions)
-    if paper.randomize_questions:
-        random.shuffle(paper_questions)
-    
-    context = {
-        'paper': paper,
-        'attempt': current_attempt,
-        'paper_questions': paper_questions,
-        'total_questions': len(paper_questions),
-    }
-    
-    return render(request, 'modelpaper/take_paper.html', context)
-
-
-@require_POST
-def submit_answer(request):
-    """Save student's answer"""
-    attempt_id = request.POST.get('attempt_id')
-    question_id = request.POST.get('question_id')
-    answer = request.POST.get('answer')
-    
-    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
-    paper_question = get_object_or_404(PaperQuestion, id=question_id)
-    
-    # Save or update response
-    response, created = ModelPaperResponse.objects.update_or_create(
-        attempt=attempt,
-        paper_question=paper_question,
-        defaults={
-            'selected_answer': answer,
-        }
-    )
-    
-    # Check if answer is correct
-    response.check_answer()
-    response.save()
-    
-    return JsonResponse({'success': True})
-
-
-@require_POST
-def submit_paper(request):
-    """Submit the complete paper"""
-    attempt_id = request.POST.get('attempt_id')
-    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
-    
-    # Calculate score
-    total_questions = attempt.model_paper.total_questions
-    correct_answers = attempt.responses.filter(is_correct=True).count()
-    
-    attempt.score = correct_answers
-    attempt.percentage = (correct_answers / total_questions * 100) if total_questions > 0 else 0
-    attempt.status = 'completed'
-    attempt.completed_at = timezone.now()
-    
-    # Calculate time taken
-    time_taken = (attempt.completed_at - attempt.started_at).total_seconds()
-    attempt.time_taken = int(time_taken)
-    
-    attempt.save()
-    
-    return JsonResponse({
-        'success': True,
-        'score': attempt.score,
-        'total': total_questions,
-        'percentage': float(attempt.percentage),
-        'passed': attempt.passed,
-    })
-
-
-@login_required
-def paper_result(request, attempt_id):
-    """Show paper results"""
-    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
-    
-    # Get all responses with questions
-    responses = attempt.responses.all().select_related('paper_question')
-    
-    context = {
-        'attempt': attempt,
-        'paper': attempt.model_paper,
-        'responses': responses,
-        'passed': attempt.passed,
-    }
-    
-    return render(request, 'modelpaper/paper_results.html', context)
-
-
-@require_POST
-def report_warning(request):
-    """Report tab switch warning"""
-    attempt_id = request.POST.get('attempt_id')
-    attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
-    
-    attempt.warning_count += 1
-    attempt.save()
-    
-    if attempt.warning_count >= 3:
-        # Auto-submit paper
-        attempt.status = 'abandoned'
-        attempt.completed_at = timezone.now()
-        attempt.save()
-        
-        return JsonResponse({
-            'success': True,
-            'auto_submit': True,
-            'message': 'Paper auto-submitted due to multiple tab switches.'
-        })
-    
-    return JsonResponse({
-        'success': True,
-        'warning_count': attempt.warning_count,
-        'remaining_warnings': 3 - attempt.warning_count
-    })
-
-
-@login_required
-def student_progress(request):
-    """Student progress for model papers"""
-    user = request.user
-    attempts = ModelPaperAttempt.objects.filter(student=user).select_related('model_paper').order_by('-started_at')
-    
-    # Calculate stats
-    completed_attempts = attempts.filter(status='completed')
-    total_papers = attempts.count()
-    best_score = completed_attempts.aggregate(Max('percentage'))['percentage__max'] or 0
-    avg_score = completed_attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0
-    avg_time = completed_attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
-    
-    context = {
-        'attempts': attempts,
-        'total_papers': total_papers,
-        'best_score': best_score,
-        'avg_score': avg_score,
-        'avg_time': avg_time,
-        'completed_attempts': completed_attempts,
-    }
-    return render(request, 'modelpaper/student_progress.html', context)
-
-
-# API endpoints
-def get_paper_question_counts(request):
-    """API to get question counts for paper name filters"""
-    paper_name = request.GET.get('paper_name')
-    
-    if not paper_name:
-        return JsonResponse({'error': 'Paper name required'}, status=400)
-    
-    questions = PaperQuestion.objects.filter(paper_name=paper_name)
-    
-    # Get filter options
-    filter_options = PaperQuestion.get_paper_filter_options(paper_name)
-    
-    return JsonResponse({
-        'total_questions': questions.count(),
-        'filters': filter_options
-    })
-
-
-def get_filtered_question_count(request):
-    """API to get question count based on filters"""
-    paper_name = request.GET.get('paper_name')
-    degree = request.GET.get('degree')
-    year = request.GET.get('year')
-    module = request.GET.get('module')
-    subject = request.GET.get('subject')
-    topic = request.GET.get('topic')
-    
-    if not paper_name:
-        return JsonResponse({'error': 'Paper name required'}, status=400)
-    
-    count = PaperQuestion.get_filtered_questions(
-        paper_name=paper_name,
-        degree=degree,
-        year=year,
-        module=module,
-        subject=subject,
-        topic=topic
-    ).count()
-    
-    return JsonResponse({'count': count})
-
-
-# Export functionality
-@login_required
-def export_paper_questions(request, paper_id):
-    """Export questions for a specific paper as CSV"""
-    paper = get_object_or_404(ModelPaper, id=paper_id)
-    questions = paper.get_questions()
-    
-    # Create CSV response
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{paper.title.replace(" ", "_")}_questions.csv"'
-    
-    writer = csv.writer(response)
-    
-    # Write header with metadata
-    writer.writerow([f'# Model Paper: {paper.title}'])
-    writer.writerow([f'# Paper Name: {paper.selected_paper_name}'])
-    writer.writerow([f'# Total Questions: {paper.total_questions}'])
-    writer.writerow([f'# Exported: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'])
-    writer.writerow([])  # Empty row
-    
-    # Write column headers
-    writer.writerow([
-        'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 
-        'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic',
-        'difficulty', 'explanation', 'marks'
-    ])
-    
-    # Write questions
-    for question in questions:
-        writer.writerow([
-            question.question_text,
-            question.option_a,
-            question.option_b,
-            question.option_c,
-            question.option_d,
-            question.option_e,
-            question.correct_answer,
-            question.paper_name,
-            question.degree,
-            question.year,
-            question.module,
-            question.subject,
-            question.topic,
-            question.difficulty,
-            question.explanation,
-            question.marks
-        ])
-    
-    return response
-
-# Add these student views to your existing modelpaper/views.py file
-
-# STUDENT VIEWS - Add to existing modelpaper/views.py
-@login_required
-def student_model_papers(request):
-    """List available model papers for students - Enhanced version"""
-    user = request.user
-    now = timezone.now()
-    
-    # Update paper statuses first
-    all_papers_for_update = ModelPaper.objects.all()
-    for paper in all_papers_for_update:
-        if paper.status == 'scheduled' and now >= paper.start_datetime:
-            paper.status = 'live'
-            paper.save()
-        elif paper.status == 'live' and now > paper.end_datetime:
-            paper.status = 'completed'
-            paper.save()
-    
-    # Get active papers
-    papers = ModelPaper.objects.filter(status='live')
-    
-    # Get user's attempts
-    user_attempts = ModelPaperAttempt.objects.filter(student=user).values('model_paper_id', 'status').order_by('-started_at')
-    
-    # Create a dict of paper attempts
-    attempt_status = {}
-    attempt_count = {}
-    for attempt in user_attempts:
-        paper_id = attempt['model_paper_id']
-        if paper_id not in attempt_count:
-            attempt_count[paper_id] = 0
-        if attempt['status'] == 'completed':
-            attempt_count[paper_id] += 1
-            if paper_id not in attempt_status:
-                attempt_status[paper_id] = 'completed'
-    
-    # Add attempt info to papers
-    for paper in papers:
-        paper.user_attempts = attempt_count.get(paper.id, 0)
-        paper.can_attempt = paper.user_attempts < paper.max_attempts
-        paper.attempt_status = attempt_status.get(paper.id, 'not_started')
-    
-    # Get upcoming papers
-    upcoming_papers = ModelPaper.objects.filter(
-        start_datetime__gt=now
-    ).order_by('start_datetime')[:5]
-    
-    context = {
-        'active_papers': papers,
-        'upcoming_papers': upcoming_papers,
-        'user': user,
-    }
-    
-    return render(request, 'modelpaper/student_model_papers.html', context)
-
-
-def get_paper_question_image_url(paper_question):
-    """
-    Helper function to get the correct image URL for a paper question
-    Similar to mock test image handling
-    """
-    # For now, paper questions don't have images, but this is ready for future use
-    return None, None
-
-
-@login_required
-def take_paper(request, paper_id):
-    """Student takes the paper - Enhanced with image support"""
+    """Student takes the paper - Enhanced with image support and proper paper name display"""
     paper = get_object_or_404(ModelPaper, id=paper_id)
     student = request.user
     
@@ -867,18 +591,29 @@ def take_paper(request, paper_id):
         print(f"DEBUG: Paper blocked - no questions found")
         return redirect('student_model_papers')
     
-    # Process questions with image handling (ready for future image support)
+    # Process questions with enhanced image handling
     processed_questions = []
     for pq in paper_questions:
         question_data = {
             'id': pq.id,
             'order': len(processed_questions) + 1,
             'text': pq.question_text,
+            'explanation': pq.explanation or '',
             'options': {},
-            'has_image': False,  # Paper questions don't have images yet
+            'has_image': bool(pq.image),
             'image_url': None,
-            'image_filename': None
+            'image_filename': pq.image if pq.image else None
         }
+        
+        # Handle image URL generation with improved matching
+        if pq.image:
+            image_url, actual_filename = get_paper_question_image_url(pq)
+            if image_url:
+                question_data['image_url'] = image_url
+                question_data['image_filename'] = actual_filename
+                print(f"DEBUG: Found image for paper question {pq.id}: {image_url}")
+            else:
+                print(f"DEBUG: Image not found for paper question {pq.id}: {pq.image}")
         
         # Add options
         if pq.option_a:
@@ -967,7 +702,6 @@ def submit_paper(request):
         'passed': attempt.passed,
     })
 
-# Add this enhanced paper_result view to your existing modelpaper/views.py
 
 @login_required
 def paper_result(request, attempt_id):
@@ -1032,10 +766,10 @@ def paper_result(request, attempt_id):
         else:
             return 'F'
     
-    # Add properties to attempt object for template compatibility
-    attempt.time_taken_display = f"{attempt.time_taken // 60}:{attempt.time_taken % 60:02d}" if attempt.time_taken else "0:00"
-    attempt.time_taken_formatted = f"{attempt.time_taken // 60} minutes {attempt.time_taken % 60} seconds" if attempt.time_taken else "0 seconds"
-    attempt.time_taken_minutes = attempt.time_taken / 60 if attempt.time_taken else 0
+    # Create calculated values instead of setting properties
+    time_taken_display = f"{attempt.time_taken // 60}:{attempt.time_taken % 60:02d}" if attempt.time_taken else "0:00"
+    time_taken_formatted = f"{attempt.time_taken // 60} minutes {attempt.time_taken % 60} seconds" if attempt.time_taken else "0 seconds"
+    time_taken_minutes = attempt.time_taken / 60 if attempt.time_taken else 0
     
     context = {
         'attempt': attempt,
@@ -1053,14 +787,20 @@ def paper_result(request, attempt_id):
         'time_efficiency': round(time_efficiency, 1),
         'grade': get_grade(float(attempt.percentage)),
         
+        # Calculated time values (not setting as properties)
+        'time_taken_display': time_taken_display,
+        'time_taken_formatted': time_taken_formatted,
+        'time_taken_minutes': time_taken_minutes,
+        
         # For template calculations
         'current_year': timezone.now().year,
     }
     
     return render(request, 'modelpaper/paper_results.html', context)
 
+
 @require_POST
-def report_paper_warning(request):
+def report_warning(request):
     """Report tab switch warning for paper"""
     attempt_id = request.POST.get('attempt_id')
     attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
@@ -1187,3 +927,99 @@ def student_paper_progress(request):
     }
     
     return render(request, 'modelpaper/student_progress.html', context)
+
+
+# API endpoints
+def get_paper_question_counts(request):
+    """API to get question counts for paper name filters"""
+    paper_name = request.GET.get('paper_name')
+    
+    if not paper_name:
+        return JsonResponse({'error': 'Paper name required'}, status=400)
+    
+    questions = PaperQuestion.objects.filter(paper_name=paper_name)
+    
+    # Get filter options
+    filter_options = PaperQuestion.get_paper_filter_options(paper_name)
+    
+    return JsonResponse({
+        'total_questions': questions.count(),
+        'filters': filter_options
+    })
+
+
+def get_filtered_question_count(request):
+    """API to get question count based on filters"""
+    paper_name = request.GET.get('paper_name')
+    degree = request.GET.get('degree')
+    year = request.GET.get('year')
+    module = request.GET.get('module')
+    subject = request.GET.get('subject')
+    topic = request.GET.get('topic')
+    
+    if not paper_name:
+        return JsonResponse({'error': 'Paper name required'}, status=400)
+    
+    count = PaperQuestion.get_filtered_questions(
+        paper_name=paper_name,
+        degree=degree,
+        year=year,
+        module=module,
+        subject=subject,
+        topic=topic
+    ).count()
+    
+    return JsonResponse({'count': count})
+
+
+# Export functionality
+@login_required
+def export_paper_questions(request, paper_id):
+    """Export questions for a specific paper as CSV"""
+    paper = get_object_or_404(ModelPaper, id=paper_id)
+    questions = paper.get_questions()
+    
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{paper.title.replace(" ", "_")}_questions.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Write header with metadata
+    writer.writerow([f'# Model Paper: {paper.title}'])
+    writer.writerow([f'# Paper Name: {paper.selected_paper_name}'])
+    writer.writerow([f'# Total Questions: {paper.total_questions}'])
+    writer.writerow([f'# Exported: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+    writer.writerow([])  # Empty row
+    
+    # Write column headers
+    writer.writerow([
+        'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 
+        'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic',
+        'difficulty', 'explanation', 'image', 'marks'
+    ])
+    
+    # Write questions
+    for question in questions:
+        writer.writerow([
+            question.question_text,
+            question.option_a,
+            question.option_b,
+            question.option_c,
+            question.option_d,
+            question.option_e,
+            question.correct_answer,
+            question.paper_name,
+            question.degree,
+            question.year,
+            question.module,
+            question.subject,
+            question.topic,
+            question.difficulty,
+            question.explanation,
+            question.image,
+            question.marks
+        ])
+    
+    return response
+

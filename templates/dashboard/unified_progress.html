@@ -5,6 +5,7 @@
 <head>
     <meta charset="UTF-8">
     {% include 'includes/favicon.html' %}
+    {% include 'includes/security_protection.html' %}   
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Progress | PulsePrep</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -787,6 +788,9 @@
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
                 </a>
+
+
+                
                 <a href="{% url 'student_notifications' %}" class="nav-item">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>

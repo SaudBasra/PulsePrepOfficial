@@ -68,7 +68,7 @@ def notification_center(request):
             Q(recipient=request.user) | Q(recipient__isnull=True)
         ).order_by('-created_at')
         
-        # Simple pagination
+        # Pagination
         paginator = Paginator(notifications_qs, 10)
         page_number = request.GET.get('page')
         user_notifications = paginator.get_page(page_number)
@@ -78,7 +78,6 @@ def notification_center(request):
         unread_count = notifications_qs.filter(is_read=False).count()
         
     except Exception as e:
-        # If there's any error, show empty state
         user_notifications = []
         total_count = 0
         unread_count = 0
@@ -120,7 +119,10 @@ def mark_all_read(request):
     """Mark all notifications as read for current user"""
     try:
         # Mark user-specific notifications as read
-        user_notifications = NotificationMessage.objects.filter(recipient=request.user, is_read=False)
+        user_notifications = NotificationMessage.objects.filter(
+            Q(recipient=request.user) | Q(recipient__isnull=True),
+            is_read=False
+        )
         count = user_notifications.update(is_read=True)
         
         if count > 0:
@@ -143,14 +145,13 @@ def mark_all_read(request):
 def student_notifications(request):
     """Student-only notification view"""
     
-    # Handle GET request (display notifications for students)
     try:
         # Get notifications for this user (or global ones)
         notifications_qs = NotificationMessage.objects.filter(
             Q(recipient=request.user) | Q(recipient__isnull=True)
         ).order_by('-created_at')
         
-        # Simple pagination
+        # Pagination
         paginator = Paginator(notifications_qs, 10)
         page_number = request.GET.get('page')
         user_notifications = paginator.get_page(page_number)
@@ -160,7 +161,6 @@ def student_notifications(request):
         unread_count = notifications_qs.filter(is_read=False).count()
         
     except Exception as e:
-        # If there's any error, show empty state
         user_notifications = []
         total_count = 0
         unread_count = 0
@@ -197,7 +197,10 @@ def student_mark_all_read(request):
     """Mark all notifications as read for current user (Student version)"""
     try:
         # Mark user-specific notifications as read
-        user_notifications = NotificationMessage.objects.filter(recipient=request.user, is_read=False)
+        user_notifications = NotificationMessage.objects.filter(
+            Q(recipient=request.user) | Q(recipient__isnull=True),
+            is_read=False
+        )
         count = user_notifications.update(is_read=True)
         
         if count > 0:

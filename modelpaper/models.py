@@ -1,10 +1,11 @@
-# modelpaper/models.py
+# modelpaper/models.py - Updated PaperQuestion model with image support
+
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
 class PaperQuestion(models.Model):
-    """Independent storage for all paper questions from CSV uploads"""
+    """Independent storage for all paper questions from CSV uploads with image support"""
     CORRECT_ANSWER_CHOICES = [
         ('A', 'A'),
         ('B', 'B'),
@@ -54,6 +55,10 @@ class PaperQuestion(models.Model):
     explanation = models.TextField(blank=True, null=True)
     marks = models.IntegerField(default=1)
     
+    # Image support - stores filename that links to manageimage.QuestionImage
+    image = models.CharField(max_length=255, blank=True, null=True, 
+                           help_text="Image filename (e.g., heart_anatomy.jpg)")
+    
     # Import tracking
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
@@ -63,6 +68,65 @@ class PaperQuestion(models.Model):
         
     def __str__(self):
         return f"{self.paper_name} - {self.question_text[:50]}..."
+    
+    @property
+    def has_image(self):
+        """Check if question has an associated image"""
+        return bool(self.image)
+    
+    def get_image_url(self):
+        """Get the actual image URL by matching with QuestionImage model"""
+        if not self.image:
+            return None, None
+        
+        try:
+            from manageimage.models import QuestionImage
+            
+            image_filename = self.image.strip()
+            if not image_filename:
+                return None, None
+            
+            # Strategy 1: Exact filename match
+            try:
+                image_obj = QuestionImage.objects.get(filename=image_filename)
+                if image_obj.image:
+                    return image_obj.image.url, image_obj.filename
+            except QuestionImage.DoesNotExist:
+                pass
+            
+            # Strategy 2: Match without extension
+            filename_no_ext = image_filename.rsplit('.', 1)[0] if '.' in image_filename else image_filename
+            
+            # Try to find by filename containing the base name
+            possible_matches = QuestionImage.objects.filter(
+                filename__icontains=filename_no_ext
+            )
+            
+            for match in possible_matches:
+                # Check if it's a close match
+                match_no_ext = match.filename.rsplit('.', 1)[0] if '.' in match.filename else match.filename
+                if match_no_ext.lower() == filename_no_ext.lower():
+                    if match.image:
+                        return match.image.url, match.filename
+            
+            # Strategy 3: Try adding common extensions
+            common_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+            for ext in common_extensions:
+                try:
+                    test_filename = filename_no_ext + ext
+                    image_obj = QuestionImage.objects.get(filename=test_filename)
+                    if image_obj.image:
+                        return image_obj.image.url, image_obj.filename
+                except QuestionImage.DoesNotExist:
+                    continue
+            
+        except ImportError:
+            # manageimage app not available
+            pass
+        except Exception as e:
+            print(f"Error loading image for paper question {self.id}: {str(e)}")
+        
+        return None, self.image
     
     @classmethod
     def get_available_paper_names(cls):
@@ -100,7 +164,7 @@ class PaperQuestion(models.Model):
             'topics': list(questions.values_list('topic', flat=True).distinct().exclude(topic=''))
         }
 
-
+# Rest of the models remain the same...
 class ModelPaper(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Draft'),
@@ -216,6 +280,52 @@ class ModelPaperAttempt(models.Model):
         elapsed = (timezone.now() - self.started_at).total_seconds()
         total_seconds = self.model_paper.duration_minutes * 60
         return max(0, int(total_seconds - elapsed))
+    
+    @property
+    def time_taken_formatted(self):
+        """Return formatted time taken in human readable format"""
+        if not self.time_taken:
+            return "0 seconds"
+        
+        seconds = self.time_taken
+        if seconds < 60:
+            return f"{seconds} second{'s' if seconds != 1 else ''}"
+        elif seconds < 3600:
+            minutes = seconds // 60
+            remaining_seconds = seconds % 60
+            if remaining_seconds == 0:
+                return f"{minutes} minute{'s' if minutes != 1 else ''}"
+            else:
+                return f"{minutes}m {remaining_seconds}s"
+        else:
+            hours = seconds // 3600
+            remaining_minutes = (seconds % 3600) // 60
+            remaining_seconds = seconds % 60
+            
+            result = f"{hours}h"
+            if remaining_minutes > 0:
+                result += f" {remaining_minutes}m"
+            if remaining_seconds > 0:
+                result += f" {remaining_seconds}s"
+            
+            return result
+    
+    @property
+    def time_taken_display(self):
+        """Return time in MM:SS format for displays"""
+        if not self.time_taken:
+            return "00:00"
+        
+        minutes = self.time_taken // 60
+        seconds = self.time_taken % 60
+        return f"{minutes:02d}:{seconds:02d}"
+    
+    @property
+    def time_taken_minutes(self):
+        """Return time taken in minutes (for calculations)"""
+        if not self.time_taken:
+            return 0
+        return round(self.time_taken / 60, 1)
 
 
 class ModelPaperResponse(models.Model):
@@ -271,55 +381,3 @@ class PaperCSVImportHistory(models.Model):
         if self.total_rows == 0:
             return 0
         return round((self.successful_imports / self.total_rows) * 100, 1)
-    
-    # Add these properties to your ModelPaperAttempt model in modelpaper/models.py
-
-    @property
-    def passed(self):
-        return self.percentage >= self.model_paper.passing_percentage
-    
-    @property
-    def time_taken_formatted(self):
-        """Return formatted time taken in human readable format"""
-        if not self.time_taken:
-            return "0 seconds"
-        
-        seconds = self.time_taken
-        if seconds < 60:
-            return f"{seconds} second{'s' if seconds != 1 else ''}"
-        elif seconds < 3600:
-            minutes = seconds // 60
-            remaining_seconds = seconds % 60
-            if remaining_seconds == 0:
-                return f"{minutes} minute{'s' if minutes != 1 else ''}"
-            else:
-                return f"{minutes}m {remaining_seconds}s"
-        else:
-            hours = seconds // 3600
-            remaining_minutes = (seconds % 3600) // 60
-            remaining_seconds = seconds % 60
-            
-            result = f"{hours}h"
-            if remaining_minutes > 0:
-                result += f" {remaining_minutes}m"
-            if remaining_seconds > 0:
-                result += f" {remaining_seconds}s"
-            
-            return result
-    
-    @property
-    def time_taken_display(self):
-        """Return time in MM:SS format for displays"""
-        if not self.time_taken:
-            return "00:00"
-        
-        minutes = self.time_taken // 60
-        seconds = self.time_taken % 60
-        return f"{minutes:02d}:{seconds:02d}"
-    
-    @property
-    def time_taken_minutes(self):
-        """Return time taken in minutes (for calculations)"""
-        if not self.time_taken:
-            return 0
-        return round(self.time_taken / 60, 1)

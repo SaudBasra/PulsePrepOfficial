@@ -1,0 +1,299 @@
+<!-- Screenshot & Copy Prevention Enhancements -->
+<style>
+    .screenshot-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #82272e;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(20px);
+    }
+
+    .screenshot-overlay.active {
+        display: flex;
+    }
+
+    .screenshot-warning {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        width: 400px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .screenshot-warning i {
+        font-size: 48px;
+        color: #ef4444;
+        margin-bottom: 20px;
+    }
+
+    /* Enhanced Button Styles */
+    .continue-button {
+        background: linear-gradient(135deg, #82272e, #a0343a);
+        border: none;
+        color: white;
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 
+            0 4px 12px rgba(130, 39, 46, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        min-width: 140px;
+        justify-content: center;
+        letter-spacing: 0.025em;
+    }
+
+    /* Shimmer Effect */
+    .continue-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .continue-button:hover::before {
+        left: 100%;
+    }
+
+    /* Button States */
+    .continue-button:hover {
+        background: linear-gradient(135deg, #9b2c33, #c23d45);
+        transform: translateY(-2px);
+        box-shadow: 
+            0 8px 20px rgba(130, 39, 46, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .continue-button:active {
+        transform: translateY(0);
+        background: linear-gradient(135deg, #6d1f26, #82272e);
+        box-shadow: 
+            0 2px 6px rgba(130, 39, 46, 0.5),
+            inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .continue-button:focus {
+        outline: 2px solid rgba(130, 39, 46, 0.5);
+        outline-offset: 2px;
+    }
+
+    /* Icon Animation */
+    .continue-button i {
+        font-size: 14px;
+        transition: transform 0.3s ease;
+    }
+
+    .continue-button:hover i {
+        transform: scale(1.1) rotate(360deg);
+    }
+
+    .secure-content {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    @media print {
+        .secure-content {
+            display: none !important;
+        }
+        body::before {
+            content: "Printing is not allowed for this content.";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: red;
+            font-weight: bold;
+        }
+    }
+
+    /* Watermark */
+    #watermark {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        color: rgba(0,0,0,0.15);
+        font-size: 12px;
+        z-index: 9999;
+        pointer-events: none;
+    }
+</style>
+
+<!-- Overlay -->
+<div class="screenshot-overlay" id="screenshot-overlay">
+    <div class="screenshot-warning">
+        <i class="fas fa-camera-retro"></i>
+        <h3>Security Violation Detected!</h3>
+        <p><strong>Screenshots, Developer Tools, Copy/Paste, and Print</strong> are not allowed. This action has been logged.</p>
+        <button class="continue-button" onclick="hideScreenshotWarning()">
+            <i class="fas fa-check"></i>
+            Continue
+        </button>
+    </div>
+</div>
+
+<!-- Watermark -->
+<div id="watermark">
+    User ID: {{ user.id }} | IP: {{ user.ip }}
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    document.body.classList.add('secure-content');
+
+    // Right-click, text select, drag
+    document.addEventListener('contextmenu', e => { e.preventDefault(); showScreenshotWarning(); });
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+
+    // Keyboard shortcuts detection
+    function detectKeys(e) {
+        const k = e.key.toLowerCase();
+        const ctrl = e.ctrlKey || e.metaKey;
+        const shift = e.shiftKey;
+
+        // Screenshot triggers
+        if (
+            k === 'printscreen' ||
+            (ctrl && shift && k === 's') ||  // Ctrl+Shift+S
+            (e.code === 'PrintScreen') ||
+            (ctrl && shift && (k === '3' || k === '4'))
+        ) {
+            e.preventDefault();
+            showScreenshotWarning();
+            reportSecurityViolation('screenshot');
+            return false;
+        }
+
+        // Dev tools
+        if (k === 'f12' || (ctrl && shift && ['i', 'j', 'c'].includes(k)) || (ctrl && k === 'u')) {
+            e.preventDefault();
+            showScreenshotWarning();
+            reportSecurityViolation('dev_tools');
+            return false;
+        }
+
+        // Copy, Paste, Select All, Save
+        if (ctrl && ['c', 'v', 'a', 's'].includes(k)) {
+            e.preventDefault();
+            showScreenshotWarning();
+            reportSecurityViolation('copy_paste');
+            return false;
+        }
+    }
+
+    document.addEventListener('keydown', detectKeys);
+    document.addEventListener('keyup', detectKeys);  // Detect PrintScreen on keyup as well
+
+    // Visibility / focus / resize changes
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            document.body.style.filter = 'blur(20px)';
+            reportSecurityViolation('tab_switch');
+        } else {
+            document.body.style.filter = 'none';
+        }
+    });
+
+    window.addEventListener('blur', () => {
+        setTimeout(() => {
+            if (!document.hasFocus()) {
+                reportSecurityViolation('focus_lost');
+            }
+        }, 100);
+    });
+
+    // Zoom detection
+    let lastWidth = window.innerWidth;
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+        const diffW = Math.abs(window.innerWidth - lastWidth);
+        const diffH = Math.abs(window.innerHeight - lastHeight);
+        if (diffW > 100 || diffH > 100) {
+            reportSecurityViolation('zoom_detected');
+        }
+        lastWidth = window.innerWidth;
+        lastHeight = window.innerHeight;
+    });
+
+    // Touch gesture prevention
+    if ('ontouchstart' in window) {
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', e => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        });
+
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        document.addEventListener('gesturechange', e => e.preventDefault());
+        document.addEventListener('gestureend', e => e.preventDefault());
+    }
+
+    // Dev tools window size detection
+    let devtoolsOpen = false;
+    setInterval(() => {
+        const threshold = 160;
+        if (window.outerHeight - window.innerHeight > threshold || window.outerWidth - window.innerWidth > threshold) {
+            if (!devtoolsOpen) {
+                devtoolsOpen = true;
+                showScreenshotWarning();
+                reportSecurityViolation('dev_tools_window');
+            }
+        } else {
+            devtoolsOpen = false;
+        }
+    }, 500);
+
+    // Overlay functions
+    window.showScreenshotWarning = function () {
+        document.getElementById('screenshot-overlay').classList.add('active');
+    };
+
+    window.hideScreenshotWarning = function () {
+        document.getElementById('screenshot-overlay').classList.remove('active');
+    };
+
+    window.reportSecurityViolation = function (type) {
+        console.warn('Security violation:', type);
+        /*
+        fetch('/api/security-violation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                type: type,
+                time: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            })
+        });
+        */
+    };
+
+})();
+</script>

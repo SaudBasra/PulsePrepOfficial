@@ -1,0 +1,38 @@
+<!-- templates/user_management/access_status.html -->
+<div class="access-status-widget">
+    {% if status == 'admin' %}
+        <div class="alert alert-info border-0">
+            <i class="fas fa-crown text-warning me-2"></i>
+            <strong>{{ message }}</strong>
+        </div>
+    {% elif status == 'approved' %}
+        <div class="alert alert-success border-0">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong>{{ message }}</strong>
+        </div>
+    {% elif status == 'pending' %}
+        <div class="alert alert-warning border-0">
+            <i class="fas fa-clock text-warning me-2"></i>
+            <strong>{{ message }}</strong>
+        </div>
+    {% elif status == 'incomplete' %}
+        <div class="alert alert-danger border-0">
+            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+            <strong>{{ message }}</strong>
+        </div>
+    {% else %}
+        <div class="alert alert-secondary border-0">
+            <i class="fas fa-sign-in-alt text-secondary me-2"></i>
+            <strong>Please log in to access content</strong>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+.access-status-widget .alert {
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+}
+</style>

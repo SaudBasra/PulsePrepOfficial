@@ -21,7 +21,7 @@ urlpatterns = [
     # Student URLs - Taking Papers
     path('student/', views.student_model_papers, name='student_model_papers'),
     path('take/<int:paper_id>/', views.take_paper, name='take_paper'),
-    path('submit-answer/', views.submit_answer, name='submit_paper_answer'),
+    path('submit-answer/', views.submit_paper_answer, name='submit_paper_answer'),
     path('submit-paper/', views.submit_paper, name='submit_paper'),
     path('result/<int:attempt_id>/', views.paper_result, name='paper_result'),
     path('report-warning/', views.report_warning, name='report_paper_warning'),

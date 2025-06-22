@@ -1,16 +1,17 @@
 {% load static %}
+{% include 'includes/favicon.html' %}
+{% include 'includes/security_protection.html' %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     {% include 'includes/favicon.html' %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ test.title }} - PulsePrep</title>
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Include Security Protection Component -->
-    
     <style>
         /* Enhanced responsive styles */
         :root {
@@ -157,7 +158,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            min-width: 0;
+            min-width: 0; /* Prevents flex item from growing beyond container */
         }
 
         .question-card {
@@ -208,50 +209,7 @@
             flex-shrink: 0;
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
-
-        /* Responsive Image styling */
-        .question-image {
-            margin: 16px 0;
-            text-align: center;
-            width: 100%;
-            flex-shrink: 0;
-        }
-
-        .question-image img {
-            max-width: 100%;
-            width: auto;
-            height: auto;
-            max-height: clamp(200px, 40vh, 400px);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #e2e8f0;
-            object-fit: contain;
-            background: white;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .question-image .image-caption {
-            font-size: clamp(10px, 2.5vw, 12px);
-            color: var(--gray);
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        .image-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: clamp(12px, 3vw, 14px);
-            margin: 16px 0;
-        }
-
-        .image-error i {
-            margin-right: 8px;
+            white-space: pre-wrap; /* FIXED: Preserve line breaks and formatting */
         }
 
         /* Options container - Responsive */
@@ -315,6 +273,76 @@
             flex: 1;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            white-space: pre-wrap; /* FIXED: Preserve formatting in options */
+        }
+
+        /* Explanation Section - MOVED FROM QUESTION TO BOTTOM */
+        .explanation-section {
+            margin-top: 20px;
+            padding: 16px;
+            background: #dbeafe;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+            display: none; /* Hidden by default, can be shown if needed */
+        }
+
+        .explanation-title {
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explanation-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--dark);
+            white-space: pre-wrap; /* FIXED: Preserve formatting in explanations */
+        }
+
+        /* Image in explanation - Responsive */
+        .explanation-image {
+            margin: 16px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .explanation-image img {
+            max-width: 100%;
+            width: auto;
+            height: auto;
+            max-height: clamp(200px, 40vh, 400px);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #e2e8f0;
+            object-fit: contain;
+            background: white;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .explanation-image .image-caption {
+            font-size: clamp(10px, 2.5vw, 12px);
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .image-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: clamp(12px, 3vw, 14px);
+            margin: 16px 0;
+        }
+
+        .image-error i {
+            margin-right: 8px;
         }
 
         /* Navigation Panel - Responsive Sidebar */
@@ -651,7 +679,7 @@
             }
             
             .test-progress, .legend {
-                display: none;
+                display: none; /* Hide on mobile to save space */
             }
         }
 
@@ -702,7 +730,7 @@
                 font-size: 12px;
             }
 
-            .question-image img {
+            .explanation-image img {
                 max-height: clamp(150px, 30vh, 250px);
             }
         }
@@ -763,7 +791,7 @@
                 width: 100%;
             }
 
-            .question-image img {
+            .explanation-image img {
                 max-height: clamp(120px, 25vh, 200px);
             }
         }
@@ -782,7 +810,7 @@
                 min-height: calc(100vh - 200px);
             }
             
-            .question-image img {
+            .explanation-image img {
                 max-height: 150px;
             }
             
@@ -864,14 +892,25 @@
                 padding: 16px;
             }
         }
+
+        /* Special character support - Enhanced typography */
+        .question-text,
+        .option-label span,
+        .explanation-content {
+            font-feature-settings: "liga" 1, "kern" 1;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Support for mathematical symbols and special characters */
+        .special-chars {
+            font-family: "Times New Roman", "Cambria Math", serif;
+            font-size: 1.1em;
+        }
     </style>
 </head>
-<body data-security-protection 
-      data-warning-enabled="true" 
-      data-warning-limit="3" 
-      data-attempt-id="{{ attempt.id }}"
-      data-auto-submit-url="{% url 'test_result' attempt.id %}"
-      data-warning-report-url="{% url 'report_warning' %}">
+<body>
+    <!-- Include Security Template -->
+    {% include 'includes/security_protection.html' %}
 
     <div class="test-container">
         <!-- Test Header -->
@@ -981,6 +1020,17 @@
         </div>
     </div>
 
+    <!-- Warning Modal -->
+    <div class="modal" id="warning-modal">
+        <div class="modal-content warning-modal">
+            <h2><i class="fas fa-exclamation-triangle"></i> Warning!</h2>
+            <p id="warning-message">You have switched tabs. This is not allowed during the test.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeWarning()">I Understand</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Submit Confirmation Modal -->
     <div class="modal" id="submit-modal">
         <div class="modal-content">
@@ -1017,63 +1067,81 @@
             {% endfor %}
         ];
         
-        // Test variables
+        // Updated timer variables - Fixed for seconds calculation
         const attemptId = {{ attempt.id }};
         const duration = {{ test.duration_minutes }};
         let currentQuestionIndex = 0;
         let answers = {};
         let markedQuestions = new Set();
-        let timeRemaining = duration * 60;
+        let timeRemaining = duration * 60; // Convert minutes to seconds correctly
         let warningCount = {{ attempt.warning_count }};
-        let visitedQuestions = new Set([1]);
-        let timerInterval = null;
+        let visitedQuestions = new Set([1]); // Track visited questions
+        let timerInterval = null; // Store timer interval for better control
+        
+        // Special character conversion function - SAME AS MODEL PAPER
+        function processSpecialCharacters(text) {
+            if (!text) return text;
+            
+            // Convert common symbols and arrows
+            text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
+            text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
+            text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
+            text = text.replace(/⇌/g, '⇌'); // Reversible reaction
+            
+            // Greek letters
+            text = text.replace(/\balpha\b/gi, 'α');
+            text = text.replace(/\bbeta\b/gi, 'β');
+            text = text.replace(/\bgamma\b/gi, 'γ');
+            text = text.replace(/\bdelta\b/gi, 'δ');
+            text = text.replace(/\blambda\b/gi, 'λ');
+            text = text.replace(/\bmu\b/gi, 'μ');
+            text = text.replace(/\bpi\b/gi, 'π');
+            text = text.replace(/\bsigma\b/gi, 'σ');
+            text = text.replace(/\bomega\b/gi, 'ω');
+            
+            // Mathematical symbols
+            text = text.replace(/\+\/-/g, '±');
+            text = text.replace(/\+-/g, '±');
+            text = text.replace(/\<=\>/g, '⇔');
+            text = text.replace(/\<=/g, '≤');
+            text = text.replace(/\>=/g, '≥');
+            text = text.replace(/\!=/g, '≠');
+            text = text.replace(/\~=/g, '≈');
+            text = text.replace(/\infty/g, '∞');
+            text = text.replace(/\sqrt/g, '√');
+            
+            // Superscript numbers
+            text = text.replace(/\^2/g, '²');
+            text = text.replace(/\^3/g, '³');
+            text = text.replace(/\^1/g, '¹');
+            
+            // Common medical symbols
+            text = text.replace(/\bdegree\b/gi, '°');
+            text = text.replace(/\bdegrees\b/gi, '°');
+            
+            return text;
+        }
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadQuestion(0);
             startTimer();
+            setupTabDetection();
             updateProgress();
             updateNavigationState();
             setupResponsiveHandlers();
-            
-            // Initialize enhanced security with warning system
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                console.log('🔒 Enhanced Security System Active');
-                
-                // Override the tab switch handler to integrate with warning system
-                const originalTabSwitch = securityProtection.setupTabSwitchProtection;
-                securityProtection.setupTabSwitchProtection = function() {
-                    document.addEventListener('visibilitychange', () => {
-                        if (document.hidden) {
-                            document.body.classList.add('security-blur');
-                            handleTabSwitch(); // Use existing test warning system
-                            
-                            setTimeout(() => {
-                                if (document.hidden) {
-                                    document.body.style.filter = 'blur(20px)';
-                                }
-                            }, 100);
-                        } else {
-                            document.body.classList.remove('security-blur');
-                            document.body.style.filter = 'none';
-                        }
-                    });
-                };
-                
-                // Re-setup with new handler
-                securityProtection.setupTabSwitchProtection();
-            }
         });
 
-        // Enhanced responsive handlers
+        // Responsive handlers
         function setupResponsiveHandlers() {
+            // Handle orientation changes
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
                     adjustLayoutForScreen();
                 }, 100);
             });
             
+            // Handle window resize
             let resizeTimeout;
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimeout);
@@ -1082,18 +1150,22 @@
                 }, 250);
             });
             
+            // Initial layout adjustment
             adjustLayoutForScreen();
         }
 
         function adjustLayoutForScreen() {
             const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
             
+            // Adjust question navigation for very small screens
             if (screenWidth <= 480) {
                 updateButtonLabels(true);
             } else {
                 updateButtonLabels(false);
             }
             
+            // Adjust timer display for very small screens
             if (screenWidth <= 360) {
                 const timerIcon = document.querySelector('.test-timer i');
                 if (timerIcon) timerIcon.style.display = 'none';
@@ -1115,7 +1187,7 @@
             } else {
                 prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i> <span>Previous</span>';
                 nextBtn.innerHTML = '<span>Next</span> <i class="fas fa-arrow-right"></i>';
-                updateMarkButtonState();
+                updateMarkButtonState(); // Restore full mark button text
             }
         }
         
@@ -1163,78 +1235,68 @@
             }
         });
         
-        // Load question with enhanced image support
+        // Load question - ENHANCED with special character processing
         function loadQuestion(index) {
             const question = testQuestions[index];
             currentQuestionIndex = index;
             visitedQuestions.add(index + 1);
             
+            // Update current question number
             document.getElementById('current-question').textContent = index + 1;
             
-            let imageHtml = '';
-            if (question.hasImage && question.imageUrl) {
-                imageHtml = `
-                    <div class="question-image">
-                        <img src="${question.imageUrl}" 
-                             alt="Question Image" 
-                             loading="lazy"
-                             onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'><i class=\\'fas fa-exclamation-triangle\\'></i>Image failed to load: ${question.imageFilename || 'Unknown'}</div>'"
-                             onload="console.log('Image loaded successfully')">
-                        ${question.imageFilename ? `<div class="image-caption">Image: ${question.imageFilename}</div>` : ''}
-                    </div>
-                `;
-            } else if (question.hasImage && !question.imageUrl) {
-                imageHtml = `
-                    <div class="image-error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Image not found: ${question.imageFilename || 'Unknown filename'}
-                    </div>
-                `;
-            }
+            // Process question text for special characters and preserve formatting
+            let processedQuestionText = processSpecialCharacters(question.text);
             
+            // Create options HTML
             let optionsHtml = '<div class="options-container"><ul class="options-list">';
             const options = Object.entries(question.options);
             
+            // Randomize options if enabled
             if (question.randomizeOptions) {
                 options.sort(() => Math.random() - 0.5);
             }
             
             options.forEach(([key, value]) => {
                 const isChecked = answers[question.id] === key;
+                const processedOptionText = processSpecialCharacters(value);
                 optionsHtml += `
                     <li class="option-item">
                         <label class="option-label ${isChecked ? 'selected' : ''}">
                             <input type="radio" name="answer" value="${key}" 
                                    ${isChecked ? 'checked' : ''} 
                                    onchange="saveAnswer('${key}')">
-                            <span>${key}) ${value}</span>
+                            <span>${key}) ${processedOptionText}</span>
                         </label>
                     </li>
                 `;
             });
             optionsHtml += '</ul></div>';
             
+            // Load question content with fade animation - NO IMAGES during test
             const questionContainer = document.getElementById('question-container');
             questionContainer.innerHTML = `
                 <div class="question-number">Question ${index + 1}</div>
-                <div class="question-text">${question.text}</div>
-                ${imageHtml}
+                <div class="question-text">${processedQuestionText}</div>
                 ${optionsHtml}
             `;
             
+            // Update navigation buttons
             updateNavigation();
             updateNavigationState();
             updateMarkButtonState();
             
+            // Scroll to top of question for mobile
             if (window.innerWidth <= 1024) {
                 questionContainer.scrollTop = 0;
             }
         }
         
+        // Update navigation button states
         function updateNavigationState() {
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             
+            // Disable/enable previous button
             if (currentQuestionIndex === 0) {
                 prevBtn.disabled = true;
                 prevBtn.style.opacity = '0.5';
@@ -1243,6 +1305,7 @@
                 prevBtn.style.opacity = '1';
             }
             
+            // Disable/enable next button
             if (currentQuestionIndex === testQuestions.length - 1) {
                 nextBtn.disabled = true;
                 nextBtn.style.opacity = '0.5';
@@ -1252,6 +1315,7 @@
             }
         }
         
+        // Update mark button state - Responsive
         function updateMarkButtonState() {
             const markBtn = document.getElementById('mark-btn');
             const question = testQuestions[currentQuestionIndex];
@@ -1274,15 +1338,18 @@
             }
         }
         
+        // Save answer
         function saveAnswer(answer) {
             const question = testQuestions[currentQuestionIndex];
             answers[question.id] = answer;
             
+            // Update UI
             document.querySelectorAll('.option-label').forEach(label => {
                 label.classList.remove('selected');
             });
             event.target.closest('.option-label').classList.add('selected');
             
+            // Save to server
             fetch('{% url "submit_answer" %}', {
                 method: 'POST',
                 headers: {
@@ -1296,6 +1363,7 @@
             updateNavigation();
         }
         
+        // Navigation functions
         function previousQuestion() {
             if (currentQuestionIndex > 0) {
                 loadQuestion(currentQuestionIndex - 1);
@@ -1312,6 +1380,7 @@
             loadQuestion(questionNumber - 1);
         }
         
+        // Mark for review
         function markForReview() {
             const question = testQuestions[currentQuestionIndex];
             
@@ -1321,6 +1390,7 @@
                 markedQuestions.add(question.id);
             }
             
+            // Save to server
             fetch('{% url "submit_test" %}', {
                 method: 'POST',
                 headers: {
@@ -1335,6 +1405,7 @@
             updateMarkButtonState();
         }
         
+        // Update navigation panel
         function updateNavigation() {
             document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
                 const question = testQuestions[index];
@@ -1351,6 +1422,7 @@
             });
         }
         
+        // Update progress
         function updateProgress() {
             const answered = Object.keys(answers).length;
             const marked = markedQuestions.size;
@@ -1361,52 +1433,67 @@
             document.getElementById('remaining-count').textContent = remaining;
         }
         
+        // Updated timer function to display time correctly in seconds
         function updateTimerDisplay() {
             const minutes = Math.floor(timeRemaining / 60);
             const seconds = timeRemaining % 60;
             
+            // Format time as MM:SS
             const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             document.getElementById('time-remaining').textContent = timeDisplay;
         }
         
+        // Updated timer function - Fixed for proper seconds calculation
         function startTimer() {
+            // Update display immediately
             updateTimerDisplay();
             
             timerInterval = setInterval(() => {
-                timeRemaining--;
+                timeRemaining--; // Decrease by 1 second
+                
                 updateTimerDisplay();
                 
                 const timerElement = document.getElementById('timer');
                 
+                // Warning when 5 minutes left (300 seconds)
                 if (timeRemaining === 300) {
                     timerElement.classList.add('warning');
-                    showTimerWarning('Only 5 minutes remaining!');
+                    showWarning('Only 5 minutes remaining!');
                 }
                 
+                // Danger when 1 minute left (60 seconds)
                 if (timeRemaining === 60) {
                     timerElement.classList.remove('warning');
                     timerElement.classList.add('danger');
-                    showTimerWarning('Only 1 minute remaining! Test will auto-submit soon.');
+                    showWarning('Only 1 minute remaining! Test will auto-submit soon.');
                 }
                 
+                // Auto submit when time's up
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     autoSubmit();
                 }
-            }, 1000);
+            }, 1000); // Run every 1000 milliseconds (1 second)
         }
         
-        function showTimerWarning(message) {
-            // Use security system to show warning if available
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                securityProtection.showWarning('timer', message);
-            } else {
-                alert(message);
-            }
+        // Tab detection for 3-warning system
+        function setupTabDetection() {
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    handleTabSwitch();
+                }
+            });
+            
+            window.addEventListener('blur', function() {
+                // Only trigger if the window actually loses focus
+                setTimeout(() => {
+                    if (!document.hasFocus()) {
+                        handleTabSwitch();
+                    }
+                }, 100);
+            });
         }
         
-        // Enhanced tab switch detection with proper warning counting
         function handleTabSwitch() {
             warningCount++;
             
@@ -1416,7 +1503,7 @@
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: `attempt_id=${attemptId}&violation_type=tabswitch&warning_count=${warningCount}`
+                body: `attempt_id=${attemptId}`
             })
             .then(response => response.json())
             .then(data => {
@@ -1424,19 +1511,22 @@
                     alert(data.message);
                     window.location.href = '{% url "test_result" attempt.id %}';
                 } else {
-                    // Use security system warning if available
-                    const securityProtection = SecurityProtection.getInstance();
-                    if (securityProtection) {
-                        securityProtection.reportViolation('tabswitch', 
-                            `Warning ${warningCount}/3: Please do not switch tabs during the test!`);
-                    }
+                    showWarning(`Warning ${warningCount}/3: Please do not switch tabs during the test!`);
                 }
-            })
-            .catch(error => {
-                console.error('Warning report failed:', error);
             });
         }
         
+        // Warning modal
+        function showWarning(message) {
+            document.getElementById('warning-message').textContent = message;
+            document.getElementById('warning-modal').style.display = 'flex';
+        }
+        
+        function closeWarning() {
+            document.getElementById('warning-modal').style.display = 'none';
+        }
+        
+        // Submit test
         function confirmSubmit() {
             const answered = Object.keys(answers).length;
             const unanswered = testQuestions.length - answered;
@@ -1461,14 +1551,9 @@
         }
         
         function submitTest() {
+            // Clear timer before submitting
             if (timerInterval) {
                 clearInterval(timerInterval);
-            }
-            
-            // Disable security protection during submission
-            const securityProtection = SecurityProtection.getInstance();
-            if (securityProtection) {
-                securityProtection.disable();
             }
             
             fetch('{% url "submit_test" %}', {
@@ -1492,6 +1577,7 @@
             submitTest();
         }
         
+        // Utility function
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -1507,15 +1593,9 @@
             return cookieValue;
         }
         
-        // Prevent back button
-        window.history.pushState(null, null, window.location.href);
-        window.onpopstate = function() {
-            window.history.go(1);
-        };
-        
-        // Enhanced keyboard shortcuts
+        // Enhanced keyboard shortcuts for responsive design
         document.addEventListener('keydown', function(e) {
-            // Only allow test navigation keys, security system handles restrictions
+            // Allow only test navigation keys (don't prevent all shortcuts)
             switch(e.key) {
                 case 'ArrowLeft':
                     if (!e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -1552,6 +1632,60 @@
                     break;
             }
         });
+
+        // Additional security measures - only test-specific ones
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'Are you sure you want to leave? Your test progress will be lost.';
+            return 'Are you sure you want to leave? Your test progress will be lost.';
+        });
+
+        // Enhanced zoom detection for responsive design
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            const currentWidth = window.innerWidth;
+            const currentHeight = window.innerHeight;
+            
+            // Check if it's a zoom change (not window resize)
+            if (Math.abs(currentWidth - lastWidth) > 100 || Math.abs(currentHeight - lastHeight) > 100) {
+                if (currentWidth < lastWidth * 0.9 || currentWidth > lastWidth * 1.1) {
+                    // Only show warning on desktop, not on mobile where resize is normal
+                    if (window.innerWidth > 768) {
+                        showWarning('Please do not zoom in or out during the test.');
+                    }
+                }
+            }
+            
+            lastWidth = currentWidth;
+            lastHeight = currentHeight;
+        });
+
+        // Touch gesture prevention for mobile
+        if ('ontouchstart' in window) {
+            let lastTouchEnd = 0;
+            
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            document.addEventListener('gesturestart', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gesturechange', function (e) {
+                e.preventDefault();
+            });
+            
+            document.addEventListener('gestureend', function (e) {
+                e.preventDefault();
+            });
+        }
     </script>
 </body>
 </html>

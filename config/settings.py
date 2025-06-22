@@ -48,6 +48,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'user_management.middleware.SingleSessionMiddleware',
+    'user_management.middleware.AutomaticAccessControlMiddleware',  # Add this
+
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -64,6 +66,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'user_management.context_processors.user_stats',
+                'notifications.context_processors.notification_context',
+
+
             ],
         },
     },
@@ -114,6 +119,7 @@ LOGOUT_REDIRECT_URL = '/login/'
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100000
 
 
 #temp

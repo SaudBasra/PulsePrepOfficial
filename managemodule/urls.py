@@ -1,4 +1,4 @@
-# managemodule/urls.py
+# managemodule/urls.py - Complete with Notes Support and Missing URLs
 from django.urls import path
 from . import views
 
@@ -6,7 +6,6 @@ urlpatterns = [
     # Admin URLs (existing)
     path('', views.managemodule, name='managemodule'),
     path('topic-questions/', views.topic_questions, name='topic_questions'),
-    path('api/topic-image-count/', views.get_topic_image_count, name='get_topic_image_count'),
     
     # Student Practice URLs (existing structure maintained)
     path('student/', views.student_practice_modules, name='student_practice_modules'),
@@ -17,6 +16,13 @@ urlpatterns = [
     path('student/progress/', views.student_practice_progress, name='student_practice_progress'),
     path('student/session/<int:session_id>/result/', views.practice_session_result, name='practice_session_result'),
     
-    # New AJAX API for dynamic question counting
+    # REQUIRED - Core Notes Functionality (FIXED - these were missing!)
+    path('student/mark-for-review/', views.mark_question_for_review, name='mark_question_for_review'),
+    path('student/save-note/', views.save_practice_note, name='save_practice_note'),
+    
+    # ENHANCED - Notes Checking Functionality (ADD THESE!)
+    path('student/check-note/', views.check_question_note, name='check_question_note'),
+    
+    # AJAX API URLs
     path('api/question-count-by-difficulty/', views.get_question_count_by_difficulty, name='get_question_count_by_difficulty'),
 ]

@@ -24,5 +24,3 @@ urlpatterns = [
     path('report-warning/', views.report_warning, name='report_warning'),
     path('progress/', views.mock_test_progress, name='mock_test_progress'),
 ]
-
-
