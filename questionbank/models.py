@@ -1,5 +1,6 @@
-# questionbank/models.py
+# questionbank/models.py - Updated with question_image field
 from django.db import models
+from django.db.models import Q  # Add this import
 from django.utils import timezone
 from django.conf import settings
 
@@ -94,10 +95,41 @@ class Question(models.Model):
     # Additional info
     difficulty = models.CharField(max_length=6, choices=DIFFICULTY_CHOICES, default='Medium')
     explanation = models.TextField(blank=True, null=True)
-    image = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Image fields
+    question_image = models.CharField(max_length=255, blank=True, null=True, 
+                                    help_text="Image to display with the question (filename only)")
+    image = models.CharField(max_length=255, blank=True, null=True, 
+                           help_text="Image to display with explanation (filename only)")
 
     def __str__(self):
         return self.question_text[:50]
+    
+    @property
+    def has_question_image(self):
+        """Check if question has an image"""
+        return bool(self.question_image and self.question_image.strip())
+    
+    @property
+    def has_explanation_image(self):
+        """Check if explanation has an image"""
+        return bool(self.image and self.image.strip())
+    
+    @property
+    def question_image_url(self):
+        """Get URL for question image if it exists"""
+        if self.has_question_image:
+            from django.conf import settings
+            return f"{settings.MEDIA_URL}question_images/{self.question_image}"
+        return None
+    
+    @property
+    def explanation_image_url(self):
+        """Get URL for explanation image if it exists"""
+        if self.has_explanation_image:
+            from django.conf import settings
+            return f"{settings.MEDIA_URL}question_images/{self.image}"
+        return None
     
     # Analytics helper methods
     @classmethod
@@ -114,6 +146,12 @@ class Question(models.Model):
             'by_type': {},
             'recent_count': cls.objects.filter(
                 created_on__gte=timezone.now() - timezone.timedelta(days=7)
+            ).count(),
+            'with_question_images': cls.objects.exclude(
+                Q(question_image__isnull=True) | Q(question_image__exact='')
+            ).count(),
+            'with_explanation_images': cls.objects.exclude(
+                Q(image__isnull=True) | Q(image__exact='')
             ).count()
         }
         

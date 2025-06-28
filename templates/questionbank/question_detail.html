@@ -35,6 +35,12 @@
       <i class="fas fa-file-csv"></i>
       <span>Manage CSVs</span>
     </a>
+
+    <a href="{% url 'manage_images' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_images' %}active{% endif %}">
+      <i class="fas fa-images"></i>
+      <span>Manage Images</span>
+    </a>
+    
     <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
       <i class="fas fa-cubes"></i>
       <span>Modules</span>
@@ -46,6 +52,10 @@
     <a href="{% url 'mocktest_list' %}" class="nav-item {% if request.resolver_match.url_name == 'mocktest_list' %}active{% endif %}">
       <i class="fas fa-vial"></i>
       <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'modelpaper_list' %}" class="nav-item {% if request.resolver_match.url_name == 'modelpaper_list' %}active{% endif %}">
+      <i class="fas fa-file-alt"></i>
+      <span>Model Papers</span>
     </a>
     <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
       <i class="fas fa-chart-bar"></i>
@@ -128,9 +138,6 @@
                 {{ form_title|default:"Question Form" }}
               </h2>
 
-
-
-              
               <!-- Question Detail Form -->
               <form method="POST" action="{{ request.path }}" class="question-form" novalidate>
                 {% csrf_token %}
@@ -208,6 +215,45 @@
                         <i class="fas fa-calendar-alt"></i>
                       </div>
                       <div class="help-text">Question creation date</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Question Image Card -->
+                <div class="question-detail-card">
+                  <div class="card-header">
+                    <h3><i class="fas fa-image"></i> Question Image</h3>
+                    <p>Optional image to display with the question (shown with MCQ options)</p>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group full-width">
+                      <label for="id_question_image">
+                        <i class="fas fa-file-image"></i> Question Image Filename
+                      </label>
+                      {{ form.question_image }}
+                      {% if form.question_image.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.question_image.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Enter the filename of an uploaded image (e.g., heart_diagram.jpg)</div>
+                      
+                      <!-- Image Preview for Question Image -->
+                      {% if question.has_question_image %}
+                        <div class="image-preview-container">
+                          <div class="image-preview-label">Current Question Image:</div>
+                          <div class="image-preview">
+                            <img src="{{ question.question_image_url }}" alt="{{ question.question_image }}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-error" style="display: none;">
+                              <i class="fas fa-exclamation-triangle"></i>
+                              <span>Image not found: {{ question.question_image }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
@@ -429,6 +475,37 @@
                       <div class="help-text">Explain why the correct answer is right and provide additional context</div>
                     </div>
                   </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group full-width">
+                      <label for="id_image">
+                        <i class="fas fa-file-image"></i> Explanation Image Filename
+                      </label>
+                      {{ form.image }}
+                      {% if form.image.errors %}
+                        <div class="error-message">
+                          <i class="fas fa-exclamation-circle"></i>
+                          {{ form.image.errors.0 }}
+                        </div>
+                      {% endif %}
+                      <div class="help-text">Enter the filename of an image to display with the explanation (e.g., solution_diagram.jpg)</div>
+                      
+                      <!-- Image Preview for Explanation Image -->
+                      {% if question.has_explanation_image %}
+                        <div class="image-preview-container">
+                          <div class="image-preview-label">Current Explanation Image:</div>
+                          <div class="image-preview">
+                            <img src="{{ question.explanation_image_url }}" alt="{{ question.image }}" 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-error" style="display: none;">
+                              <i class="fas fa-exclamation-triangle"></i>
+                              <span>Image not found: {{ question.image }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Form Actions -->
@@ -576,179 +653,93 @@
     </script>
     
     <style>
-      /* NEW: Bulk Actions Styles */
-      .bulk-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 10px 15px;
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.2);
+      /* Image Preview Styles */
+      .image-preview-container {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         border-radius: 6px;
-        animation: slideInRight 0.3s ease;
       }
 
-      .bulk-info {
-        font-size: 14px;
+      .image-preview-label {
+        font-size: 0.875rem;
         font-weight: 600;
-        color: #dc2626;
+        color: #374151;
+        margin-bottom: 0.5rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 0.5rem;
       }
 
-      .bulk-info::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        background: #dc2626;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-      }
-
-      .select-mode-btn {
-        transition: all 0.3s ease;
-      }
-
-      .select-mode-btn.active {
-        background: #dc2626;
-        color: white;
-        border-color: #dc2626;
-      }
-
-      /* NEW: Enhanced Checkbox Styles */
-      .checkbox-container {
-        position: relative;
-        display: inline-block;
-      }
-
-      .checkbox-container input[type="checkbox"] {
-        opacity: 0;
-        position: absolute;
-        width: 0;
-        height: 0;
-      }
-
-      .checkbox-label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #d1d5db;
+      .image-preview {
+        max-width: 300px;
         border-radius: 4px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-      }
-
-      .checkbox-label i {
-        opacity: 0;
-        transform: scale(0);
-        transition: all 0.2s ease;
-        color: white;
-        font-size: 12px;
-      }
-
-      .checkbox-container input:checked + .checkbox-label {
-        background: #dc2626;
-        border-color: #dc2626;
-      }
-
-      .checkbox-container input:checked + .checkbox-label i {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      .select-column {
-        width: 50px;
-        text-align: center;
-      }
-
-      /* NEW: Row Selection States */
-      .question-row.selected {
-        background: rgba(239, 68, 68, 0.05);
-        border-left: 3px solid #dc2626;
-      }
-
-      .question-row.select-mode {
-        cursor: pointer;
-      }
-
-      .question-row.select-mode:hover {
-        background: rgba(239, 68, 68, 0.02);
-      }
-
-      /* NEW: Button Styles */
-      .btn-danger {
-        background: #dc2626;
-        color: white;
-        border: 2px solid #dc2626;
-        padding: 10px 16px;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-      }
-
-      .btn-danger:hover:not(:disabled) {
-        background: #b91c1c;
-        border-color: #b91c1c;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-      }
-
-      .btn-danger:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-      }
-
-      .deselect-all-btn {
-        background: white;
-        color: #6b7280;
+        overflow: hidden;
         border: 1px solid #d1d5db;
       }
 
-      .deselect-all-btn:hover {
-        background: #f9fafb;
-        color: #374151;
-      }
-
-      /* NEW: Bulk Delete Modal Styles */
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
+      .image-preview img {
         width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        overflow: auto;
+        height: auto;
+        display: block;
       }
 
-      .modal-content {
-        background-color: white;
-        margin: 5% auto;
-        padding: 0;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 600px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        animation: modalFadeIn 0.3s ease;
+      .image-error {
+        padding: 2rem;
+        text-align: center;
+        background: #fef2f2;
+        color: #dc2626;
+        font-size: 0.875rem;
       }
 
-      @keyframes modalFadeIn {
+      .image-error i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      /* Enhanced card spacing for image cards */
+      .question-detail-card {
+        margin-bottom: 2rem;
+      }
+
+      /* Character counter styles */
+      .char-counter {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-align: right;
+        margin-top: 0.25rem;
+      }
+
+      /* Form field enhancements */
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      /* Help text styling */
+      .help-text {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+        line-height: 1.4;
+      }
+
+      /* Error message styling */
+      .error-message {
+        color: #dc2626;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+
+      /* Enhanced form animations */
+      @keyframes slideIn {
         from {
           opacity: 0;
-          transform: translateY(-20px);
+          transform: translateY(-10px);
         }
         to {
           opacity: 1;
@@ -756,244 +747,14 @@
         }
       }
 
-      .modal-header {
-        padding: 20px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .modal-header h3 {
-        margin: 0;
-        font-size: 18px;
-        color: #111827;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .close-modal {
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: #6b7280;
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-      }
-
-      .close-modal:hover {
-        color: #111827;
-      }
-
-      .modal-body {
-        padding: 20px;
-      }
-
-      .bulk-delete-warning {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-      }
-
-      .warning-icon {
-        text-align: center;
-        font-size: 48px;
-        color: #dc2626;
-        margin-bottom: 10px;
-      }
-
-      .warning-content h4 {
-        color: #dc2626;
-        margin: 0 0 15px 0;
-        font-size: 18px;
-        text-align: center;
-      }
-
-      .warning-content p {
-        color: #374151;
-        margin: 0 0 20px 0;
-        text-align: center;
-        line-height: 1.6;
-      }
-
-      .selected-questions-preview {
-        max-height: 200px;
-        overflow-y: auto;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 6px;
-        padding: 15px;
-        margin: 15px 0;
-      }
-
-      .preview-question {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 0;
-        border-bottom: 1px solid #e5e7eb;
-        font-size: 13px;
-      }
-
-      .preview-question:last-child {
-        border-bottom: none;
-      }
-
-      .preview-question-number {
-        background: #dc2626;
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 600;
-        flex-shrink: 0;
-      }
-
-      .preview-question-text {
-        flex: 1;
-        color: #374151;
-        line-height: 1.4;
-      }
-
-      .warning-checklist {
-        background: rgba(239, 68, 68, 0.05);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        border-radius: 6px;
-        padding: 15px;
-      }
-
-      .warning-checklist h5 {
-        margin: 0 0 10px 0;
-        color: #dc2626;
-        font-size: 14px;
-      }
-
-      .warning-checklist ul {
-        margin: 0;
-        padding-left: 20px;
-        color: #7f1d1d;
-      }
-
-      .warning-checklist li {
-        margin-bottom: 5px;
-        line-height: 1.4;
-      }
-
-      .confirmation-checkbox {
-        margin: 20px 0;
-        text-align: center;
-      }
-
-      .confirmation-checkbox .checkbox-container {
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        color: #374151;
-      }
-
-      .confirmation-checkbox .checkmark {
-        width: 20px;
-        height: 20px;
-        border: 2px solid #e5e7eb;
-        border-radius: 4px;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-
-      .confirmation-checkbox input[type="checkbox"]:checked + .checkmark {
-        background: #dc2626;
-        border-color: #dc2626;
-      }
-
-      .confirmation-checkbox input[type="checkbox"]:checked + .checkmark::after {
-        content: '✓';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        padding: 20px;
-        border-top: 1px solid #e5e7eb;
-      }
-
-      /* NEW: Animations */
-      @keyframes slideInRight {
-        from {
-          opacity: 0;
-          transform: translateX(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-
-      @keyframes pulse {
-        0%, 100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.5;
-        }
-      }
-
-      /* NEW: Responsive Design for Bulk Actions */
+      /* Responsive design for image previews */
       @media (max-width: 768px) {
-        .bulk-actions {
-          flex-direction: column;
-          gap: 10px;
-          align-items: stretch;
+        .image-preview {
+          max-width: 100%;
         }
 
-        .bulk-info {
-          justify-content: center;
-        }
-
-        .modal-footer {
-          flex-direction: column;
-        }
-
-        .modal-footer .btn-danger,
-        .modal-footer .btn-secondary {
-          width: 100%;
-          justify-content: center;
-        }
-      }
-
-      @media (max-width: 576px) {
-        .bulk-actions {
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: white;
-          border-top: 2px solid #dc2626;
-          box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
-          padding: 15px;
-          z-index: 100;
-          margin: 0;
-          border-radius: 0;
-        }
-        
-        .questions-section {
-          padding-bottom: 80px;
+        .image-preview-container {
+          padding: 0.75rem;
         }
       }
     </style>

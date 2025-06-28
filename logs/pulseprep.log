@@ -1,0 +1,39 @@
+INFO 2025-06-25 13:18:52,543 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:20:00,790 autoreload D:\PulsePrepProject\user_management\urls.py changed, reloading.
+INFO 2025-06-25 13:20:01,674 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:21:04,234 autoreload D:\PulsePrepProject\user_management\views.py changed, reloading.
+INFO 2025-06-25 13:21:05,039 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:21:28,032 autoreload D:\PulsePrepProject\user_management\views.py changed, reloading.
+INFO 2025-06-25 13:21:28,941 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:23:41,702 autoreload D:\PulsePrepProject\user_management\models.py changed, reloading.
+INFO 2025-06-25 13:23:42,576 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:24:38,937 autoreload D:\PulsePrepProject\user_management\models.py changed, reloading.
+INFO 2025-06-25 13:24:39,792 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:29:15,005 autoreload D:\PulsePrepProject\user_management\models.py changed, reloading.
+INFO 2025-06-25 13:29:15,930 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:29:43,067 autoreload D:\PulsePrepProject\user_management\admin.py changed, reloading.
+INFO 2025-06-25 13:29:43,934 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:30:41,391 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:30:42,207 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:30:59,251 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:32:18,240 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:32:19,056 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:32:36,745 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:32:52,306 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:32:53,081 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:33:01,502 autoreload D:\PulsePrepProject\user_management\urls.py changed, reloading.
+INFO 2025-06-25 13:33:02,270 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:33:18,874 autoreload D:\PulsePrepProject\user_management\urls.py changed, reloading.
+INFO 2025-06-25 13:33:19,655 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:33:38,280 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:33:39,050 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:33:56,667 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:33:57,481 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:35:11,366 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:35:12,162 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:35:25,679 autoreload D:\PulsePrepProject\user_management\email_utils.py changed, reloading.
+INFO 2025-06-25 13:35:26,513 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:35:43,099 autoreload D:\PulsePrepProject\user_management\admin.py changed, reloading.
+INFO 2025-06-25 13:35:43,826 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:54:12,739 autoreload Watching for file changes with StatReloader
+INFO 2025-06-25 13:54:43,935 autoreload D:\PulsePrepProject\config\settings.py changed, reloading.

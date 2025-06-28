@@ -1,10 +1,11 @@
-# user_management/middleware.py - Fixed Timezone Issue
+# user_management/middleware.py - Enhanced with Back Button Prevention
 from django.conf import settings
 from django.contrib.auth import logout
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.deprecation import MiddlewareMixin
 from .models import UserSession
 
 class SingleSessionMiddleware:
@@ -57,6 +58,10 @@ class AutomaticAccessControlMiddleware:
             '/analytics/',
             '/modelpaper/',
             '/dashboard/',  # Students need approval to see dashboard
+            '/my_profile/',  # Add profile protection
+            '/notes/',
+            '/progress/',
+            '/practice/',
         ]
         
         # URLs that are completely exempt
@@ -115,3 +120,51 @@ class AutomaticAccessControlMiddleware:
             if path.startswith(pattern):
                 return True
         return False
+
+
+class BackButtonSecurityMiddleware(MiddlewareMixin):
+    """
+    NEW: Middleware to add cache prevention headers to protected pages
+    and prevent back button access after logout
+    """
+    
+    # Pages that should have cache prevention headers
+    PROTECTED_URLS = [
+        'dashboard',
+        'student_dashboard', 
+        'admin_dashboard',
+        'my_profile',
+        'questionbank',
+        'managemodule',
+        'mocktest',
+        'analytics',
+        'notes',
+        'practice',
+        'progress',
+        'modelpaper',
+    ]
+    
+    def process_response(self, request, response):
+        """Add cache prevention headers to protected pages"""
+        
+        # Add cache prevention headers to all protected pages
+        if self._is_protected_url(request.path):
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+            response['Pragma'] = 'no-cache'
+            response['Expires'] = '0'
+            
+            # Additional security headers
+            response['X-Frame-Options'] = 'SAMEORIGIN'
+            response['X-Content-Type-Options'] = 'nosniff'
+            
+        # Special handling for logout page
+        if 'logout' in request.path:
+            response['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+            response['Pragma'] = 'no-cache' 
+            response['Expires'] = '0'
+            
+        return response
+    
+    def _is_protected_url(self, path):
+        """Check if the URL path requires cache prevention"""
+        return any(protected in path for protected in self.PROTECTED_URLS)

@@ -35,13 +35,15 @@
       <i class="fas fa-file-csv"></i>
       <span>Manage CSVs</span>
     </a>
-    <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
-      <i class="fas fa-cubes"></i>
-      <span>Modules</span>
-    </a>
+
     <a href="{% url 'manage_images' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_images' %}active{% endif %}">
       <i class="fas fa-images"></i>
       <span>Manage Images</span>
+    </a>
+    
+    <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
+      <i class="fas fa-cubes"></i>
+      <span>Modules</span>
     </a>
     <a href="/admin/user_management/customuser/" class="nav-item">
       <i class="fas fa-users"></i>
@@ -50,6 +52,10 @@
     <a href="{% url 'mocktest_list' %}" class="nav-item {% if request.resolver_match.url_name == 'mocktest_list' %}active{% endif %}">
       <i class="fas fa-vial"></i>
       <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'modelpaper_list' %}" class="nav-item {% if request.resolver_match.url_name == 'modelpaper_list' %}active{% endif %}">
+      <i class="fas fa-file-alt"></i>
+      <span>Model Papers</span>
     </a>
     <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
       <i class="fas fa-chart-bar"></i>
@@ -129,7 +135,7 @@
             <!-- Statistics Section -->
             <div class="stats-section">
               <h2><i class="fas fa-chart-bar"></i> Image Statistics</h2>
-              <p class="section-description">Overview of your image library</p>
+              <p class="section-description">Overview of your image library for Question Bank</p>
               
               <div class="stats-cards">
                 <div class="stat-card">
@@ -149,6 +155,7 @@
                   <div class="stat-content">
                     <h3>{{ stats.used_images|default:"0" }}</h3>
                     <p>Used in Questions</p>
+                    <small>Question Bank Only</small>
                   </div>
                 </div>
                 
@@ -177,7 +184,7 @@
             <!-- Upload Section -->
             <div class="upload-section">
               <h2><i class="fas fa-cloud-upload-alt"></i> Upload Images</h2>
-              <p class="section-description">Upload images for use in questions</p>
+              <p class="section-description">Upload images for use in Question Bank questions</p>
               
               <div class="upload-area" id="upload-area">
                 <div class="upload-icon">
@@ -479,31 +486,67 @@
         }
 
         function loadImageUsage() {
+          console.log('=== Starting loadImageUsage ===');
           const imageCards = document.querySelectorAll('.image-card');
+          console.log('Found', imageCards.length, 'image cards');
           
-          imageCards.forEach(card => {
+          imageCards.forEach((card, index) => {
             const imageId = card.dataset.imageId;
             const usageElement = card.querySelector(`#usage-${imageId}`);
             
-            fetch(`{% url 'get_image_usage' 0 %}`.replace('0', imageId))
-              .then(response => response.json())
-              .then(data => {
-                console.log('Usage data for image', imageId, ':', data); // Debug log
-                
-                if (data.usage_count > 0) {
-                  usageElement.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Used in ${data.usage_count} question(s)`;
-                  usageElement.style.background = '#ecfdf5';
-                  usageElement.style.color = '#065f46';
-                } else {
-                  usageElement.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Not used`;
-                  usageElement.style.background = '#fffbeb';
-                  usageElement.style.color = '#92400e';
-                }
-              })
-              .catch(error => {
-                console.error('Error loading usage for image', imageId, ':', error);
-                usageElement.innerHTML = `<i class="fas fa-question-circle" style="color: #6b7280;"></i> Unknown`;
-              });
+            console.log(`Loading usage for image ${imageId} (card ${index + 1}/${imageCards.length})`);
+            
+            // Add a small delay between requests to avoid overwhelming the server
+            setTimeout(() => {
+              fetch(`{% url 'get_image_usage_summary' 0 %}`.replace('0', imageId))
+                .then(response => {
+                  console.log(`Response status for image ${imageId}:`, response.status);
+                  if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log('=== Usage data for image', imageId, '===');
+                  console.log('Full response:', data);
+                  console.log('Total usage:', data.total_usage);
+                  console.log('QuestionBank count:', data.questionbank_count);
+                  console.log('Usage tags:', data.usage_tags);
+                  
+                  if (data.total_usage > 0) {
+                    // Create usage display with detailed breakdown
+                    let usageHtml = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Used in ${data.total_usage} question(s)`;
+                    
+                    // Add detailed breakdown
+                    if (data.questionbank_count > 0) {
+                      usageHtml += ` <span class="usage-tags">QB(${data.questionbank_count})</span>`;
+                    }
+                    
+                    usageElement.innerHTML = usageHtml;
+                    usageElement.style.background = '#ecfdf5';
+                    usageElement.style.color = '#065f46';
+                    usageElement.style.border = '1px solid #10b981';
+                    
+                    // Update card styling to indicate usage
+                    card.style.borderLeft = '4px solid #10b981';
+                  } else {
+                    usageElement.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Not used`;
+                    usageElement.style.background = '#fffbeb';
+                    usageElement.style.color = '#92400e';
+                    usageElement.style.border = '1px solid #f59e0b';
+                    
+                    // Update card styling to indicate no usage
+                    card.style.borderLeft = '4px solid #f59e0b';
+                  }
+                })
+                .catch(error => {
+                  console.error('=== Error loading usage for image', imageId, '===');
+                  console.error('Error details:', error);
+                  usageElement.innerHTML = `<i class="fas fa-question-circle" style="color: #6b7280;"></i> Error loading`;
+                  usageElement.style.background = '#f3f4f6';
+                  usageElement.style.color = '#6b7280';
+                });
+            }, index * 100); // Stagger requests by 100ms
           });
         }
 
@@ -518,12 +561,16 @@
           fetch(`{% url 'get_image_usage' 0 %}`.replace('0', imageId))
             .then(response => response.json())
             .then(data => {
-              console.log('Usage data:', data); // Debug log
+              console.log('=== Detailed usage data ===');
+              console.log('Response:', data);
               
               let usageHtml = `
                 <div class="usage-details">
                   <h4>${data.filename}</h4>
-                  <p><strong>Used in ${data.usage_count} question(s)</strong></p>
+                  <div class="usage-summary">
+                    <p><strong>Total Usage: ${data.usage_count} question(s)</strong></p>
+                    ${data.questionbank_count > 0 ? `<p><i class="fas fa-question-circle" style="color: #3b82f6;"></i> QuestionBank: ${data.questionbank_count} questions</p>` : ''}
+                  </div>
               `;
               
               if (data.questions && data.questions.length > 0) {
@@ -531,6 +578,9 @@
                 data.questions.forEach(q => {
                   usageHtml += `
                     <div class="question-item">
+                      <div class="question-header">
+                        <span class="source-tag ${q.source_tag}">${q.source_tag}</span>
+                      </div>
                       <div class="question-preview">${q.question_preview}</div>
                       <div class="question-meta">
                         <span class="badge">${q.degree}</span>
@@ -663,6 +713,47 @@
     </script>
     
     <style>
+      /* Enhanced styles for improved usage display */
+      .usage-tags {
+        margin-left: 0.5rem;
+        font-size: 0.7rem;
+        font-weight: bold;
+      }
+      
+      .usage-summary {
+        background: #f8fafc;
+        padding: 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        border-left: 4px solid #3b82f6;
+      }
+      
+      .usage-summary p {
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .question-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .source-tag {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        color: white;
+      }
+      
+      .source-tag.QB {
+        background: #3b82f6;
+      }
+      
       /* Image Management Specific Styles */
       .image-management-container {
         max-width: 1200px;
@@ -716,6 +807,13 @@
       .stat-content p {
         color: #6b7280;
         margin: 0;
+      }
+
+      .stat-content small {
+        color: #9ca3af;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 0.25rem;
       }
 
       .upload-section {
@@ -847,19 +945,6 @@
         padding: 1rem;
       }
 
-      .image-card {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .image-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
       .image-preview {
         position: relative;
         height: 200px;
@@ -939,6 +1024,8 @@
         background: #f3f4f6;
         border-radius: 4px;
         text-align: center;
+        border: 1px solid transparent;
+        transition: all 0.3s;
       }
 
       .no-images {
@@ -1120,6 +1207,13 @@
         padding: 1rem;
       }
 
+      .no-usage {
+        text-align: center;
+        color: #6b7280;
+        padding: 2rem;
+        font-style: italic;
+      }
+
       /* Notification styles */
       .notification {
         position: fixed;
@@ -1184,6 +1278,199 @@
         color: #6b7280;
         font-size: 0.75rem;
         margin-top: 0.25rem;
+      }
+
+      /* Breadcrumb styles */
+      .breadcrumb-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+
+      .breadcrumb-link {
+        color: #3b82f6;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .breadcrumb-link:hover {
+        text-decoration: underline;
+      }
+
+      .breadcrumb-current {
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+
+      /* Messages styles */
+      .messages {
+        margin-bottom: 1.5rem;
+      }
+
+      .message {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .message.success {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #d1fae5;
+      }
+
+      .message.error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      .message.warning {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fed7aa;
+      }
+
+      .message.info {
+        background: #eff6ff;
+        color: #1e40af;
+        border: 1px solid #dbeafe;
+      }
+
+      /* Section description styles */
+      .section-description {
+        color: #6b7280;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+      }
+
+      /* Search container styles */
+      .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input {
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        width: 300px;
+        font-size: 0.875rem;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      .search-icon {
+        position: absolute;
+        right: 0.75rem;
+        color: #9ca3af;
+      }
+
+      /* Button styles */
+      .btn-secondary {
+        background: #6b7280;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.2s;
+      }
+
+      .btn-secondary:hover {
+        background: #4b5563;
+      }
+
+      .btn-danger {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: background 0.2s;
+      }
+
+      .btn-danger:hover {
+        background: #b91c1c;
+      }
+
+      /* Enhanced image card borders for better visual feedback */
+      .image-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #e5e7eb; /* Default border */
+        transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.3s;
+      }
+
+      .image-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .image-management-container {
+          padding: 1rem;
+        }
+
+        .stats-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .controls-section {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .search-controls {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .search-input {
+          width: 100%;
+        }
+
+        .images-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+          width: 95%;
+          margin: 1rem;
+        }
+
+        .upload-area {
+          padding: 1.5rem;
+        }
+
+        .breadcrumb-nav {
+          flex-wrap: wrap;
+        }
       }
     </style>
   </body>

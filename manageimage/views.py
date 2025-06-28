@@ -1,7 +1,8 @@
+# manageimage/views.py - CLEANED VERSION (QuestionBank Only)
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -92,17 +93,17 @@ def upload_images(request):
 @login_required
 @require_POST
 def delete_image(request, image_id):
-    """Delete a single image"""
+    """Delete a single image with usage checking (QuestionBank only)"""
     try:
         image = get_object_or_404(QuestionImage, id=image_id)
         
-        # Check if image is being used
-        from questionbank.models import Question
-        usage_count = Question.objects.filter(image=image.filename).count()
+        # Get usage information (QuestionBank only)
+        usage_details = image.get_image_usage_details()
+        total_usage = usage_details['total_usage']
         
-        if usage_count > 0:
+        if total_usage > 0:
             return JsonResponse({
-                'error': f'Cannot delete. Image is used in {usage_count} question(s)'
+                'error': f'Cannot delete. Image is used in {usage_details["questionbank_count"]} QuestionBank question(s)'
             }, status=400)
         
         filename = image.filename
@@ -115,44 +116,43 @@ def delete_image(request, image_id):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-# Update manageimage/views.py to fix usage detection
 
 @login_required
 def get_image_usage(request, image_id):
-    """Get usage details for a specific image"""
+    """Get usage details for a specific image (QuestionBank only)"""
     try:
         image = get_object_or_404(QuestionImage, id=image_id)
         
-        from questionbank.models import Question
+        # Get usage information (QuestionBank only)
+        usage_details = image.get_image_usage_details()
         
-        # FIX: Match by filename without extension AND with extension
-        questions = Question.objects.filter(
-            Q(image=image.filename) |  # Exact match
-            Q(image=image.filename.rsplit('.', 1)[0]) |  # Without extension
-            Q(image__icontains=image.filename.rsplit('.', 1)[0])  # Contains filename
-        ).values(
-            'id', 'question_text', 'degree', 'year', 'subject', 'topic'
-        )
+        # Format response data
+        response_data = {
+            'filename': image.filename,
+            'usage_count': usage_details['total_usage'],
+            'questionbank_count': usage_details['questionbank_count'],
+            'usage_tags': usage_details['usage_tags'],
+            'questions': []
+        }
         
-        usage_data = []
-        for q in questions:
-            usage_data.append({
+        # Add QuestionBank questions only
+        for q in usage_details['questionbank_questions']:
+            response_data['questions'].append({
                 'id': q['id'],
                 'question_preview': q['question_text'][:100] + '...' if len(q['question_text']) > 100 else q['question_text'],
                 'degree': q['degree'],
                 'year': q['year'],
                 'subject': q['subject'],
-                'topic': q['topic']
+                'topic': q['topic'],
+                'source': 'QuestionBank',
+                'source_tag': 'QB'
             })
         
-        return JsonResponse({
-            'filename': image.filename,
-            'usage_count': len(usage_data),
-            'questions': usage_data
-        })
+        return JsonResponse(response_data)
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
 @login_required
 def get_available_images(request):
     """API endpoint to get list of available images for dropdowns"""
@@ -168,8 +168,21 @@ def get_available_images(request):
     
     return JsonResponse({'images': image_list})
 
-
-# Add this debug view to manageimage/views.py
+@login_required
+def get_image_usage_summary(request, image_id):
+    """Get quick usage summary for display in image cards (QuestionBank only)"""
+    try:
+        image = get_object_or_404(QuestionImage, id=image_id)
+        usage_details = image.get_image_usage_details()
+        
+        return JsonResponse({
+            'total_usage': usage_details['total_usage'],
+            'usage_tags': usage_details['usage_tags'],
+            'questionbank_count': usage_details['questionbank_count'],
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 def debug_images(request):
@@ -202,7 +215,6 @@ def debug_images(request):
     }
     
     return render(request, 'manageimage/debug_images.html', context)
-
 
 @login_required
 def test_images(request):

@@ -1,1298 +1,1633 @@
 {% load static %}
-{% include 'includes/favicon.html' %}
-{% include 'includes/security_protection.html' %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    {% include 'includes/favicon.html' %}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice Results - {{ session.topic }} - PulsePrep</title>
-    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    {% include 'user_management/security_protection.html' %}
-
-    <style>
-        /* Practice Results Enhanced Green Theme */
-        :root {
-            --primary: #82272e;
-            --primary-light: #a53b47;
-            --primary-dark: #6b1e24;
-            --practice-primary: #16a34a;       /* Green for practice mode */
-            --practice-primary-light: #22c55e;
-            --practice-primary-dark: #15803d;
-            --secondary: #10b981;
-            --accent: #3b82f6;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --success: #10b981;
-            --info: #3b82f6;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --white: #ffffff;
-            --dark: #1e293b;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        .page-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        /* Session Header - Practice Green Theme */
-        .session-header-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 4px 20px rgba(22, 163, 74, 0.08);
-            border-top: 4px solid var(--practice-primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .session-header-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(22, 163, 74, 0.05), rgba(22, 163, 74, 0.02));
-            border-radius: 50%;
-            z-index: 0;
-        }
-
-        .session-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex: 1;
-            position: relative;
-            z-index: 1;
-        }
-
-        .session-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 28px;
-            flex-shrink: 0;
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
-        }
-
-        .session-details h2 {
-            margin: 0 0 8px 0;
-            color: var(--dark);
-            font-size: 28px;
-            font-weight: 700;
-            white-space: pre-wrap;
-        }
-
-        .session-breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--gray-500);
-            font-size: 14px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-
-        .session-breadcrumb i {
-            color: var(--gray-300);
-        }
-
-        .session-breadcrumb span {
-            white-space: pre-wrap;
-        }
-
-        .session-meta {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .session-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--gray-500);
-            font-size: 14px;
-        }
-
-        .session-meta i {
-            color: var(--practice-primary);
-        }
-
-        .mode-indicator {
-            background: var(--practice-primary);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-left: 12px;
-        }
-
-        .overall-score {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(var(--practice-primary) 0deg, var(--gray-100) 0deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            transition: background 1s ease-in-out;
-        }
-
-        .score-circle::before {
-            content: '';
-            position: absolute;
-            width: 85px;
-            height: 85px;
-            background: white;
-            border-radius: 50%;
-        }
-
-        .score-text {
-            position: relative;
-            text-align: center;
-            z-index: 1;
-        }
-
-        .score-number {
-            display: block;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .score-label {
-            font-size: 12px;
-            color: var(--gray-500);
-            font-weight: 500;
-        }
-
-        /* Results Overview */
-        .results-overview {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .result-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(22, 163, 74, 0.1);
-        }
-
-        .result-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(22, 163, 74, 0.15);
-        }
-
-        .result-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .result-icon.correct {
-            background: linear-gradient(135deg, var(--success), #059669);
-        }
-
-        .result-icon.incorrect {
-            background: linear-gradient(135deg, var(--danger), #dc2626);
-        }
-
-        .result-icon.total {
-            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
-        }
-
-        .result-icon.time {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-        }
-
-        .result-content h3 {
-            margin: 0 0 4px 0;
-            color: var(--dark);
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .result-content p {
-            margin: 0;
-            color: var(--gray-500);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        /* Difficulty Breakdown */
-        .difficulty-breakdown-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05);
-            border: 1px solid rgba(22, 163, 74, 0.1);
-        }
-
-        .difficulty-breakdown-card h3 {
-            margin: 0 0 24px 0;
-            color: var(--dark);
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .difficulty-breakdown-card h3 i {
-            color: var(--practice-primary);
-        }
-
-        .difficulty-stats {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .difficulty-stat {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .difficulty-label {
-            min-width: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .difficulty-badge {
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .difficulty-easy {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .difficulty-medium {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .difficulty-hard {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .difficulty-count {
-            font-size: 14px;
-            color: var(--gray-500);
-            font-weight: 500;
-        }
-
-        .difficulty-progress {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 10px;
-            background: var(--gray-100);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 1s ease;
-        }
-
-        .progress-fill.difficulty-easy {
-            background: linear-gradient(90deg, var(--success), #059669);
-        }
-
-        .progress-fill.difficulty-medium {
-            background: linear-gradient(90deg, var(--warning), #d97706);
-        }
-
-        .progress-fill.difficulty-hard {
-            background: linear-gradient(90deg, var(--danger), #dc2626);
-        }
-
-        .percentage {
-            font-size: 14px;
-            color: var(--gray-500);
-            font-weight: 600;
-            min-width: 45px;
-        }
-
-        /* Question Review */
-        .question-review-card {
-            background: white;
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.05);
-            border: 1px solid rgba(22, 163, 74, 0.1);
-        }
-
-        .review-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .review-header h3 {
-            margin: 0;
-            color: var(--dark);
-            font-size: 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .review-header h3 i {
-            color: var(--practice-primary);
-        }
-
-        .review-filters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 8px 16px;
-            border: 1px solid var(--gray-200);
-            background: white;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: var(--gray-500);
-        }
-
-        .filter-btn:hover {
-            background: var(--gray-50);
-        }
-
-        .filter-btn.active {
-            background: var(--practice-primary);
-            color: white;
-            border-color: var(--practice-primary);
-        }
-
-        .questions-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .question-item {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: 20px;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .question-item:hover {
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
-            border-color: var(--practice-primary-light);
-        }
-
-        .question-item.correct {
-            border-left: 4px solid var(--success);
-        }
-
-        .question-item.incorrect {
-            border-left: 4px solid var(--danger);
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .question-number {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .question-number .number {
-            width: 36px;
-            height: 36px;
-            background: var(--gray-100);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 14px;
-        }
-
-        .status-icon i {
-            font-size: 20px;
-        }
-
-        .status-icon i.correct {
-            color: var(--success);
-        }
-
-        .status-icon i.incorrect {
-            color: var(--danger);
-        }
-
-        .question-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .time-spent {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--gray-500);
-        }
-
-        .question-content {
-            margin-left: 48px;
-        }
-
-        .question-text {
-            color: var(--gray-700);
-            margin-bottom: 16px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            font-size: 15px;
-        }
-
-        .answer-summary {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .answer-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-        }
-
-        .answer-label {
-            color: var(--gray-500);
-            font-weight: 500;
-            min-width: 110px;
-        }
-
-        .answer-value {
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .answer-value.correct {
-            background: rgba(16, 185, 129, 0.1);
-            color: #059669;
-        }
-
-        .answer-value.incorrect {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-        }
-
-        .explanation {
-            margin-top: 16px;
-        }
-
-        .explanation-toggle {
-            background: var(--practice-primary);
-            border: none;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .explanation-toggle:hover {
-            background: var(--practice-primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .explanation-toggle.active {
-            background: var(--practice-primary-dark);
-        }
-
-        .explanation-content {
-            display: none;
-            margin-top: 16px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-            border-left: 4px solid var(--practice-primary);
-        }
-
-        .explanation-content.show {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        .explanation-text {
-            color: var(--gray-700);
-            line-height: 1.7;
-            font-size: 14px;
-            white-space: pre-wrap;
-            margin-bottom: 16px;
-        }
-
-        /* Enhanced Question Image in Explanations */
-        .explanation-image {
-            margin: 16px 0;
-            text-align: center;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .explanation-image img {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            border: 1px solid var(--gray-200);
-            transition: transform 0.3s ease;
-            object-fit: contain;
-            background: white;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .explanation-image img:hover {
-            transform: scale(1.02);
-        }
-
-        .image-caption {
-            font-size: 12px;
-            color: var(--gray-500);
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        .image-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            margin: 16px 0;
-        }
-
-        .image-error i {
-            margin-right: 8px;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
-            color: white;
-            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(22, 163, 74, 0.4);
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-700);
-            border: 1px solid var(--gray-200);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-200);
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--accent), #2563eb);
-            color: white;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .session-header-card {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px;
-            }
-
-            .session-info {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .session-meta {
-                justify-content: center;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .results-overview {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-
-            .review-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .review-filters {
-                justify-content: center;
-            }
-
-            .question-content {
-                margin-left: 0;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-                justify-content: center;
-            }
-
-            .difficulty-stat {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 8px;
-            }
-
-            .difficulty-label {
-                min-width: auto;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .page-content {
-                padding: 16px;
-            }
-
-            .session-header-card, .result-card, .difficulty-breakdown-card, .question-review-card {
-                padding: 16px;
-            }
-
-            .results-overview {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-btn {
-                flex: 1;
-                text-align: center;
-            }
-
-            .explanation-image img {
-                max-height: 250px;
-            }
-        }
-
-        /* Animations */
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                max-height: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                max-height: 1000px;
-                transform: translateY(0);
-            }
-        }
-
-        /* Special character support - Enhanced typography */
-        .question-text,
-        .explanation-text,
-        .session-details h2,
-        .session-breadcrumb span {
-            font-feature-settings: "liga" 1, "kern" 1;
-            text-rendering: optimizeLegibility;
-        }
-
-        /* Support for mathematical symbols and special characters */
-        .special-chars {
-            font-family: "Times New Roman", "Cambria Math", serif;
-            font-size: 1.1em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+{% include 'includes/favicon.html' %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Results - {{ session.topic }} | PulsePrep</title>
+<link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+{% include 'includes/special_characters.html' %}
+{% include 'user_management/security_protection.html' %}
+
+<style>
+:root {
+    --primary: #82272e;
+    --primary-light: #a53b47;
+    --primary-dark: #6b1e24;
+    --practice-primary: #16a34a;       /* Green for practice mode */
+    --practice-primary-light: #22c55e;
+    --practice-primary-dark: #15803d;
+    --secondary: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --gray: #64748b;
+    --gray-light: #e2e8f0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* Navigation Bar */
+.nav-bar {
+    background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.nav-brand img {
+    height: 32px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Result Container */
+.result-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* Header */
+.result-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.result-header h1 {
+    color: var(--dark);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.result-header p {
+    color: var(--gray);
+    font-size: 16px;
+}
+
+/* Summary Card */
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.1);
+    text-align: center;
+    border: 1px solid var(--gray-light);
+}
+
+.score-display {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 24px;
+}
+
+.score-circle {
+    width: 100%;
+    height: 100%;
+}
+
+.score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--practice-primary);
+}
+
+.practice-status {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 24px;
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 32px 0;
+}
+
+.stat-card {
+    background: #f8fafc;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid var(--gray-light);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(22, 163, 74, 0.1);
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--practice-primary);
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    color: var(--gray);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.stat-icon {
+    font-size: 20px;
+    color: var(--practice-primary);
+    margin-bottom: 12px;
+}
+
+/* Performance Summary */
+.performance-summary {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.1);
+    margin-bottom: 32px;
+    border: 1px solid var(--gray-light);
+}
+
+.section-title {
+    color: var(--dark);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-title i {
+    color: var(--practice-primary);
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.performance-item {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--practice-primary);
+}
+
+.performance-item h4 {
+    color: var(--dark);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.performance-item p {
+    color: var(--gray);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.performance-bar {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.performance-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--practice-primary), var(--practice-primary-light));
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+/* Review Section */
+.review-section {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.1);
+    margin-bottom: 32px;
+    border: 1px solid var(--gray-light);
+}
+
+.review-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.review-toggle h2 {
+    margin: 0;
+    color: var(--dark);
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.review-toggle h2 i {
+    color: var(--practice-primary);
+}
+
+.review-filters {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    background: #f1f5f9;
+    border: 2px solid transparent;
+    color: var(--dark);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: var(--practice-primary);
+    color: white;
+    border-color: var(--practice-primary);
+}
+
+.filter-btn:hover {
+    background: var(--practice-primary-light);
+    color: white;
+}
+
+.toggle-btn {
+    background: var(--practice-primary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+    background: var(--practice-primary-dark);
+    transform: translateY(-2px);
+}
+
+.question-review {
+    border: 1px solid var(--gray-light);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    background: white;
+    display: none;
+}
+
+.question-review.show {
+    display: block;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.question-number {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 18px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-correct {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-incorrect {
+    background: #fecaca;
+    color: #991b1b;
+}
+
+.status-unanswered {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.question-text {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    color: var(--dark);
+    font-weight: 500;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border-left: 4px solid var(--practice-primary);
+    white-space: pre-wrap;
+}
+
+/* Question Image Display */
+.question-image, .explanation-image {
+    margin: 16px 0;
+    text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.question-image img, .explanation-image img {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid var(--gray-light);
+    transition: transform 0.2s ease;
+    object-fit: contain;
+    background: white;
+}
+
+.question-image img:hover, .explanation-image img:hover {
+    transform: scale(1.02);
+}
+
+.image-caption {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 8px;
+    font-style: italic;
+}
+
+.image-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    margin: 16px 0;
+}
+
+.image-error i {
+    margin-right: 8px;
+}
+
+/* Question Context */
+.question-context {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+}
+
+.context-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.context-item i {
+    color: var(--practice-primary);
+    font-size: 11px;
+}
+
+.mcq-options-section {
+    margin-bottom: 24px;
+}
+
+.section-subtitle {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 16px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.option-item {
+    margin-bottom: 12px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    min-height: 60px;
+}
+
+.option-label.correct-answer {
+    background: #d1fae5;
+    border-color: var(--secondary);
+    font-weight: 600;
+}
+
+.option-label.selected-wrong {
+    background: #fecaca;
+    border-color: var(--danger);
+    font-weight: 600;
+}
+
+.option-label.selected-correct {
+    background: #d1fae5;
+    border-color: var(--secondary);
+    font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.option-label input[type="radio"] {
+    margin-right: 16px;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    accent-color: var(--practice-primary);
+    flex-shrink: 0;
+}
+
+.option-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--dark);
+    flex: 1;
+    white-space: pre-wrap;
+}
+
+.option-feedback {
+    margin-left: 16px;
+    font-size: 18px;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.option-feedback.correct {
+    color: #065f46;
+}
+
+.option-feedback.incorrect {
+    color: #991b1b;
+}
+
+/* Answer Summary */
+.answer-summary {
+    margin: 16px 0;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid var(--gray-light);
+}
+
+.answer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.correct-text {
+    color: #065f46;
+    font-weight: 600;
+}
+
+.incorrect-text {
+    color: #991b1b;
+    font-weight: 600;
+}
+
+.explanation-section {
+    margin-top: 24px;
+}
+
+.explanation-box {
+    background: #dbeafe;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid var(--info);
+}
+
+.explanation-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.explanation-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--dark);
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+}
+
+/* Question Actions */
+.question-review-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-light);
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    background: #f1f5f9;
+    border: 1px solid var(--gray-light);
+    color: var(--gray);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-action:hover {
+    background: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+/* Question Details */
+.question-details {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid var(--gray-light);
+}
+
+.details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--gray);
+    min-width: 80px;
+}
+
+.detail-value {
+    color: var(--dark);
+}
+
+.image-tag {
+    background: var(--practice-primary);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-right: 6px;
+}
+
+.image-tag.explanation-img {
+    background: var(--warning);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--practice-primary), var(--practice-primary-dark));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(22, 163, 74, 0.3);
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: var(--dark);
+    border: 1px solid var(--gray-light);
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: var(--secondary);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+/* No Questions State */
+.no-questions {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(22, 163, 74, 0.1);
+    border: 1px solid var(--gray-light);
+}
+
+.no-questions-content i {
+    font-size: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.no-questions-content h3 {
+    margin: 0 0 8px 0;
+    color: var(--gray);
+    font-size: 18px;
+}
+
+.no-questions-content p {
+    margin: 0;
+    color: var(--gray);
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .result-container {
+        padding: 16px;
+    }
+
+    .summary-card {
+        padding: 24px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .review-section {
+        padding: 24px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .nav-bar {
+        padding: 12px 16px;
+    }
+
+    .nav-brand {
+        font-size: 16px;
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .performance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-toggle {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .review-filters {
+        justify-content: center;
+    }
+
+    .question-review-actions {
+        gap: 6px;
+    }
+
+    .btn-action {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result-container {
+        padding: 16px;
+    }
+
+    .summary-card, .performance-summary, .review-section {
+        padding: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-btn {
+        flex: 1;
+        text-align: center;
+    }
+
+    .question-image img, .explanation-image img {
+        max-height: 250px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 12pt !important;
+    }
+    
+    .result-container {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 15pt !important;
+    }
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+    }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="logo-container">
-                <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
+{% include 'includes/security_protection.html' %}
+
+<!-- Navigation Bar -->
+<div class="nav-bar no-print">
+    <div class="nav-brand">
+        <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+        Practice Session Results
+    </div>
+    <div class="nav-actions">
+        <button onclick="printSummary()" class="nav-btn">
+            <i class="fas fa-print"></i> Print Summary
+        </button>
+        <a href="{% url 'student_practice_modules' %}" class="nav-btn">
+            <i class="fas fa-dumbbell"></i> Practice Modules
+        </a>
+        <a href="{% url 'student_dashboard' %}" class="nav-btn">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="result-container">
+    <!-- Result Header -->
+    <div class="result-header">
+        <h1>{{ session.topic }}</h1>
+        <p>Practice session completed on {{ session.completed_at|date:"F j, Y" }} at {{ session.completed_at|time:"g:i A" }}</p>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="summary-card fade-in">
+        <div class="score-display">
+            <canvas id="scoreChart" class="score-circle" width="200" height="200"></canvas>
+            <div class="score-text">{{ session.accuracy|floatformat:0 }}%</div>
+        </div>
+
+        <div class="practice-status">
+            <i class="fas fa-dumbbell"></i>
+            {{ session.practice_mode|default:"Student"|title }} Mode
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div class="stat-value">{{ total_questions }}</div>
+                <div class="stat-label">Total Questions</div>
             </div>
-            <nav class="nav-menu">
-                <a href="{% url 'student_dashboard' %}" class="nav-item">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{% url 'student_practice_modules' %}" class="nav-item active">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>Practice Modules</span>
-                </a>
-                <a href="{% url 'student_mock_tests' %}" class="nav-item">
-                    <i class="fas fa-vial"></i>
-                    <span>Mock Tests</span>
-                </a>
-                <a href="{% url 'student_model_papers' %}" class="nav-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Model Papers</span>
-                </a>
-                <a href="{% url 'student_practice_progress' %}" class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>My Progress</span>
-                </a>
-                <a href="{% url 'myaccount' %}" class="nav-item">
-                    <i class="fas fa-user"></i>
-                    <span>My Account</span>
-                </a>
-                <a href="{% url 'student_notifications' %}" class="nav-item">
-                    <i class="fas fa-bell"></i>
-                    <span>Notifications</span>
-                </a>
-                <a href="{% url 'logout' %}" class="nav-item">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="header">
-                <div class="mobile-menu">
-                    <button id="sidebar-toggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
                 </div>
-                <h1><i class="fas fa-dumbbell"></i> Practice Session Results</h1>
-                <div class="user-menu">
-                    <div class="notification-container">
-                        <a href="{% url 'student_notifications' %}"><i class="fas fa-bell"></i></a>
-                        <span class="notification-badge"></span>
-                    </div>
-                    <div class="avatar">
-                        <img src="https://i.pravatar.cc/40?img=12" alt="User Avatar" />
-                    </div>
+                <div class="stat-value">{{ correct_answers }}</div>
+                <div class="stat-label">Correct Answers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-times-circle"></i>
                 </div>
-            </header>
-
-            <!-- Page Content -->
-            <div class="page-content">
-                <!-- Session Header -->
-                <div class="session-header-card">
-                    <div class="session-info">
-                        <div class="session-icon">
-                            <i class="fas fa-dumbbell"></i>
-                        </div>
-                        <div class="session-details">
-                            <h2>{{ session.topic }}
-                                <span class="mode-indicator">{{ session.practice_mode|default:"Student"|title }} Mode</span>
-                            </h2>
-                            <div class="session-breadcrumb">
-                                <span>{{ session.block }}</span>
-                                <i class="fas fa-chevron-right"></i>
-                                <span>{{ session.module }}</span>
-                                <i class="fas fa-chevron-right"></i>
-                                <span>{{ session.subject }}</span>
-                            </div>
-                            <div class="session-meta">
-                                <span><i class="fas fa-calendar"></i> {{ session.completed_at|date:"M d, Y H:i" }}</span>
-                                <span><i class="fas fa-clock"></i> {{ session.time_spent_formatted }}</span>
-                                <span><i class="fas fa-graduation-cap"></i> {{ session.degree }} - {{ session.year }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="overall-score">
-                        <div class="score-circle">
-                            <div class="score-text">
-                                <span class="score-number">{{ session.accuracy|floatformat:1 }}%</span>
-                                <span class="score-label">Accuracy</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="stat-value">{{ incorrect_answers }}</div>
+                <div class="stat-label">Incorrect Answers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
                 </div>
+                <div class="stat-value">{{ session.time_spent_formatted }}</div>
+                <div class="stat-label">Time Spent</div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Results Overview -->
-                <div class="results-overview">
-                    <div class="result-card">
-                        <div class="result-icon correct">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="result-content">
-                            <h3>{{ correct_answers }}</h3>
-                            <p>Correct Answers</p>
-                        </div>
-                    </div>
-
-                    <div class="result-card">
-                        <div class="result-icon incorrect">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="result-content">
-                            <h3>{{ incorrect_answers }}</h3>
-                            <p>Incorrect Answers</p>
-                        </div>
-                    </div>
-
-                    <div class="result-card">
-                        <div class="result-icon total">
-                            <i class="fas fa-list"></i>
-                        </div>
-                        <div class="result-content">
-                            <h3>{{ total_questions }}</h3>
-                            <p>Total Questions</p>
-                        </div>
-                    </div>
-
-                    <div class="result-card">
-                        <div class="result-icon time">
-                            <i class="fas fa-stopwatch"></i>
-                        </div>
-                        <div class="result-content">
-                            <h3>{{ session.time_spent_formatted }}</h3>
-                            <p>Time Spent</p>
-                        </div>
-                    </div>
+    <!-- Performance Summary -->
+    <div class="performance-summary fade-in">
+        <h2 class="section-title">
+            <i class="fas fa-chart-line"></i>
+            Performance Analysis
+        </h2>
+        
+        <div class="performance-grid">
+            <div class="performance-item">
+                <h4>Overall Accuracy</h4>
+                <p>Your performance in this practice session</p>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="width: {{ session.accuracy }}%"></div>
                 </div>
-
-                <!-- Difficulty Breakdown -->
-                {% if difficulty_stats %}
-                <div class="difficulty-breakdown-card">
-                    <h3><i class="fas fa-chart-bar"></i> Performance by Difficulty</h3>
-                    <div class="difficulty-stats">
-                        {% for difficulty, stats in difficulty_stats.items %}
-                        <div class="difficulty-stat">
-                            <div class="difficulty-label">
-                                <span class="difficulty-badge difficulty-{{ difficulty|lower }}">{{ difficulty }}</span>
-                                <span class="difficulty-count">{{ stats.correct }}/{{ stats.total }}</span>
-                            </div>
-                            <div class="difficulty-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill difficulty-{{ difficulty|lower }}" 
-                                         style="width: {% widthratio stats.correct stats.total 100 %}%"></div>
-                                </div>
-                                <span class="percentage">{% widthratio stats.correct stats.total 100 %}%</span>
-                            </div>
-                        </div>
-                        {% endfor %}
+                <small>{{ session.accuracy|floatformat:1 }}% ({{ correct_answers }}/{{ total_questions }})</small>
+            </div>
+            
+            <!-- Difficulty Breakdown (if available) -->
+            {% if difficulty_breakdown %}
+                {% for difficulty in difficulty_breakdown %}
+                <div class="performance-item">
+                    <h4>{{ difficulty.name }} Questions</h4>
+                    <p>{{ difficulty.total }} questions attempted</p>
+                    <div class="performance-bar">
+                        <div class="performance-fill" style="width: {{ difficulty.accuracy }}%"></div>
                     </div>
+                    <small>{{ difficulty.accuracy|floatformat:1 }}% accuracy</small>
                 </div>
-                {% endif %}
-                
-                <!-- Question Review with Enhanced Image Support -->
-                <div class="question-review-card">
+                {% endfor %}
+            {% endif %}
+            
+            <div class="performance-item">
+                <h4>Practice Session</h4>
+                <p>Session details and completion</p>
+                <div class="performance-bar">
+                    <div class="performance-fill" style="width: 100%"></div>
+                </div>
+                <small>Session completed successfully</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Information -->
+    <div class="performance-summary fade-in">
+        <h2 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            Session Information
+        </h2>
+        
+        <div class="performance-grid">
+            <div class="performance-item">
+                <h4>Topic Details</h4>
+                <p><strong>Topic:</strong> {{ session.topic }}</p>
+                <p><strong>Block:</strong> {{ session.block|default:"N/A" }}</p>
+                <p><strong>Module:</strong> {{ session.module|default:"N/A" }}</p>
+                <p><strong>Subject:</strong> {{ session.subject|default:"N/A" }}</p>
+            </div>
+            
+            <div class="performance-item">
+                <h4>Session Details</h4>
+                <p><strong>Started:</strong> {{ session.started_at|date:"M j, Y g:i A"|default:"N/A" }}</p>
+                <p><strong>Completed:</strong> {{ session.completed_at|date:"M j, Y g:i A" }}</p>
+                <p><strong>Time Spent:</strong> {{ session.time_spent_formatted }}</p>
+                <p><strong>Mode:</strong> {{ session.practice_mode|default:"Student"|title }}</p>
+            </div>
+            
+            <div class="performance-item">
+                <h4>Student Information</h4>
+                <p><strong>Name:</strong> {{ user.get_full_name|default:"N/A" }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Course:</strong> {{ session.degree|default:"N/A" }} - {{ session.year|default:"N/A" }}</p>
+            </div>
+            
+            <div class="performance-item">
+                <h4>Result Summary</h4>
+                <p><strong>Accuracy:</strong> {{ session.accuracy|floatformat:1 }}%</p>
+                <p><strong>Questions:</strong> {{ correct_answers }}/{{ total_questions }} correct</p>
+                <p><strong>Performance:</strong> 
+                    {% if session.accuracy >= 90 %}Excellent
+                    {% elif session.accuracy >= 80 %}Very Good
+                    {% elif session.accuracy >= 70 %}Good
+                    {% elif session.accuracy >= 60 %}Fair
+                    {% elif session.accuracy >= 50 %}Needs Improvement
+                    {% else %}Poor
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Answers Review -->
+    <div class="review-section fade-in no-print">
+        <div class="review-toggle">
+            <h2 class="section-title">
+                <i class="fas fa-clipboard-check"></i>
+                Detailed Answers Review
+            </h2>
+            
+            <div class="review-filters">
+                <button class="filter-btn active" onclick="filterQuestions('all')" id="filter-all">
+                    <i class="fas fa-list"></i> All Questions
+                </button>
+                <button class="filter-btn" onclick="filterQuestions('correct')" id="filter-correct">
+                    <i class="fas fa-check"></i> Correct Only
+                </button>
+                <button class="filter-btn" onclick="filterQuestions('incorrect')" id="filter-incorrect">
+                    <i class="fas fa-times"></i> Incorrect Only
+                </button>
+            </div>
+            
+            <button class="toggle-btn" onclick="toggleReview()">
+                <i class="fas fa-eye" id="toggle-icon"></i>
+                <span id="toggle-text">Show Answers</span>
+            </button>
+        </div>
+        
+        <div id="review-content">
+            {% for response_data in responses %}
+                <div class="question-review" data-status="{% if response_data.response.is_correct %}correct{% else %}incorrect{% endif %}">
                     <div class="review-header">
-                        <h3><i class="fas fa-list-alt"></i> Question Review</h3>
-                        <div class="review-filters">
-                            <button class="filter-btn active" data-filter="all">All Questions</button>
-                            <button class="filter-btn" data-filter="correct">Correct</button>
-                            <button class="filter-btn" data-filter="incorrect">Incorrect</button>
-                        </div>
+                        <div class="question-number">Question {{ forloop.counter }}</div>
+                        <span class="status-badge {% if response_data.response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
+                            <i class="fas fa-{% if response_data.response.is_correct %}check{% else %}times{% endif %}"></i>
+                            {% if response_data.response.is_correct %}Correct{% else %}Incorrect{% endif %}
+                        </span>
                     </div>
                     
-                    <div class="questions-list">
-                        {% for response in responses %}
-                        <div class="question-item {% if response.is_correct %}correct{% else %}incorrect{% endif %}" 
-                             data-status="{% if response.is_correct %}correct{% else %}incorrect{% endif %}">
-                            <div class="question-header">
-                                <div class="question-number">
-                                    <span class="number">{{ forloop.counter }}</span>
-                                    <div class="status-icon">
-                                        {% if response.is_correct %}
-                                            <i class="fas fa-check-circle correct"></i>
-                                        {% else %}
-                                            <i class="fas fa-times-circle incorrect"></i>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="question-info">
-                                    <span class="difficulty-badge difficulty-{{ response.question.difficulty|lower }}">
-                                        {{ response.question.difficulty }}
-                                    </span>
-                                    <span class="time-spent">
-                                        <i class="fas fa-clock"></i> {{ response.time_spent }}s
-                                    </span>
-                                </div>
+                    <div class="question-text">{{ response_data.question.question_text }}</div>
+                    
+                    <!-- Question Image Display -->
+                    {% if response_data.question_image_url %}
+                        <div class="question-image">
+                            <img src="{{ response_data.question_image_url }}" 
+                                 alt="Question {{ forloop.counter }} Image" 
+                                 loading="lazy"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-error" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Image not found: {{ response_data.question_image_filename }}</span>
                             </div>
-                            
-                            <div class="question-content">
-                                <div class="question-text">{{ response.question.question_text }}</div>
-                                
-                                <div class="answer-summary">
-                                    <div class="answer-item">
-                                        <span class="answer-label">Your Answer:</span>
-                                        <span class="answer-value {% if response.is_correct %}correct{% else %}incorrect{% endif %}">
-                                            {% if response.selected_answer %}
-                                                {{ response.selected_answer }}
-                                            {% else %}
-                                                Not Answered
+                            {% if response_data.question_image_filename %}
+                                <div class="image-caption">Image: {{ response_data.question_image_filename }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Question Context Info -->
+                    <div class="question-context">
+                        <div class="context-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>{{ response_data.question.degree }} - {{ response_data.question.year }}</span>
+                        </div>
+                        {% if response_data.question.block or response_data.question.module or response_data.question.subject or response_data.question.topic %}
+                            <div class="context-item">
+                                <i class="fas fa-sitemap"></i>
+                                <span>
+                                    {% if response_data.question.block %}{{ response_data.question.block }}{% endif %}
+                                    {% if response_data.question.module %} → {{ response_data.question.module }}{% endif %}
+                                    {% if response_data.question.subject %} → {{ response_data.question.subject }}{% endif %}
+                                    {% if response_data.question.topic %} → {{ response_data.question.topic }}{% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+                        {% if response_data.question.difficulty %}
+                            <div class="context-item">
+                                <i class="fas fa-signal"></i>
+                                <span>{{ response_data.question.difficulty }}</span>
+                            </div>
+                        {% endif %}
+                        {% if response_data.response.time_spent %}
+                            <div class="context-item">
+                                <i class="fas fa-clock"></i>
+                                <span>{{ response_data.response.time_spent|default:"0" }}s</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- MCQ Options Section -->
+                    {% if response_data.question.question_type == 'MCQ' %}
+                        <div class="mcq-options-section">
+                            <div class="section-subtitle">
+                                <i class="fas fa-list-ol"></i>
+                                Answer Options
+                            </div>
+                            <ul class="options-list">
+                                {% if response_data.question.option_a %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response_data.question.correct_answer == 'A' %}correct-answer{% endif %}
+                                            {% if response_data.response.selected_answer == 'A' and response_data.question.correct_answer != 'A' %}selected-wrong{% endif %}
+                                            {% if response_data.response.selected_answer == 'A' and response_data.question.correct_answer == 'A' %}selected-correct{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="A" 
+                                                {% if response_data.response.selected_answer == 'A' %}checked{% endif %}>
+                                            <span class="option-text">A) {{ response_data.question.option_a }}</span>
+                                            {% if response_data.question.correct_answer == 'A' %}
+                                                <i class="fas fa-check option-feedback correct"></i>
+                                            {% elif response_data.response.selected_answer == 'A' %}
+                                                <i class="fas fa-times option-feedback incorrect"></i>
                                             {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response_data.question.option_b %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response_data.question.correct_answer == 'B' %}correct-answer{% endif %}
+                                            {% if response_data.response.selected_answer == 'B' and response_data.question.correct_answer != 'B' %}selected-wrong{% endif %}
+                                            {% if response_data.response.selected_answer == 'B' and response_data.question.correct_answer == 'B' %}selected-correct{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="B" 
+                                                {% if response_data.response.selected_answer == 'B' %}checked{% endif %}>
+                                            <span class="option-text">B) {{ response_data.question.option_b }}</span>
+                                            {% if response_data.question.correct_answer == 'B' %}
+                                                <i class="fas fa-check option-feedback correct"></i>
+                                            {% elif response_data.response.selected_answer == 'B' %}
+                                                <i class="fas fa-times option-feedback incorrect"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response_data.question.option_c %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response_data.question.correct_answer == 'C' %}correct-answer{% endif %}
+                                            {% if response_data.response.selected_answer == 'C' and response_data.question.correct_answer != 'C' %}selected-wrong{% endif %}
+                                            {% if response_data.response.selected_answer == 'C' and response_data.question.correct_answer == 'C' %}selected-correct{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="C" 
+                                                {% if response_data.response.selected_answer == 'C' %}checked{% endif %}>
+                                            <span class="option-text">C) {{ response_data.question.option_c }}</span>
+                                            {% if response_data.question.correct_answer == 'C' %}
+                                                <i class="fas fa-check option-feedback correct"></i>
+                                            {% elif response_data.response.selected_answer == 'C' %}
+                                                <i class="fas fa-times option-feedback incorrect"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response_data.question.option_d %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response_data.question.correct_answer == 'D' %}correct-answer{% endif %}
+                                            {% if response_data.response.selected_answer == 'D' and response_data.question.correct_answer != 'D' %}selected-wrong{% endif %}
+                                            {% if response_data.response.selected_answer == 'D' and response_data.question.correct_answer == 'D' %}selected-correct{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="D" 
+                                                {% if response_data.response.selected_answer == 'D' %}checked{% endif %}>
+                                            <span class="option-text">D) {{ response_data.question.option_d }}</span>
+                                            {% if response_data.question.correct_answer == 'D' %}
+                                                <i class="fas fa-check option-feedback correct"></i>
+                                            {% elif response_data.response.selected_answer == 'D' %}
+                                                <i class="fas fa-times option-feedback incorrect"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                                
+                                {% if response_data.question.option_e %}
+                                    <li class="option-item">
+                                        <label class="option-label 
+                                            {% if response_data.question.correct_answer == 'E' %}correct-answer{% endif %}
+                                            {% if response_data.response.selected_answer == 'E' and response_data.question.correct_answer != 'E' %}selected-wrong{% endif %}
+                                            {% if response_data.response.selected_answer == 'E' and response_data.question.correct_answer == 'E' %}selected-correct{% endif %}">
+                                            <input type="radio" name="q{{ forloop.counter }}" value="E" 
+                                                {% if response_data.response.selected_answer == 'E' %}checked{% endif %}>
+                                            <span class="option-text">E) {{ response_data.question.option_e }}</span>
+                                            {% if response_data.question.correct_answer == 'E' %}
+                                                <i class="fas fa-check option-feedback correct"></i>
+                                            {% elif response_data.response.selected_answer == 'E' %}
+                                                <i class="fas fa-times option-feedback incorrect"></i>
+                                            {% endif %}
+                                        </label>
+                                    </li>
+                                {% endif %}
+                            </ul>
+
+                            <!-- Answer Summary -->
+                            <div class="answer-summary">
+                                <div class="answer-item">
+                                    <strong>Your Answer:</strong> 
+                                    <span class="{% if response_data.response.is_correct %}correct-text{% else %}incorrect-text{% endif %}">
+                                        {{ response_data.response.selected_answer|default:"Not answered" }}
+                                    </span>
+                                </div>
+                                <div class="answer-item">
+                                    <strong>Correct Answer:</strong> 
+                                    <span class="correct-text">{{ response_data.question.correct_answer }}</span>
+                                </div>
+                                <div class="answer-item">
+                                    <strong>Result:</strong> 
+                                    {% if response_data.response.is_correct %}
+                                        <span class="correct-text">
+                                            <i class="fas fa-check-circle"></i> Correct
                                         </span>
-                                    </div>
-                                    
-                                    {% if not response.is_correct %}
-                                    <div class="answer-item">
-                                        <span class="answer-label">Correct Answer:</span>
-                                        <span class="answer-value correct">{{ response.question.correct_answer }}</span>
-                                    </div>
+                                    {% else %}
+                                        <span class="incorrect-text">
+                                            <i class="fas fa-times-circle"></i> Incorrect
+                                        </span>
                                     {% endif %}
                                 </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Explanation Section -->
+                    {% if response_data.question.explanation %}
+                        <div class="explanation-section">
+                            <div class="explanation-box">
+                                <div class="explanation-title">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Explanation
+                                </div>
+                                <div class="explanation-text">{{ response_data.question.explanation|linebreaks }}</div>
                                 
-                                {% if response.question.explanation or response.question.image %}
-                                <div class="explanation">
-                                    <button class="explanation-toggle" onclick="toggleExplanation({{ forloop.counter }})">
-                                        <i class="fas fa-lightbulb"></i> Show Explanation
-                                    </button>
-                                    <div class="explanation-content" id="explanation-{{ forloop.counter }}">
-                                        {% if response.question.explanation %}
-                                            <div class="explanation-text">{{ response.question.explanation }}</div>
-                                        {% else %}
-                                            <div class="explanation-text"><em>No explanation available for this question.</em></div>
-                                        {% endif %}
-                                        
-                                        {% if response.question.image %}
-                                        <div class="explanation-image">
-                                            {% load static %}
-                                            <img src="{% get_media_prefix %}question_images/{{ response.question.image }}" 
-                                                 alt="Question {{ forloop.counter }} Image" 
-                                                 loading="lazy"
-                                                 onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'><i class=\\'fas fa-exclamation-triangle\\'></i> Image unavailable</div>'"
-                                                 onload="this.style.opacity='1';"
-                                                 style="opacity: 0; transition: opacity 0.3s ease;">
-                                            <div class="image-caption">Image: {{ response.question.image }}</div>
+                                <!-- Explanation Image Display -->
+                                {% if response_data.explanation_image_url %}
+                                    <div class="explanation-image">
+                                        <img src="{{ response_data.explanation_image_url }}" 
+                                             alt="Question {{ forloop.counter }} Explanation Image" 
+                                             loading="lazy"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <div class="image-error" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span>Image not found: {{ response_data.explanation_image_filename }}</span>
                                         </div>
+                                        {% if response_data.explanation_image_filename %}
+                                            <div class="image-caption">Explanation Image: {{ response_data.explanation_image_filename }}</div>
                                         {% endif %}
                                     </div>
-                                </div>
                                 {% endif %}
                             </div>
                         </div>
-                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Question Actions -->
+                    <div class="question-review-actions">
+                        <button class="btn-action" onclick="toggleQuestionDetails({{ response_data.question.id }})">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Question Details</span>
+                        </button>
+                        <button class="btn-action" onclick="addQuestionNote({{ response_data.question.id }})">
+                            <i class="fas fa-sticky-note"></i>
+                            <span>Add Note</span>
+                        </button>
+                        {% if session.practice_mode == 'student' %}
+                            <button class="btn-action" onclick="reportQuestion({{ response_data.question.id }})">
+                                <i class="fas fa-flag"></i>
+                                <span>Report Issue</span>
+                            </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Collapsible Question Details -->
+                    <div class="question-details" id="details-{{ response_data.question.id }}" style="display: none;">
+                        <div class="details-content">
+                            <div class="detail-row">
+                                <span class="detail-label">Question ID:</span>
+                                <span class="detail-value">{{ response_data.question.id }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Created:</span>
+                                <span class="detail-value">{{ response_data.question.created_on|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Category:</span>
+                                <span class="detail-value">
+                                    {{ response_data.question.degree }} → {{ response_data.question.year }} → {{ response_data.question.subject }}
+                                </span>
+                            </div>
+                            {% if response_data.question_image_filename or response_data.explanation_image_filename %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Images:</span>
+                                    <span class="detail-value">
+                                        {% if response_data.question_image_filename %}
+                                            <span class="image-tag question-img">Q: {{ response_data.question_image_filename }}</span>
+                                        {% endif %}
+                                        {% if response_data.explanation_image_filename %}
+                                            <span class="image-tag explanation-img">E: {{ response_data.explanation_image_filename }}</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            {% if response_data.response.time_spent %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Time Spent:</span>
+                                    <span class="detail-value">{{ response_data.response.time_spent }} seconds</span>
+                                </div>
+                            {% endif %}
+                            {% if response_data.response.answered_at %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Answered At:</span>
+                                    <span class="detail-value">{{ response_data.response.answered_at|date:"H:i:s" }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <a href="{% url 'student_practice_modules' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Modules
-                    </a>
-                    
-                    <a href="{% url 'start_practice_session' %}?degree={{ session.degree }}&year={{ session.year }}&block={{ session.block }}&module={{ session.module }}&subject={{ session.subject }}&topic={{ session.topic }}" 
-                       class="btn btn-primary">
-                        <i class="fas fa-redo"></i> Practice Again
-                    </a>
-                    
-                    <a href="{% url 'student_practice_progress' %}" class="btn btn-success">
-                        <i class="fas fa-chart-line"></i> View Progress
-                    </a>
+            {% empty %}
+                <div class="no-questions">
+                    <div class="no-questions-content">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>No Questions Found</h3>
+                        <p>No questions were answered in this practice session.</p>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Footer -->
-            <footer class="footer">
-                <div class="social-links">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                </div>
-                <div class="copyright">
-                    &copy; PulsePrep Media Direct, LLC. All rights reserved.
-                </div>
-            </footer>
-        </main>
+            {% endfor %}
+        </div>
     </div>
 
-    <script src="{% static 'js/DAscript.js' %}"></script>
-    <script>
-        // Special character processing function
-        function processSpecialCharacters(text) {
-            if (!text) return text;
-            
-            // Convert common symbols and arrows
-            text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
-            text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
-            text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
-            text = text.replace(/⇌/g, '⇌');
-            
-            // Greek letters
-            text = text.replace(/\balpha\b/gi, 'α');
-            text = text.replace(/\bbeta\b/gi, 'β');
-            text = text.replace(/\bgamma\b/gi, 'γ');
-            text = text.replace(/\bdelta\b/gi, 'δ');
-            text = text.replace(/\blambda\b/gi, 'λ');
-            text = text.replace(/\bmu\b/gi, 'μ');
-            text = text.replace(/\bpi\b/gi, 'π');
-            text = text.replace(/\bsigma\b/gi, 'σ');
-            text = text.replace(/\bomega\b/gi, 'ω');
-            
-            // Mathematical symbols
-            text = text.replace(/\+\/-/g, '±');
-            text = text.replace(/\+-/g, '±');
-            text = text.replace(/\<=\>/g, '⇔');
-            text = text.replace(/\<=/g, '≤');
-            text = text.replace(/\>=/g, '≥');
-            text = text.replace(/\!=/g, '≠');
-            text = text.replace(/\~=/g, '≈');
-            text = text.replace(/\infty/g, '∞');
-            text = text.replace(/\sqrt/g, '√');
-            
-            // Superscript numbers
-            text = text.replace(/\^2/g, '²');
-            text = text.replace(/\^3/g, '³');
-            text = text.replace(/\^1/g, '¹');
-            
-            // Common medical symbols
-            text = text.replace(/\bdegree\b/gi, '°');
-            text = text.replace(/\bdegrees\b/gi, '°');
-            
-            return text;
+    <!-- Action Buttons -->
+    <div class="action-buttons no-print">
+        <a href="{% url 'student_practice_modules' %}" class="btn btn-secondary">
+            <i class="fas fa-dumbbell"></i> Practice Modules
+        </a>
+        <button onclick="printSummary()" class="btn btn-success">
+            <i class="fas fa-print"></i> Print Summary
+        </button>
+        <a href="{% url 'start_practice_session' %}?degree={{ session.degree }}&year={{ session.year }}&block={{ session.block }}&module={{ session.module }}&subject={{ session.subject }}&topic={{ session.topic }}" 
+           class="btn btn-primary">
+            <i class="fas fa-redo"></i> Practice Again
+        </a>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Draw score chart
+const ctx = document.getElementById('scoreChart').getContext('2d');
+const percentage = {{ session.accuracy }};
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        datasets: [{
+            data: [percentage, 100 - percentage],
+            backgroundColor: [
+                '#16a34a',  // Green for practice mode
+                '#e5e7eb'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        cutout: '75%',
+        rotation: -90,
+        circumference: 180,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        },
+        animation: {
+            animateScale: true,
+            animateRotate: true,
+            duration: 1500
         }
+    }
+});
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Filter functionality
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            const questionItems = document.querySelectorAll('.question-item');
-            
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.dataset.filter;
-                    
-                    // Update active button
-                    filterBtns.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Filter questions
-                    questionItems.forEach(item => {
-                        if (filter === 'all' || item.dataset.status === filter) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Animate score circle
-            animateScoreCircle();
-            
-            // Animate result cards
-            animateResultCards();
-            
-            // Animate progress bars
-            setTimeout(() => {
-                document.querySelectorAll('.progress-fill').forEach(bar => {
-                    const width = bar.style.width;
-                    bar.style.width = '0%';
-                    setTimeout(() => {
-                        bar.style.transition = 'width 1s ease-in-out';
-                        bar.style.width = width;
-                    }, 100);
-                });
-            }, 500);
+// Review functionality
+let reviewVisible = false;
+let currentFilter = 'all';
 
-            // Process special characters in displayed text
-            processSpecialCharactersInDOM();
-        });
+function toggleReview() {
+    const reviewContent = document.getElementById('review-content');
+    const toggleIcon = document.getElementById('toggle-icon');
+    const toggleText = document.getElementById('toggle-text');
+    
+    reviewVisible = !reviewVisible;
+    
+    if (reviewVisible) {
+        showQuestionsWithFilter(currentFilter);
+        toggleIcon.className = 'fas fa-eye-slash';
+        toggleText.textContent = 'Hide Answers';
+    } else {
+        hideAllQuestions();
+        toggleIcon.className = 'fas fa-eye';
+        toggleText.textContent = 'Show Answers';
+    }
+}
+
+function filterQuestions(filter) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`filter-${filter}`).classList.add('active');
+    
+    currentFilter = filter;
+    
+    if (reviewVisible) {
+        showQuestionsWithFilter(filter);
+    }
+}
+
+function showQuestionsWithFilter(filter) {
+    const questions = document.querySelectorAll('.question-review');
+    let delay = 0;
+    
+    questions.forEach((question, index) => {
+        const status = question.getAttribute('data-status');
+        let shouldShow = false;
         
-        function toggleExplanation(questionNumber) {
-            const explanationContent = document.getElementById(`explanation-${questionNumber}`);
-            const toggleBtn = explanationContent.previousElementSibling;
-            
-            if (explanationContent.classList.contains('show')) {
-                explanationContent.classList.remove('show');
-                toggleBtn.innerHTML = '<i class="fas fa-lightbulb"></i> Show Explanation';
-                toggleBtn.classList.remove('active');
-            } else {
-                explanationContent.classList.add('show');
-                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Explanation';
-                toggleBtn.classList.add('active');
+        switch(filter) {
+            case 'all':
+                shouldShow = true;
+                break;
+            case 'correct':
+                shouldShow = status === 'correct';
+                break;
+            case 'incorrect':
+                shouldShow = status === 'incorrect';
+                break;
+        }
+        
+        if (shouldShow) {
+            setTimeout(() => {
+                question.classList.add('show', 'slide-down');
+            }, delay);
+            delay += 100;
+        } else {
+            question.classList.remove('show', 'slide-down');
+        }
+    });
+}
+
+function hideAllQuestions() {
+    const questions = document.querySelectorAll('.question-review');
+    questions.forEach(question => {
+        question.classList.remove('show', 'slide-down');
+    });
+}
+
+function toggleQuestionDetails(questionId) {
+    const details = document.getElementById(`details-${questionId}`);
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        details.style.animation = 'slideDown 0.3s ease';
+    } else {
+        details.style.display = 'none';
+    }
+}
+
+function addQuestionNote(questionId) {
+    // Implement note adding functionality
+    console.log('Adding note for question:', questionId);
+    // You can integrate this with your existing note system
+}
+
+function reportQuestion(questionId) {
+    // Implement question reporting functionality
+    console.log('Reporting question:', questionId);
+    if (confirm('Report this question as having an issue?')) {
+        // Add your reporting logic here
+        alert('Question reported successfully!');
+    }
+}
+
+// Enhanced Print Summary Function
+function printSummary() {
+    // Store original security state
+    const originalSecureClass = document.body.classList.contains('secure-content');
+    const reviewSection = document.querySelector('.review-section');
+    const originalDisplay = reviewSection ? reviewSection.style.display : '';
+    
+    // Temporarily disable security for printing
+    if (originalSecureClass) {
+        document.body.classList.remove('secure-content');
+    }
+    
+    // Hide review section for print
+    if (reviewSection) {
+        reviewSection.style.display = 'none';
+    }
+    
+    // Create a temporary style override for print
+    const printStyle = document.createElement('style');
+    printStyle.id = 'temp-print-style';
+    printStyle.textContent = `
+        @media print {
+            body::before {
+                display: none !important;
+            }
+            .secure-content {
+                display: block !important;
+                -webkit-user-select: text !important;
+                -moz-user-select: text !important;
+                -ms-user-select: text !important;
+                user-select: text !important;
+            }
+            .no-print {
+                display: none !important;
             }
         }
+    `;
+    document.head.appendChild(printStyle);
+    
+    // Print the page
+    window.print();
+    
+    // Restore everything after print dialog
+    setTimeout(() => {
+        // Remove temporary print styles
+        const tempStyle = document.getElementById('temp-print-style');
+        if (tempStyle) {
+            tempStyle.remove();
+        }
         
-        function animateScoreCircle() {
-            const scoreNumber = document.querySelector('.score-number');
-            const accuracy = {{ session.accuracy|floatformat:1 }};
-            let current = 0;
-            const increment = accuracy / 30;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= accuracy) {
-                    current = accuracy;
-                    clearInterval(timer);
-                }
-                scoreNumber.textContent = current.toFixed(1) + '%';
-            }, 50);
-            
-            // Animate circle stroke
-            const circle = document.querySelector('.score-circle');
-            const circumference = 2 * Math.PI * 60; // radius = 60
-            const strokeDasharray = (accuracy / 100) * circumference;
-            
+        // Restore security class if it was originally present
+        if (originalSecureClass) {
+            document.body.classList.add('secure-content');
+        }
+        
+        // Restore review section display
+        if (reviewSection) {
+            reviewSection.style.display = originalDisplay;
+        }
+    }, 1000);
+}
+
+// Animate performance bars on load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const performanceFills = document.querySelectorAll('.performance-fill');
+        performanceFills.forEach(fill => {
+            const width = fill.style.width;
+            fill.style.width = '0%';
             setTimeout(() => {
-                circle.style.background = `conic-gradient(var(--practice-primary) ${accuracy * 3.6}deg, var(--gray-100) 0deg)`;
-            }, 100);
-        }
-        
-        function animateResultCards() {
-            const cards = document.querySelectorAll('.result-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 150);
-            });
-        }
-
-        // Process special characters in the DOM
-        function processSpecialCharactersInDOM() {
-            // Process question texts
-            document.querySelectorAll('.question-text').forEach(element => {
-                element.innerHTML = processSpecialCharacters(element.innerHTML);
-            });
-            
-            // Process explanation content
-            document.querySelectorAll('.explanation-text').forEach(element => {
-                element.innerHTML = processSpecialCharacters(element.innerHTML);
-            });
-
-            // Process session details
-            document.querySelectorAll('.session-details h2, .breadcrumb span').forEach(element => {
-                element.innerHTML = processSpecialCharacters(element.innerHTML);
-            });
-        }
-    </script>
+                fill.style.width = width;
+            }, 300);
+        });
+    }, 500);
+});
+</script>
 </body>
 </html>

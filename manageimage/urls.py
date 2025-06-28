@@ -9,5 +9,5 @@ urlpatterns = [
     path('api/available/', views.get_available_images, name='get_available_images'),
     path('debug/', views.debug_images, name='debug_images'),  # ADD THIS
     path('test/', views.test_images, name='test_images'),  # ADD THIS
-
+path('usage-summary/<int:image_id>/', views.get_image_usage_summary, name='get_image_usage_summary'),
 ]

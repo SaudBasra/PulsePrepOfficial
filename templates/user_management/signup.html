@@ -158,18 +158,36 @@
               </div>
             </div>
 
-<!-- Profile Picture-->
-<div class="form-group">
-  <label for="profile_image">Profile Picture</label>
-  <div class="file-upload">
-    <input type="file" id="profile_image" name="profile_image" accept="image/*" />
-    <label for="profile_image" class="file-upload-label">
-      <i class="fas fa-cloud-upload-alt"></i> Upload Profile Picture
-    </label>
-    <span class="file-name">No file chosen</span>
-  </div>
-  <small class="form-text text-muted">Upload a profile picture (recommended size: 256x256 pixels)</small>
-</div>
+            <!-- NEW: Voucher/Reference Field -->
+            <div class="form-group">
+              <label for="voucherReference">Voucher/Reference Code <span class="optional">(Optional)</span></label>
+              <div class="input-with-icon">
+                <i class="fas fa-ticket-alt"></i>
+                <input
+                  type="text"
+                  id="voucherReference"
+                  name="voucher_reference"
+                  placeholder="Enter voucher or reference code"
+                  maxlength="50"
+                  pattern="[A-Za-z0-9]+"
+                  title="Only letters and numbers are allowed"
+                />
+              </div>
+              <small class="form-text text-muted">Optional voucher code or reference number (letters and numbers only)</small>
+            </div>
+
+            <!-- Profile Picture-->
+            <div class="form-group">
+              <label for="profile_image">Profile Picture</label>
+              <div class="file-upload">
+                <input type="file" id="profile_image" name="profile_image" accept="image/*" />
+                <label for="profile_image" class="file-upload-label">
+                  <i class="fas fa-cloud-upload-alt"></i> Upload Profile Picture
+                </label>
+                <span class="file-name">No file chosen</span>
+              </div>
+              <small class="form-text text-muted">Upload a profile picture (recommended size: 256x256 pixels)</small>
+            </div>
 
             <!-- Payment slip upload -->
             <div class="form-group">
@@ -227,6 +245,7 @@
       document.querySelector('.auth-form').addEventListener('submit', function(e) {
         const password = document.getElementById('signupPassword');
         const confirmPassword = document.getElementById('confirmPassword');
+        const voucherField = document.getElementById('voucherReference');
         
         // Check if passwords match
         if (password.value !== confirmPassword.value) {
@@ -242,25 +261,43 @@
           alert('Password does not meet the requirements!');
           return false;
         }
+        
+        // Validate voucher field if provided (alphanumeric only)
+        if (voucherField.value.trim() !== '') {
+          const voucherRegex = /^[A-Za-z0-9]+$/;
+          if (!voucherRegex.test(voucherField.value.trim())) {
+            e.preventDefault();
+            alert('Voucher/Reference code can only contain letters and numbers!');
+            voucherField.focus();
+            return false;
+          }
+        }
       });
       
       // Display filename when file is selected
-      document.getElementById('payment_slip').addEventListener('change', function() {
-        const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-        this.nextElementSibling.nextElementSibling.textContent = fileName;
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function() {
+          const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
+          const fileNameSpan = this.nextElementSibling.nextElementSibling;
+          if (fileNameSpan) {
+            fileNameSpan.textContent = fileName;
+          }
+        });
       });
 
-      // Add to your existing signup form JavaScript
-// Handle multiple file upload fields
-document.querySelectorAll('input[type="file"]').forEach(input => {
-  input.addEventListener('change', function() {
-    const fileName = this.files[0] ? this.files[0].name : 'No file chosen';
-    const fileNameSpan = this.nextElementSibling.nextElementSibling;
-    if (fileNameSpan) {
-      fileNameSpan.textContent = fileName;
-    }
-  });
-});
+      // Real-time voucher validation feedback
+      document.getElementById('voucherReference').addEventListener('input', function() {
+        const value = this.value.trim();
+        const voucherRegex = /^[A-Za-z0-9]*$/; // Allow empty or alphanumeric
+        
+        if (value !== '' && !voucherRegex.test(value)) {
+          this.style.borderColor = '#dc3545';
+          this.setAttribute('title', 'Only letters and numbers are allowed');
+        } else {
+          this.style.borderColor = '';
+          this.removeAttribute('title');
+        }
+      });
     </script>
   </body>
 </html>

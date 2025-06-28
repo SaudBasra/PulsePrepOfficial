@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Enhanced responsive styles for Model Papers */
+        /* Enhanced responsive styles for Model Papers with Mode Selection Popup */
         :root {
             --primary: #1e40af;
             --primary-light: #3b82f6;
@@ -41,6 +41,270 @@
             overflow-x: hidden;
         }
 
+        /* Mode Selection Popup Modal */
+        .mode-selection-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .mode-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            position: relative;
+            animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Paper Info in Modal */
+        .modal-paper-info {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .modal-paper-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.3);
+        }
+
+        .modal-paper-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0 0 8px;
+        }
+
+        .modal-paper-meta {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .modal-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Mode Selection Header */
+        .mode-selection-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .mode-selection-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mode-selection-header p {
+            color: var(--gray);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Mode Options */
+        .mode-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .mode-option {
+            background: var(--light);
+            border: 2px solid var(--gray-light);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-align: center;
+        }
+
+        .mode-option:hover {
+            border-color: var(--primary);
+            background: rgba(30, 64, 175, 0.02);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 64, 175, 0.1);
+        }
+
+        .mode-option.selected {
+            border-color: var(--primary);
+            background: rgba(30, 64, 175, 0.05);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .mode-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            border-radius: 12px 12px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .mode-option.selected::before {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .mode-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin: 0 auto 12px;
+            transition: all 0.3s ease;
+        }
+
+        .student-mode .mode-icon {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+        }
+
+        .tutor-mode .mode-icon {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        .mode-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin: 0 0 8px;
+        }
+
+        .mode-description {
+            font-size: 12px;
+            color: var(--gray);
+            line-height: 1.4;
+            margin: 0 0 12px;
+        }
+
+        .mode-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .mode-feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            justify-content: center;
+        }
+
+        .mode-feature i {
+            color: var(--primary);
+            font-size: 10px;
+            width: 12px;
+        }
+
+        /* Modal Actions */
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+        }
+
+        .modal-btn-secondary {
+            background: white;
+            color: var(--gray);
+            border: 2px solid var(--gray-light);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--light);
+            border-color: var(--gray);
+            transform: translateY(-1px);
+        }
+
         /* Paper Container - Responsive Layout */
         .paper-container {
             display: flex;
@@ -49,7 +313,7 @@
             background: white;
         }
 
-        /* Paper Header - Always responsive */
+        /* Paper Header - Enhanced with Mode Indicator */
         .paper-header {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
@@ -69,11 +333,36 @@
             margin: 0 0 4px;
             font-size: clamp(14px, 4vw, 18px);
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .paper-info span {
             font-size: clamp(12px, 3vw, 14px);
             opacity: 0.9;
+        }
+
+        /* Mode Indicator */
+        .mode-indicator {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mode-indicator.student {
+            background: rgba(34, 197, 94, 0.3);
+            color: #dcfce7;
+        }
+
+        .mode-indicator.tutor {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fecaca;
         }
 
         .paper-timer {
@@ -199,7 +488,7 @@
             border-radius: 2px;
         }
 
-        /* Paper info section - NEW: Display paper name above question */
+        /* Paper info section */
         .paper-info-section {
             background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
             border: 1px solid #bfdbfe;
@@ -233,7 +522,7 @@
             flex-shrink: 0;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: pre-wrap; /* FIXED: Preserve line breaks and formatting */
+            white-space: pre-wrap;
         }
 
         /* Options container - Responsive */
@@ -290,6 +579,43 @@
             font-weight: 500;
         }
 
+        /* Student Mode Feedback Styles */
+        .option-label.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .option-label.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .option-feedback {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .option-label.correct .option-feedback,
+        .option-label.incorrect .option-feedback {
+            opacity: 1;
+        }
+
+        .feedback-correct {
+            color: var(--secondary);
+        }
+
+        .feedback-incorrect {
+            color: var(--danger);
+        }
+
         .option-label span {
             font-size: clamp(14px, 3.5vw, 16px);
             line-height: 1.5;
@@ -297,6 +623,81 @@
             flex: 1;
             word-wrap: break-word;
             overflow-wrap: break-word;
+        }
+
+        /* Student Mode Feedback Panel */
+        .student-feedback {
+            margin-top: 20px;
+            padding: 16px;
+            background: #dbeafe;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+            display: none;
+        }
+
+        .student-feedback.show {
+            display: block;
+            animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .student-feedback.correct {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left-color: var(--secondary);
+        }
+
+        .student-feedback.incorrect {
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            border-left-color: var(--danger);
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        .explanation-toggle-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .explanation-toggle-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .explanation-content {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .explanation-content.show {
+            display: block;
+        }
+
+        .explanation-text {
+            color: var(--gray);
+            line-height: 1.6;
+            font-size: 14px;
+            white-space: pre-wrap;
         }
 
         /* Navigation Panel - Responsive Sidebar */
@@ -433,6 +834,18 @@
             background: var(--secondary);
             color: white;
             border-color: var(--secondary);
+        }
+
+        .question-nav-btn.correct {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        .question-nav-btn.incorrect {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
         }
 
         .question-nav-btn.marked {
@@ -588,7 +1001,7 @@
             flex-wrap: wrap;
         }
 
-        /* Mobile-First Responsive Design */
+        /* Responsive Design */
         @media (max-width: 1200px) {
             .navigation-panel {
                 width: 240px;
@@ -638,6 +1051,25 @@
         }
 
         @media (max-width: 768px) {
+            .mode-modal-content {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .mode-options {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+
             .paper-header {
                 padding: 10px 12px;
                 gap: 6px;
@@ -686,6 +1118,16 @@
         }
 
         @media (max-width: 480px) {
+            .mode-modal-content {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .modal-paper-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+
             .paper-header {
                 padding: 8px 10px;
                 flex-direction: column;
@@ -799,11 +1241,6 @@
             animation: fadeIn 0.3s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         /* Ensure content doesn't overflow */
         .paper-container * {
             max-width: 100%;
@@ -842,11 +1279,106 @@
     </style>
 </head>
 <body>
+    <!-- Mode Selection Modal Popup -->
+    {% if show_mode_popup %}
+    <div class="mode-selection-modal" id="mode-selection-modal">
+        <div class="mode-modal-content">
+            <!-- Paper Info -->
+            <div class="modal-paper-info">
+                <div class="modal-paper-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2 class="modal-paper-title">{{ paper.title }}</h2>
+                <div class="modal-paper-meta">
+                    <div class="modal-meta-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ paper.duration_minutes }} min</span>
+                    </div>
+                    <div class="modal-meta-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>{{ total_questions }} questions</span>
+                    </div>
+                    <div class="modal-meta-item">
+                        <i class="fas fa-percentage"></i>
+                        <span>Pass: {{ paper.passing_percentage }}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="mode-selection-header">
+                <h3><i class="fas fa-user-graduate"></i> Choose Practice Mode</h3>
+                <p>Select how you want to take this paper</p>
+            </div>
+
+            <div class="mode-options">
+                <div class="mode-option student-mode selected" onclick="selectMode('student', this)">
+                    <div class="mode-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h4 class="mode-title">Student Mode</h4>
+                    <p class="mode-description">Learning-focused with immediate feedback</p>
+                    <ul class="mode-features">
+                        <li class="mode-feature">
+                            <i class="fas fa-check"></i>
+                            <span>Instant feedback</span>
+                        </li>
+                        <li class="mode-feature">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Explanations shown</span>
+                        </li>
+                        <li class="mode-feature">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Progress tracking</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mode-option tutor-mode" onclick="selectMode('tutor', this)">
+                    <div class="mode-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <h4 class="mode-title">Exam Mode</h4>
+                    <p class="mode-description">True exam simulation environment</p>
+                    <ul class="mode-features">
+                        <li class="mode-feature">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Exam simulation</span>
+                        </li>
+                        <li class="mode-feature">
+                            <i class="fas fa-eye-slash"></i>
+                            <span>No feedback</span>
+                        </li>
+                        <li class="mode-feature">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Results at end</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="cancelModeSelection()">
+                    <i class="fas fa-arrow-left"></i>
+                    Cancel
+                </button>
+                <button class="modal-btn modal-btn-primary" onclick="startWithMode()" id="start-btn">
+                    <i class="fas fa-play"></i>
+                    Start Learning
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="paper-container">
-        <!-- Paper Header -->
+        <!-- Paper Header with Mode Support -->
         <div class="paper-header">
             <div class="paper-info">
-                <h3>{{ paper.title }}</h3>
+                <h3>
+                    {{ paper.title }}
+                    <span class="mode-indicator {{ practice_mode }}">{{ practice_mode|title }} Mode</span>
+                </h3>
                 <span>Question <span id="current-question">1</span> of {{ total_questions }}</span>
             </div>
             
@@ -873,8 +1405,27 @@
                 <div class="question-card fade-in" id="question-card">
                     <div class="question-content">
                         <div id="question-container">
-                            <!-- Questions will be loaded here -->
+                            <!-- Questions will be loaded here by JavaScript -->
                         </div>
+                        
+                        <!-- Student Mode Feedback (only show in student mode) -->
+                        {% if practice_mode == 'student' %}
+                        <div class="student-feedback" id="student-feedback">
+                            <div class="feedback-header">
+                                <i id="feedback-icon"></i>
+                                <span id="feedback-title"></span>
+                            </div>
+                            <div id="feedback-content">
+                                <button class="explanation-toggle-btn" onclick="toggleExplanation()">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span id="explanation-btn-text">Show Explanation</span>
+                                </button>
+                                <div class="explanation-content" id="explanation-content">
+                                    <div class="explanation-text" id="explanation-text"></div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                     
                     <div class="action-buttons">
@@ -902,6 +1453,16 @@
                         <span>Answered:</span>
                         <strong id="answered-count">0</strong>
                     </div>
+                    {% if practice_mode == 'student' %}
+                    <div class="progress-item">
+                        <span>Correct:</span>
+                        <strong id="correct-count">0</strong>
+                    </div>
+                    <div class="progress-item">
+                        <span>Accuracy:</span>
+                        <strong id="accuracy">0%</strong>
+                    </div>
+                    {% endif %}
                     <div class="progress-item">
                         <span>Marked:</span>
                         <strong id="marked-count">0</strong>
@@ -923,6 +1484,16 @@
                         <div class="legend-box" style="background: var(--secondary);"></div>
                         <span>Answered</span>
                     </div>
+                    {% if practice_mode == 'student' %}
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: var(--secondary);"></div>
+                        <span>Correct</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-box" style="background: var(--danger);"></div>
+                        <span>Incorrect</span>
+                    </div>
+                    {% endif %}
                     <div class="legend-item">
                         <div class="legend-box" style="background: var(--warning);"></div>
                         <span>Marked</span>
@@ -977,7 +1548,7 @@
     </div>
 
     <script>
-        // Paper data
+        // Paper data with mode support (all image-related code removed)
         const paperQuestions = [
             {% for question in paper_questions %}
             {
@@ -990,18 +1561,17 @@
                     {{ key }}: `{{ value|escapejs }}`,
                     {% endfor %}
                 },
-                hasImage: {{ question.has_image|yesno:"true,false" }},
-                imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
-                imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
+                correctAnswer: `{{ question.correct_answer|escapejs }}`,
                 randomizeOptions: {{ paper.randomize_options|yesno:"true,false" }}
             },
             {% endfor %}
         ];
         
-        // Paper variables
+        // Paper variables with mode support
         const attemptId = {{ attempt.id }};
         const duration = {{ paper.duration_minutes }};
         const paperName = `{{ paper.selected_paper_name|escapejs }}`;
+        let practiceMode = `{{ practice_mode|default:"student" }}`;
         let currentQuestionIndex = 0;
         let answers = {};
         let markedQuestions = new Set();
@@ -1009,6 +1579,87 @@
         let warningCount = {{ attempt.warning_count }};
         let visitedQuestions = new Set([1]);
         let timerInterval = null;
+        
+        console.log('Practice Mode:', practiceMode);
+
+        // Mode selection popup functions
+        let selectedMode = 'student';
+
+        function selectMode(mode, element) {
+            // Remove selected class from all mode options
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            selectedMode = mode;
+            
+            // Update button text based on mode
+            const startBtn = document.getElementById('start-btn');
+            if (mode === 'student') {
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Learning';
+            } else {
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Exam';
+            }
+        }
+
+        function startWithMode() {
+            practiceMode = selectedMode;
+            
+            // Update the page URL with the selected mode
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('practice_mode', practiceMode);
+            window.history.replaceState({}, '', currentUrl);
+            
+            // Hide the modal
+            document.getElementById('mode-selection-modal').style.display = 'none';
+            
+            // Update mode indicator in header
+            const modeIndicator = document.querySelector('.mode-indicator');
+            if (modeIndicator) {
+                modeIndicator.textContent = practiceMode.charAt(0).toUpperCase() + practiceMode.slice(1) + ' Mode';
+                modeIndicator.className = `mode-indicator ${practiceMode}`;
+            }
+            
+            // Update student feedback visibility based on mode
+            const studentFeedback = document.getElementById('student-feedback');
+            if (studentFeedback) {
+                if (practiceMode === 'tutor') {
+                    studentFeedback.style.display = 'none';
+                } else {
+                    studentFeedback.style.display = 'block';
+                }
+            }
+            
+            // Update legend based on mode
+            updateLegendForMode();
+            
+            // Start the paper
+            loadQuestion(0);
+            startTimer();
+        }
+
+        function cancelModeSelection() {
+            // Redirect back to papers list
+            window.location.href = '{% url "student_model_papers" %}';
+        }
+
+        function updateLegendForMode() {
+            const legend = document.querySelector('.legend');
+            if (!legend) return;
+            
+            const correctLegend = legend.querySelector('.legend-item:nth-child(3)');
+            const incorrectLegend = legend.querySelector('.legend-item:nth-child(4)');
+            
+            if (practiceMode === 'tutor') {
+                if (correctLegend) correctLegend.style.display = 'none';
+                if (incorrectLegend) incorrectLegend.style.display = 'none';
+            } else {
+                if (correctLegend) correctLegend.style.display = 'flex';
+                if (incorrectLegend) incorrectLegend.style.display = 'flex';
+            }
+        }
         
         // Special character conversion function
         function processSpecialCharacters(text) {
@@ -1018,7 +1669,7 @@
             text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
             text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
             text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
-            text = text.replace(/⇌/g, '⇌'); // Reversible reaction
+            text = text.replace(/⇌/g, '⇌');
             
             // Greek letters
             text = text.replace(/\balpha\b/gi, 'α');
@@ -1056,6 +1707,13 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if mode popup should be shown
+            const modeModal = document.getElementById('mode-selection-modal');
+            if (modeModal) {
+                // Don't start timer or load questions yet if popup is shown
+                return;
+            }
+            
             loadQuestion(0);
             startTimer();
             setupTabDetection();
@@ -1064,7 +1722,421 @@
             setupResponsiveHandlers();
         });
 
-        // Responsive handlers
+        // Enhanced loadQuestion function with mode support (image code removed)
+        function loadQuestion(index) {
+            const question = paperQuestions[index];
+            currentQuestionIndex = index;
+            visitedQuestions.add(index + 1);
+            
+            document.getElementById('current-question').textContent = index + 1;
+            
+            // Create paper info HTML
+            let paperInfoHtml = `
+                <div class="paper-info-section">
+                    <div class="paper-name">
+                        <i class="fas fa-file-alt"></i>
+                        ${paperName}
+                    </div>
+                </div>
+            `;
+            
+            // Process question text for special characters and preserve formatting
+            let processedQuestionText = processSpecialCharacters(question.text);
+            
+            // Create options HTML with mode-specific behavior
+            let optionsHtml = '<div class="options-container"><ul class="options-list">';
+            const options = Object.entries(question.options);
+            
+            if (question.randomizeOptions) {
+                options.sort(() => Math.random() - 0.5);
+            }
+            
+            options.forEach(([key, value]) => {
+                const isSelected = answers[question.id] && answers[question.id].answer === key;
+                const isAnswered = answers[question.id] !== undefined;
+                const isCorrect = isAnswered && question.correctAnswer === key;
+                const isUserAnswer = isAnswered && answers[question.id].answer === key;
+                
+                let optionClass = 'option-label';
+                let feedbackIcon = '';
+                let isDisabled = '';
+                
+                // Only show feedback in student mode
+                if (practiceMode === 'student' && isAnswered) {
+                    if (isCorrect) {
+                        optionClass += ' correct';
+                        if (isUserAnswer) {
+                            feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                        }
+                    } else if (isUserAnswer && !isCorrect) {
+                        optionClass += ' incorrect';
+                        feedbackIcon = '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+                    } else if (isCorrect) {
+                        feedbackIcon = '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                    }
+                    // Disable options after answering in student mode
+                    isDisabled = 'disabled';
+                } else if (isSelected) {
+                    optionClass += ' selected';
+                }
+                
+                // In tutor mode, don't disable after answering to allow changes
+                if (practiceMode === 'tutor') {
+                    isDisabled = '';
+                }
+                
+                const processedOptionText = processSpecialCharacters(value);
+                
+                optionsHtml += `
+                    <li class="option-item">
+                        <label class="${optionClass}">
+                            <input type="radio" name="answer" value="${key}" 
+                                   ${isSelected ? 'checked' : ''} 
+                                   ${isDisabled}
+                                   onchange="saveAnswer('${key}')">
+                            <span>${key}) ${processedOptionText}</span>
+                            ${feedbackIcon}
+                        </label>
+                    </li>
+                `;
+            });
+            optionsHtml += '</ul></div>';
+            
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = `
+                ${paperInfoHtml}
+                <div class="question-number">Question ${index + 1}</div>
+                <div class="question-text">${processedQuestionText}</div>
+                ${optionsHtml}
+            `;
+            
+            // Show student feedback if already answered and in student mode
+            if (answers[question.id] && practiceMode === 'student') {
+                showStudentFeedback(question, answers[question.id]);
+            } else {
+                hideStudentFeedback();
+            }
+            
+            updateNavigation();
+            updateNavigationState();
+            updateMarkButtonState();
+            
+            if (window.innerWidth <= 1024) {
+                questionContainer.scrollTop = 0;
+            }
+        }
+
+        // Enhanced saveAnswer function with mode support
+        function saveAnswer(answer) {
+            const question = paperQuestions[currentQuestionIndex];
+            const timeSpent = Math.floor((Date.now() - (window.questionStartTime || Date.now())) / 1000);
+            
+            // Clear previous selection styling
+            document.querySelectorAll('.option-label').forEach(label => {
+                label.classList.remove('selected');
+            });
+            event.target.closest('.option-label').classList.add('selected');
+            
+            // Save answer locally
+            answers[question.id] = {
+                answer: answer,
+                timeSpent: timeSpent,
+                isCorrect: answer === question.correctAnswer
+            };
+            
+            // Submit to server with practice mode
+            fetch('{% url "submit_paper_answer" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: `attempt_id=${attemptId}&question_id=${question.id}&answer=${answer}&practice_mode=${practiceMode}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    answers[question.id].isCorrect = data.is_correct !== undefined ? data.is_correct : (answer === question.correctAnswer);
+                    
+                    // Only show immediate feedback in student mode
+                    if (practiceMode === 'student' && data.is_correct !== undefined) {
+                        updateOptionsWithFeedback(question, answer, data.is_correct);
+                        showStudentFeedback(question, {
+                            answer: answer,
+                            isCorrect: data.is_correct,
+                            explanation: data.explanation
+                        });
+                    }
+                    
+                    updateProgress();
+                    updateNavigation();
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting answer:', error);
+            });
+        }
+
+        // Student mode feedback functions
+        function showStudentFeedback(question, answerData) {
+            if (practiceMode !== 'student') return;
+            
+            const feedbackDiv = document.getElementById('student-feedback');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+
+            if (!feedbackDiv || !feedbackIcon || !feedbackTitle) {
+                return;
+            }
+
+            if (answerData.isCorrect) {
+                feedbackDiv.className = 'student-feedback show correct';
+                feedbackIcon.className = 'fas fa-check-circle';
+                feedbackTitle.textContent = 'Excellent! Correct Answer';
+            } else {
+                feedbackDiv.className = 'student-feedback show incorrect';
+                feedbackIcon.className = 'fas fa-times-circle';
+                feedbackTitle.textContent = `Incorrect. The correct answer is ${question.correctAnswer}`;
+            }
+
+            const explanationContent = document.getElementById('explanation-content');
+            const explanationBtn = document.getElementById('explanation-btn-text');
+            if (explanationContent && explanationBtn) {
+                explanationContent.classList.remove('show');
+                explanationBtn.textContent = 'Show Explanation';
+            }
+        }
+
+        function hideStudentFeedback() {
+            const feedbackDiv = document.getElementById('student-feedback');
+            if (feedbackDiv) {
+                feedbackDiv.classList.remove('show');
+            }
+        }
+
+        function toggleExplanation() {
+            if (practiceMode !== 'student') return;
+            
+            const explanationContent = document.getElementById('explanation-content');
+            const explanationBtn = document.getElementById('explanation-btn-text');
+            const question = paperQuestions[currentQuestionIndex];
+
+            if (!explanationContent || !explanationBtn || !question) {
+                return;
+            }
+
+            if (explanationContent.classList.contains('show')) {
+                explanationContent.classList.remove('show');
+                explanationBtn.textContent = 'Show Explanation';
+            } else {
+                const explanationText = document.getElementById('explanation-text');
+                
+                if (explanationText) {
+                    let explanationHtml = '';
+                    
+                    if (question.explanation && question.explanation.trim()) {
+                        const processedExplanation = processSpecialCharacters(question.explanation);
+                        explanationHtml = processedExplanation;
+                    } else {
+                        explanationHtml = '<em>No explanation available for this question.</em>';
+                    }
+                    
+                    explanationText.innerHTML = explanationHtml;
+                }
+                
+                explanationContent.classList.add('show');
+                explanationBtn.textContent = 'Hide Explanation';
+            }
+        }
+
+        function updateOptionsWithFeedback(question, selectedAnswer, isCorrect) {
+            if (practiceMode !== 'student') return;
+            
+            const optionLabels = document.querySelectorAll('.option-label');
+
+            optionLabels.forEach(label => {
+                const input = label.querySelector('input');
+                const optionKey = input.value;
+                
+                if (input) {
+                    input.disabled = true;
+                }
+                
+                label.classList.remove('selected', 'correct', 'incorrect');
+                
+                if (optionKey === question.correctAnswer) {
+                    label.classList.add('correct');
+                    if (!label.querySelector('.option-feedback')) {
+                        label.innerHTML += '<i class="fas fa-check-circle option-feedback feedback-correct"></i>';
+                    }
+                } else if (optionKey === selectedAnswer && !isCorrect) {
+                    label.classList.add('incorrect');
+                    if (!label.querySelector('.option-feedback')) {
+                        label.innerHTML += '<i class="fas fa-times-circle option-feedback feedback-incorrect"></i>';
+                    }
+                }
+            });
+        }
+
+        // Enhanced navigation functions
+        function updateNavigation() {
+            document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
+                const question = paperQuestions[index];
+                
+                btn.className = 'question-nav-btn';
+                
+                if (index === currentQuestionIndex) {
+                    btn.classList.add('current');
+                } else if (markedQuestions.has(question.id)) {
+                    btn.classList.add('marked');
+                } else if (answers[question.id]) {
+                    if (practiceMode === 'student') {
+                        if (answers[question.id].isCorrect) {
+                            btn.classList.add('correct');
+                        } else {
+                            btn.classList.add('incorrect');
+                        }
+                    } else {
+                        btn.classList.add('answered');
+                    }
+                }
+            });
+        }
+
+        // Enhanced progress update with mode support
+        function updateProgress() {
+            const answered = Object.keys(answers).length;
+            const marked = markedQuestions.size;
+            const remaining = paperQuestions.length - answered;
+            
+            document.getElementById('answered-count').textContent = answered;
+            document.getElementById('marked-count').textContent = marked;
+            document.getElementById('remaining-count').textContent = remaining;
+            
+            // Only show accuracy in student mode
+            if (practiceMode === 'student') {
+                const correct = Object.values(answers).filter(a => a.isCorrect).length;
+                const accuracy = answered > 0 ? (correct / answered) * 100 : 0;
+                
+                const correctEl = document.getElementById('correct-count');
+                const accuracyEl = document.getElementById('accuracy');
+                
+                if (correctEl) correctEl.textContent = correct;
+                if (accuracyEl) accuracyEl.textContent = accuracy.toFixed(0) + '%';
+            }
+        }
+
+        // Navigation functions
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+        
+        function nextQuestion() {
+            if (currentQuestionIndex < paperQuestions.length - 1) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+        
+        function goToQuestion(questionNumber) {
+            loadQuestion(questionNumber - 1);
+        }
+        
+        function markForReview() {
+            const question = paperQuestions[currentQuestionIndex];
+            
+            if (markedQuestions.has(question.id)) {
+                markedQuestions.delete(question.id);
+            } else {
+                markedQuestions.add(question.id);
+            }
+            
+            updateNavigation();
+            updateProgress();
+            updateMarkButtonState();
+        }
+
+        function updateNavigationState() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (currentQuestionIndex === 0) {
+                prevBtn.disabled = true;
+                prevBtn.style.opacity = '0.5';
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.style.opacity = '1';
+            }
+            
+            if (currentQuestionIndex === paperQuestions.length - 1) {
+                nextBtn.disabled = true;
+                nextBtn.style.opacity = '0.5';
+            } else {
+                nextBtn.disabled = false;
+                nextBtn.style.opacity = '1';
+            }
+        }
+        
+        function updateMarkButtonState() {
+            const markBtn = document.getElementById('mark-btn');
+            const question = paperQuestions[currentQuestionIndex];
+            const isCompact = window.innerWidth <= 480;
+            
+            if (markedQuestions.has(question.id)) {
+                if (isCompact) {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #64748b;"></i>';
+                } else {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Unmark</span>';
+                }
+                markBtn.style.backgroundColor = '#64748b';
+            } else {
+                if (isCompact) {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                } else {
+                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Mark</span>';
+                }
+                markBtn.style.backgroundColor = 'var(--warning)';
+            }
+        }
+
+        // Timer functions
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            
+            const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('time-remaining').textContent = timeDisplay;
+        }
+        
+        function startTimer() {
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                const timerElement = document.getElementById('timer');
+                
+                if (timeRemaining === 300) { // 5 minutes
+                    timerElement.classList.add('warning');
+                    showWarning('Only 5 minutes remaining!');
+                }
+                
+                if (timeRemaining === 60) { // 1 minute
+                    timerElement.classList.remove('warning');
+                    timerElement.classList.add('danger');
+                    showWarning('Only 1 minute remaining! Paper will auto-submit soon.');
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    autoSubmit();
+                }
+            }, 1000);
+        }
+
+        // Responsive handler functions
         function setupResponsiveHandlers() {
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
@@ -1160,224 +2232,7 @@
             }
         });
         
-        // Load question with enhanced formatting and image support
-        function loadQuestion(index) {
-            const question = paperQuestions[index];
-            currentQuestionIndex = index;
-            visitedQuestions.add(index + 1);
-            
-            document.getElementById('current-question').textContent = index + 1;
-            
-            // Create paper info HTML - MOVED ABOVE QUESTION
-            let paperInfoHtml = `
-                <div class="paper-info-section">
-                    <div class="paper-name">
-                        <i class="fas fa-file-alt"></i>
-                        ${paperName}
-                    </div>
-                </div>
-            `;
-            
-            // Process question text for special characters and preserve formatting
-            let processedQuestionText = processSpecialCharacters(question.text);
-            
-            // Create options HTML
-            let optionsHtml = '<div class="options-container"><ul class="options-list">';
-            const options = Object.entries(question.options);
-            
-            if (question.randomizeOptions) {
-                options.sort(() => Math.random() - 0.5);
-            }
-            
-            options.forEach(([key, value]) => {
-                const isChecked = answers[question.id] === key;
-                const processedOptionText = processSpecialCharacters(value);
-                optionsHtml += `
-                    <li class="option-item">
-                        <label class="option-label ${isChecked ? 'selected' : ''}">
-                            <input type="radio" name="answer" value="${key}" 
-                                   ${isChecked ? 'checked' : ''} 
-                                   onchange="saveAnswer('${key}')">
-                            <span>${key}) ${processedOptionText}</span>
-                        </label>
-                    </li>
-                `;
-            });
-            optionsHtml += '</ul></div>';
-            
-            const questionContainer = document.getElementById('question-container');
-            questionContainer.innerHTML = `
-                ${paperInfoHtml}
-                <div class="question-number">Question ${index + 1}</div>
-                <div class="question-text">${processedQuestionText}</div>
-                ${optionsHtml}
-            `;
-            
-            updateNavigation();
-            updateNavigationState();
-            updateMarkButtonState();
-            
-            if (window.innerWidth <= 1024) {
-                questionContainer.scrollTop = 0;
-            }
-        }
-        
-        function updateNavigationState() {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            
-            if (currentQuestionIndex === 0) {
-                prevBtn.disabled = true;
-                prevBtn.style.opacity = '0.5';
-            } else {
-                prevBtn.disabled = false;
-                prevBtn.style.opacity = '1';
-            }
-            
-            if (currentQuestionIndex === paperQuestions.length - 1) {
-                nextBtn.disabled = true;
-                nextBtn.style.opacity = '0.5';
-            } else {
-                nextBtn.disabled = false;
-                nextBtn.style.opacity = '1';
-            }
-        }
-        
-        function updateMarkButtonState() {
-            const markBtn = document.getElementById('mark-btn');
-            const question = paperQuestions[currentQuestionIndex];
-            const isCompact = window.innerWidth <= 480;
-            
-            if (markedQuestions.has(question.id)) {
-                if (isCompact) {
-                    markBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #64748b;"></i>';
-                } else {
-                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Unmark</span>';
-                }
-                markBtn.style.backgroundColor = '#64748b';
-            } else {
-                if (isCompact) {
-                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
-                } else {
-                    markBtn.innerHTML = '<i class="fas fa-bookmark"></i> <span>Mark</span>';
-                }
-                markBtn.style.backgroundColor = 'var(--warning)';
-            }
-        }
-        
-        function saveAnswer(answer) {
-            const question = paperQuestions[currentQuestionIndex];
-            answers[question.id] = answer;
-            
-            document.querySelectorAll('.option-label').forEach(label => {
-                label.classList.remove('selected');
-            });
-            event.target.closest('.option-label').classList.add('selected');
-            
-            fetch('{% url "submit_paper_answer" %}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: `attempt_id=${attemptId}&question_id=${question.id}&answer=${answer}`
-            });
-            
-            updateProgress();
-            updateNavigation();
-        }
-        
-        function previousQuestion() {
-            if (currentQuestionIndex > 0) {
-                loadQuestion(currentQuestionIndex - 1);
-            }
-        }
-        
-        function nextQuestion() {
-            if (currentQuestionIndex < paperQuestions.length - 1) {
-                loadQuestion(currentQuestionIndex + 1);
-            }
-        }
-        
-        function goToQuestion(questionNumber) {
-            loadQuestion(questionNumber - 1);
-        }
-        
-        function markForReview() {
-            const question = paperQuestions[currentQuestionIndex];
-            
-            if (markedQuestions.has(question.id)) {
-                markedQuestions.delete(question.id);
-            } else {
-                markedQuestions.add(question.id);
-            }
-            
-            updateNavigation();
-            updateProgress();
-            updateMarkButtonState();
-        }
-        
-        function updateNavigation() {
-            document.querySelectorAll('.question-nav-btn').forEach((btn, index) => {
-                const question = paperQuestions[index];
-                
-                btn.className = 'question-nav-btn';
-                
-                if (index === currentQuestionIndex) {
-                    btn.classList.add('current');
-                } else if (markedQuestions.has(question.id)) {
-                    btn.classList.add('marked');
-                } else if (answers[question.id]) {
-                    btn.classList.add('answered');
-                }
-            });
-        }
-        
-        function updateProgress() {
-            const answered = Object.keys(answers).length;
-            const marked = markedQuestions.size;
-            const remaining = paperQuestions.length - answered;
-            
-            document.getElementById('answered-count').textContent = answered;
-            document.getElementById('marked-count').textContent = marked;
-            document.getElementById('remaining-count').textContent = remaining;
-        }
-        
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            
-            const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('time-remaining').textContent = timeDisplay;
-        }
-        
-        function startTimer() {
-            updateTimerDisplay();
-            
-            timerInterval = setInterval(() => {
-                timeRemaining--;
-                updateTimerDisplay();
-                
-                const timerElement = document.getElementById('timer');
-                
-                if (timeRemaining === 300) { // 5 minutes
-                    timerElement.classList.add('warning');
-                    showWarning('Only 5 minutes remaining!');
-                }
-                
-                if (timeRemaining === 60) { // 1 minute
-                    timerElement.classList.remove('warning');
-                    timerElement.classList.add('danger');
-                    showWarning('Only 1 minute remaining! Paper will auto-submit soon.');
-                }
-                
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    autoSubmit();
-                }
-            }, 1000);
-        }
-        
+        // Tab detection and security
         function setupTabDetection() {
             document.addEventListener('visibilitychange', function() {
                 if (document.hidden) {
@@ -1425,6 +2280,7 @@
             document.getElementById('warning-modal').style.display = 'none';
         }
         
+        // Submit functions
         function confirmSubmit() {
             const answered = Object.keys(answers).length;
             const unanswered = paperQuestions.length - answered;
@@ -1438,6 +2294,13 @@
             
             if (markedQuestions.size > 0) {
                 summary += `Marked for Review: ${markedQuestions.size}`;
+            }
+            
+            // Add mode-specific summary
+            if (practiceMode === 'student') {
+                const correct = Object.values(answers).filter(a => a.isCorrect).length;
+                const accuracy = answered > 0 ? (correct / answered) * 100 : 0;
+                summary += `\nCurrent Accuracy: ${accuracy.toFixed(1)}%`;
             }
             
             document.getElementById('submit-summary').textContent = summary;
@@ -1489,26 +2352,18 @@
             return cookieValue;
         }
         
-        // Enhanced history prevention - fixes back button issue
+        // Enhanced history prevention
         window.addEventListener('load', function() {
-            // Replace current history state to break back button chain
             window.history.replaceState({}, '', window.location.href);
-            
-            // Add a dummy state to catch back navigation
             window.history.pushState({}, '', window.location.href);
             
-            // Handle popstate (back button clicks)
             window.addEventListener('popstate', function(event) {
                 event.preventDefault();
-                
-                // Immediately push forward again
                 window.history.pushState({}, '', window.location.href);
                 
-                // Show confirmation dialog
                 const userChoice = confirm('You cannot go back to the paper once started. Do you want to go to the dashboard instead?');
                 
                 if (userChoice) {
-                    // Redirect to dashboard
                     window.location.href = '{% url "student_dashboard" %}';
                 }
                 
@@ -1550,7 +2405,7 @@
                         const index = optionKeys.indexOf(e.key);
                         if (index !== -1) {
                             const radioButton = document.querySelector(`input[value="${answerKeys[index]}"]`);
-                            if (radioButton) {
+                            if (radioButton && !radioButton.disabled) {
                                 radioButton.click();
                             }
                         }
@@ -1559,7 +2414,7 @@
             }
         });
 
-        // Additional security measures
+        // Security measures
         window.addEventListener('beforeunload', function(e) {
             e.preventDefault();
             e.returnValue = 'Are you sure you want to leave? Your paper progress will be lost.';
@@ -1610,6 +2465,18 @@
                 e.preventDefault();
             });
         }
+
+        // Initialize question start time tracking
+        window.questionStartTime = Date.now();
+        
+        // Update question start time when changing questions
+        const originalLoadQuestion = loadQuestion;
+        loadQuestion = function(index) {
+            window.questionStartTime = Date.now();
+            return originalLoadQuestion(index);
+        };
+
+        console.log('Paper interface initialized in', practiceMode, 'mode');
     </script>
 </body>
 </html>

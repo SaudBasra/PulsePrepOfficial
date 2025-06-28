@@ -1,4 +1,4 @@
-# notes/views.py
+# notes/views.py - Updated with Access Control
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -13,9 +13,21 @@ from .models import StudentNote, NoteImage, StudySession, NoteRevision
 from questionbank.models import Question
 from .forms import StudentNoteForm, QuickNoteForm
 
-@login_required
+# IMPORTS FOR ACCESS CONTROL
+from user_management.decorators import (
+    content_access_required, 
+    admin_required, 
+    filter_by_user_access as apply_user_access_filter
+)
+from user_management.utils import (
+    get_user_access_info, 
+    check_object_access
+)
+
+
+@content_access_required
 def notes_dashboard(request):
-    """Main notes dashboard with hybrid hierarchy - shows both questions and notes"""
+    """Enhanced main notes dashboard with access control - shows both questions and notes"""
     # Get filter parameters
     query = request.GET.get('q', '')
     filter_degree = request.GET.get('degree', '')
@@ -24,6 +36,9 @@ def notes_dashboard(request):
     
     # Get user's notes for counting and building hierarchy
     user_notes = StudentNote.objects.filter(student=request.user)
+    
+    # APPLY USER ACCESS FILTER TO USER'S NOTES
+    user_notes = apply_user_access_filter(user_notes, request.user)
     
     # Apply search to notes
     if query:
@@ -47,8 +62,10 @@ def notes_dashboard(request):
     if filter_note_type:
         user_notes = user_notes.filter(note_type=filter_note_type)
     
-    # Get questions for additional hierarchy structure
+    # Get questions for additional hierarchy structure - WITH ACCESS CONTROL
     questions = Question.objects.all()
+    questions = apply_user_access_filter(questions, request.user)
+    
     if filter_degree:
         questions = questions.filter(degree=filter_degree)
     if filter_year:
@@ -80,16 +97,17 @@ def notes_dashboard(request):
         'degree_choices': degree_choices,
         'year_choices': year_choices,
         'note_type_choices': note_type_choices,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/notes_dashboard.html', context)
 
 
 def build_hybrid_notes_hierarchy(questions, user_notes):
-    """Build hierarchy that includes both questions and notes - comprehensive coverage"""
+    """Enhanced hierarchy builder with access control - comprehensive coverage"""
     from collections import defaultdict
     
-    # Step 1: Build hierarchy paths from both questions AND notes
+    # Step 1: Build hierarchy paths from both questions AND notes (both already filtered by access control)
     all_paths = set()
     
     # Add paths from questions
@@ -246,10 +264,10 @@ def build_hybrid_notes_hierarchy(questions, user_notes):
 
 
 def calculate_notes_stats(user_notes):
-    """Calculate statistics for notes dashboard"""
+    """Calculate statistics for notes dashboard with access control"""
     total_notes = user_notes.count()
     
-    # Count unique hierarchy levels from user's notes
+    # Count unique hierarchy levels from user's accessible notes
     modules_count = user_notes.values('module').distinct().count()
     subjects_count = user_notes.values('subject').distinct().count()
     topics_count = user_notes.values('topic').distinct().count()
@@ -273,10 +291,11 @@ def calculate_notes_stats(user_notes):
         'recent_notes': recent_notes,
         'notes_by_type': notes_by_type,
     }
-    
-@login_required
+
+
+@content_access_required
 def topic_notes(request):
-    """View notes for a specific topic (similar to topic_questions)"""
+    """Enhanced view notes for a specific topic with access control"""
     # Get filter parameters
     block = request.GET.get('block')
     module = request.GET.get('module')
@@ -303,6 +322,9 @@ def topic_notes(request):
     
     notes = StudentNote.objects.filter(notes_filter).order_by('-updated_at')
     
+    # APPLY USER ACCESS FILTER
+    notes = apply_user_access_filter(notes, request.user)
+    
     # Search functionality
     search_query = request.GET.get('q', '')
     if search_query:
@@ -328,6 +350,21 @@ def topic_notes(request):
     if topic:
         breadcrumb_parts.append(topic)
     
+    # Get related questions for this topic (with access control)
+    if block and module and subject and topic and degree and year:
+        related_questions = Question.objects.filter(
+            block=block,
+            module=module,
+            subject=subject,
+            topic=topic,
+            degree=degree,
+            year=year
+        )
+        related_questions = apply_user_access_filter(related_questions, request.user)
+        related_questions_count = related_questions.count()
+    else:
+        related_questions_count = 0
+    
     context = {
         'notes': page_obj,
         'total_notes': notes.count(),
@@ -341,19 +378,32 @@ def topic_notes(request):
             'year': year,
         },
         'search_query': search_query,
+        'related_questions_count': related_questions_count,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/topic_notes.html', context)
 
 
-@login_required
+@content_access_required
 def add_note(request):
-    """Add a new note"""
+    """Enhanced add note with access control"""
     if request.method == 'POST':
         form = StudentNoteForm(request.POST, request.FILES)
         if form.is_valid():
             note = form.save(commit=False)
             note.student = request.user
+            
+            # APPLY USER ACCESS FILTER TO NOTE DATA
+            user_access = get_user_access_info(request.user)
+            if user_access['level'] == 'student':
+                # Ensure student can only create notes for their degree/year
+                filter_params = user_access.get('filter_params', {})
+                if filter_params.get('degree'):
+                    note.degree = filter_params['degree']
+                if filter_params.get('year'):
+                    note.year = filter_params['year']
+            
             note.save()
             
             # Handle multiple image uploads
@@ -376,6 +426,12 @@ def add_note(request):
         if question_id:
             try:
                 question = Question.objects.get(id=question_id)
+                
+                # ACCESS CONTROL: Check if user can access this question
+                if not check_object_access(question, request.user):
+                    messages.error(request, "You don't have access to create notes for this question.")
+                    return redirect('notes_dashboard')
+                
                 initial_data.update({
                     'question': question,
                     'degree': question.degree,
@@ -395,15 +451,21 @@ def add_note(request):
     context = {
         'form': form,
         'is_edit': False,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/add_edit_note.html', context)
 
 
-@login_required
+@content_access_required
 def edit_note(request, note_id):
-    """Edit an existing note"""
+    """Enhanced edit note with access control"""
     note = get_object_or_404(StudentNote, id=note_id, student=request.user)
+    
+    # ACCESS CONTROL: Check if note content is still accessible
+    if not check_object_access(note, request.user):
+        messages.error(request, "You no longer have access to edit this note.")
+        return redirect('notes_dashboard')
     
     if request.method == 'POST':
         # Create revision before editing
@@ -415,7 +477,19 @@ def edit_note(request, note_id):
         
         form = StudentNoteForm(request.POST, request.FILES, instance=note)
         if form.is_valid():
-            form.save()
+            updated_note = form.save(commit=False)
+            
+            # APPLY USER ACCESS FILTER TO UPDATED NOTE DATA
+            user_access = get_user_access_info(request.user)
+            if user_access['level'] == 'student':
+                # Ensure student can only edit notes within their access level
+                filter_params = user_access.get('filter_params', {})
+                if filter_params.get('degree'):
+                    updated_note.degree = filter_params['degree']
+                if filter_params.get('year'):
+                    updated_note.year = filter_params['year']
+            
+            updated_note.save()
             
             # Handle new image uploads
             files = request.FILES.getlist('images')
@@ -432,32 +506,40 @@ def edit_note(request, note_id):
         'form': form,
         'note': note,
         'is_edit': True,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/add_edit_note.html', context)
 
 
-@login_required
+@content_access_required
 def delete_note(request, note_id):
-    """Delete a note"""
+    """Enhanced delete note with access control"""
     note = get_object_or_404(StudentNote, id=note_id, student=request.user)
     
+    # ACCESS CONTROL: Ensure user owns this note and can still access it
+    if not check_object_access(note, request.user):
+        messages.error(request, "You no longer have access to this note.")
+        return redirect('notes_dashboard')
+    
     if request.method == 'POST':
+        note_title = note.title
         note.delete()
-        messages.success(request, 'Note deleted successfully!')
+        messages.success(request, f'Note "{note_title}" deleted successfully!')
         return redirect('notes_dashboard')
     
     context = {
         'note': note,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/confirm_delete.html', context)
-# Updated notes/views.py - Replace the quick_add_note function with this fixed version
+
 
 @require_POST
-@login_required
+@content_access_required
 def quick_add_note(request):
-    """Quick add note via AJAX (for use during question practice) - FIXED VERSION"""
+    """Enhanced quick add note via AJAX with access control - FIXED VERSION"""
     question_id = request.POST.get('question_id')
     content = request.POST.get('content')
     title = request.POST.get('title', 'Quick Note')
@@ -478,6 +560,12 @@ def quick_add_note(request):
         if question_id and question_id != 'undefined' and question_id != 'null' and question_id.strip() and question_id.isdigit():
             try:
                 question = Question.objects.get(id=int(question_id))
+                
+                # ACCESS CONTROL: Check if user can access this question
+                if not check_object_access(question, request.user):
+                    return JsonResponse({
+                        'error': 'You don\'t have access to create notes for this question'
+                    }, status=403)
                 
                 # FIXED: Properly populate ALL hierarchy fields from the question
                 note_data.update({
@@ -500,15 +588,28 @@ def quick_add_note(request):
                 print(f"Warning: Question with ID {question_id} not found")
                 pass
         else:
-            # For general notes without question link, use default values
-            note_data.update({
-                'degree': 'MBBS',  # Default degree
-                'year': '1st',     # Default year
-                'block': '',       # Empty block for general notes
-                'module': '',      # Empty module for general notes
-                'subject': '',     # Empty subject for general notes
-                'topic': '',       # Empty topic for general notes
-            })
+            # For general notes without question link, use user's default values with access control
+            user_access = get_user_access_info(request.user)
+            if user_access['level'] == 'student':
+                filter_params = user_access.get('filter_params', {})
+                note_data.update({
+                    'degree': filter_params.get('degree', 'MBBS'),
+                    'year': filter_params.get('year', '1st'),
+                    'block': '',       # Empty block for general notes
+                    'module': '',      # Empty module for general notes
+                    'subject': '',     # Empty subject for general notes
+                    'topic': '',       # Empty topic for general notes
+                })
+            else:
+                # Admin default
+                note_data.update({
+                    'degree': 'MBBS',
+                    'year': '1st',
+                    'block': '',
+                    'module': '',
+                    'subject': '',
+                    'topic': '',
+                })
         
         # Create the note with all populated data
         note = StudentNote.objects.create(**note_data)
@@ -527,56 +628,87 @@ def quick_add_note(request):
                 'topic': note.topic,
                 'note_type': note.note_type,
                 'hierarchy_path': note.hierarchy_path
-            }
+            },
+            'user_access_level': get_user_access_info(request.user).get('level', 'student')
         })
         
     except Exception as e:
         # Log the error for debugging
         print(f"Error in quick_add_note: {str(e)}")
-        return JsonResponse({'error': f'Error saving note: {str(e)}'}, status=500)    
+        return JsonResponse({'error': f'Error saving note: {str(e)}'}, status=500)
+
+
 @require_POST
-@login_required
+@content_access_required
 def toggle_favorite(request, note_id):
-    """Toggle favorite status of a note"""
+    """Enhanced toggle favorite with access control"""
     note = get_object_or_404(StudentNote, id=note_id, student=request.user)
+    
+    # ACCESS CONTROL: Check if note is still accessible
+    if not check_object_access(note, request.user):
+        return JsonResponse({
+            'success': False,
+            'error': 'You no longer have access to this note'
+        }, status=403)
+    
     note.is_favorite = not note.is_favorite
     note.save()
     
     return JsonResponse({
         'success': True,
-        'is_favorite': note.is_favorite
+        'is_favorite': note.is_favorite,
+        'user_access_level': get_user_access_info(request.user).get('level', 'student')
     })
 
 
-@login_required
+@content_access_required
 def note_detail(request, note_id):
-    """View detailed note with revisions and related info"""
+    """Enhanced note detail with access control"""
     note = get_object_or_404(StudentNote, id=note_id, student=request.user)
+    
+    # ACCESS CONTROL: Check if note is still accessible
+    if not check_object_access(note, request.user):
+        messages.error(request, "You no longer have access to this note.")
+        return redirect('notes_dashboard')
+    
     revisions = note.revisions.all()[:5]  # Show last 5 revisions
+    
+    # Get related notes with access control
+    related_notes = StudentNote.objects.filter(
+        student=request.user,
+        subject=note.subject,
+        topic=note.topic
+    ).exclude(id=note.id)
+    
+    # APPLY ACCESS FILTER TO RELATED NOTES
+    related_notes = apply_user_access_filter(related_notes, request.user)[:5]
     
     context = {
         'note': note,
         'revisions': revisions,
+        'related_notes': related_notes,
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/note_detail.html', context)
 
 
-@login_required
+@content_access_required
 def study_session_start(request):
-    """Start a new study session"""
+    """Enhanced start study session with access control"""
     session = StudySession.objects.create(student=request.user)
     request.session['current_study_session'] = session.id
     
     return JsonResponse({
         'success': True,
-        'session_id': session.id
+        'session_id': session.id,
+        'user_access_level': get_user_access_info(request.user).get('level', 'student')
     })
 
 
-@login_required
+@content_access_required
 def study_session_end(request):
-    """End current study session"""
+    """Enhanced end study session with access control"""
     session_id = request.session.get('current_study_session')
     if session_id:
         try:
@@ -592,19 +724,26 @@ def study_session_end(request):
             
             return JsonResponse({
                 'success': True,
-                'duration_minutes': session.duration_minutes
+                'duration_minutes': session.duration_minutes,
+                'user_access_level': get_user_access_info(request.user).get('level', 'student')
             })
         except StudySession.DoesNotExist:
             pass
     
-    return JsonResponse({'success': False})
+    return JsonResponse({
+        'success': False,
+        'user_access_level': get_user_access_info(request.user).get('level', 'student')
+    })
 
 
-@login_required
+@content_access_required
 def search_notes(request):
-    """Search notes with advanced filters"""
+    """Enhanced search notes with access control"""
     query = request.GET.get('q', '')
     notes = StudentNote.objects.filter(student=request.user)
+    
+    # APPLY USER ACCESS FILTER
+    notes = apply_user_access_filter(notes, request.user)
     
     if query:
         notes = notes.filter(
@@ -629,6 +768,375 @@ def search_notes(request):
         'notes': page_obj,
         'query': query,
         'total_results': notes.count(),
+        'user_access': get_user_access_info(request.user),
     }
     
     return render(request, 'notes/search_results.html', context)
+
+
+# ADMIN VIEWS WITH ACCESS CONTROL
+
+@admin_required
+def admin_notes_overview(request):
+    """Admin overview of all student notes"""
+    # Get all notes
+    all_notes = StudentNote.objects.all().select_related('student')
+    
+    # Calculate statistics
+    total_notes = all_notes.count()
+    total_students_with_notes = all_notes.values('student').distinct().count()
+    
+    # Notes by degree/year
+    degree_stats = {}
+    for note in all_notes:
+        key = f"{note.degree} - {note.year}"
+        if key not in degree_stats:
+            degree_stats[key] = {'notes': 0, 'students': set()}
+        degree_stats[key]['notes'] += 1
+        degree_stats[key]['students'].add(note.student.id)
+    
+    # Calculate unique students per degree/year
+    for key in degree_stats:
+        degree_stats[key]['unique_students'] = len(degree_stats[key]['students'])
+        del degree_stats[key]['students']  # Remove set for template
+    
+    # Most active note-takers
+    active_students = all_notes.values('student__first_name', 'student__last_name', 'student__email').annotate(
+        note_count=Count('id')
+    ).order_by('-note_count')[:10]
+    
+    # Notes by type
+    notes_by_type = {}
+    for note_type, label in StudentNote.NOTE_TYPES:
+        count = all_notes.filter(note_type=note_type).count()
+        notes_by_type[note_type] = {'count': count, 'label': label}
+    
+    context = {
+        'total_notes': total_notes,
+        'total_students_with_notes': total_students_with_notes,
+        'degree_stats': degree_stats,
+        'active_students': active_students,
+        'notes_by_type': notes_by_type,
+        'user_access': get_user_access_info(request.user),
+    }
+    
+    return render(request, 'notes/admin_notes_overview.html', context)
+
+
+# UTILITY FUNCTIONS WITH ACCESS CONTROL
+
+@content_access_required
+def get_notes_hierarchy_data(request):
+    """AJAX endpoint for notes hierarchy data with access control"""
+    field = request.GET.get('field')
+    degree = request.GET.get('degree', '')
+    year = request.GET.get('year', '')
+    block = request.GET.get('block', '')
+    module = request.GET.get('module', '')
+    subject = request.GET.get('subject', '')
+    
+    # Get user's notes
+    notes = StudentNote.objects.filter(student=request.user)
+    
+    # APPLY USER ACCESS FILTER
+    notes = apply_user_access_filter(notes, request.user)
+    
+    if degree:
+        notes = notes.filter(degree=degree)
+    if year:
+        notes = notes.filter(year=year)
+    if block:
+        notes = notes.filter(block=block)
+    if module:
+        notes = notes.filter(module=module)
+    if subject:
+        notes = notes.filter(subject=subject)
+    
+    if field == 'blocks':
+        data = list(notes.values_list('block', flat=True).distinct().order_by('block'))
+    elif field == 'modules':
+        data = list(notes.values_list('module', flat=True).distinct().order_by('module'))
+    elif field == 'subjects':
+        data = list(notes.values_list('subject', flat=True).distinct().order_by('subject'))
+    elif field == 'topics':
+        data = list(notes.values_list('topic', flat=True).distinct().order_by('topic'))
+    else:
+        data = []
+    
+    # Remove empty values
+    data = [item for item in data if item and item.strip()]
+    
+    user_access = get_user_access_info(request.user)
+    
+    return JsonResponse({
+        'data': data,
+        'count': len(data),
+        'user_access_level': user_access.get('level', 'student'),
+        'filter_applied': user_access.get('level') == 'student'
+    })
+
+
+@content_access_required
+def get_notes_statistics(request):
+    """AJAX endpoint for notes statistics with access control"""
+    degree = request.GET.get('degree', '')
+    year = request.GET.get('year', '')
+    subject = request.GET.get('subject', '')
+    topic = request.GET.get('topic', '')
+    
+    # Get user's notes
+    notes = StudentNote.objects.filter(student=request.user)
+    
+    # APPLY USER ACCESS FILTER
+    notes = apply_user_access_filter(notes, request.user)
+    
+    if degree:
+        notes = notes.filter(degree=degree)
+    if year:
+        notes = notes.filter(year=year)
+    if subject:
+        notes = notes.filter(subject=subject)
+    if topic:
+        notes = notes.filter(topic=topic)
+    
+    # Calculate statistics
+    total_notes = notes.count()
+    favorite_notes = notes.filter(is_favorite=True).count()
+    recent_notes = notes.filter(created_at__gte=timezone.now() - timezone.timedelta(days=7)).count()
+    
+    # Notes by type for the filtered set
+    notes_by_type = {}
+    for note_type, label in StudentNote.NOTE_TYPES:
+        count = notes.filter(note_type=note_type).count()
+        notes_by_type[note_type] = {'count': count, 'label': label}
+    
+    user_access = get_user_access_info(request.user)
+    
+    return JsonResponse({
+        'total_notes': total_notes,
+        'favorite_notes': favorite_notes,
+        'recent_notes': recent_notes,
+        'notes_by_type': notes_by_type,
+        'user_access_level': user_access.get('level', 'student'),
+        'filter_applied': user_access.get('level') == 'student'
+    })
+
+
+@content_access_required
+def export_notes(request):
+    """Export notes to CSV with access control"""
+    # Get user's notes
+    notes = StudentNote.objects.filter(student=request.user)
+    
+    # APPLY USER ACCESS FILTER
+    notes = apply_user_access_filter(notes, request.user)
+    
+    # Apply filters if provided
+    subject = request.GET.get('subject')
+    note_type = request.GET.get('note_type')
+    
+    if subject:
+        notes = notes.filter(subject__icontains=subject)
+    
+    if note_type:
+        notes = notes.filter(note_type=note_type)
+    
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="my_notes.csv"'
+    
+    import csv
+    writer = csv.writer(response)
+    
+    # Write header
+    writer.writerow([
+        'Title', 'Content', 'Note Type', 'Degree', 'Year', 'Block', 
+        'Module', 'Subject', 'Topic', 'Tags', 'Is Favorite', 
+        'Created At', 'Updated At'
+    ])
+    
+    # Write data
+    for note in notes:
+        writer.writerow([
+            note.title,
+            note.content,
+            note.get_note_type_display(),
+            note.degree,
+            note.year,
+            note.block,
+            note.module,
+            note.subject,
+            note.topic,
+            note.tags,
+            'Yes' if note.is_favorite else 'No',
+            note.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            note.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    
+    return response
+
+
+# ADDITIONAL USEFUL VIEWS WITH ACCESS CONTROL
+
+@content_access_required
+def notes_by_subject(request):
+    """View notes grouped by subject with access control"""
+    user_notes = StudentNote.objects.filter(student=request.user)
+    user_notes = apply_user_access_filter(user_notes, request.user)
+    
+    # Group notes by subject
+    subjects = {}
+    for note in user_notes:
+        subject = note.subject or 'Uncategorized'
+        if subject not in subjects:
+            subjects[subject] = {
+                'notes': [],
+                'count': 0,
+                'favorite_count': 0,
+                'recent_count': 0
+            }
+        subjects[subject]['notes'].append(note)
+        subjects[subject]['count'] += 1
+        if note.is_favorite:
+            subjects[subject]['favorite_count'] += 1
+        if note.created_at >= timezone.now() - timezone.timedelta(days=7):
+            subjects[subject]['recent_count'] += 1
+    
+    context = {
+        'subjects': subjects,
+        'total_subjects': len(subjects),
+        'user_access': get_user_access_info(request.user),
+    }
+    
+    return render(request, 'notes/notes_by_subject.html', context)
+
+
+@content_access_required
+def favorite_notes(request):
+    """View only favorite notes with access control"""
+    user_notes = StudentNote.objects.filter(student=request.user, is_favorite=True)
+    user_notes = apply_user_access_filter(user_notes, request.user)
+    
+    # Apply search if provided
+    query = request.GET.get('q', '')
+    if query:
+        user_notes = user_notes.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(tags__icontains=query)
+        )
+    
+    # Pagination
+    paginator = Paginator(user_notes, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'notes': page_obj,
+        'query': query,
+        'total_favorites': user_notes.count(),
+        'user_access': get_user_access_info(request.user),
+    }
+    
+    return render(request, 'notes/favorite_notes.html', context)
+
+
+@content_access_required
+def recent_notes(request):
+    """View recent notes (last 30 days) with access control"""
+    thirty_days_ago = timezone.now() - timezone.timedelta(days=30)
+    user_notes = StudentNote.objects.filter(
+        student=request.user,
+        created_at__gte=thirty_days_ago
+    ).order_by('-created_at')
+    
+    user_notes = apply_user_access_filter(user_notes, request.user)
+    
+    # Pagination
+    paginator = Paginator(user_notes, 15)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'notes': page_obj,
+        'total_recent': user_notes.count(),
+        'user_access': get_user_access_info(request.user),
+    }
+    
+    return render(request, 'notes/recent_notes.html', context)
+
+
+@require_POST
+@content_access_required
+def bulk_delete_notes(request):
+    """Bulk delete notes with access control"""
+    note_ids = request.POST.getlist('note_ids')
+    
+    if not note_ids:
+        return JsonResponse({'error': 'No notes selected'}, status=400)
+    
+    # Get notes that belong to user
+    notes = StudentNote.objects.filter(id__in=note_ids, student=request.user)
+    
+    # Apply access control
+    accessible_notes = []
+    for note in notes:
+        if check_object_access(note, request.user):
+            accessible_notes.append(note)
+    
+    if not accessible_notes:
+        return JsonResponse({'error': 'No accessible notes to delete'}, status=403)
+    
+    # Delete accessible notes
+    deleted_count = len(accessible_notes)
+    for note in accessible_notes:
+        note.delete()
+    
+    return JsonResponse({
+        'success': True,
+        'deleted_count': deleted_count,
+        'message': f'{deleted_count} notes deleted successfully',
+        'user_access_level': get_user_access_info(request.user).get('level', 'student')
+    })
+
+
+@require_POST
+@content_access_required
+def bulk_favorite_notes(request):
+    """Bulk toggle favorite status with access control"""
+    note_ids = request.POST.getlist('note_ids')
+    action = request.POST.get('action', 'add')  # 'add' or 'remove'
+    
+    if not note_ids:
+        return JsonResponse({'error': 'No notes selected'}, status=400)
+    
+    # Get notes that belong to user
+    notes = StudentNote.objects.filter(id__in=note_ids, student=request.user)
+    
+    # Apply access control
+    accessible_notes = []
+    for note in notes:
+        if check_object_access(note, request.user):
+            accessible_notes.append(note)
+    
+    if not accessible_notes:
+        return JsonResponse({'error': 'No accessible notes to modify'}, status=403)
+    
+    # Update favorite status
+    updated_count = 0
+    for note in accessible_notes:
+        if action == 'add':
+            note.is_favorite = True
+        else:
+            note.is_favorite = False
+        note.save()
+        updated_count += 1
+    
+    action_text = 'added to' if action == 'add' else 'removed from'
+    
+    return JsonResponse({
+        'success': True,
+        'updated_count': updated_count,
+        'message': f'{updated_count} notes {action_text} favorites',
+        'user_access_level': get_user_access_info(request.user).get('level', 'student')
+    })

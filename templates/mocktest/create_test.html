@@ -183,6 +183,12 @@
       <i class="fas fa-file-csv"></i>
       <span>Manage CSVs</span>
     </a>
+
+    <a href="{% url 'manage_images' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_images' %}active{% endif %}">
+      <i class="fas fa-images"></i>
+      <span>Manage Images</span>
+    </a>
+    
     <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
       <i class="fas fa-cubes"></i>
       <span>Modules</span>
@@ -194,6 +200,10 @@
     <a href="{% url 'mocktest_list' %}" class="nav-item {% if request.resolver_match.url_name == 'mocktest_list' %}active{% endif %}">
       <i class="fas fa-vial"></i>
       <span>Mock Tests</span>
+    </a>
+    <a href="{% url 'modelpaper_list' %}" class="nav-item {% if request.resolver_match.url_name == 'modelpaper_list' %}active{% endif %}">
+      <i class="fas fa-file-alt"></i>
+      <span>Model Papers</span>
     </a>
     <a href="{% url 'analytics_report' %}" class="nav-item {% if request.resolver_match.url_name == 'analytics_report' %}active{% endif %}">
       <i class="fas fa-chart-bar"></i>

@@ -1,0 +1,1198 @@
+<!-- templates/user_management/manage_users.html - Fixed Version -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Users - PulsePrep Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .email-status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .email-sent { background: #d4edda; color: #155724; }
+    .email-failed { background: #f8d7da; color: #721c24; }
+    .email-pending { background: #fff3cd; color: #856404; }
+    .email-not-sent { background: #e2e3e5; color: #383d41; }
+    
+    .activation-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-activated { background: #d4edda; color: #155724; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-expired { background: #f8d7da; color: #721c24; }
+    .status-not-sent { background: #e2e3e5; color: #383d41; }
+
+    .btn-email {
+        padding: 4px 8px;
+        font-size: 11px;
+        border-radius: 4px;
+        margin: 1px;
+    }
+    
+    .bulk-actions {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .loading-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .user-info {
+        flex: 1;
+    }
+    
+    .badge-voucher {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .table-actions {
+        white-space: nowrap;
+    }
+    
+    .filters-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    
+    @media (max-width: 768px) {
+        .table-responsive {
+            font-size: 14px;
+        }
+        
+        .btn-email {
+            padding: 2px 4px;
+            font-size: 10px;
+        }
+        
+        .stat-card h4 {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">
+                <i class="fas fa-users text-primary"></i> User Management
+            </h2>
+            <p class="text-muted mb-0">Manage user accounts, approvals, and email activations</p>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="testEmailConfig()">
+                <i class="fas fa-envelope-open-text"></i> Test Email
+            </button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="fas fa-plus"></i> Add User
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-primary mb-1">{{ total_users }}</h4>
+                <small class="text-muted">Total Users</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-warning mb-1">{{ pending_users }}</h4>
+                <small class="text-muted">Pending Approval</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-success mb-1">{{ approved_users }}</h4>
+                <small class="text-muted">Approved</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-info mb-1">{{ activated_users }}</h4>
+                <small class="text-muted">Activated</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-danger mb-1">{{ pending_activation }}</h4>
+                <small class="text-muted">Pending Activation</small>
+            </div>
+        </div>
+        <div class="col-md-2 col-sm-6">
+            <div class="stat-card text-center">
+                <h4 class="text-secondary mb-1">{{ mbbs_users }}</h4>
+                <small class="text-muted">MBBS Users</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0"><i class="fas fa-bolt"></i> Bulk Actions</h6>
+            <span id="selected-count" class="badge bg-primary">0 selected</span>
+        </div>
+        <div class="btn-group flex-wrap" role="group">
+            <button type="button" class="btn btn-success btn-sm" onclick="bulkSendActivationEmails()">
+                <i class="fas fa-envelope"></i> Send Activation Emails
+            </button>
+            <button type="button" class="btn btn-outline-success btn-sm" onclick="bulkApproveUsers()">
+                <i class="fas fa-check"></i> Approve Selected
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="bulkRejectUsers()">
+                <i class="fas fa-times"></i> Reject Selected
+            </button>
+            <button type="button" class="btn btn-outline-info btn-sm" onclick="exportSelectedUsers()">
+                <i class="fas fa-download"></i> Export Selected
+            </button>
+            <button type="button" class="btn btn-outline-warning btn-sm" onclick="retryFailedEmails()">
+                <i class="fas fa-redo"></i> Retry Failed Emails
+            </button>
+        </div>
+        <small class="text-muted d-block mt-2">
+            <i class="fas fa-info-circle"></i> Select users from the table below to perform bulk actions.
+        </small>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <h6 class="mb-3"><i class="fas fa-filter"></i> Filters & Search</h6>
+        <div class="row g-3">
+            <div class="col-md-2 col-sm-6">
+                <label class="form-label small">Approval Status</label>
+                <select class="form-select form-select-sm" id="statusFilter" onchange="applyFilters()">
+                    <option value="all"{% if status_filter == 'all' %} selected{% endif %}>All Status</option>
+                    <option value="pending"{% if status_filter == 'pending' %} selected{% endif %}>Pending</option>
+                    <option value="approved"{% if status_filter == 'approved' %} selected{% endif %}>Approved</option>
+                    <option value="rejected"{% if status_filter == 'rejected' %} selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-6">
+                <label class="form-label small">Activation Status</label>
+                <select class="form-select form-select-sm" id="activationFilter" onchange="applyFilters()">
+                    <option value="all"{% if activation_filter == 'all' %} selected{% endif %}>All Activation</option>
+                    <option value="activated"{% if activation_filter == 'activated' %} selected{% endif %}>Activated</option>
+                    <option value="pending_activation"{% if activation_filter == 'pending_activation' %} selected{% endif %}>Pending Activation</option>
+                    <option value="not_sent"{% if activation_filter == 'not_sent' %} selected{% endif %}>Email Not Sent</option>
+                    <option value="expired"{% if activation_filter == 'expired' %} selected{% endif %}>Activation Expired</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-6">
+                <label class="form-label small">Degree</label>
+                <select class="form-select form-select-sm" id="degreeFilter" onchange="applyFilters()">
+                    <option value="all"{% if degree_filter == 'all' %} selected{% endif %}>All Degrees</option>
+                    <option value="MBBS"{% if degree_filter == 'MBBS' %} selected{% endif %}>MBBS</option>
+                    <option value="BDS"{% if degree_filter == 'BDS' %} selected{% endif %}>BDS</option>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-6">
+                <label class="form-label small">Year</label>
+                <select class="form-select form-select-sm" id="yearFilter" onchange="applyFilters()">
+                    <option value="all"{% if year_filter == 'all' %} selected{% endif %}>All Years</option>
+                    {% for year_choice in year_choices %}
+                        <option value="{{ year_choice.0 }}"{% if year_filter == year_choice.0|stringformat:"s" %} selected{% endif %}>
+                            Year {{ year_choice.0 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small">Search</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Search name, email, voucher..." 
+                           id="searchInput" value="{{ search_query }}" onkeyup="searchUsers()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-table"></i> Users List
+                <span class="badge bg-secondary ms-2">{{ page_obj.paginator.count }} total</span>
+            </h5>
+            <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-primary" onclick="refreshTable()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <a href="/user-management/export-csv/" class="btn btn-outline-success">
+                    <i class="fas fa-file-csv"></i> Export All
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th width="40">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="form-check-input">
+                            </th>
+                            <th>User Info</th>
+                            <th>Access Level</th>
+                            <th>Approval Status</th>
+                            <th>Activation Status</th>
+                            <th>Email Status</th>
+                            <th width="200">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        {% for user in users %}
+                        <tr data-user-id="{{ user.id }}"{% if not user.is_account_activated and user.approval_status == 'approved' %} class="table-warning"{% endif %}>
+                            <td>
+                                <input type="checkbox" class="user-checkbox form-check-input" value="{{ user.id }}" onchange="updateSelectedCount()">
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if user.profile_image %}
+                                        <img src="{{ user.profile_image.url }}" class="user-avatar me-3" alt="Profile">
+                                    {% else %}
+                                        <div class="avatar-placeholder bg-primary me-3">
+                                            {{ user.first_name|first }}{{ user.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="user-info">
+                                        <div class="fw-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="small text-muted">{{ user.email }}</div>
+                                        <div class="small">
+                                            {% if user.voucher_reference %}
+                                                <span class="badge badge-voucher bg-info">{{ user.voucher_reference }}</span>
+                                            {% endif %}
+                                            <span class="text-muted">Joined: {{ user.date_joined|date:"M d, Y" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if user.is_admin %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-user-shield"></i> Administrator
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary">
+                                        {{ user.degree }} Year {{ user.year }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if user.approval_status == 'approved' %}bg-success{% elif user.approval_status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                    {% if user.approval_status == 'approved' %}<i class="fas fa-check"></i>{% elif user.approval_status == 'pending' %}<i class="fas fa-clock"></i>{% else %}<i class="fas fa-times"></i>{% endif %}
+                                    {{ user.get_approval_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if user.is_account_activated %}
+                                    <span class="activation-status status-activated">
+                                        <i class="fas fa-check-circle"></i> Activated
+                                    </span>
+                                    {% if user.activated_at %}
+                                        <small class="d-block text-muted">{{ user.activated_at|date:"M d, H:i" }}</small>
+                                    {% endif %}
+                                {% elif user.activation_sent_at and user.is_activation_token_valid %}
+                                    <span class="activation-status status-pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                    <small class="d-block text-muted">Sent: {{ user.activation_sent_at|date:"M d, H:i" }}</small>
+                                {% elif user.activation_sent_at %}
+                                    <span class="activation-status status-expired">
+                                        <i class="fas fa-exclamation-triangle"></i> Expired
+                                    </span>
+                                    <small class="d-block text-muted">Expired: {{ user.activation_sent_at|date:"M d, H:i" }}</small>
+                                {% else %}
+                                    <span class="activation-status status-not-sent">
+                                        <i class="fas fa-envelope"></i> Not Sent
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% with user.email_logs.first as latest_email %}
+                                    {% if latest_email %}
+                                        {% if latest_email.status == 'sent' %}
+                                            <span class="email-status email-sent">
+                                                <i class="fas fa-check"></i> Sent
+                                            </span>
+                                        {% elif latest_email.status == 'failed' %}
+                                            <span class="email-status email-failed">
+                                                <i class="fas fa-times"></i> Failed
+                                            </span>
+                                        {% elif latest_email.status == 'bounced' %}
+                                            <span class="email-status email-failed">
+                                                <i class="fas fa-exclamation-triangle"></i> Bounced
+                                            </span>
+                                        {% else %}
+                                            <span class="email-status email-pending">
+                                                <i class="fas fa-clock"></i> Processing
+                                            </span>
+                                        {% endif %}
+                                        <small class="d-block text-muted">{{ latest_email.sent_at|date:"M d, H:i" }}</small>
+                                    {% else %}
+                                        <span class="email-status email-not-sent">-</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="table-actions">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Approval Actions -->
+                                    {% if user.approval_status == 'pending' %}
+                                        <button class="btn btn-success btn-email" 
+                                                onclick="changeUserStatus({{ user.id }}, 'approved')"
+                                                title="Approve & Send Activation Email">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-email" 
+                                                onclick="changeUserStatus({{ user.id }}, 'rejected')"
+                                                title="Reject User">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    {% elif user.approval_status == 'rejected' %}
+                                        <button class="btn btn-success btn-email" 
+                                                onclick="changeUserStatus({{ user.id }}, 'approved')"
+                                                title="Approve & Send Activation Email">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    {% elif user.approval_status == 'approved' %}
+                                        <button class="btn btn-outline-danger btn-email" 
+                                                onclick="changeUserStatus({{ user.id }}, 'rejected')"
+                                                title="Reject User">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    {% endif %}
+                                    
+                                    <!-- Email Actions -->
+                                    {% if user.approval_status == 'approved' and not user.is_account_activated %}
+                                        <button class="btn btn-info btn-email" 
+                                                onclick="resendActivationEmail({{ user.id }})"
+                                                title="Resend Activation Email">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                        <button class="btn btn-warning btn-email" 
+                                                onclick="manualActivateAccount({{ user.id }})"
+                                                title="Manual Activation (Bypass Email)">
+                                            <i class="fas fa-key"></i>
+                                        </button>
+                                    {% endif %}
+                                    
+                                    <!-- View Details -->
+                                    <button class="btn btn-outline-secondary btn-email" 
+                                            onclick="viewUserDetails({{ user.id }})"
+                                            title="View User Details">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    
+                                    <!-- Delete (only for non-admin users) -->
+                                    {% if not user.is_admin and not user.is_superuser %}
+                                        <button class="btn btn-outline-danger btn-email" 
+                                                onclick="deleteUser({{ user.id }})"
+                                                title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-users fa-3x mb-3"></i>
+                                    <h5>No users found</h5>
+                                    <p>No users match your current filter criteria.</p>
+                                    <button class="btn btn-outline-primary" onclick="clearAllFilters()">
+                                        <i class="fas fa-filter"></i> Clear Filters
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer">
+            <nav aria-label="User pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if activation_filter != 'all' %}&activation={{ activation_filter }}{% endif %}{% if degree_filter != 'all' %}&degree={{ degree_filter }}{% endif %}{% if year_filter != 'all' %}&year={{ year_filter }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if activation_filter != 'all' %}&activation={{ activation_filter }}{% endif %}{% if degree_filter != 'all' %}&degree={{ degree_filter }}{% endif %}{% if year_filter != 'all' %}&year={{ year_filter }}{% endif %}">
+                                <i class="fas fa-angle-left"></i> Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            <small class="d-block">{{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</small>
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if activation_filter != 'all' %}&activation={{ activation_filter }}{% endif %}{% if degree_filter != 'all' %}&degree={{ degree_filter }}{% endif %}{% if year_filter != 'all' %}&year={{ year_filter }}{% endif %}">
+                                Next <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter != 'all' %}&status={{ status_filter }}{% endif %}{% if activation_filter != 'all' %}&activation={{ activation_filter }}{% endif %}{% if degree_filter != 'all' %}&degree={{ degree_filter }}{% endif %}{% if year_filter != 'all' %}&year={{ year_filter }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">
+                    <i class="fas fa-user-plus"></i> Add New User
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'user_management:add_user' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="user-name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="user-name" name="user-name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="user-email" class="form-label">Email Address *</label>
+                                <input type="email" class="form-control" id="user-email" name="user-email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="user-type" class="form-label">User Type *</label>
+                                <select class="form-select" id="user-type" name="user-type" onchange="toggleStudentFields()">
+                                    <option value="Student">Student</option>
+                                    <option value="Admin">Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="degree-field">
+                            <div class="mb-3">
+                                <label for="user-field" class="form-label">Degree *</label>
+                                <select class="form-select" id="user-field" name="user-field">
+                                    <option value="">Select Degree</option>
+                                    <option value="MBBS">MBBS</option>
+                                    <option value="BDS">BDS</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4" id="year-field">
+                            <div class="mb-3">
+                                <label for="user-year" class="form-label">Year *</label>
+                                <select class="form-select" id="user-year" name="user-year">
+                                    <option value="">Select Year</option>
+                                    <option value="1">1st Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="5">5th Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="user-image" class="form-label">Profile Image</label>
+                                <input type="file" class="form-control" id="user-image" name="user-image" accept="image/*">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="user-status" name="user-status" checked>
+                                    <label class="form-check-label" for="user-status">
+                                        Approve immediately & send activation email
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Create User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailsModalLabel">
+                    <i class="fas fa-user"></i> User Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userDetailsContent">
+                    <!-- Dynamic content loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="text-center text-white">
+            <div class="spinner-border mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Processing request...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let selectedUsers = new Set();
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    updateSelectedCount();
+    initializeTooltips();
+});
+
+// Enhanced user status change with loading states
+function changeUserStatus(userId, newStatus) {
+    const statusNames = {
+        'approved': 'approve',
+        'rejected': 'reject',
+        'pending': 'set as pending'
+    };
+    
+    if (confirm('Are you sure you want to ' + statusNames[newStatus] + ' this user?')) {
+        showLoading();
+        
+        fetch('/user-management/api/users/' + userId + '/status/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('An error occurred. Please try again.', 'error');
+        });
+    }
+}
+
+// Resend activation email
+function resendActivationEmail(userId) {
+    if (confirm('Resend activation email to this user?')) {
+        showLoading();
+        
+        fetch('/user-management/api/users/' + userId + '/resend-activation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to resend email. Please try again.', 'error');
+        });
+    }
+}
+
+// Manual account activation
+function manualActivateAccount(userId) {
+    if (confirm('Manually activate this account (bypass email activation)?')) {
+        showLoading();
+        
+        fetch('/user-management/api/users/' + userId + '/manual-activate/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to activate account. Please try again.', 'error');
+        });
+    }
+}
+
+// Bulk send activation emails
+function bulkSendActivationEmails() {
+    const selectedUserIds = getSelectedUsers();
+    if (selectedUserIds.length === 0) {
+        showAlert('Please select users first.', 'warning');
+        return;
+    }
+    
+    if (confirm('Send activation emails to ' + selectedUserIds.length + ' selected user(s)?')) {
+        showLoading();
+        
+        fetch('/user-management/api/bulk-send-activation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ user_ids: selectedUserIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to send bulk emails. Please try again.', 'error');
+        });
+    }
+}
+
+// Bulk approve users
+function bulkApproveUsers() {
+    const selectedUserIds = getSelectedUsers();
+    if (selectedUserIds.length === 0) {
+        showAlert('Please select users first.', 'warning');
+        return;
+    }
+    
+    if (confirm('Approve ' + selectedUserIds.length + ' selected user(s) and send activation emails?')) {
+        showLoading();
+        
+        // Process each user individually
+        let processed = 0;
+        let successful = 0;
+        
+        selectedUserIds.forEach(userId => {
+            fetch('/user-management/api/users/' + userId + '/status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ status: 'approved' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                processed++;
+                if (data.success) successful++;
+                
+                if (processed === selectedUserIds.length) {
+                    hideLoading();
+                    showAlert('Bulk approval completed: ' + successful + ' successful, ' + (processed - successful) + ' failed', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(error => {
+                processed++;
+                if (processed === selectedUserIds.length) {
+                    hideLoading();
+                    showAlert('Bulk approval completed with errors', 'warning');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            });
+        });
+    }
+}
+
+// Bulk reject users
+function bulkRejectUsers() {
+    const selectedUserIds = getSelectedUsers();
+    if (selectedUserIds.length === 0) {
+        showAlert('Please select users first.', 'warning');
+        return;
+    }
+    
+    if (confirm('Reject ' + selectedUserIds.length + ' selected user(s)?')) {
+        showLoading();
+        
+        let processed = 0;
+        let successful = 0;
+        
+        selectedUserIds.forEach(userId => {
+            fetch('/user-management/api/users/' + userId + '/status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ status: 'rejected' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                processed++;
+                if (data.success) successful++;
+                
+                if (processed === selectedUserIds.length) {
+                    hideLoading();
+                    showAlert('Bulk rejection completed: ' + successful + ' successful, ' + (processed - successful) + ' failed', 'success');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            })
+            .catch(error => {
+                processed++;
+                if (processed === selectedUserIds.length) {
+                    hideLoading();
+                    showAlert('Bulk rejection completed with errors', 'warning');
+                    setTimeout(() => location.reload(), 2000);
+                }
+            });
+        });
+    }
+}
+
+// Test email configuration
+function testEmailConfig() {
+    if (confirm('Send a test email to verify email configuration?')) {
+        showLoading();
+        
+        fetch('/user-management/api/test-email/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to send test email. Please check your email configuration.', 'error');
+        });
+    }
+}
+
+// Retry failed emails
+function retryFailedEmails() {
+    if (confirm('Retry sending failed activation emails from the last 24 hours?')) {
+        showLoading();
+        
+        fetch('/user-management/api/retry-failed-emails/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to retry emails. Please try again.', 'error');
+        });
+    }
+}
+
+// Delete user
+function deleteUser(userId) {
+    if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+        showLoading();
+        
+        fetch('/user-management/api/users/' + userId + '/delete/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                showAlert(data.message, 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to delete user. Please try again.', 'error');
+        });
+    }
+}
+
+// View user details
+function viewUserDetails(userId) {
+    showLoading();
+    
+    fetch('/user-management/api/users/' + userId + '/details/')
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                document.getElementById('userDetailsContent').innerHTML = data.html;
+                new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+            } else {
+                showAlert('Failed to load user details.', 'error');
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showAlert('Failed to load user details.', 'error');
+        });
+}
+
+// Export selected users
+function exportSelectedUsers() {
+    const selectedUserIds = getSelectedUsers();
+    if (selectedUserIds.length === 0) {
+        showAlert('Please select users first.', 'warning');
+        return;
+    }
+    
+    // Create form and submit for CSV download
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/user-management/api/export-selected/';
+    
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = getCookie('csrftoken');
+    form.appendChild(csrfInput);
+    
+    const userIdsInput = document.createElement('input');
+    userIdsInput.type = 'hidden';
+    userIdsInput.name = 'user_ids';
+    userIdsInput.value = JSON.stringify(selectedUserIds);
+    form.appendChild(userIdsInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    showAlert('Exporting ' + selectedUserIds.length + ' selected users...', 'info');
+}
+
+// Selection management
+function getSelectedUsers() {
+    const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = selectAll.checked;
+        if (selectAll.checked) {
+            selectedUsers.add(parseInt(cb.value));
+        } else {
+            selectedUsers.delete(parseInt(cb.value));
+        }
+    });
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const selectedCount = document.querySelectorAll('.user-checkbox:checked').length;
+    const totalCount = document.querySelectorAll('.user-checkbox').length;
+    
+    document.getElementById('selected-count').textContent = selectedCount + ' selected';
+    
+    // Update select all checkbox state
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if (selectedCount === 0) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = false;
+    } else if (selectedCount === totalCount) {
+        selectAllCheckbox.indeterminate = false;
+        selectAllCheckbox.checked = true;
+    } else {
+        selectAllCheckbox.indeterminate = true;
+    }
+}
+
+// Filtering and search
+function applyFilters() {
+    const status = document.getElementById('statusFilter').value;
+    const activation = document.getElementById('activationFilter').value;
+    const degree = document.getElementById('degreeFilter').value;
+    const year = document.getElementById('yearFilter').value;
+    const search = document.getElementById('searchInput').value;
+    
+    const params = new URLSearchParams();
+    if (status !== 'all') params.set('status', status);
+    if (activation !== 'all') params.set('activation', activation);
+    if (degree !== 'all') params.set('degree', degree);
+    if (year !== 'all') params.set('year', year);
+    if (search) params.set('search', search);
+    
+    window.location.href = window.location.pathname + '?' + params.toString();
+}
+
+function searchUsers() {
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(applyFilters, 500);
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    applyFilters();
+}
+
+function clearAllFilters() {
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('activationFilter').value = 'all';
+    document.getElementById('degreeFilter').value = 'all';
+    document.getElementById('yearFilter').value = 'all';
+    document.getElementById('searchInput').value = '';
+    applyFilters();
+}
+
+function refreshTable() {
+    location.reload();
+}
+
+// Modal functions
+function toggleStudentFields() {
+    const userType = document.getElementById('user-type').value;
+    const degreeField = document.getElementById('degree-field');
+    const yearField = document.getElementById('year-field');
+    
+    if (userType === 'Admin') {
+        degreeField.style.display = 'none';
+        yearField.style.display = 'none';
+        document.getElementById('user-field').required = false;
+        document.getElementById('user-year').required = false;
+    } else {
+        degreeField.style.display = 'block';
+        yearField.style.display = 'block';
+        document.getElementById('user-field').required = true;
+        document.getElementById('user-year').required = true;
+    }
+}
+
+// Utility functions
+function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function showAlert(message, type) {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-' + (type === 'error' ? 'danger' : type) + ' alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 10000; max-width: 400px;';
+    alertDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle') + '"></i> ' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+    
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function initializeTooltips() {
+    // Initialize Bootstrap tooltips if available
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+}
+
+// Handle checkbox changes for selection tracking
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('user-checkbox')) {
+        updateSelectedCount();
+    }
+});
+
+// Auto-refresh every 5 minutes to keep data current
+setInterval(() => {
+    if (document.visibilityState === 'visible') {
+        location.reload();
+    }
+}, 300000); // 5 minutes
+</script>
+{% endblock %}

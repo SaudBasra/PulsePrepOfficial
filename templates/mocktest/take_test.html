@@ -1,19 +1,19 @@
 {% load static %}
 {% include 'includes/favicon.html' %}
 {% include 'includes/security_protection.html' %}
+{% include 'includes/special_characters.html' %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    {% include 'includes/favicon.html' %}
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>{{ test.title }} - PulsePrep</title>
     <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Enhanced responsive styles */
         :root {
             --primary: #82272e;
             --primary-light: #a53b47;
@@ -33,7 +33,6 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
             background-color: #f9fafb;
             color: var(--dark);
             line-height: 1.6;
@@ -158,7 +157,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            min-width: 0; /* Prevents flex item from growing beyond container */
+            min-width: 0;
         }
 
         .question-card {
@@ -209,7 +208,69 @@
             flex-shrink: 0;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: pre-wrap; /* FIXED: Preserve line breaks and formatting */
+            white-space: pre-wrap;
+        }
+
+        /* ENHANCED: Image Display Styles */
+        .question-image, .explanation-image {
+            margin: 16px 0;
+            text-align: center;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .question-image img, .explanation-image img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid var(--gray-light);
+            transition: transform 0.2s ease;
+            object-fit: contain;
+            background: white;
+            cursor: pointer;
+        }
+
+        .question-image img:hover, .explanation-image img:hover {
+            transform: scale(1.02);
+        }
+
+        .image-caption {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .image-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin: 16px 0;
+        }
+
+        .image-error i {
+            margin-right: 8px;
+        }
+
+        .image-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Options container - Responsive */
@@ -273,76 +334,7 @@
             flex: 1;
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: pre-wrap; /* FIXED: Preserve formatting in options */
-        }
-
-        /* Explanation Section - MOVED FROM QUESTION TO BOTTOM */
-        .explanation-section {
-            margin-top: 20px;
-            padding: 16px;
-            background: #dbeafe;
-            border-radius: 8px;
-            border-left: 4px solid var(--info);
-            display: none; /* Hidden by default, can be shown if needed */
-        }
-
-        .explanation-title {
-            font-weight: 600;
-            color: #1e40af;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .explanation-content {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--dark);
-            white-space: pre-wrap; /* FIXED: Preserve formatting in explanations */
-        }
-
-        /* Image in explanation - Responsive */
-        .explanation-image {
-            margin: 16px 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        .explanation-image img {
-            max-width: 100%;
-            width: auto;
-            height: auto;
-            max-height: clamp(200px, 40vh, 400px);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            border: 1px solid #e2e8f0;
-            object-fit: contain;
-            background: white;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .explanation-image .image-caption {
-            font-size: clamp(10px, 2.5vw, 12px);
-            color: var(--gray);
-            margin-top: 8px;
-            font-style: italic;
-        }
-
-        .image-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: clamp(12px, 3vw, 14px);
-            margin: 16px 0;
-        }
-
-        .image-error i {
-            margin-right: 8px;
+            white-space: pre-wrap;
         }
 
         /* Navigation Panel - Responsive Sidebar */
@@ -634,6 +626,48 @@
             flex-wrap: wrap;
         }
 
+        /* ENHANCED: Image Modal for zoomed view */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .image-modal img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
         /* Mobile-First Responsive Design */
         @media (max-width: 1200px) {
             .navigation-panel {
@@ -679,7 +713,11 @@
             }
             
             .test-progress, .legend {
-                display: none; /* Hide on mobile to save space */
+                display: none;
+            }
+
+            .question-image img, .explanation-image img {
+                max-height: 250px;
             }
         }
 
@@ -730,8 +768,8 @@
                 font-size: 12px;
             }
 
-            .explanation-image img {
-                max-height: clamp(150px, 30vh, 250px);
+            .question-image img, .explanation-image img {
+                max-height: 200px;
             }
         }
 
@@ -791,8 +829,8 @@
                 width: 100%;
             }
 
-            .explanation-image img {
-                max-height: clamp(120px, 25vh, 200px);
+            .question-image img, .explanation-image img {
+                max-height: 150px;
             }
         }
 
@@ -810,10 +848,6 @@
                 min-height: calc(100vh - 200px);
             }
             
-            .explanation-image img {
-                max-height: 150px;
-            }
-            
             .question-grid {
                 max-height: 60px;
                 grid-template-columns: repeat(auto-fit, minmax(25px, 1fr));
@@ -823,6 +857,10 @@
                 width: 25px;
                 height: 25px;
                 font-size: 10px;
+            }
+
+            .question-image img, .explanation-image img {
+                max-height: 120px;
             }
         }
 
@@ -855,22 +893,6 @@
             to { opacity: 1; }
         }
 
-        /* Loading indicator */
-        .image-loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-            margin: 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         /* Ensure content doesn't overflow */
         .test-container * {
             max-width: 100%;
@@ -892,24 +914,9 @@
                 padding: 16px;
             }
         }
-
-        /* Special character support - Enhanced typography */
-        .question-text,
-        .option-label span,
-        .explanation-content {
-            font-feature-settings: "liga" 1, "kern" 1;
-            text-rendering: optimizeLegibility;
-        }
-
-        /* Support for mathematical symbols and special characters */
-        .special-chars {
-            font-family: "Times New Roman", "Cambria Math", serif;
-            font-size: 1.1em;
-        }
     </style>
 </head>
 <body>
-    <!-- Include Security Template -->
     {% include 'includes/security_protection.html' %}
 
     <div class="test-container">
@@ -943,7 +950,7 @@
                 <div class="question-card fade-in" id="question-card">
                     <div class="question-content">
                         <div id="question-container">
-                            <!-- Questions will be loaded here -->
+                            <!-- Questions will be loaded here automatically -->
                         </div>
                     </div>
                     
@@ -1046,8 +1053,16 @@
         </div>
     </div>
 
+    <!-- ENHANCED: Image Modal for zoomed view -->
+    <div class="image-modal" id="image-modal">
+        <button class="image-modal-close" onclick="closeImageModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="modal-image" src="" alt="Zoomed Image">
+    </div>
+
     <script>
-        // Test data - Updated for image support
+        // Test data - special characters processed automatically by include
         const testQuestions = [
             {% for question in test_questions %}
             {
@@ -1059,70 +1074,38 @@
                     {{ key }}: `{{ value|escapejs }}`,
                     {% endfor %}
                 },
-                hasImage: {{ question.has_image|yesno:"true,false" }},
-                imageUrl: {% if question.image_url %}`{{ question.image_url }}`{% else %}null{% endif %},
-                imageFilename: {% if question.image_filename %}`{{ question.image_filename|escapejs }}`{% else %}null{% endif %},
+                // ENHANCED: Support both question and explanation images
+                hasQuestionImage: {{ question.has_question_image|yesno:"true,false" }},
+                questionImageUrl: {% if question.question_image_url %}`{{ question.question_image_url }}`{% else %}null{% endif %},
+                questionImageFilename: {% if question.question_image_filename %}`{{ question.question_image_filename|escapejs }}`{% else %}null{% endif %},
+                hasExplanationImage: {{ question.has_explanation_image|yesno:"true,false" }},
+                explanationImageUrl: {% if question.explanation_image_url %}`{{ question.explanation_image_url }}`{% else %}null{% endif %},
+                explanationImageFilename: {% if question.explanation_image_filename %}`{{ question.explanation_image_filename|escapejs }}`{% else %}null{% endif %},
+                // Additional context
+                degree: `{{ question.degree|escapejs }}`,
+                year: `{{ question.year|escapejs }}`,
+                block: `{{ question.block|escapejs }}`,
+                module: `{{ question.module|escapejs }}`,
+                subject: `{{ question.subject|escapejs }}`,
+                topic: `{{ question.topic|escapejs }}`,
+                difficulty: `{{ question.difficulty|escapejs }}`,
                 randomizeOptions: {{ test.randomize_options|yesno:"true,false" }}
             },
             {% endfor %}
         ];
         
-        // Updated timer variables - Fixed for seconds calculation
+        // Timer variables
         const attemptId = {{ attempt.id }};
         const duration = {{ test.duration_minutes }};
         let currentQuestionIndex = 0;
         let answers = {};
         let markedQuestions = new Set();
-        let timeRemaining = duration * 60; // Convert minutes to seconds correctly
+        let timeRemaining = duration * 60; // Convert to seconds
         let warningCount = {{ attempt.warning_count }};
-        let visitedQuestions = new Set([1]); // Track visited questions
-        let timerInterval = null; // Store timer interval for better control
+        let visitedQuestions = new Set([1]);
+        let timerInterval = null;
         
-        // Special character conversion function - SAME AS MODEL PAPER
-        function processSpecialCharacters(text) {
-            if (!text) return text;
-            
-            // Convert common symbols and arrows
-            text = text.replace(/→/g, '→').replace(/->/g, '→').replace(/-->/g, '→');
-            text = text.replace(/←/g, '←').replace(/<-/g, '←').replace(/<--/g, '←');
-            text = text.replace(/↔/g, '↔').replace(/<->/g, '↔').replace(/<-->/g, '↔');
-            text = text.replace(/⇌/g, '⇌'); // Reversible reaction
-            
-            // Greek letters
-            text = text.replace(/\balpha\b/gi, 'α');
-            text = text.replace(/\bbeta\b/gi, 'β');
-            text = text.replace(/\bgamma\b/gi, 'γ');
-            text = text.replace(/\bdelta\b/gi, 'δ');
-            text = text.replace(/\blambda\b/gi, 'λ');
-            text = text.replace(/\bmu\b/gi, 'μ');
-            text = text.replace(/\bpi\b/gi, 'π');
-            text = text.replace(/\bsigma\b/gi, 'σ');
-            text = text.replace(/\bomega\b/gi, 'ω');
-            
-            // Mathematical symbols
-            text = text.replace(/\+\/-/g, '±');
-            text = text.replace(/\+-/g, '±');
-            text = text.replace(/\<=\>/g, '⇔');
-            text = text.replace(/\<=/g, '≤');
-            text = text.replace(/\>=/g, '≥');
-            text = text.replace(/\!=/g, '≠');
-            text = text.replace(/\~=/g, '≈');
-            text = text.replace(/\infty/g, '∞');
-            text = text.replace(/\sqrt/g, '√');
-            
-            // Superscript numbers
-            text = text.replace(/\^2/g, '²');
-            text = text.replace(/\^3/g, '³');
-            text = text.replace(/\^1/g, '¹');
-            
-            // Common medical symbols
-            text = text.replace(/\bdegree\b/gi, '°');
-            text = text.replace(/\bdegrees\b/gi, '°');
-            
-            return text;
-        }
-        
-        // Initialize
+        // Initialize - All content will be automatically processed for special characters
         document.addEventListener('DOMContentLoaded', function() {
             loadQuestion(0);
             startTimer();
@@ -1134,14 +1117,12 @@
 
         // Responsive handlers
         function setupResponsiveHandlers() {
-            // Handle orientation changes
             window.addEventListener('orientationchange', function() {
                 setTimeout(() => {
                     adjustLayoutForScreen();
                 }, 100);
             });
             
-            // Handle window resize
             let resizeTimeout;
             window.addEventListener('resize', function() {
                 clearTimeout(resizeTimeout);
@@ -1150,22 +1131,18 @@
                 }, 250);
             });
             
-            // Initial layout adjustment
             adjustLayoutForScreen();
         }
 
         function adjustLayoutForScreen() {
             const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
             
-            // Adjust question navigation for very small screens
             if (screenWidth <= 480) {
                 updateButtonLabels(true);
             } else {
                 updateButtonLabels(false);
             }
             
-            // Adjust timer display for very small screens
             if (screenWidth <= 360) {
                 const timerIcon = document.querySelector('.test-timer i');
                 if (timerIcon) timerIcon.style.display = 'none';
@@ -1187,7 +1164,7 @@
             } else {
                 prevBtn.innerHTML = '<i class="fas fa-arrow-left"></i> <span>Previous</span>';
                 nextBtn.innerHTML = '<span>Next</span> <i class="fas fa-arrow-right"></i>';
-                updateMarkButtonState(); // Restore full mark button text
+                updateMarkButtonState();
             }
         }
         
@@ -1235,68 +1212,108 @@
             }
         });
         
-        // Load question - ENHANCED with special character processing
+        // ENHANCED: Load question with image support
         function loadQuestion(index) {
             const question = testQuestions[index];
             currentQuestionIndex = index;
             visitedQuestions.add(index + 1);
             
-            // Update current question number
             document.getElementById('current-question').textContent = index + 1;
             
-            // Process question text for special characters and preserve formatting
-            let processedQuestionText = processSpecialCharacters(question.text);
+            // Build question HTML with image support
+            let questionHtml = `
+                <div class="question-number">Question ${index + 1}</div>
+                <div class="question-text">${question.text}</div>
+            `;
+
+            // ENHANCED: Add question image if available
+            if (question.hasQuestionImage && question.questionImageUrl) {
+                questionHtml += `
+                    <div class="question-image">
+                        <img src="${question.questionImageUrl}" 
+                             alt="Question ${index + 1} Image" 
+                             loading="lazy"
+                             onclick="openImageModal('${question.questionImageUrl}')"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="image-error" style="display: none;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Question image not found: ${question.questionImageFilename || 'Unknown'}</span>
+                        </div>
+                        <div class="image-caption">
+                            Question Image: ${question.questionImageFilename || 'Click to zoom'}
+                        </div>
+                    </div>
+                `;
+            }
             
-            // Create options HTML
+            // Build options HTML - special characters will be processed automatically
             let optionsHtml = '<div class="options-container"><ul class="options-list">';
             const options = Object.entries(question.options);
             
-            // Randomize options if enabled
             if (question.randomizeOptions) {
                 options.sort(() => Math.random() - 0.5);
             }
             
             options.forEach(([key, value]) => {
                 const isChecked = answers[question.id] === key;
-                const processedOptionText = processSpecialCharacters(value);
                 optionsHtml += `
                     <li class="option-item">
                         <label class="option-label ${isChecked ? 'selected' : ''}">
                             <input type="radio" name="answer" value="${key}" 
                                    ${isChecked ? 'checked' : ''} 
                                    onchange="saveAnswer('${key}')">
-                            <span>${key}) ${processedOptionText}</span>
+                            <span class="option-text">${key}) ${value}</span>
                         </label>
                     </li>
                 `;
             });
             optionsHtml += '</ul></div>';
             
-            // Load question content with fade animation - NO IMAGES during test
+            // Insert content - special characters will be automatically processed by include
             const questionContainer = document.getElementById('question-container');
-            questionContainer.innerHTML = `
-                <div class="question-number">Question ${index + 1}</div>
-                <div class="question-text">${processedQuestionText}</div>
-                ${optionsHtml}
-            `;
+            questionContainer.innerHTML = questionHtml + optionsHtml;
             
-            // Update navigation buttons
             updateNavigation();
             updateNavigationState();
             updateMarkButtonState();
             
-            // Scroll to top of question for mobile
             if (window.innerWidth <= 1024) {
                 questionContainer.scrollTop = 0;
             }
         }
+
+        // ENHANCED: Image modal functions
+        function openImageModal(imageUrl) {
+            const modal = document.getElementById('image-modal');
+            const modalImage = document.getElementById('modal-image');
+            
+            modalImage.src = imageUrl;
+            modal.style.display = 'flex';
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            modal.style.display = 'none';
+            
+            // Restore body scroll
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside image
+        document.getElementById('image-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
         
         // Update navigation button states
         function updateNavigationState() {
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
             
-            // Disable/enable previous button
             if (currentQuestionIndex === 0) {
                 prevBtn.disabled = true;
                 prevBtn.style.opacity = '0.5';
@@ -1305,7 +1322,6 @@
                 prevBtn.style.opacity = '1';
             }
             
-            // Disable/enable next button
             if (currentQuestionIndex === testQuestions.length - 1) {
                 nextBtn.disabled = true;
                 nextBtn.style.opacity = '0.5';
@@ -1343,13 +1359,11 @@
             const question = testQuestions[currentQuestionIndex];
             answers[question.id] = answer;
             
-            // Update UI
             document.querySelectorAll('.option-label').forEach(label => {
                 label.classList.remove('selected');
             });
             event.target.closest('.option-label').classList.add('selected');
             
-            // Save to server
             fetch('{% url "submit_answer" %}', {
                 method: 'POST',
                 headers: {
@@ -1390,7 +1404,6 @@
                 markedQuestions.add(question.id);
             }
             
-            // Save to server
             fetch('{% url "submit_test" %}', {
                 method: 'POST',
                 headers: {
@@ -1433,47 +1446,40 @@
             document.getElementById('remaining-count').textContent = remaining;
         }
         
-        // Updated timer function to display time correctly in seconds
+        // Timer functions
         function updateTimerDisplay() {
             const minutes = Math.floor(timeRemaining / 60);
             const seconds = timeRemaining % 60;
             
-            // Format time as MM:SS
             const timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             document.getElementById('time-remaining').textContent = timeDisplay;
         }
         
-        // Updated timer function - Fixed for proper seconds calculation
         function startTimer() {
-            // Update display immediately
             updateTimerDisplay();
             
             timerInterval = setInterval(() => {
-                timeRemaining--; // Decrease by 1 second
-                
+                timeRemaining--;
                 updateTimerDisplay();
                 
                 const timerElement = document.getElementById('timer');
                 
-                // Warning when 5 minutes left (300 seconds)
                 if (timeRemaining === 300) {
                     timerElement.classList.add('warning');
                     showWarning('Only 5 minutes remaining!');
                 }
                 
-                // Danger when 1 minute left (60 seconds)
                 if (timeRemaining === 60) {
                     timerElement.classList.remove('warning');
                     timerElement.classList.add('danger');
                     showWarning('Only 1 minute remaining! Test will auto-submit soon.');
                 }
                 
-                // Auto submit when time's up
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
                     autoSubmit();
                 }
-            }, 1000); // Run every 1000 milliseconds (1 second)
+            }, 1000);
         }
         
         // Tab detection for 3-warning system
@@ -1485,7 +1491,6 @@
             });
             
             window.addEventListener('blur', function() {
-                // Only trigger if the window actually loses focus
                 setTimeout(() => {
                     if (!document.hasFocus()) {
                         handleTabSwitch();
@@ -1551,7 +1556,6 @@
         }
         
         function submitTest() {
-            // Clear timer before submitting
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
@@ -1593,9 +1597,17 @@
             return cookieValue;
         }
         
-        // Enhanced keyboard shortcuts for responsive design
+        // Enhanced keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            // Allow only test navigation keys (don't prevent all shortcuts)
+            // Close image modal with Escape key
+            if (e.key === 'Escape') {
+                const imageModal = document.getElementById('image-modal');
+                if (imageModal.style.display === 'flex') {
+                    closeImageModal();
+                    return;
+                }
+            }
+
             switch(e.key) {
                 case 'ArrowLeft':
                     if (!e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -1633,14 +1645,14 @@
             }
         });
 
-        // Additional security measures - only test-specific ones
+        // Security measures
         window.addEventListener('beforeunload', function(e) {
             e.preventDefault();
             e.returnValue = 'Are you sure you want to leave? Your test progress will be lost.';
             return 'Are you sure you want to leave? Your test progress will be lost.';
         });
 
-        // Enhanced zoom detection for responsive design
+        // Enhanced zoom detection
         let lastWidth = window.innerWidth;
         let lastHeight = window.innerHeight;
 
@@ -1648,10 +1660,8 @@
             const currentWidth = window.innerWidth;
             const currentHeight = window.innerHeight;
             
-            // Check if it's a zoom change (not window resize)
             if (Math.abs(currentWidth - lastWidth) > 100 || Math.abs(currentHeight - lastHeight) > 100) {
                 if (currentWidth < lastWidth * 0.9 || currentWidth > lastWidth * 1.1) {
-                    // Only show warning on desktop, not on mobile where resize is normal
                     if (window.innerWidth > 768) {
                         showWarning('Please do not zoom in or out during the test.');
                     }

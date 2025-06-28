@@ -1,0 +1,224 @@
+<!-- templates/user_management/emails/activation_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation - PulsePrep</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #82272e 0%, #13406a 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-box {
+            background: #f8f9ff;
+            border-left: 4px solid #82272e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .activation-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #82272e 0%, #13406a 100%);
+            color: white !important;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .activation-button:hover {
+            transform: translateY(-2px);
+        }
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer a {
+            color: #82272e;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 5px;
+            }
+            .content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Account Approved!</h1>
+            <p>Welcome to PulsePrep Medical Education</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{ user.first_name }},</h2>
+            
+            <div class="welcome-box">
+                <strong>Congratulations!</strong> Your {{ degree_year }} account has been approved by our administrators.
+            </div>
+            
+            <p>To complete your registration and access your study materials, please activate your account by clicking the button below:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ activation_url }}" class="activation-button">
+                    🔓 Activate My Account
+                </a>
+            </div>
+            
+            <div class="info-box">
+                <strong>⏰ Important:</strong> This activation link will expire in {{ expires_hours }} hours for security reasons.
+            </div>
+            
+            <h3>What happens after activation?</h3>
+            <ul>
+                <li>✅ Full access to {{ degree_year }} question bank</li>
+                <li>✅ Practice tests and mock exams</li>
+                <li>✅ Progress tracking and analytics</li>
+                <li>✅ Study notes and materials</li>
+            </ul>
+            
+            <p>If you're unable to click the button above, copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace;">
+                {{ activation_url }}
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Need help? Contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a></p>
+            <p>© 2025 PulsePrep - Medical Education Platform</p>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- templates/user_management/emails/approval_notification.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Approved - PulsePrep</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer a {
+            color: #28a745;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Account Approved!</h1>
+            <p>Your application has been accepted</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{ user.first_name }},</h2>
+            
+            <div class="success-box">
+                <strong>Great news!</strong> Your {{ degree_year }} account application has been approved.
+            </div>
+            
+            <p>You will receive a separate email with activation instructions to complete your registration and access your study materials.</p>
+            
+            <p>Thank you for choosing PulsePrep for your medical education journey!</p>
+        </div>
+        
+        <div class="footer">
+            <p>Questions? Contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a></p>
+            <p>© 2025 PulsePrep - Medical Education Platform</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -19,6 +19,5 @@ urlpatterns = [
     path('api/import-questions-simple/', views.import_questions, name='import_questions'),
     
     
-    path('api/paper-details/<int:paper_id>/', views.get_paper_details, name='get_paper_details'),  # New endpoint
 
 ]

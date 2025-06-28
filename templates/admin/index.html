@@ -1,3 +1,5 @@
+
+<!-- templates/admin/index.html - Enhanced Dashboard -->
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
@@ -8,40 +10,80 @@
 {% block content %}
 <h1>{% trans 'PulsePrep Administration' %}</h1>
 
-<!-- Quick Navigation -->
+<!-- Email Quick Stats -->
 <div class="dashboard-shortcuts">
-    <h3>Quick Navigation</h3>
-    <div class="quick-links">
-        <a href="{% url 'dashboard' %}" class="quick-link">
-            <i class="fas fa-th-large"></i> Main Dashboard
-        </a>
-        <a href="{% url 'questionbank' %}" class="quick-link">
-            <i class="fas fa-question-circle"></i> Manage Questions
-        </a>
-        <a href="{% url 'managemodule' %}" class="quick-link">
-            <i class="fas fa-cubes"></i> Modules
-        </a>
-        <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="quick-link">
-            <i class="fas fa-user-clock"></i> Pending Approvals
-        </a>
-        <a href="{% url 'mocktest_list' %}" class="quick-link">
-            <i class="fas fa-vial"></i> Mock Tests
-        </a>
-        <a href="{% url 'analytics_report' %}" class="quick-link">
-            <i class="fas fa-chart-bar"></i> Analytics
-        </a>
+    <h3>📧 Email System Status</h3>
+    <div class="email-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users|default:"0" }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ pending_users|default:"0" }}</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ activated_users|default:"0" }}</div>
+            <div class="stat-label">Activated Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ failed_emails|default:"0" }}</div>
+            <div class="stat-label">Failed Emails</div>
+        </div>
     </div>
 </div>
 
-<!-- Quick Stats -->
+<!-- Quick Navigation -->
 <div class="dashboard-shortcuts">
-    <h3>Quick Stats</h3>
-    <p>
-        <strong>Total Users:</strong> {{ total_users|default:"0" }} | 
-        <strong>Pending Approvals:</strong> {{ pending_users|default:"0" }} | 
-        <strong>Total Questions:</strong> {{ total_questions|default:"0" }}
-    </p>
+    <h3>🚀 Quick Navigation</h3>
+    <div class="quick-links">
+        <a href="{% url 'admin:user_management_customuser_changelist' %}" class="quick-link">
+            👥 Manage Users
+        </a>
+        <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="quick-link">
+            ⏳ Pending Approvals ({{ pending_users|default:"0" }})
+        </a>
+        <a href="/admin/user_management/customuser/?approval_status__exact=approved&is_account_activated__exact=0" class="quick-link">
+            📧 Need Activation ({{ pending_activation|default:"0" }})
+        </a>
+        <a href="{% url 'admin:user_management_emaillog_changelist' %}" class="quick-link">
+            📊 Email Logs
+        </a>
+        <a href="{% url 'admin:email_dashboard' %}" class="quick-link">
+            📈 Email Dashboard
+        </a>
+
+    </div>
 </div>
+
+<!-- Recent Activity -->
+{% if recent_emails %}
+<div class="dashboard-shortcuts">
+    <h3>📮 Recent Email Activity</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f8f9fa;">
+                <th style="padding: 8px; text-align: left;">User</th>
+                <th style="padding: 8px; text-align: left;">Type</th>
+                <th style="padding: 8px; text-align: left;">Status</th>
+                <th style="padding: 8px; text-align: left;">Sent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for email in recent_emails|slice:":5" %}
+            <tr>
+                <td style="padding: 8px;">{{ email.user.email }}</td>
+                <td style="padding: 8px;">{{ email.get_email_type_display }}</td>
+                <td style="padding: 8px;">
+                    <span class="email-status-{{ email.status }}">{{ email.get_status_display }}</span>
+                </td>
+                <td style="padding: 8px;">{{ email.sent_at|date:"M d, H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 
 <!-- Default Django Admin Apps -->
 {% if app_list %}
@@ -84,7 +126,7 @@
 {% endif %}
 
 <script>
-// Remove dark mode toggle button
+// Remove theme toggle and enhance admin functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Remove theme toggle buttons
     const themeToggles = document.querySelectorAll(
@@ -98,28 +140,16 @@ document.addEventListener('DOMContentLoaded', function() {
         element.remove();
     });
     
-    // Also check for dynamically added toggles
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            mutation.addedNodes.forEach(function(node) {
-                if (node.nodeType === 1) { // Element node
-                    const toggles = node.querySelectorAll(
-                        '#theme-toggle, .theme-toggle, [data-theme-toggle], .dark-mode-toggle'
-                    );
-                    toggles.forEach(function(toggle) {
-                        toggle.remove();
-                    });
-                }
-            });
-        });
-    });
+    // Auto-refresh email stats every 30 seconds
+    setInterval(function() {
+        // You can add AJAX refresh logic here if needed
+        console.log('Auto-refresh check for email stats');
+    }, 30000);
     
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    console.log('PulsePrep Admin loaded - Theme toggle removed');
+    console.log('PulsePrep Enhanced Admin loaded');
 });
 
-// Nuclear approach - remove ANY button with moon/sun icons
+// Nuclear approach for theme toggle removal
 setInterval(function() {
     const buttons = document.querySelectorAll('button, a');
     buttons.forEach(btn => {
@@ -133,6 +163,6 @@ setInterval(function() {
             btn.remove();
         }
     });
-}, 500); // Check every 500ms
+}, 500);
 </script>
 {% endblock %}

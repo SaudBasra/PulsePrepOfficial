@@ -18,6 +18,7 @@ urlpatterns = [
     path('modelpaper/', include('modelpaper.urls')),
     path('images/', include('manageimage.urls')),
     path('notes/', include('notes.urls')),
+    path('user-management/', include('user_management.urls')),
 
 
 

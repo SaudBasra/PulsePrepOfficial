@@ -71,6 +71,9 @@
     <div class="container">
       
 <!-- Sidebar Navigation -->
+
+      
+<!-- Sidebar Navigation -->
 <aside class="sidebar">
   <div class="logo-container">
     <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
@@ -88,6 +91,12 @@
       <i class="fas fa-file-csv"></i>
       <span>Manage CSVs</span>
     </a>
+
+    <a href="{% url 'manage_images' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_images' %}active{% endif %}">
+      <i class="fas fa-images"></i>
+      <span>Manage Images</span>
+    </a>
+    
     <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
       <i class="fas fa-cubes"></i>
       <span>Modules</span>
@@ -123,8 +132,7 @@
     </a>
   </nav>
 </aside>
-
-      <!-- Main Content -->
+    <!-- Main Content -->
       <main class="main-content">
         <header class="header">
           <div class="mobile-menu">

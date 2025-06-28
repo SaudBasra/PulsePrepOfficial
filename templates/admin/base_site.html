@@ -1,3 +1,4 @@
+<!-- templates/admin/base_site.html - Enhanced with Consistent Header Navigation -->
 {% extends "admin/base.html" %}
 {% load static %}
 
@@ -5,18 +6,37 @@
 
 {% block branding %}
 <h1 id="site-name">
-    <a href="{% url 'dashboard' %}">
+    <a href="{% url 'admin:index' %}">
         <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" style="height: 30px; margin-right: 10px; vertical-align: middle;">
         PulsePrep Administration
     </a>
 </h1>
 {% endblock %}
 
+{% block nav-global %}
+<div class="admin-header-nav">
+    <a href="{% url 'admin:user_management_customuser_changelist' %}" class="header-nav-btn users-btn">
+        👥 Manage Users
+    </a>
+    <a href="{% url 'admin:email_dashboard' %}" class="header-nav-btn dashboard-btn">
+        📧 Email Dashboard
+    </a>
+    <a href="/admin/user_management/customuser/?approval_status__exact=pending" class="header-nav-btn pending-btn">
+        ⏳ Pending Approvals 
+        <span class="count-badge" id="pending-count">{{ pending_users|default:"0" }}</span>
+    </a>
+    <a href="/admin/user_management/customuser/?approval_status__exact=approved&is_account_activated__exact=0" class="header-nav-btn activation-btn">
+        📨 Need Activation
+        <span class="count-badge" id="activation-count">{{ pending_activation|default:"0" }}</span>
+    </a>
+</div>
+{% endblock %}
+
 {% block extrahead %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{% static 'admin/css/disable_dark_mode.css' %}">
 <style>
-/* Force disable dark mode */
+/* Enhanced admin styling with consistent header navigation */
 :root {
     --primary: #79aec8;
     --secondary: #417690;
@@ -52,25 +72,23 @@
     --default-button-hover-bg: var(--secondary);
     --close-button-bg: #888;
     --close-button-hover-bg: #747474;
-    --delete-button-bg: #ba2121;
-    --delete-button-hover-bg: #a41515;
+    --delete-button-bg: #6c757d;
+    --delete-button-hover-bg: #5a6268;
     --object-tools-fg: var(--button-fg);
     --object-tools-bg: var(--close-button-bg);
     --object-tools-hover-bg: var(--close-button-hover-bg);
 }
 
-/* Force light mode styles */
+/* Force light mode */
 html, body {
     background: #fff !important;
     color: #333 !important;
 }
 
-/* Ensure all elements use light mode */
 *, *::before, *::after {
     color-scheme: light !important;
 }
 
-/* Override any dark mode media queries */
 @media (prefers-color-scheme: dark) {
     html, body {
         background: #fff !important;
@@ -89,10 +107,11 @@ html, body {
     }
 }
 
-/* Simple color scheme customization */
+/* Custom admin colors */
 #header {
     background: #82272e !important;
     color: white !important;
+    position: relative;
 }
 
 #branding h1, #branding h1 a:link, #branding h1 a:visited {
@@ -114,117 +133,384 @@ html, body {
     background: #13406a !important;
 }
 
-.selector-chosen h2 {
-    background: #13406a !important;
-}
-
-.calendar td.selected a {
-    background: #82272e !important;
-}
-
-.timelist a {
-    color: #82272e !important;
-}
-
-#changelist-search .button {
-    background: #82272e !important;
-}
-
-/* Status badges for user approval */
-.field-approval_status {
-    font-weight: bold;
-}
-
-/* Quick navigation buttons */
-.dashboard-shortcuts {
-    background: #f8f9fa;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 5px;
-    border-left: 4px solid #82272e;
-}
-
-.dashboard-shortcuts h3 {
-    color: #82272e;
-    margin: 0 0 10px 0;
-}
-
-.quick-links {
+/* Header Navigation Styling */
+.admin-header-nav {
+    float: right;
+    margin-top: 10px;
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
 }
 
-.quick-link {
-    background: #82272e;
-    color: white;
+.header-nav-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: white !important;
     padding: 8px 15px;
-    text-decoration: none;
+    text-decoration: none !important;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: white !important;
+    text-decoration: none !important;
+    transform: translateY(-1px);
+}
+
+.header-nav-btn.users-btn {
+    background: #28a745;
+    border-color: #1e7e34;
+}
+
+.header-nav-btn.users-btn:hover {
+    background: #218838 !important;
+}
+
+.header-nav-btn.dashboard-btn {
+    background: #17a2b8;
+    border-color: #138496;
+}
+
+.header-nav-btn.dashboard-btn:hover {
+    background: #138496 !important;
+}
+
+.header-nav-btn.pending-btn {
+    background: #ffc107;
+    color: #212529 !important;
+    border-color: #e0a800;
+}
+
+.header-nav-btn.pending-btn:hover {
+    background: #e0a800 !important;
+    color: #212529 !important;
+}
+
+.header-nav-btn.activation-btn {
+    background: #6f42c1;
+    border-color: #5a359a;
+}
+
+.header-nav-btn.activation-btn:hover {
+    background: #5a359a !important;
+}
+
+.count-badge {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-left: 5px;
+    min-width: 18px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Hide count badge when zero */
+.count-badge:empty,
+.count-badge[data-count="0"] {
+    display: none;
+}
+
+/* Quick Action Buttons Styling */
+.admin-action-btn {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 2px;
+    font-size: 11px;
+    text-decoration: none !important;
     border-radius: 3px;
-    font-size: 12px;
+    color: white !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-.quick-link:hover {
-    background: #13406a;
-    color: white;
-    text-decoration: none;
+.admin-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-
-
-
-
-/* Hide the specific theme toggle button */
-button.theme-toggle {
-    display: none !important;
+.approve-btn {
+    background: #28a745 !important;
+    border: 1px solid #1e7e34;
 }
 
-/* Hide by class names from your screenshot */
+.approve-btn:hover {
+    background: #218838 !important;
+}
+
+.email-btn {
+    background: #17a2b8 !important;
+    border: 1px solid #138496;
+}
+
+.email-btn:hover {
+    background: #138496 !important;
+}
+
+.activate-btn {
+    background: #ffc107 !important;
+    color: #212529 !important;
+    border: 1px solid #e0a800;
+}
+
+.activate-btn:hover {
+    background: #e0a800 !important;
+    color: #212529 !important;
+}
+
+/* Enhanced status colors - no red */
+.email-status-sent { color: #28a745; font-weight: bold; }
+.email-status-failed { color: #6c757d; font-weight: bold; }
+.email-status-pending { color: #ffc107; font-weight: bold; }
+
+.activation-status-activated { color: #28a745; font-weight: bold; }
+.activation-status-pending { color: #ffc107; font-weight: bold; }
+.activation-status-expired { color: #6c757d; font-weight: bold; }
+
+/* Hide theme toggle completely */
 .theme-toggle,
 .theme-icon-when-auto,
 .theme-icon-when-light,
 .theme-icon-when-dark,
 .theme-label-when-auto,
 .theme-label-when-light,
-.theme-label-when-dark {
+.theme-label-when-dark,
+[data-theme-toggle],
+button[aria-label*="theme"],
+button[title*="theme"] {
     display: none !important;
 }
 
-/* Force light mode */
-html {
-    color-scheme: light !important;
+/* Enhanced pagination */
+.paginator {
+    padding: 10px 0;
+    color: #666;
 }
 
-body {
-    background: #fff !important;
-    color: #333 !important;
+/* Responsive header navigation */
+@media (max-width: 768px) {
+    .admin-header-nav {
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    
+    .header-nav-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 }
 
-/* Your custom admin colors */
-#header {
-    background: #82272e !important;
-    color: white !important;
+/* Email dashboard specific enhancements */
+.email-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
-    color: white !important;
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #82272e;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.module h2, .module caption, .inline-group h2 {
-    background: #13406a !important;
-    color: white !important;
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #82272e;
 }
 
-.button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #82272e !important;
-    color: white !important;
-    border: none !important;
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
 }
 
-.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
-    background: #13406a !important;
+/* Enhanced table styling */
+.results table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
+.results th {
+    background: #f8f9fa;
+    padding: 10px 8px;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+}
 
+.results td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.results tr:hover {
+    background: #f8f9fa;
+}
+
+/* Message styling */
+.messagelist {
+    margin: 0;
+    padding: 0;
+}
+
+.messagelist li {
+    margin: 10px 0;
+    padding: 10px 15px;
+    border-radius: 4px;
+    border-left: 4px solid;
+}
+
+.messagelist .success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+}
+
+.messagelist .warning {
+    background: #fff3cd;
+    color: #856404;
+    border-left-color: #ffc107;
+}
+
+.messagelist .error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: #6c757d;
+}
+
+.messagelist .info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-left-color: #17a2b8;
+}
 </style>
+
+<script>
+// Enhanced admin functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Remove theme toggle elements
+    const themeToggles = document.querySelectorAll(
+        '#theme-toggle, .theme-toggle, [data-theme-toggle], .dark-mode-toggle, ' +
+        'button[aria-label*="theme"], button[title*="theme"], button[class*="theme"], ' +
+        'a[class*="theme"], .toggle[class*="theme"], ' +
+        'button[aria-label*="Dark"], button[aria-label*="Light"]'
+    );
+    
+    themeToggles.forEach(function(element) {
+        element.remove();
+    });
+    
+    // Add active state to current nav button
+    const currentPath = window.location.pathname;
+    const navButtons = document.querySelectorAll('.header-nav-btn');
+    
+    navButtons.forEach(btn => {
+        const href = btn.getAttribute('href');
+        if (currentPath.includes(href) || 
+            (href.includes('email_dashboard') && currentPath.includes('email-dashboard')) ||
+            (href.includes('customuser') && currentPath.includes('customuser'))) {
+            btn.style.background = 'rgba(255, 255, 255, 0.3)';
+            btn.style.fontWeight = 'bold';
+        }
+    });
+    
+    // Hide count badges when count is 0
+    const countBadges = document.querySelectorAll('.count-badge');
+    countBadges.forEach(badge => {
+        const count = parseInt(badge.textContent) || 0;
+        if (count === 0) {
+            badge.style.display = 'none';
+        }
+    });
+    
+    // Enhanced action button hover effects
+    const actionButtons = document.querySelectorAll('.admin-action-btn');
+    actionButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-1px)';
+            this.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Auto-refresh counts every 30 seconds for navigation
+    function updateNavigationCounts() {
+        if (window.location.pathname.includes('/admin/')) {
+            fetch('/admin/user_management/customuser/api/navigation-counts/')
+                .then(response => response.json())
+                .then(data => {
+                    const pendingBadge = document.getElementById('pending-count');
+                    const activationBadge = document.getElementById('activation-count');
+                    
+                    if (pendingBadge) {
+                        pendingBadge.textContent = data.pending_users || '0';
+                        pendingBadge.style.display = data.pending_users > 0 ? 'inline-block' : 'none';
+                    }
+                    
+                    if (activationBadge) {
+                        activationBadge.textContent = data.pending_activation || '0';
+                        activationBadge.style.display = data.pending_activation > 0 ? 'inline-block' : 'none';
+                    }
+                    
+                    console.log('Navigation counts updated:', data);
+                })
+                .catch(error => {
+                    console.log('Navigation count update failed:', error);
+                    // Fallback: try to get counts from Django template context
+                    const pendingBadge = document.getElementById('pending-count');
+                    const activationBadge = document.getElementById('activation-count');
+                    
+                    if (pendingBadge && !pendingBadge.textContent) {
+                        pendingBadge.textContent = '0';
+                        pendingBadge.style.display = 'none';
+                    }
+                    
+                    if (activationBadge && !activationBadge.textContent) {
+                        activationBadge.textContent = '0';
+                        activationBadge.style.display = 'none';
+                    }
+                });
+        }
+    }
+    
+    // Initial load
+    updateNavigationCounts();
+    
+    // Update every 30 seconds
+    setInterval(updateNavigationCounts, 30000);
+    
+    console.log('PulsePrep Enhanced Admin loaded');
+});
+
+// Continuous theme toggle removal
+setInterval(function() {
+    const buttons = document.querySelectorAll('button, a');
+    buttons.forEach(btn => {
+        const hasThemeIcon = btn.innerHTML.includes('moon') || 
+                           btn.innerHTML.includes('sun') || 
+                           btn.innerHTML.includes('theme') ||
+                           btn.classList.toString().includes('theme') ||
+                           btn.classList.toString().includes('dark') ||
+                           btn.classList.toString().includes('light');
+        if (hasThemeIcon) {
+            btn.remove();
+        }
+    });
+}, 500);
+</script>
 {% endblock %}

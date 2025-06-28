@@ -1,0 +1,546 @@
+<!-- Special Characters Processing Include -->
+<!-- File: templates/includes/special_characters.html -->
+
+<style>
+    /* Enhanced font support ONLY for question content */
+    .question-text,
+    .option-text,
+    .option-label span,
+    .explanation-text,
+    .explanation-content {
+        font-family: 
+            'Segoe UI', 
+            'Arial Unicode MS', 
+            'Lucida Sans Unicode', 
+            'DejaVu Sans', 
+            'Tahoma', 
+            'Liberation Sans', 
+            sans-serif !important;
+        
+        /* Enable proper Unicode rendering */
+        unicode-bidi: embed;
+        direction: ltr;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-feature-settings: "liga" 1, "kern" 1;
+    }
+    
+    /* Fallback fonts for problematic characters */
+    .question-text.special-char-fallback,
+    .option-text.special-char-fallback,
+    .option-label span.special-char-fallback,
+    .explanation-text.special-char-fallback {
+        font-family: 
+            'Arial Unicode MS', 
+            'Lucida Sans Unicode', 
+            'MS Gothic', 
+            'DejaVu Sans', 
+            'FreeSans', 
+            'Liberation Sans', 
+            'Cambria Math',
+            serif !important;
+    }
+    </style>
+    
+    <script>
+    /**
+     * COMPREHENSIVE Special Character Processing
+     * Handles boxes (▯), quotation marks, hyphens, bullets, and display issues
+     * while preserving normal text and HTML structure
+     */
+    function processSpecialCharacters(text) {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Create a temporary element to safely handle HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = text;
+        
+        // Process only text nodes, preserve HTML structure
+        function processTextNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                let processedText = node.textContent;
+                
+                // ==========================================
+                // QUOTATION MARKS AND APOSTROPHES (Priority 1 - Most common box characters)
+                // ==========================================
+                
+                // Smart double quotes
+                processedText = processedText.replace(/[\u201C\u201D\u201E\u201F]/g, '"');
+                processedText = processedText.replace(/[\u2033\u2036]/g, '"');
+                processedText = processedText.replace(/[\u00AB\u00BB]/g, '"'); // « »
+                
+                // Smart single quotes and apostrophes
+                processedText = processedText.replace(/[\u2018\u2019\u201A\u201B]/g, "'");
+                processedText = processedText.replace(/[\u2039\u203A]/g, "'"); // ‹ ›
+                processedText = processedText.replace(/[\u2032]/g, "'"); // Prime ′
+                processedText = processedText.replace(/[\u0060]/g, "'"); // Grave accent `
+                processedText = processedText.replace(/[\u00B4]/g, "'"); // Acute accent ´
+                
+                // Common problematic quotes
+                processedText = processedText.replace(/[\u275D\u275E]/g, '"'); // Heavy quotes
+                processedText = processedText.replace(/[\u276E\u276F]/g, '"'); // Heavy angle quotes
+                
+                // ==========================================
+                // HYPHENS AND DASHES (Priority 2)
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u2013]/g, '-'); // En dash –
+                processedText = processedText.replace(/[\u2014]/g, '-'); // Em dash —
+                processedText = processedText.replace(/[\u2212]/g, '-'); // Minus sign −
+                processedText = processedText.replace(/[\u2010\u2011]/g, '-'); // Hyphen variants
+                processedText = processedText.replace(/[\u2012\u2015]/g, '-'); // Figure dash, horizontal bar
+                processedText = processedText.replace(/[\u2043]/g, '-'); // Hyphen bullet ⁃
+                processedText = processedText.replace(/[\u058A]/g, '-'); // Armenian hyphen
+                processedText = processedText.replace(/[\u05BE]/g, '-'); // Hebrew punctuation
+                processedText = processedText.replace(/[\u1400]/g, '-'); // Canadian syllabics hyphen
+                processedText = processedText.replace(/[\u2796]/g, '-'); // Heavy minus sign
+                
+                // ==========================================
+                // BULLET POINTS AND LIST MARKERS (Priority 3)
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u2022]/g, '•'); // Bullet •
+                processedText = processedText.replace(/[\u2023]/g, '•'); // Triangular bullet ‣
+                processedText = processedText.replace(/[\u25E6]/g, '•'); // White bullet ◦
+                processedText = processedText.replace(/[\u204C\u204D]/g, '•'); // Black/white leftwards bullet
+                processedText = processedText.replace(/[\u25AA\u25AB]/g, '•'); // Black/white small square
+                processedText = processedText.replace(/[\u25A0\u25A1]/g, '•'); // Black/white large square
+                processedText = processedText.replace(/[\u25CF\u25CB]/g, '•'); // Black/white circle
+                processedText = processedText.replace(/[\u25B2\u25B3]/g, '•'); // Black/white triangle
+                processedText = processedText.replace(/[\u25BC\u25BD]/g, '•'); // Black/white down triangle
+                processedText = processedText.replace(/[\u25C6\u25C7]/g, '•'); // Black/white diamond
+                processedText = processedText.replace(/[\u2666\u2665\u2663\u2660]/g, '•'); // Card suits
+                processedText = processedText.replace(/[\u26AB\u26AA]/g, '•'); // Black/white circle
+                processedText = processedText.replace(/[\u29BF]/g, '•'); // Circled bullet
+                
+                // Additional bullet variants
+                processedText = processedText.replace(/[\u2219]/g, '•'); // Bullet operator ∙
+                processedText = processedText.replace(/[\u22C5]/g, '•'); // Dot operator ⋅
+                processedText = processedText.replace(/[\u00B7]/g, '•'); // Middle dot ·
+                processedText = processedText.replace(/[\u2024]/g, '•'); // One dot leader
+                processedText = processedText.replace(/[\u2027]/g, '•'); // Hyphenation point
+                
+                // ==========================================
+                // SPACES AND INVISIBLE CHARACTERS (Priority 4)
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00A0]/g, ' '); // Non-breaking space
+                processedText = processedText.replace(/[\u2002\u2003]/g, ' '); // En/em space
+                processedText = processedText.replace(/[\u2004\u2005]/g, ' '); // Three-per-em/four-per-em space
+                processedText = processedText.replace(/[\u2006\u2007]/g, ' '); // Six-per-em/figure space
+                processedText = processedText.replace(/[\u2008\u2009]/g, ' '); // Punctuation/thin space
+                processedText = processedText.replace(/[\u200A\u200B]/g, ' '); // Hair/zero-width space
+                processedText = processedText.replace(/[\u2028\u2029]/g, '\n'); // Line/paragraph separator
+                processedText = processedText.replace(/[\u202F]/g, ' '); // Narrow no-break space
+                processedText = processedText.replace(/[\u205F]/g, ' '); // Medium mathematical space
+                processedText = processedText.replace(/[\u3000]/g, ' '); // Ideographic space
+                processedText = processedText.replace(/[\u180E]/g, ' '); // Mongolian vowel separator
+                processedText = processedText.replace(/[\u200C\u200D]/g, ''); // Zero width non-joiner/joiner
+                processedText = processedText.replace(/[\uFEFF]/g, ''); // Zero width no-break space
+                
+                // ==========================================
+                // ELLIPSIS AND DOTS (Priority 5)
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u2026]/g, '...'); // Horizontal ellipsis …
+                processedText = processedText.replace(/[\u22EF]/g, '...'); // Midline horizontal ellipsis
+                processedText = processedText.replace(/[\u22EE]/g, '...'); // Vertical ellipsis
+                processedText = processedText.replace(/[\u22F0]/g, '...'); // Up right diagonal ellipsis
+                processedText = processedText.replace(/[\u22F1]/g, '...'); // Down right diagonal ellipsis
+                
+                // ==========================================
+                // MATHEMATICAL SYMBOLS (preserve existing functionality)
+                // ==========================================
+                
+                // Basic mathematical operations
+                processedText = processedText.replace(/[\u00B1]/g, '±'); // Plus-minus
+                processedText = processedText.replace(/[\u2213]/g, '∓'); // Minus-plus  
+                processedText = processedText.replace(/[\u00D7]/g, '×'); // Multiplication
+                processedText = processedText.replace(/[\u00F7]/g, '÷'); // Division
+                processedText = processedText.replace(/[\u2260]/g, '≠'); // Not equal
+                processedText = processedText.replace(/[\u2264]/g, '≤'); // Less than or equal
+                processedText = processedText.replace(/[\u2265]/g, '≥'); // Greater than or equal
+                processedText = processedText.replace(/[\u2248]/g, '≈'); // Approximately equal
+                processedText = processedText.replace(/[\u221E]/g, '∞'); // Infinity
+                processedText = processedText.replace(/[\u221A]/g, '√'); // Square root
+                processedText = processedText.replace(/[\u2211]/g, '∑'); // Summation
+                processedText = processedText.replace(/[\u220F]/g, '∏'); // Product
+                processedText = processedText.replace(/[\u222B]/g, '∫'); // Integral
+                
+                // ==========================================
+                // ARROWS (preserve existing functionality)
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u2192\u21D2]/g, '→'); // Right arrows
+                processedText = processedText.replace(/[\u2190\u21D0]/g, '←'); // Left arrows
+                processedText = processedText.replace(/[\u2194\u21D4]/g, '↔'); // Left-right arrows
+                processedText = processedText.replace(/[\u2191\u21D1]/g, '↑'); // Up arrows
+                processedText = processedText.replace(/[\u2193\u21D3]/g, '↓'); // Down arrows
+                processedText = processedText.replace(/[\u21C4\u21CC]/g, '⇌'); // Reversible arrows
+                processedText = processedText.replace(/[\u2197]/g, '↗'); // Northeast arrow
+                processedText = processedText.replace(/[\u2198]/g, '↘'); // Southeast arrow
+                processedText = processedText.replace(/[\u2199]/g, '↙'); // Southwest arrow
+                processedText = processedText.replace(/[\u2196]/g, '↖'); // Northwest arrow
+                
+                // ==========================================
+                // TEXT-BASED CONVERSIONS (preserve existing functionality)
+                // ==========================================
+                
+                processedText = processedText.replace(/->/g, '→');
+                processedText = processedText.replace(/-->/g, '→');
+                processedText = processedText.replace(/<-/g, '←');
+                processedText = processedText.replace(/<--/g, '←');
+                processedText = processedText.replace(/<->/g, '↔');
+                processedText = processedText.replace(/<-->/g, '↔');
+                processedText = processedText.replace(/\+\/-/g, '±');
+                processedText = processedText.replace(/\+-/g, '±');
+                processedText = processedText.replace(/\<=/g, '≤');
+                processedText = processedText.replace(/\>=/g, '≥');
+                processedText = processedText.replace(/\!=/g, '≠');
+                processedText = processedText.replace(/\~=/g, '≈');
+                
+                // ==========================================
+                // GREEK LETTERS (preserve existing functionality)
+                // ==========================================
+                
+                processedText = processedText.replace(/\balpha\b/gi, 'α');
+                processedText = processedText.replace(/\bbeta\b/gi, 'β');
+                processedText = processedText.replace(/\bgamma\b/gi, 'γ');
+                processedText = processedText.replace(/\bdelta\b/gi, 'δ');
+                processedText = processedText.replace(/\bepsilon\b/gi, 'ε');
+                processedText = processedText.replace(/\bzeta\b/gi, 'ζ');
+                processedText = processedText.replace(/\beta\b/gi, 'η');
+                processedText = processedText.replace(/\btheta\b/gi, 'θ');
+                processedText = processedText.replace(/\biota\b/gi, 'ι');
+                processedText = processedText.replace(/\bkappa\b/gi, 'κ');
+                processedText = processedText.replace(/\blambda\b/gi, 'λ');
+                processedText = processedText.replace(/\bmu\b/gi, 'μ');
+                processedText = processedText.replace(/\bnu\b/gi, 'ν');
+                processedText = processedText.replace(/\bxi\b/gi, 'ξ');
+                processedText = processedText.replace(/\bomicron\b/gi, 'ο');
+                processedText = processedText.replace(/\bpi\b/gi, 'π');
+                processedText = processedText.replace(/\brho\b/gi, 'ρ');
+                processedText = processedText.replace(/\bsigma\b/gi, 'σ');
+                processedText = processedText.replace(/\btau\b/gi, 'τ');
+                processedText = processedText.replace(/\bupsilon\b/gi, 'υ');
+                processedText = processedText.replace(/\bphi\b/gi, 'φ');
+                processedText = processedText.replace(/\bchi\b/gi, 'χ');
+                processedText = processedText.replace(/\bpsi\b/gi, 'ψ');
+                processedText = processedText.replace(/\bomega\b/gi, 'ω');
+                
+                // ==========================================
+                // SUPERSCRIPTS AND SUBSCRIPTS
+                // ==========================================
+                
+                processedText = processedText.replace(/\^2\b/g, '²');
+                processedText = processedText.replace(/\^3\b/g, '³');
+                processedText = processedText.replace(/\^1\b/g, '¹');
+                processedText = processedText.replace(/\^0\b/g, '⁰');
+                processedText = processedText.replace(/\^4\b/g, '⁴');
+                processedText = processedText.replace(/\^5\b/g, '⁵');
+                processedText = processedText.replace(/\^6\b/g, '⁶');
+                processedText = processedText.replace(/\^7\b/g, '⁷');
+                processedText = processedText.replace(/\^8\b/g, '⁸');
+                processedText = processedText.replace(/\^9\b/g, '⁹');
+                
+                // ==========================================
+                // DEGREE AND TEMPERATURE
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00B0]/g, '°');
+                processedText = processedText.replace(/\bdegree[s]?\b/gi, '°');
+                processedText = processedText.replace(/\bdeg\b/gi, '°');
+                
+                // ==========================================
+                // CURRENCY SYMBOLS
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00A2]/g, '¢'); // Cent
+                processedText = processedText.replace(/[\u00A3]/g, '£'); // Pound
+                processedText = processedText.replace(/[\u00A5]/g, '¥'); // Yen
+                processedText = processedText.replace(/[\u20AC]/g, '€'); // Euro
+                processedText = processedText.replace(/[\u20B9]/g, '₹'); // Rupee
+                processedText = processedText.replace(/[\u0024]/g, '$'); // Dollar
+                
+                // ==========================================
+                // FRACTIONS
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00BC]/g, '¼'); // 1/4
+                processedText = processedText.replace(/[\u00BD]/g, '½'); // 1/2
+                processedText = processedText.replace(/[\u00BE]/g, '¾'); // 3/4
+                processedText = processedText.replace(/[\u2153]/g, '⅓'); // 1/3
+                processedText = processedText.replace(/[\u2154]/g, '⅔'); // 2/3
+                processedText = processedText.replace(/[\u2155]/g, '⅕'); // 1/5
+                processedText = processedText.replace(/[\u2156]/g, '⅖'); // 2/5
+                processedText = processedText.replace(/[\u2157]/g, '⅗'); // 3/5
+                processedText = processedText.replace(/[\u2158]/g, '⅘'); // 4/5
+                processedText = processedText.replace(/[\u2159]/g, '⅙'); // 1/6
+                processedText = processedText.replace(/[\u215A]/g, '⅚'); // 5/6
+                processedText = processedText.replace(/[\u215B]/g, '⅛'); // 1/8
+                processedText = processedText.replace(/[\u215C]/g, '⅜'); // 3/8
+                processedText = processedText.replace(/[\u215D]/g, '⅝'); // 5/8
+                processedText = processedText.replace(/[\u215E]/g, '⅞'); // 7/8
+                
+                // ==========================================
+                // COPYRIGHT AND TRADEMARK
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00A9]/g, '©'); // Copyright
+                processedText = processedText.replace(/[\u00AE]/g, '®'); // Registered
+                processedText = processedText.replace(/[\u2122]/g, '™'); // Trademark
+                
+                // ==========================================
+                // SECTION AND PARAGRAPH
+                // ==========================================
+                
+                processedText = processedText.replace(/[\u00A7]/g, '§'); // Section
+                processedText = processedText.replace(/[\u00B6]/g, '¶'); // Paragraph
+                
+                // ==========================================
+                // MEDICAL/SCIENTIFIC UNITS
+                // ==========================================
+                
+                processedText = processedText.replace(/\bmcg\b/gi, 'μg'); // Microgram
+                processedText = processedText.replace(/\bmicroL\b/gi, 'μL'); // Microliter
+                processedText = processedText.replace(/\bmicron\b/gi, 'μm'); // Micrometer
+                processedText = processedText.replace(/\bmicro\b/gi, 'μ'); // Micro prefix
+                
+                // ==========================================
+                // CHEMICAL FORMULAS
+                // ==========================================
+                
+                processedText = processedText.replace(/\bH2O\b/g, 'H₂O');
+                processedText = processedText.replace(/\bCO2\b/g, 'CO₂');
+                processedText = processedText.replace(/\bO2\b/g, 'O₂');
+                processedText = processedText.replace(/\bN2\b/g, 'N₂');
+                processedText = processedText.replace(/\bCH4\b/g, 'CH₄');
+                processedText = processedText.replace(/\bNH3\b/g, 'NH₃');
+                processedText = processedText.replace(/\bSO2\b/g, 'SO₂');
+                processedText = processedText.replace(/\bNO2\b/g, 'NO₂');
+                
+                // ==========================================
+                // PROBLEMATIC PUNCTUATION
+                // ==========================================
+                
+                // Additional problematic characters that show as boxes
+                processedText = processedText.replace(/[\u2047\u2048\u2049]/g, '?'); // Question mark variants
+                processedText = processedText.replace(/[\u203D]/g, '?!'); // Interrobang
+                processedText = processedText.replace(/[\u00A1]/g, '!'); // Inverted exclamation
+                processedText = processedText.replace(/[\u00BF]/g, '?'); // Inverted question mark
+                
+                // Quotation mark variants that commonly show as boxes
+                processedText = processedText.replace(/[\u301D\u301E]/g, '"'); // CJK quotes
+                processedText = processedText.replace(/[\u301F]/g, '"'); // Low double prime quotation mark
+                
+                node.textContent = processedText;
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                // Recursively process child nodes
+                Array.from(node.childNodes).forEach(processTextNode);
+            }
+        }
+        
+        // Process all text nodes in the HTML
+        Array.from(tempDiv.childNodes).forEach(processTextNode);
+        
+        return tempDiv.innerHTML;
+    }
+    
+    /**
+     * Process special characters ONLY in question content
+     * Ultra-strict targeting to avoid processing website UI
+     */
+    function processSpecialCharactersInDOM() {
+        // ULTRA-SPECIFIC selectors - only question content
+        const questionSelectors = [
+            // Question text containers
+            '.question-text',
+            '.question-content .question-text',
+            
+            // Option text containers (multiple variations)
+            '.option-text',
+            '.option-label span',
+            '.options-list .option-text',
+            '.options-list .option-label span',
+            
+            // Explanation containers
+            '.explanation-text',
+            '.explanation-content',
+            '.explanation-content .explanation-text'
+        ];
+        
+        // Process only these ultra-specific selectors
+        questionSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(element => {
+                // Multiple safety checks to avoid processing website content
+                
+                // 1. Skip if already processed
+                if (element.dataset.specialCharsProcessed) {
+                    return;
+                }
+                
+                // 2. Skip if it contains form elements (inputs, buttons)
+                if (element.querySelector('input, button, select, textarea, form')) {
+                    return;
+                }
+                
+                // 3. Skip if it's part of navigation, header, footer, or UI elements
+                if (element.closest('.nav-bar, .navbar, .header, .footer, .sidebar, .menu, .btn, .button, .nav-item, .nav-menu, .action-buttons, .header-actions')) {
+                    return;
+                }
+                
+                // 4. Skip if it's in action buttons or controls
+                if (element.closest('.action-buttons, .nav-actions, .controls, .toolbar, .modal-actions, .quick-note-actions')) {
+                    return;
+                }
+                
+                // 5. Skip if it's a title, heading, or label (unless it's question content)
+                if (element.matches('h1, h2, h3, h4, h5, h6, label') && 
+                    !element.closest('.question-review, .question-item, .mcq-options-section, .question-content, .explanation-content')) {
+                    return;
+                }
+                
+                // 6. Only process if it has actual text content
+                if (!element.textContent || !element.textContent.trim()) {
+                    return;
+                }
+                
+                // 7. Additional check: only process if parent contains question-related content
+                const isQuestionContent = element.closest('.question-review, .question-item, .options-list, .explanation-section, .mcq-options-section, .question-content, .explanation-content, .question-card, .practice-container, .test-body, .result-container');
+                if (!isQuestionContent) {
+                    return;
+                }
+                
+                // 8. Final safety: don't process if text is too short (likely UI text)
+                if (element.textContent.trim().length < 2) {
+                    return;
+                }
+                
+                // 9. Skip website text content
+                const websiteTextKeywords = ['dashboard', 'logout', 'settings', 'profile', 'notification', 'menu', 'navigation', 'copyright', 'pulseprep', 'login', 'submit', 'cancel', 'save', 'previous', 'next', 'mark', 'complete'];
+                const elementText = element.textContent.toLowerCase();
+                if (websiteTextKeywords.some(keyword => elementText.includes(keyword) && elementText.length < 50)) {
+                    return;
+                }
+                
+                // Process the content
+                try {
+                    const originalHTML = element.innerHTML;
+                    const processedHTML = processSpecialCharacters(originalHTML);
+                    
+                    // Only update if there were actual changes
+                    if (processedHTML !== originalHTML) {
+                        element.innerHTML = processedHTML;
+                        element.dataset.specialCharsProcessed = 'true';
+                        
+                        // Add fallback font class only if problematic characters were found/fixed
+                        const hasProblematicChars = /[""''•–—…±×÷≤≥≠≈∞√α-ωΑ-Ω°²³¹⁰⁴⁵⁶⁷⁸⁹]/;
+                        if (hasProblematicChars.test(element.textContent)) {
+                            element.classList.add('special-char-fallback');
+                        }
+                        
+                        console.log('✓ Processed special characters in:', selector);
+                    }
+                } catch (error) {
+                    console.warn('Error processing special characters:', error);
+                    // Mark as processed even if there was an error to avoid infinite loops
+                    element.dataset.specialCharsProcessed = 'true';
+                }
+            });
+        });
+    }
+    
+    /**
+     * Initialize special character processing with ultra-strict targeting
+     */
+    function initializeSpecialCharacters() {
+        // Process on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                // Delay to ensure all content is loaded
+                setTimeout(processSpecialCharactersInDOM, 200);
+            });
+        } else {
+            setTimeout(processSpecialCharactersInDOM, 200);
+        }
+        
+        // Process after additional delays for dynamic content (REDUCED frequency)
+        setTimeout(processSpecialCharactersInDOM, 1000);
+        setTimeout(processSpecialCharactersInDOM, 3000);
+        
+        // Observer for dynamically added content - ULTRA-SPECIFIC
+        const observer = new MutationObserver(function(mutations) {
+            let shouldProcess = false;
+            
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            // ONLY process if new content contains ULTRA-SPECIFIC question elements
+                            const hasQuestionContent = node.matches && (
+                                // Direct question content
+                                node.matches('.question-text, .option-text, .option-label, .explanation-text, .explanation-content') ||
+                                // Question containers
+                                node.matches('.question-review, .question-item, .mcq-options-section, .question-content, .options-list') ||
+                                // Check for question content inside
+                                node.querySelector('.question-text, .option-text, .option-label span, .explanation-text, .explanation-content')
+                            );
+                            
+                            // Additional safety: must be inside a question context AND not in UI areas
+                            const isInQuestionContext = node.closest && (
+                                node.closest('.question-review, .review-section, .question-item, .practice-container, .test-body, .result-container, .question-panel')
+                            );
+                            
+                            const isNotInUIArea = !node.closest('.nav-bar, .navbar, .header, .footer, .sidebar, .action-buttons, .nav-actions, .modal-actions');
+                            
+                            if (hasQuestionContent && isInQuestionContext && isNotInUIArea) {
+                                shouldProcess = true;
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (shouldProcess) {
+                // Debounce processing to avoid too frequent calls
+                clearTimeout(window.specialCharTimeout);
+                window.specialCharTimeout = setTimeout(processSpecialCharactersInDOM, 300);
+            }
+        });
+        
+        // Start observing with ultra-minimal scope - only question areas
+        const questionAreas = document.querySelectorAll('.review-section, .question-review, .practice-container, .result-container, .test-body, .question-panel, .question-content');
+        
+        if (questionAreas.length > 0) {
+            questionAreas.forEach(area => {
+                observer.observe(area, {
+                    childList: true,
+                    subtree: true
+                });
+            });
+        } else {
+            // Fallback: observe body but with ultra-strict filtering
+            observer.observe(document.body, {
+                childList: true,
+                subtree: false // Only direct children to reduce scope
+            });
+        }
+    }
+    
+    // Auto-initialize with performance optimization
+    if (document.readyState !== 'complete') {
+        window.addEventListener('load', initializeSpecialCharacters);
+    } else {
+        initializeSpecialCharacters();
+    }
+    
+    // Expose functions globally for manual use if needed
+    window.processSpecialCharacters = processSpecialCharacters;
+    window.processSpecialCharactersInDOM = processSpecialCharactersInDOM;
+    
+    // Performance monitoring (optional - can be removed in production)
+    if (typeof console !== 'undefined' && console.log) {
+        console.log('✓ Special Characters Processor loaded - targeting question content only');
+    }
+    </script>

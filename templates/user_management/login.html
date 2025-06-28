@@ -5,11 +5,16 @@
   <head>
     <meta charset="UTF-8" />
     {% include 'includes/favicon.html' %}
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login | PulsePrep</title>
+    <link rel="stylesheet" href="{% static 'css/DAstyles.css' %}" />
     <link rel="stylesheet" href="{% static 'css/user_management/signup.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- Add cache control headers if coming from logout -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
   </head>
   <body>
     <div class="auth-container">
@@ -78,7 +83,6 @@
                 <input type="checkbox" id="remember" name="remember" />
                 <label for="remember">Remember me</label>
               </div>
-              <a href="/password-reset/" class="forgot-password">Forgot password?</a>
             </div>
 
             <button type="submit" class="submit-btn">Login</button>
@@ -105,6 +109,63 @@
           this.classList.add('fa-eye-slash');
         }
       });
+
+      // Browser back button prevention (only after logout)
+      (function() {
+        // Check if user came from logout (indicated by success message about logout)
+        const messages = document.querySelectorAll('.message.success');
+        let cameFromLogout = false;
+        
+        messages.forEach(function(message) {
+          if (message.textContent.includes('logged out')) {
+            cameFromLogout = true;
+          }
+        });
+
+        // Only apply back button prevention if coming from logout
+        if (cameFromLogout) {
+          // Disable browser back button
+          function disableBackButton() {
+            window.history.pushState(null, "", window.location.href);
+            window.onpopstate = function() {
+              window.history.pushState(null, "", window.location.href);
+            };
+          }
+          
+          // Execute on page load
+          window.addEventListener('load', function() {
+            disableBackButton();
+            console.log('Back button disabled after logout');
+          });
+          
+          // Handle page restore from cache
+          window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+              disableBackButton();
+            }
+          });
+          
+          // Clear any cached authentication data
+          if (typeof(Storage) !== "undefined") {
+            sessionStorage.removeItem('user_session');
+            localStorage.removeItem('auth_token');
+          }
+        }
+      })();
+
+      // Auto-hide logout success message after 5 seconds
+      setTimeout(function() {
+        const logoutMessages = document.querySelectorAll('.message.success');
+        logoutMessages.forEach(function(message) {
+          if (message.textContent.includes('logged out')) {
+            message.style.transition = 'opacity 0.5s ease';
+            message.style.opacity = '0';
+            setTimeout(function() {
+              message.remove();
+            }, 500);
+          }
+        });
+      }, 5000);
     </script>
   </body>
 </html>

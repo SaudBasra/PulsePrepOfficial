@@ -1,4 +1,4 @@
-# myaccount/forms.py
+# myaccount/forms.py - Updated with Readonly Degree/Year for Students
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from user_management.models import CustomUser
@@ -42,13 +42,45 @@ class UserProfileForm(forms.ModelForm):
         user = kwargs.get('instance')
         super().__init__(*args, **kwargs)
         
-        # If user is admin, remove degree and year fields
-        if user and (user.is_admin or user.is_superuser):
-            del self.fields['degree']
-            del self.fields['year']
-            # Add custom admin-specific fields if needed
-            self.fields['first_name'].help_text = 'Administrator first name'
-            self.fields['last_name'].help_text = 'Administrator last name'
+        # Make degree and year readonly for students (non-admin users)
+        if user and not (user.is_admin or user.is_superuser):
+            # Make degree field readonly for students
+            self.fields['degree'].widget = forms.TextInput(attrs={
+                'class': 'form-control readonly-field',
+                'readonly': True,
+                'value': user.get_degree_display() if user.degree else 'Not Set'
+            })
+            self.fields['degree'].help_text = "Contact administrator to change degree program"
+            
+            # Make year field readonly for students  
+            self.fields['year'].widget = forms.TextInput(attrs={
+                'class': 'form-control readonly-field',
+                'readonly': True,
+                'value': user.get_year_display() if user.year else 'Not Set'
+            })
+            self.fields['year'].help_text = "Contact administrator to change academic year"
+            
+            # Remove from form processing
+            self.fields['degree'].disabled = True
+            self.fields['year'].disabled = True
+        else:
+            # For admins, keep them editable but add help text
+            self.fields['degree'].help_text = 'Administrator can edit degree program'
+            self.fields['year'].help_text = 'Administrator can edit academic year'
+
+    def clean_degree(self):
+        """Prevent students from changing degree"""
+        if self.instance and not (self.instance.is_admin or self.instance.is_superuser):
+            # Return the original value for students
+            return self.instance.degree
+        return self.cleaned_data.get('degree')
+    
+    def clean_year(self):
+        """Prevent students from changing year"""
+        if self.instance and not (self.instance.is_admin or self.instance.is_superuser):
+            # Return the original value for students
+            return self.instance.year
+        return self.cleaned_data.get('year')
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):
@@ -75,4 +107,3 @@ class CustomPasswordChangeForm(PasswordChangeForm):
         self.fields['old_password'].label = 'Current Password'
         self.fields['new_password1'].label = 'New Password'
         self.fields['new_password2'].label = 'Confirm New Password'
-

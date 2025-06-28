@@ -1,0 +1,7 @@
+INFO 2025-06-28 20:07:10,741 autoreload 16008 3264 Watching for file changes with StatReloader
+INFO 2025-06-28 20:07:20,170 autoreload 16008 3264 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-28 20:07:28,354 autoreload 16296 9400 Watching for file changes with StatReloader
+INFO 2025-06-28 20:07:35,712 autoreload 16296 9400 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-28 20:07:47,247 autoreload 13908 15760 Watching for file changes with StatReloader
+INFO 2025-06-28 20:12:08,875 autoreload 11384 2704 Watching for file changes with StatReloader
+INFO 2025-06-28 20:15:08,916 autoreload 15740 1252 Watching for file changes with StatReloader

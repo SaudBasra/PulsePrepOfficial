@@ -1,0 +1,21 @@
+INFO 2025-06-23 16:07:52,576 email_utils 15396 12588 Starting email validation for: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:07:52,579 email_utils 15396 12588 Verifying email existence: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:08:25,971 email_utils 15396 5136 Starting email validation for: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:08:25,973 email_utils 15396 5136 Verifying email existence: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:08:46,469 email_utils 15396 12588 Email validation result for saudkffnkvk@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:09:18,335 email_utils 15396 5136 Email validation result for saudkffnkvk@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:10:58,621 email_utils 15396 14928 Starting email validation for: saudknnknk@gmail.com
+INFO 2025-06-23 16:10:58,628 email_utils 15396 14928 Verifying email existence: saudknnknk@gmail.com
+INFO 2025-06-23 16:11:50,412 email_utils 15396 14928 Email validation result for saudknnknk@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:46:08,268 email_utils 5552 4200 Starting email validation for: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:46:08,268 email_utils 5552 4200 Verifying email existence: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:47:02,608 email_utils 5552 4200 Email validation result for saudkffnkvk@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:48:32,261 email_utils 5552 4200 Starting email validation for: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:48:32,263 email_utils 5552 4200 Verifying email existence: saudkffnkvk@gmail.com
+INFO 2025-06-23 16:49:26,228 email_utils 5552 4200 Email validation result for saudkffnkvk@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:52:31,146 email_utils 11180 14652 Starting email validation for: saudahmadbasra@gmail.com
+INFO 2025-06-23 16:52:31,146 email_utils 11180 14652 Verifying email existence: saudahmadbasra@gmail.com
+INFO 2025-06-23 16:53:24,795 email_utils 11180 14652 Email validation result for saudahmadbasra@gmail.com: INVALID - Email does not exist or cannot receive messages
+INFO 2025-06-23 16:55:26,453 email_utils 11180 14652 Starting email validation for: saudahmadbasra@gmail.com
+INFO 2025-06-23 16:55:26,453 email_utils 11180 14652 Verifying email existence: saudahmadbasra@gmail.com
+INFO 2025-06-23 16:56:18,523 email_utils 11180 14652 Email validation result for saudahmadbasra@gmail.com: INVALID - Email does not exist or cannot receive messages
