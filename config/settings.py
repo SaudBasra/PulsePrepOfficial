@@ -92,6 +92,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Production database (PostgreSQL) - Active configuration
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
        'NAME': 'pulseprep_db',
         'USER': 'pulseprep_user',
         'PASSWORD': 'Ppproject@#12345',
