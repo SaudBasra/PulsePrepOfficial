@@ -1,0 +1,342 @@
+<!-- manageimage/templates/manageimage/debug_upload.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Image Upload - PulsePrep</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .upload-area {
+            border: 2px dashed #007bff;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+        .upload-area.drag-over {
+            background: rgba(0, 123, 255, 0.2);
+            border-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Image Upload Debug Tool</h1>
+        <p>This tool helps diagnose image upload issues.</p>
+
+        <!-- System Information -->
+        <div class="test-section">
+            <h3>1. System Information</h3>
+            <button onclick="checkSystemInfo()">Check System Info</button>
+            <div id="system-info-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- CSRF Token Test -->
+        <div class="test-section">
+            <h3>2. CSRF Token Test</h3>
+            <button onclick="testCSRFToken()">Test CSRF Token</button>
+            <div id="csrf-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Endpoint Test -->
+        <div class="test-section">
+            <h3>3. Upload Endpoint Test</h3>
+            <button onclick="testUploadEndpoint()">Test Debug Endpoint</button>
+            <div id="endpoint-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Actual Upload Test -->
+        <div class="test-section">
+            <h3>4. File Upload Test</h3>
+            <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+                <p>📁 Click here or drag files to test upload</p>
+                <p><small>Select one or more image files</small></p>
+            </div>
+            <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+            <div id="upload-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Manual Test Form -->
+        <div class="test-section">
+            <h3>5. Manual Form Test</h3>
+            <form id="manual-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="images" multiple accept="image/*" required>
+                <button type="submit">Upload via Form</button>
+            </form>
+            <div id="form-result" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Clear Results -->
+        <div class="test-section">
+            <button onclick="clearResults()" style="background: #6c757d;">Clear All Results</button>
+        </div>
+    </div>
+
+    <script>
+        // Get CSRF token
+        function getCSRFToken() {
+            return document.querySelector('meta[name=csrf-token]')?.getAttribute('content') ||
+                   document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+                   getCookie('csrftoken');
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Test 1: System Information
+        function checkSystemInfo() {
+            const result = document.getElementById('system-info-result');
+            result.style.display = 'block';
+            result.className = 'result info';
+            
+            const info = {
+                'Current URL': window.location.href,
+                'User Agent': navigator.userAgent,
+                'Browser': navigator.appName,
+                'Platform': navigator.platform,
+                'Cookies Enabled': navigator.cookieEnabled,
+                'Local Storage': typeof(Storage) !== "undefined",
+                'File API Support': window.File && window.FileReader && window.FileList && window.Blob
+            };
+            
+            let html = '<h4>Browser Information:</h4><pre>';
+            for (const [key, value] of Object.entries(info)) {
+                html += `${key}: ${value}\n`;
+            }
+            html += '</pre>';
+            
+            result.innerHTML = html;
+        }
+
+        // Test 2: CSRF Token
+        function testCSRFToken() {
+            const result = document.getElementById('csrf-result');
+            result.style.display = 'block';
+            
+            const token = getCSRFToken();
+            if (token) {
+                result.className = 'result success';
+                result.innerHTML = `<h4>✅ CSRF Token Found</h4><pre>Token: ${token.substring(0, 20)}...</pre>`;
+            } else {
+                result.className = 'result error';
+                result.innerHTML = '<h4>❌ CSRF Token Missing</h4><p>CSRF token not found in meta tag, form, or cookies.</p>';
+            }
+        }
+
+        // Test 3: Upload Endpoint
+        function testUploadEndpoint() {
+            const result = document.getElementById('endpoint-result');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '<h4>🔄 Testing endpoint...</h4>';
+            
+            fetch('/manageimage/debug-upload/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({test: 'debug'})
+            })
+            .then(response => {
+                console.log('Debug endpoint response:', response);
+                return response.json();
+            })
+            .then(data => {
+                result.className = 'result success';
+                result.innerHTML = `<h4>✅ Endpoint Working</h4><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            })
+            .catch(error => {
+                result.className = 'result error';
+                result.innerHTML = `<h4>❌ Endpoint Error</h4><pre>Error: ${error.message}</pre>`;
+            });
+        }
+
+        // Test 4: File Upload
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            testFileUpload(e.target.files);
+        });
+
+        // Drag and drop
+        const uploadArea = document.getElementById('upload-area');
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            testFileUpload(e.dataTransfer.files);
+        });
+
+        function testFileUpload(files) {
+            const result = document.getElementById('upload-result');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = `<h4>🔄 Testing upload of ${files.length} file(s)...</h4>`;
+
+            const formData = new FormData();
+            for (let file of files) {
+                formData.append('images', file);
+            }
+
+            fetch('/manageimage/upload/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCSRFToken(),
+                }
+            })
+            .then(response => {
+                console.log('Upload response status:', response.status);
+                console.log('Upload response headers:', response.headers);
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    throw new Error(`Server returned ${response.status}: ${response.statusText}. Expected JSON but got ${contentType}`);
+                }
+            })
+            .then(data => {
+                console.log('Upload response data:', data);
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `<h4>✅ Upload Successful</h4><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `<h4>❌ Upload Failed</h4><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                result.className = 'result error';
+                result.innerHTML = `<h4>❌ Upload Error</h4><pre>Error: ${error.message}</pre>`;
+            });
+        }
+
+        // Test 5: Manual Form
+        document.getElementById('manual-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const result = document.getElementById('form-result');
+            result.style.display = 'block';
+            result.className = 'result info';
+            result.innerHTML = '<h4>🔄 Submitting form...</h4>';
+
+            const formData = new FormData(this);
+
+            fetch('/manageimage/upload/', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `<h4>✅ Form Upload Successful</h4><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `<h4>❌ Form Upload Failed</h4><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            })
+            .catch(error => {
+                result.className = 'result error';
+                result.innerHTML = `<h4>❌ Form Error</h4><pre>Error: ${error.message}</pre>`;
+            });
+        });
+
+        // Clear results
+        function clearResults() {
+            document.querySelectorAll('.result').forEach(result => {
+                result.style.display = 'none';
+            });
+        }
+
+        // Auto-run system info and CSRF test on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                checkSystemInfo();
+                testCSRFToken();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

@@ -135,7 +135,14 @@
             <!-- Statistics Section -->
             <div class="stats-section">
               <h2><i class="fas fa-chart-bar"></i> Image Statistics</h2>
-              <p class="section-description">Overview of your image library for Question Bank</p>
+              <p class="section-description">
+                Overview of your image library for 
+                {% if stats.modelpaper_available %}
+                  Question Bank and Model Papers
+                {% else %}
+                  Question Bank
+                {% endif %}
+              </p>
               
               <div class="stats-cards">
                 <div class="stat-card">
@@ -155,7 +162,11 @@
                   <div class="stat-content">
                     <h3>{{ stats.used_images|default:"0" }}</h3>
                     <p>Used in Questions</p>
-                    <small>Question Bank Only</small>
+                    {% if stats.modelpaper_available %}
+                      <small>QB: {{ stats.questionbank_usage|default:"0" }} | MP: {{ stats.modelpaper_usage|default:"0" }}</small>
+                    {% else %}
+                      <small>Question Bank Only</small>
+                    {% endif %}
                   </div>
                 </div>
                 
@@ -184,7 +195,14 @@
             <!-- Upload Section -->
             <div class="upload-section">
               <h2><i class="fas fa-cloud-upload-alt"></i> Upload Images</h2>
-              <p class="section-description">Upload images for use in Question Bank questions</p>
+              <p class="section-description">
+                Upload images for use in 
+                {% if stats.modelpaper_available %}
+                  Question Bank questions and Model Paper questions
+                {% else %}
+                  Question Bank questions
+                {% endif %}
+              </p>
               
               <div class="upload-area" id="upload-area">
                 <div class="upload-icon">
@@ -219,9 +237,31 @@
                   />
                   <i class="fas fa-search search-icon"></i>
                 </div>
+                <select name="usage" class="filter-select">
+                  <option value="">All Images</option>
+                  <option value="used" {% if usage_filter == 'used' %}selected{% endif %}>Used Images</option>
+                  <option value="unused" {% if usage_filter == 'unused' %}selected{% endif %}>Unused Images</option>
+                  <option value="questionbank" {% if usage_filter == 'questionbank' %}selected{% endif %}>QuestionBank Only</option>
+                  {% if stats.modelpaper_available %}
+                    <option value="modelpaper" {% if usage_filter == 'modelpaper' %}selected{% endif %}>Model Paper Only</option>
+                  {% endif %}
+                </select>
+                <select name="sort" class="filter-select">
+                  <option value="-uploaded_at" {% if sort_by == '-uploaded_at' %}selected{% endif %}>Newest First</option>
+                  <option value="uploaded_at" {% if sort_by == 'uploaded_at' %}selected{% endif %}>Oldest First</option>
+                  <option value="filename" {% if sort_by == 'filename' %}selected{% endif %}>Name A-Z</option>
+                  <option value="-filename" {% if sort_by == '-filename' %}selected{% endif %}>Name Z-A</option>
+                  <option value="-file_size" {% if sort_by == '-file_size' %}selected{% endif %}>Largest First</option>
+                  <option value="file_size" {% if sort_by == 'file_size' %}selected{% endif %}>Smallest First</option>
+                </select>
                 <button type="submit" class="btn-secondary">
-                  <i class="fas fa-search"></i> Search
+                  <i class="fas fa-filter"></i> Apply
                 </button>
+                {% if query or usage_filter or sort_by != '-uploaded_at' %}
+                  <a href="{% url 'manage_images' %}" class="btn-clear">
+                    <i class="fas fa-times"></i> Clear
+                  </a>
+                {% endif %}
               </form>
               
               <div class="view-controls">
@@ -245,8 +285,7 @@
                     <div class="image-card" data-image-id="{{ image.id }}">
                       <div class="image-preview">
                         <img src="{{ image.image.url }}" alt="{{ image.filename }}" loading="lazy" 
-                             onload="console.log('Image loaded:', '{{ image.filename }}');"
-                             onerror="console.log('Image failed:', '{{ image.filename }}', this.src); this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-error\'><i class=\'fas fa-exclamation-triangle\'></i><br>Image not found<br><small>{{ image.filename }}</small></div>';">
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-error\'><i class=\'fas fa-exclamation-triangle\'></i><br>Image not found<br><small>{{ image.filename }}</small></div>';">
                         <div class="image-overlay">
                           <button class="btn-icon view-usage-btn" title="View Usage" onclick="viewImageUsage({{ image.id }})">
                             <i class="fas fa-eye"></i>
@@ -275,7 +314,7 @@
                   <div class="pagination-container">
                     <div class="pagination">
                       {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">
+                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if usage_filter %}&usage={{ usage_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="page-link">
                           <i class="fas fa-chevron-left"></i>
                         </a>
                       {% endif %}
@@ -284,12 +323,12 @@
                         {% if page_obj.number == num %}
                           <span class="page-link active">{{ num }}</span>
                         {% else %}
-                          <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" class="page-link">{{ num }}</a>
+                          <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if usage_filter %}&usage={{ usage_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="page-link">{{ num }}</a>
                         {% endif %}
                       {% endfor %}
                       
                       {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" class="page-link">
+                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if usage_filter %}&usage={{ usage_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" class="page-link">
                           <i class="fas fa-chevron-right"></i>
                         </a>
                       {% endif %}
@@ -304,12 +343,14 @@
                     <h3>No Images Found</h3>
                     {% if query %}
                       <p>No images match your search "{{ query }}". Try a different search term.</p>
-                      <a href="{% url 'manage_images' %}" class="btn-secondary">
-                        <i class="fas fa-times"></i> Clear Search
-                      </a>
+                    {% elif usage_filter %}
+                      <p>No images match the selected filter. Try a different filter option.</p>
                     {% else %}
                       <p>Start by uploading your first images above.</p>
                     {% endif %}
+                    <a href="{% url 'manage_images' %}" class="btn-secondary">
+                      <i class="fas fa-arrow-left"></i> View All Images
+                    </a>
                   </div>
                 </div>
               {% endif %}
@@ -354,7 +395,7 @@
     <div id="usage-modal" class="modal" style="display: none;">
       <div class="modal-content large">
         <div class="modal-header">
-          <h3><i class="fas fa-eye"></i> Image Usage</h3>
+          <h3><i class="fas fa-eye"></i> Image Usage Details</h3>
           <button class="close-modal" aria-label="Close">&times;</button>
         </div>
         <div class="modal-body">
@@ -486,40 +527,37 @@
         }
 
         function loadImageUsage() {
-          console.log('=== Starting loadImageUsage ===');
           const imageCards = document.querySelectorAll('.image-card');
-          console.log('Found', imageCards.length, 'image cards');
           
           imageCards.forEach((card, index) => {
             const imageId = card.dataset.imageId;
             const usageElement = card.querySelector(`#usage-${imageId}`);
             
-            console.log(`Loading usage for image ${imageId} (card ${index + 1}/${imageCards.length})`);
-            
             // Add a small delay between requests to avoid overwhelming the server
             setTimeout(() => {
               fetch(`{% url 'get_image_usage_summary' 0 %}`.replace('0', imageId))
                 .then(response => {
-                  console.log(`Response status for image ${imageId}:`, response.status);
                   if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                   }
                   return response.json();
                 })
                 .then(data => {
-                  console.log('=== Usage data for image', imageId, '===');
-                  console.log('Full response:', data);
-                  console.log('Total usage:', data.total_usage);
-                  console.log('QuestionBank count:', data.questionbank_count);
-                  console.log('Usage tags:', data.usage_tags);
-                  
                   if (data.total_usage > 0) {
                     // Create usage display with detailed breakdown
                     let usageHtml = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Used in ${data.total_usage} question(s)`;
                     
-                    // Add detailed breakdown
+                    // Add detailed breakdown with enhanced Model Paper support
+                    let tagParts = [];
                     if (data.questionbank_count > 0) {
-                      usageHtml += ` <span class="usage-tags">QB(${data.questionbank_count})</span>`;
+                      tagParts.push(`QB(${data.questionbank_count})`);
+                    }
+                    if (data.modelpaper_available && data.modelpaper_count > 0) {
+                      tagParts.push(`MP(${data.modelpaper_count})`);
+                    }
+                    
+                    if (tagParts.length > 0) {
+                      usageHtml += ` <span class="usage-tags">${tagParts.join(', ')}</span>`;
                     }
                     
                     usageElement.innerHTML = usageHtml;
@@ -540,8 +578,7 @@
                   }
                 })
                 .catch(error => {
-                  console.error('=== Error loading usage for image', imageId, '===');
-                  console.error('Error details:', error);
+                  console.error('Error loading usage for image', imageId, ':', error);
                   usageElement.innerHTML = `<i class="fas fa-question-circle" style="color: #6b7280;"></i> Error loading`;
                   usageElement.style.background = '#f3f4f6';
                   usageElement.style.color = '#6b7280';
@@ -561,15 +598,13 @@
           fetch(`{% url 'get_image_usage' 0 %}`.replace('0', imageId))
             .then(response => response.json())
             .then(data => {
-              console.log('=== Detailed usage data ===');
-              console.log('Response:', data);
-              
               let usageHtml = `
                 <div class="usage-details">
                   <h4>${data.filename}</h4>
                   <div class="usage-summary">
                     <p><strong>Total Usage: ${data.usage_count} question(s)</strong></p>
                     ${data.questionbank_count > 0 ? `<p><i class="fas fa-question-circle" style="color: #3b82f6;"></i> QuestionBank: ${data.questionbank_count} questions</p>` : ''}
+                    ${data.modelpaper_available && data.modelpaper_count > 0 ? `<p><i class="fas fa-file-alt" style="color: #10b981;"></i> Model Papers: ${data.modelpaper_count} questions</p>` : ''}
                   </div>
               `;
               
@@ -580,13 +615,20 @@
                     <div class="question-item">
                       <div class="question-header">
                         <span class="source-tag ${q.source_tag}">${q.source_tag}</span>
+                        <span class="usage-type-badge">${q.usage_type}</span>
                       </div>
                       <div class="question-preview">${q.question_preview}</div>
                       <div class="question-meta">
-                        <span class="badge">${q.degree}</span>
-                        <span class="badge">${q.year}</span>
-                        <span class="badge">${q.subject}</span>
-                        <span class="badge">${q.topic}</span>
+                        <span class="badge">${q.degree || 'N/A'}</span>
+                        <span class="badge">${q.year || 'N/A'}</span>
+                        <span class="badge">${q.subject || 'N/A'}</span>
+                        <span class="badge">${q.topic || 'N/A'}</span>
+                        ${q.paper_name ? `<span class="badge paper-name">${q.paper_name}</span>` : ''}
+                      </div>
+                      <div class="question-actions">
+                        <a href="${q.edit_url}" class="btn-edit" target="_blank">
+                          <i class="fas fa-edit"></i> Edit
+                        </a>
                       </div>
                     </div>
                   `;
@@ -713,7 +755,7 @@
     </script>
     
     <style>
-      /* Enhanced styles for improved usage display */
+      /* Enhanced styles for improved usage display and Model Paper support */
       .usage-tags {
         margin-left: 0.5rem;
         font-size: 0.7rem;
@@ -754,6 +796,45 @@
         background: #3b82f6;
       }
       
+      .source-tag.MP {
+        background: #10b981;
+      }
+      
+      .usage-type-badge {
+        padding: 0.2rem 0.4rem;
+        background: #f3f4f6;
+        color: #374151;
+        border-radius: 3px;
+        font-size: 0.65rem;
+        font-weight: 500;
+      }
+      
+      .question-actions {
+        margin-top: 0.5rem;
+      }
+      
+      .btn-edit {
+        padding: 0.25rem 0.5rem;
+        background: #f59e0b;
+        color: white;
+        text-decoration: none;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      
+      .btn-edit:hover {
+        background: #d97706;
+        color: white;
+      }
+      
+      .paper-name {
+        background: #10b981 !important;
+        color: white !important;
+      }
+
       /* Image Management Specific Styles */
       .image-management-container {
         max-width: 1200px;
@@ -884,6 +965,33 @@
         display: flex;
         gap: 1rem;
         align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .filter-select {
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        background: white;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+
+      .btn-clear {
+        padding: 0.75rem 1rem;
+        background: #6b7280;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-clear:hover {
+        background: #4b5563;
+        color: white;
       }
 
       .view-controls {
@@ -943,6 +1051,20 @@
       .images-grid.list-view .image-info {
         flex: 1;
         padding: 1rem;
+      }
+
+      .image-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        border-left: 4px solid #e5e7eb;
+        transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.3s;
+      }
+
+      .image-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
       .image-preview {
@@ -1414,21 +1536,6 @@
 
       .btn-danger:hover {
         background: #b91c1c;
-      }
-
-      /* Enhanced image card borders for better visual feedback */
-      .image-card {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-        border-left: 4px solid #e5e7eb; /* Default border */
-        transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.3s;
-      }
-
-      .image-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
 
       /* Responsive design */

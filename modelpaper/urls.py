@@ -19,7 +19,8 @@ urlpatterns = [
     
     # ==================== CSV IMPORT URLS ====================
     path('import-questions/', views.import_paper_questions, name='import_paper_questions'),
-    
+        path('export-questions/<path:paper_name>/', views.export_modelpaper_questions, name='export_modelpaper_questions'),
+
     # ==================== API URLS FOR FILTERING ====================
     path('api/paper-counts/', views.get_paper_question_counts, name='get_paper_question_counts'),
     path('api/filtered-count/', views.get_filtered_question_count, name='get_filtered_question_count'),
@@ -33,7 +34,6 @@ urlpatterns = [
     path('result/<int:attempt_id>/', views.paper_result, name='paper_result'),
     path('report-warning/', views.report_warning, name='report_paper_warning'),
     path('progress/', views.student_paper_progress, name='student_paper_progress'),
-    
     # ==================== ADMIN IMPORT HISTORY (optional) ====================
     # Uncomment these if you want import history views
     # path('admin/import-history/', views.import_history, name='modelpaper_import_history'),

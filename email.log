@@ -6,3 +6,6 @@ Activation email sent successfully to codewithbasra1122@gmail.com
 SMTP connection test successful
 Activation email sent successfully to saudahmadbasra@gmail.com
 Welcome email sent to saudahmadbasra@gmail.com
+INFO 2025-06-29 13:57:47,500 email_service 11504 16708 SMTP connection test successful
+INFO 2025-06-29 13:57:53,427 email_service 11504 16708 Activation email sent successfully to saudahmadbasra@gmail.com
+INFO 2025-06-29 14:00:36,907 email_service 13920 16036 Welcome email sent to saudahmadbasra@gmail.com

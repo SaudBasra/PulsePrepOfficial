@@ -1,5 +1,4 @@
-from django.views.decorators.http import require_GET
-# Add JSON import for functionality
+# questionbank/views.py - COMPLETE: Updated with Model Paper integration and image support
 
 import json
 import io
@@ -13,15 +12,26 @@ from django.views.decorators.http import require_POST
 from django.db.models import Q, Sum
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from .models import Question, CSVImportHistory
 from .forms import QuestionForm, QuestionImportForm
+
+# Import model paper models if available
+try:
+    from modelpaper.models import PaperQuestion, PaperCSVImportHistory
+    from modelpaper.forms import PaperQuestionImportForm
+    MODELPAPER_AVAILABLE = True
+except ImportError:
+    MODELPAPER_AVAILABLE = False
+    PaperQuestion = None
+    PaperCSVImportHistory = None
+    PaperQuestionImportForm = None
 
 # Get the custom user model
 User = get_user_model()
 
 
-# Remove login_required for development/testing
 def questionbank(request):
     """View to display all questions with search and filter"""
     query = request.GET.get('q', '')
@@ -82,7 +92,7 @@ def questionbank(request):
     
     return render(request, 'questionbank/questionbank.html', context)
 
-# Remove login_required for development/testing
+
 def question_detail(request, pk=None):
     """View to create a new question or edit an existing one"""
     if pk:
@@ -120,7 +130,7 @@ def question_detail(request, pk=None):
     
     return render(request, 'questionbank/question_detail.html', context)
 
-# Remove login_required for development/testing
+
 def delete_question(request, pk):
     """View to delete a question"""
     question = get_object_or_404(Question, pk=pk)
@@ -136,9 +146,9 @@ def delete_question(request, pk):
     
     return render(request, 'questionbank/delete_question.html', context)
 
-# Remove login_required for development/testing
+
 def import_questions(request):
-    """View to handle CSV import"""
+    """Legacy view for basic CSV import - kept for backward compatibility"""
     if request.method == 'POST':
         form = QuestionImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -162,7 +172,7 @@ def import_questions(request):
                 
                 question_count = 0
                 for row in reader:
-                    # FIXED: Move image_filename inside the loop
+                    # Handle image fields
                     question_image_filename = str(row.get('question_image', '')).strip()
                     explanation_image_filename = str(row.get('image', '')).strip()
                     
@@ -184,8 +194,8 @@ def import_questions(request):
                         topic=row.get('topic', ''),
                         difficulty=row.get('difficulty', 'Medium'),
                         explanation=row.get('explanation', ''),
-                        question_image=question_image_filename or None,  # NEW: Question image
-                        image=explanation_image_filename or None,  # Explanation image
+                        question_image=question_image_filename or None,
+                        image=explanation_image_filename or None,
                         created_by=creator
                     )
                     question_count += 1
@@ -200,43 +210,8 @@ def import_questions(request):
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
-def enhanced_duplicate_detection_questionbank(question_text, option_a, option_b, option_c, option_d, option_e=None):
-    """
-    Enhanced duplicate detection for questionbank questions
-    """
-    # Clean inputs
-    question_text = question_text.strip().lower()
-    option_a = option_a.strip().lower() if option_a else ""
-    option_b = option_b.strip().lower() if option_b else ""
-    option_c = option_c.strip().lower() if option_c else ""
-    option_d = option_d.strip().lower() if option_d else ""
-    option_e = option_e.strip().lower() if option_e else ""
-    
-    # Check for exact question text match
-    exact_question_matches = Question.objects.filter(
-        question_text__iexact=question_text
-    )
-    
-    if exact_question_matches.exists():
-        return True, "Exact question text match found"
-    
-    # Check question text + first two options
-    if option_a and option_b:
-        mcq_matches = Question.objects.filter(
-            question_text__icontains=question_text[:30],  # First 30 chars
-            option_a__iexact=option_a,
-            option_b__iexact=option_b
-        )
-        
-        if mcq_matches.exists():
-            return True, "Similar MCQ found with matching options"
-    
-    return False, None
-
-
-# Simplified manage_csv view (QuestionBank only)
 def manage_csv(request):
-    """CSV management view for QuestionBank only"""
+    """Enhanced CSV management view for both QuestionBank and Model Papers"""
     
     # Get questionbank statistics
     questionbank_total_imports = CSVImportHistory.objects.count()
@@ -246,8 +221,35 @@ def manage_csv(request):
         total=models.Sum('successful_imports')
     )['total'] or 0
     
-    # Get questionbank import history
+    # Get model paper statistics if available
+    modelpaper_stats = {
+        'total_imports': 0,
+        'successful_imports': 0,
+        'failed_imports': 0,
+        'total_paper_names': 0,
+        'success_rate': 0
+    }
+    
+    if MODELPAPER_AVAILABLE:
+        modelpaper_total_imports = PaperCSVImportHistory.objects.count()
+        modelpaper_successful_imports = PaperCSVImportHistory.objects.filter(status='SUCCESS').count()
+        modelpaper_failed_imports = PaperCSVImportHistory.objects.filter(status='FAILED').count()
+        modelpaper_total_paper_names = PaperQuestion.objects.values('paper_name').distinct().count()
+        
+        modelpaper_stats = {
+            'total_imports': modelpaper_total_imports,
+            'successful_imports': modelpaper_successful_imports,
+            'failed_imports': modelpaper_failed_imports,
+            'total_paper_names': modelpaper_total_paper_names,
+            'success_rate': round((modelpaper_successful_imports / modelpaper_total_imports * 100), 1) if modelpaper_total_imports > 0 else 0
+        }
+    
+    # Get import history
     questionbank_history = CSVImportHistory.objects.all()[:10]
+    modelpaper_history = []
+    
+    if MODELPAPER_AVAILABLE:
+        modelpaper_history = PaperCSVImportHistory.objects.all()[:10]
     
     context = {
         'questionbank_stats': {
@@ -257,23 +259,32 @@ def manage_csv(request):
             'total_questions_imported': questionbank_total_questions_imported,
             'success_rate': round((questionbank_successful_imports / questionbank_total_imports * 100), 1) if questionbank_total_imports > 0 else 0
         },
+        'modelpaper_stats': modelpaper_stats,
         'questionbank_history': questionbank_history,
+        'modelpaper_history': modelpaper_history,
+        'modelpaper_available': MODELPAPER_AVAILABLE,
     }
     
     return render(request, 'questionbank/manage_csv.html', context)
 
 
 def import_questions_with_history(request):
-    """CSV import for QuestionBank only"""
+    """Enhanced CSV import that handles both QuestionBank and Model Paper imports"""
     if request.method == 'POST':
-        # Only handle questionbank imports
-        return import_to_questionbank(request)
+        import_type = request.POST.get('import_type', 'questionbank')
+        
+        if import_type == 'questionbank':
+            return import_to_questionbank(request)
+        elif import_type == 'modelpaper' and MODELPAPER_AVAILABLE:
+            return import_to_modelpaper(request)
+        else:
+            return JsonResponse({'error': 'Invalid import type'}, status=400)
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 
 def import_to_questionbank(request):
-    """Import questions to questionbank with question_image support"""
+    """Import questions to questionbank with image support"""
     form = QuestionImportForm(request.POST, request.FILES)
     if form.is_valid():
         csv_file = request.FILES['csv_file']
@@ -370,7 +381,7 @@ def import_to_questionbank(request):
                     else:
                         difficulty = 'Medium'
                     
-                    # Handle image fields properly (NEW: Support both question_image and image)
+                    # Handle image fields properly (Support both question_image and image)
                     question_image_filename = str(row.get('question_image', '')).strip()
                     explanation_image_filename = str(row.get('image', '')).strip()
                     
@@ -384,7 +395,7 @@ def import_to_questionbank(request):
                         error_count += 1
                         continue
                     
-                    # Create question with both image fields
+                    # Create question with image fields
                     Question.objects.create(
                         question_text=question_text,
                         question_type=question_type,
@@ -402,7 +413,7 @@ def import_to_questionbank(request):
                         topic=str(row.get('topic', 'General')).strip() or 'General',
                         difficulty=difficulty,
                         explanation=str(row.get('explanation', '')).strip() or None,
-                        question_image=question_image_filename or None,  # NEW: Question image
+                        question_image=question_image_filename or None,  # Question image
                         image=explanation_image_filename or None,  # Explanation image
                         created_by=creator
                     )
@@ -437,8 +448,253 @@ def import_to_questionbank(request):
     else:
         return JsonResponse({'error': 'Invalid form submission'}, status=400)
 
+
+def import_to_modelpaper(request):
+    """Import questions to model paper with image support"""
+    if not MODELPAPER_AVAILABLE:
+        return JsonResponse({'error': 'Model paper functionality not available'}, status=400)
+    
+    form = PaperQuestionImportForm(request.POST, request.FILES)
+    if form.is_valid():
+        csv_file = request.FILES['csv_file']
+        
+        if not csv_file.name.endswith('.csv'):
+            return JsonResponse({'error': 'Please upload a CSV file'}, status=400)
+        
+        # Create import history record
+        import_record = PaperCSVImportHistory.objects.create(
+            file_name=csv_file.name,
+            uploaded_by=request.user if request.user.is_authenticated else None,
+            file_size=csv_file.size,
+            status='PROCESSING'
+        )
+        
+        try:
+            # Try different encodings
+            file_content = csv_file.read()
+            decoded_file = None
+            
+            encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1']
+            
+            for encoding in encodings:
+                try:
+                    decoded_file = file_content.decode(encoding)
+                    break
+                except UnicodeDecodeError:
+                    continue
+            
+            if decoded_file is None:
+                raise Exception("Could not decode file. Please save your CSV with UTF-8 encoding.")
+            
+            io_string = io.StringIO(decoded_file)
+            reader = csv.DictReader(io_string)
+            
+            question_count = 0
+            error_count = 0
+            total_rows = 0
+            errors = []
+            paper_names_imported = set()
+            
+            for row_num, row in enumerate(reader, start=1):
+                total_rows += 1
+                try:
+                    # Required fields
+                    question_text = str(row.get('question_text', '') or row.get('Question', '') or row.get('question', '')).strip()
+                    paper_name = str(row.get('paper_name', '') or row.get('Paper_Name', '') or row.get('paper', '')).strip()
+                    
+                    if not question_text:
+                        errors.append(f"Row {row_num}: Missing question text")
+                        error_count += 1
+                        continue
+                        
+                    if not paper_name:
+                        errors.append(f"Row {row_num}: Missing paper name")
+                        error_count += 1
+                        continue
+                    
+                    # Handle options
+                    option_a = str(row.get('option_a', '') or row.get('option_A', '') or row.get('Option_A', '') or '').strip()
+                    option_b = str(row.get('option_b', '') or row.get('option_B', '') or row.get('Option_B', '') or '').strip()
+                    option_c = str(row.get('option_c', '') or row.get('option_C', '') or row.get('Option_C', '') or '').strip()
+                    option_d = str(row.get('option_d', '') or row.get('option_D', '') or row.get('Option_D', '') or '').strip()
+                    option_e = str(row.get('option_e', '') or row.get('option_E', '') or row.get('Option_E', '') or '').strip()
+                    
+                    # Validate required options
+                    if not all([option_a, option_b, option_c, option_d]):
+                        errors.append(f"Row {row_num}: Missing required options (A, B, C, D)")
+                        error_count += 1
+                        continue
+                    
+                    # Handle correct answer
+                    correct_answer = str(row.get('correct_answer', '') or row.get('correct_option', '') or row.get('Correct_Answer', '') or row.get('answer', '') or '').strip().upper()
+                    if correct_answer not in ['A', 'B', 'C', 'D', 'E']:
+                        errors.append(f"Row {row_num}: Invalid correct answer '{correct_answer}'. Must be A, B, C, D, or E")
+                        error_count += 1
+                        continue
+                    
+                    # Handle optional fields
+                    degree = str(row.get('degree', '')).strip().upper()
+                    if degree and degree not in ['MBBS', 'BDS']:
+                        degree = ''
+                    
+                    year = str(row.get('year', '')).strip()
+                    if year and year not in ['1st', '2nd', '3rd', '4th', '5th']:
+                        year = ''
+                    
+                    # Handle difficulty
+                    difficulty_raw = str(row.get('difficulty', 'Medium')).strip()
+                    if difficulty_raw.lower() == 'easy':
+                        difficulty = 'Easy'
+                    elif difficulty_raw.lower() == 'medium':
+                        difficulty = 'Medium'
+                    elif difficulty_raw.lower() == 'hard':
+                        difficulty = 'Hard'
+                    else:
+                        difficulty = 'Medium'
+                    
+                    # Handle image fields (paper_image and image)
+                    paper_image_filename = str(row.get('paper_image', '')).strip()
+                    explanation_image_filename = str(row.get('image', '')).strip()
+                    
+                    # Enhanced duplicate detection within same paper name
+                    is_duplicate, duplicate_reason = enhanced_duplicate_detection_modelpaper(
+                        paper_name, question_text, option_a, option_b, option_c, option_d, option_e
+                    )
+                    
+                    if is_duplicate:
+                        errors.append(f"Row {row_num}: {duplicate_reason} - '{question_text[:50]}...'")
+                        error_count += 1
+                        continue
+                    
+                    # Create paper question with image fields
+                    PaperQuestion.objects.create(
+                        question_text=question_text,
+                        option_a=option_a,
+                        option_b=option_b,
+                        option_c=option_c,
+                        option_d=option_d,
+                        option_e=option_e or None,
+                        correct_answer=correct_answer,
+                        paper_name=paper_name,
+                        degree=degree,
+                        year=year,
+                        module=str(row.get('module', '')).strip(),
+                        subject=str(row.get('subject', '')).strip(),
+                        topic=str(row.get('topic', '')).strip(),
+                        difficulty=difficulty,
+                        explanation=str(row.get('explanation', '')).strip() or None,
+                        paper_image=paper_image_filename or None,  # Paper image field
+                        image=explanation_image_filename or None,  # Explanation image field
+                        marks=int(row.get('marks', 1)) if str(row.get('marks', '')).isdigit() else 1,
+                        created_by=request.user if request.user.is_authenticated else None
+                    )
+                    question_count += 1
+                    paper_names_imported.add(paper_name)
+                    
+                except Exception as e:
+                    errors.append(f"Row {row_num}: {str(e)}")
+                    error_count += 1
+            
+            # Update import record
+            import_record.total_rows = total_rows
+            import_record.successful_imports = question_count
+            import_record.failed_imports = error_count
+            import_record.status = 'SUCCESS' if error_count == 0 else ('FAILED' if question_count == 0 else 'SUCCESS')
+            import_record.error_details = '\n'.join(errors) if errors else None
+            import_record.paper_names_imported = json.dumps(list(paper_names_imported))
+            import_record.save()
+            
+            return JsonResponse({
+                'success': True,
+                'imported': question_count,
+                'failed': error_count,
+                'total': total_rows,
+                'paper_names': list(paper_names_imported),
+                'errors': errors[:10] if errors else []
+            })
+            
+        except Exception as e:
+            # Update import record with failure
+            import_record.status = 'FAILED'
+            import_record.error_details = str(e)
+            import_record.save()
+            
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid form submission'}, status=400)
+
+
+def enhanced_duplicate_detection_questionbank(question_text, option_a, option_b, option_c, option_d, option_e=None):
+    """Enhanced duplicate detection for questionbank questions"""
+    # Clean inputs
+    question_text = question_text.strip().lower()
+    option_a = option_a.strip().lower() if option_a else ""
+    option_b = option_b.strip().lower() if option_b else ""
+    option_c = option_c.strip().lower() if option_c else ""
+    option_d = option_d.strip().lower() if option_d else ""
+    option_e = option_e.strip().lower() if option_e else ""
+    
+    # Check for exact question text match
+    exact_question_matches = Question.objects.filter(
+        question_text__iexact=question_text
+    )
+    
+    if exact_question_matches.exists():
+        return True, "Exact question text match found"
+    
+    # Check question text + first two options
+    if option_a and option_b:
+        mcq_matches = Question.objects.filter(
+            question_text__icontains=question_text[:30],  # First 30 chars
+            option_a__iexact=option_a,
+            option_b__iexact=option_b
+        )
+        
+        if mcq_matches.exists():
+            return True, "Similar MCQ found with matching options"
+    
+    return False, None
+
+
+def enhanced_duplicate_detection_modelpaper(paper_name, question_text, option_a, option_b, option_c, option_d, option_e=None):
+    """Enhanced duplicate detection for paper questions within the same paper name"""
+    if not MODELPAPER_AVAILABLE:
+        return False, None
+    
+    # Clean inputs
+    question_text = question_text.strip().lower()
+    option_a = option_a.strip().lower() if option_a else ""
+    option_b = option_b.strip().lower() if option_b else ""
+    option_c = option_c.strip().lower() if option_c else ""
+    option_d = option_d.strip().lower() if option_d else ""
+    option_e = option_e.strip().lower() if option_e else ""
+    
+    # Check for exact question text match within same paper name
+    exact_question_matches = PaperQuestion.objects.filter(
+        paper_name=paper_name,
+        question_text__iexact=question_text
+    )
+    
+    if exact_question_matches.exists():
+        return True, "Exact question text match found in this paper"
+    
+    # Check question text + first two options within same paper name
+    if option_a and option_b:
+        mcq_matches = PaperQuestion.objects.filter(
+            paper_name=paper_name,
+            question_text__icontains=question_text[:30],  # First 30 chars
+            option_a__iexact=option_a,
+            option_b__iexact=option_b
+        )
+        
+        if mcq_matches.exists():
+            return True, "Similar MCQ found in this paper with matching options"
+    
+    return False, None
+
+
 def export_questions(request):
-    """View to export questions as CSV - Updated with question_image field"""
+    """View to export questions as CSV - Updated with image fields"""
     # Get filtered questions
     query = request.GET.get('q', '')
     filter_block = request.GET.get('block', '')
@@ -477,7 +733,7 @@ def export_questions(request):
     
     writer = csv.writer(response)
     
-    # CSV headers with both image fields
+    # CSV headers with image fields
     writer.writerow([
         'question_text', 'question_type', 
         'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_answer',
@@ -490,7 +746,386 @@ def export_questions(request):
             question.question_text, question.question_type,
             question.option_a, question.option_b, question.option_c, question.option_d, question.option_e, question.correct_answer,
             question.degree, question.year, question.block, question.module, question.subject, question.topic,
-            question.difficulty, question.explanation, question.question_image or '', question.image or '', question.created_on
+            question.difficulty, question.explanation, 
+            question.question_image or '', question.image or '', question.created_on
         ])
     
     return response
+
+
+def export_modelpaper_questions(request, paper_name):
+    """Export model paper questions by paper name with image support"""
+    if not MODELPAPER_AVAILABLE:
+        return JsonResponse({'error': 'Model paper functionality not available'}, status=400)
+    
+    from urllib.parse import unquote
+    
+    # Decode the URL-encoded paper name
+    decoded_paper_name = unquote(paper_name)
+    
+    # Get questions for this paper
+    questions = PaperQuestion.objects.filter(paper_name=decoded_paper_name).order_by('id')
+    
+    if not questions.exists():
+        return JsonResponse({'error': f'No questions found for paper: {decoded_paper_name}'}, status=404)
+    
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    safe_filename = decoded_paper_name.replace(' ', '_').replace('/', '_')
+    response['Content-Disposition'] = f'attachment; filename="{safe_filename}_questions.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Write header with metadata
+    writer.writerow([f'# Model Paper: {decoded_paper_name}'])
+    writer.writerow([f'# Total Questions: {questions.count()}'])
+    writer.writerow([f'# Exported: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+    writer.writerow([])  # Empty row
+    
+    # Write column headers with image fields
+    writer.writerow([
+        'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 
+        'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic',
+        'difficulty', 'explanation', 'paper_image', 'image', 'marks'
+    ])
+    
+    # Write questions with image fields
+    for question in questions:
+        writer.writerow([
+            question.question_text,
+            question.option_a,
+            question.option_b,
+            question.option_c,
+            question.option_d,
+            question.option_e,
+            question.correct_answer,
+            question.paper_name,
+            question.degree,
+            question.year,
+            question.module,
+            question.subject,
+            question.topic,
+            question.difficulty,
+            question.explanation,
+            question.paper_image or '',  # Paper image field
+            question.image or '',  # Explanation image field
+            question.marks
+        ])
+    
+    return response
+
+
+# Additional utility functions for CSV management
+
+def get_csv_template_data():
+    """Generate CSV template data for downloads"""
+    templates = {
+        'questionbank-basic': {
+            'filename': 'questionbank_template_basic.csv',
+            'headers': ['question_text', 'question_type', 'degree', 'year', 'block', 'module', 'subject', 'topic', 'difficulty', 'explanation', 'question_image', 'image'],
+            'sample_data': [
+                ["What is the normal heart rate range for a healthy adult?", "MCQ", "MBBS", "1st", "Cardiovascular", "Physiology", "Cardiology", "Heart Rate", "Easy", "Normal adult heart rate is 60-100 beats per minute at rest.", "heart_rate_diagram.jpg", "heart_rate_explanation.jpg"],
+                ["Describe the pathophysiology of myocardial infarction", "SEQ", "MBBS", "3rd", "Cardiovascular", "Pathology", "Cardiology", "Myocardial Infarction", "Hard", "MI occurs due to coronary artery occlusion leading to myocardial cell death.", "", "mi_pathology_detailed.png"],
+                ["Anatomy of the human heart chambers", "NOTE", "MBBS", "1st", "Cardiovascular", "Anatomy", "Cardiology", "Heart Anatomy", "Medium", "Study notes on the four chambers of the heart and their functions.", "heart_chambers_labeled.jpg", ""]
+            ]
+        },
+        'questionbank-mcq': {
+            'filename': 'questionbank_template_mcq.csv',
+            'headers': ['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_answer', 'degree', 'year', 'block', 'module', 'subject', 'topic', 'difficulty', 'explanation', 'question_image', 'image'],
+            'sample_data': [
+                ["What is the normal blood pressure reading for adults?", "120/80 mmHg", "140/90 mmHg", "160/100 mmHg", "100/60 mmHg", "180/110 mmHg", "A", "MBBS", "1st", "Cardiovascular", "Physiology", "Cardiology", "Blood Pressure", "Easy", "Normal blood pressure is approximately 120/80 mmHg for healthy adults.", "bp_measurement_diagram.jpg", "bp_ranges_chart.jpg"],
+                ["Which tooth is shown in the radiograph?", "Central Incisor", "Lateral Incisor", "Canine", "First Premolar", "Second Premolar", "C", "BDS", "2nd", "Oral", "Radiology", "Dentistry", "Tooth Identification", "Medium", "Canine teeth have characteristic single pointed crown and long root.", "dental_xray_canine.png", "canine_anatomy.jpg"],
+                ["The structure indicated by the arrow is:", "Left Ventricle", "Right Atrium", "Aortic Arch", "Pulmonary Trunk", "Superior Vena Cava", "A", "MBBS", "1st", "Cardiovascular", "Anatomy", "Cardiology", "Heart Anatomy", "Medium", "The left ventricle is the main pumping chamber with thick muscular walls.", "heart_anatomy_labeled.jpg", "ventricle_detail.png"]
+            ]
+        }
+    }
+    
+    if MODELPAPER_AVAILABLE:
+        templates['modelpaper-medical'] = {
+            'filename': 'modelpaper_medical_template.csv',
+            'headers': ['question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic', 'difficulty', 'explanation', 'paper_image', 'image', 'marks'],
+            'sample_data': [
+                ["The ECG shown indicates:", "Normal Sinus Rhythm", "Atrial Fibrillation", "Ventricular Tachycardia", "Complete Heart Block", "ST Elevation MI", "E", "MBBS Final Exam 2024", "MBBS", "4th", "Cardiology", "Medicine", "ECG Interpretation", "Hard", "ST elevation in leads II, III, aVF indicates inferior wall MI.", "ecg_stemi_inferior.jpg", "ecg_mi_explanation.png", "2"],
+                ["Identify the dental restoration material shown:", "Amalgam", "Composite Resin", "Glass Ionomer", "Gold Inlay", "Ceramic Crown", "B", "BDS Final Exam 2024", "BDS", "4th", "Restorative", "Dentistry", "Dental Materials", "Medium", "Composite resin appears tooth-colored and blends with natural enamel.", "composite_restoration.png", "composite_properties_chart.jpg", "1"],
+                ["The radiological finding shows:", "Normal Chest X-ray", "Pneumothorax", "Pleural Effusion", "Pneumonia", "Pulmonary Edema", "C", "MBBS Midterm 2024", "MBBS", "3rd", "Respiratory", "Medicine", "Chest Radiology", "Medium", "Pleural effusion appears as fluid collection in the pleural space.", "chest_xray_effusion.jpg", "pleural_anatomy.png", "2"],
+                ["Which periodontal instrument is shown?", "Periodontal Probe", "Curette", "Scaler", "Explorer", "Furcation Probe", "A", "BDS Midterm 2024", "BDS", "3rd", "Periodontics", "Dentistry", "Periodontal Instruments", "Easy", "Periodontal probe is used to measure pocket depths and has millimeter markings.", "perio_probe.jpg", "probe_technique.png", "1"],
+                ["The histological section demonstrates:", "Normal Liver Tissue", "Fatty Liver", "Cirrhosis", "Hepatitis", "Liver Cancer", "C", "MBBS Pathology Exam 2024", "MBBS", "2nd", "Pathology", "Medicine", "Liver Pathology", "Hard", "Cirrhosis shows fibrous bands dividing liver into regenerative nodules.", "liver_cirrhosis_histo.jpg", "cirrhosis_stages.png", "3"]
+            ]
+        }
+    
+    return templates
+
+
+def get_import_statistics():
+    """Get comprehensive import statistics for both question types"""
+    stats = {
+        'questionbank': {
+            'total_imports': CSVImportHistory.objects.count(),
+            'successful_imports': CSVImportHistory.objects.filter(status='SUCCESS').count(),
+            'failed_imports': CSVImportHistory.objects.filter(status='FAILED').count(),
+            'total_questions': CSVImportHistory.objects.filter(status='SUCCESS').aggregate(
+                total=models.Sum('successful_imports')
+            )['total'] or 0,
+            'recent_imports': CSVImportHistory.objects.filter(
+                uploaded_at__gte=timezone.now() - timezone.timedelta(days=7)
+            ).count(),
+        }
+    }
+    
+    if MODELPAPER_AVAILABLE:
+        stats['modelpaper'] = {
+            'total_imports': PaperCSVImportHistory.objects.count(),
+            'successful_imports': PaperCSVImportHistory.objects.filter(status='SUCCESS').count(),
+            'failed_imports': PaperCSVImportHistory.objects.filter(status='FAILED').count(),
+            'total_questions': PaperCSVImportHistory.objects.filter(status='SUCCESS').aggregate(
+                total=models.Sum('successful_imports')
+            )['total'] or 0,
+            'paper_names': PaperQuestion.objects.values('paper_name').distinct().count(),
+            'recent_imports': PaperCSVImportHistory.objects.filter(
+                uploaded_at__gte=timezone.now() - timezone.timedelta(days=7)
+            ).count(),
+        }
+    else:
+        stats['modelpaper'] = {
+            'total_imports': 0,
+            'successful_imports': 0,
+            'failed_imports': 0,
+            'total_questions': 0,
+            'paper_names': 0,
+            'recent_imports': 0,
+        }
+    
+    return stats
+
+
+def validate_csv_structure(csv_file, import_type='questionbank'):
+    """Validate CSV structure before processing"""
+    try:
+        # Read first few lines to check structure
+        csv_file.seek(0)
+        sample = csv_file.read(1024).decode('utf-8')
+        csv_file.seek(0)
+        
+        # Basic validations
+        if not sample:
+            return False, "Empty file"
+        
+        # Check for common CSV issues
+        if '\t' in sample and ',' not in sample:
+            return False, "File appears to be tab-separated. Please use comma-separated format."
+        
+        # Try to parse headers
+        import io
+        sample_io = io.StringIO(sample)
+        reader = csv.DictReader(sample_io)
+        
+        try:
+            headers = reader.fieldnames
+        except:
+            return False, "Could not parse CSV headers"
+        
+        if not headers:
+            return False, "No headers found in CSV"
+        
+        # Check required fields based on import type
+        if import_type == 'questionbank':
+            required_fields = ['question_text']
+            recommended_fields = ['option_a', 'option_b', 'option_c', 'option_d', 'correct_answer']
+        else:  # modelpaper
+            required_fields = ['question_text', 'paper_name']
+            recommended_fields = ['option_a', 'option_b', 'option_c', 'option_d', 'correct_answer']
+        
+        # Check for required fields
+        missing_required = []
+        for field in required_fields:
+            if not any(field.lower() in h.lower() for h in headers):
+                missing_required.append(field)
+        
+        if missing_required:
+            return False, f"Missing required fields: {', '.join(missing_required)}"
+        
+        # Warn about missing recommended fields
+        missing_recommended = []
+        for field in recommended_fields:
+            if not any(field.lower() in h.lower() for h in headers):
+                missing_recommended.append(field)
+        
+        if missing_recommended:
+            return True, f"Warning: Missing recommended fields: {', '.join(missing_recommended)}"
+        
+        return True, "CSV structure looks good"
+        
+    except Exception as e:
+        return False, f"Error validating CSV: {str(e)}"
+
+
+# API endpoints for CSV management
+
+def get_csv_stats_api(request):
+    """API endpoint for CSV statistics"""
+    stats = get_import_statistics()
+    
+    # Add question bank specific stats
+    questionbank_total = Question.objects.count()
+    questionbank_with_images = Question.objects.exclude(
+        Q(question_image__isnull=True) | Q(question_image__exact='') |
+        Q(image__isnull=True) | Q(image__exact='')
+    ).count()
+    
+    stats['questionbank']['total_questions_db'] = questionbank_total
+    stats['questionbank']['questions_with_images'] = questionbank_with_images
+    
+    if MODELPAPER_AVAILABLE:
+        modelpaper_total = PaperQuestion.objects.count()
+        modelpaper_with_images = PaperQuestion.objects.exclude(
+            Q(paper_image__isnull=True) | Q(paper_image__exact='') |
+            Q(image__isnull=True) | Q(image__exact='')
+        ).count()
+        
+        stats['modelpaper']['total_questions_db'] = modelpaper_total
+        stats['modelpaper']['questions_with_images'] = modelpaper_with_images
+    
+    return JsonResponse({
+        'success': True,
+        'stats': stats,
+        'modelpaper_available': MODELPAPER_AVAILABLE,
+        'timestamp': timezone.now().isoformat()
+    })
+
+
+def validate_csv_api(request):
+    """API endpoint for CSV validation"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST method required'}, status=405)
+    
+    if 'csv_file' not in request.FILES:
+        return JsonResponse({'error': 'No CSV file provided'}, status=400)
+    
+    csv_file = request.FILES['csv_file']
+    import_type = request.POST.get('import_type', 'questionbank')
+    
+    is_valid, message = validate_csv_structure(csv_file, import_type)
+    
+    return JsonResponse({
+        'success': True,
+        'is_valid': is_valid,
+        'message': message,
+        'import_type': import_type
+    })
+
+
+# CSV Import History Management
+
+def get_import_history_api(request):
+    """API endpoint for import history"""
+    import_type = request.GET.get('type', 'all')
+    limit = int(request.GET.get('limit', 20))
+    
+    history_data = {}
+    
+    if import_type in ['questionbank', 'all']:
+        questionbank_history = CSVImportHistory.objects.all()[:limit]
+        history_data['questionbank'] = [
+            {
+                'id': record.id,
+                'file_name': record.file_name,
+                'uploaded_at': record.uploaded_at.isoformat(),
+                'status': record.status,
+                'total_rows': record.total_rows,
+                'successful_imports': record.successful_imports,
+                'failed_imports': record.failed_imports,
+                'file_size': record.file_size,
+                'uploaded_by': record.uploaded_by.email if record.uploaded_by else None,
+            }
+            for record in questionbank_history
+        ]
+    
+    if import_type in ['modelpaper', 'all'] and MODELPAPER_AVAILABLE:
+        modelpaper_history = PaperCSVImportHistory.objects.all()[:limit]
+        history_data['modelpaper'] = [
+            {
+                'id': record.id,
+                'file_name': record.file_name,
+                'uploaded_at': record.uploaded_at.isoformat(),
+                'status': record.status,
+                'total_rows': record.total_rows,
+                'successful_imports': record.successful_imports,
+                'failed_imports': record.failed_imports,
+                'file_size': record.file_size,
+                'uploaded_by': record.uploaded_by.email if record.uploaded_by else None,
+                'paper_names': record.imported_paper_names_list,
+            }
+            for record in modelpaper_history
+        ]
+    
+    return JsonResponse({
+        'success': True,
+        'history': history_data,
+        'modelpaper_available': MODELPAPER_AVAILABLE,
+    })
+
+
+# Error handling for CSV operations
+
+def handle_csv_error(request, error_type, error_message, import_type='unknown'):
+    """Centralized error handling for CSV operations"""
+    error_context = {
+        'error_type': error_type,
+        'error_message': error_message,
+        'import_type': import_type,
+        'user': request.user,
+        'timestamp': timezone.now(),
+        'request_data': {
+            'method': request.method,
+            'path': request.path,
+            'user_agent': request.META.get('HTTP_USER_AGENT', ''),
+        }
+    }
+    
+    # Log error for debugging
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.error(f"CSV Error: {error_type} - {error_message}", extra=error_context)
+    
+    if request.headers.get('Accept') == 'application/json':
+        return JsonResponse({
+            'success': False,
+            'error': error_message,
+            'error_type': error_type,
+            'import_type': import_type
+        }, status=400)
+    
+    # For non-AJAX requests, redirect with error message
+    messages.error(request, f"CSV {error_type}: {error_message}")
+    return redirect('manage_csv')
+
+
+# Cleanup and maintenance functions
+
+def cleanup_failed_imports():
+    """Cleanup function to remove old failed import records"""
+    cutoff_date = timezone.now() - timezone.timedelta(days=30)
+    
+    # Clean questionbank import history
+    old_questionbank_imports = CSVImportHistory.objects.filter(
+        status='FAILED',
+        uploaded_at__lt=cutoff_date
+    )
+    questionbank_count = old_questionbank_imports.count()
+    old_questionbank_imports.delete()
+    
+    modelpaper_count = 0
+    if MODELPAPER_AVAILABLE:
+        # Clean modelpaper import history
+        old_modelpaper_imports = PaperCSVImportHistory.objects.filter(
+            status='FAILED',
+            uploaded_at__lt=cutoff_date
+        )
+        modelpaper_count = old_modelpaper_imports.count()
+        old_modelpaper_imports.delete()
+    
+    return {
+        'questionbank_cleaned': questionbank_count,
+        'modelpaper_cleaned': modelpaper_count,
+        'total_cleaned': questionbank_count + modelpaper_count
+    }

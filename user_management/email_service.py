@@ -62,7 +62,7 @@ class EmailService:
     
     @staticmethod
     def send_activation_email(user, request=None):
-        """Send account activation email that stays in inbox permanently"""
+        """Send account activation email - Template 1: Approval + Activation"""
         try:
             # Validate email settings first
             EmailService.validate_email_settings()
@@ -101,60 +101,43 @@ class EmailService:
             
             activation_url = f"{protocol}://{domain}{reverse('user_management:activate_account', kwargs={'token': user.activation_token})}"
             
-            # Make it look like regular email, not system email
-            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Student"
-            subject = f"Welcome to PulsePrep - Your {user.degree} Account Details"
+            # Professional subject line with celebration emoji
+            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Medical Studies"
+            subject = f"🎉 {degree_year} Account Approved - Activate Now"
             
-            # Use personal, conversational tone
-            message = f'''
-Dear {user.first_name},
+            # Clean, professional activation email template
+            message = f'''Hello {user.first_name} {user.last_name},
 
-Thank you for joining PulsePrep! We're excited to have you as part of our {degree_year} community.
+Great news! Your {degree_year} account has been approved.
 
-Your account has been approved and is ready to use. To get started with your studies, please confirm your account by clicking the link below:
+🔗 ACTIVATE YOUR ACCOUNT
+Click this link to activate your account:
+{activation_url}
 
-🔗 Complete Your Registration: {activation_url}
+⚠️ IMPORTANT: This activation link expires in 72 hours.
 
-ACCOUNT INFORMATION:
-📧 Email: {user.email}
-🎓 Program: {degree_year}
-⏰ Access Expires: 72 hours from now
+📧 LOGIN DETAILS
+After activation, you can login with:
+- Email: {user.email}
+- Password: [your chosen password]
 
-WHAT'S INCLUDED IN YOUR ACCOUNT:
-• Complete question bank for {degree_year}
-• Practice tests and mock examinations
-• Study progress tracking and analytics
-• Access to study notes and materials
-• Performance insights and recommendations
-
-IMPORTANT: Please save this email for your records. It contains your account information and registration link.
-
-If you have any questions or need assistance, please don't hesitate to contact our support team at support@pulseprep.net.
+Need help? Contact us at support@pulseprep.net
 
 Best regards,
-Dr. Sarah Ahmed
-Academic Director
-PulsePrep Medical Education
-
----
-PulsePrep - Your Medical Education Partner
-📧 support@pulseprep.net | 🌐 pulseprep.net
-
-This email contains important account information. Please keep it for your records.
-            '''
+PulsePrep Team
+support@pulseprep.net'''
             
-            # Send with specific headers to avoid auto-deletion
+            # Send with professional headers
             email = EmailMessage(
                 subject=subject,
                 body=message,
-                from_email='Dr. Sarah Ahmed <support@pulseprep.net>',
+                from_email='PulsePrep Team <support@pulseprep.net>',
                 to=[user.email],
                 headers={
                     'X-Priority': '1',
                     'X-MSMail-Priority': 'High',
                     'Importance': 'high',
                     'X-Mailer': 'PulsePrep Education Platform',
-                    'List-Unsubscribe': '<mailto:unsubscribe@pulseprep.net>',
                     'X-Auto-Response-Suppress': 'DR, RN, NRN, OOF, AutoReply',
                 }
             )
@@ -172,7 +155,7 @@ This email contains important account information. Please keep it for your recor
                 )
                 
                 logger.info(f"Activation email sent successfully to {user.email}")
-                return True, "Account welcome email sent successfully"
+                return True, "Account activation email sent successfully"
             else:
                 error_msg = "Email sending returned False"
                 logger.error(error_msg)
@@ -211,10 +194,99 @@ This email contains important account information. Please keep it for your recor
             recipient_email=user.email,
             subject=subject if 'subject' in locals() else 'Account Activation',
             status='failed',
-            error_message=error_msg
+            error_message=error_msg if 'error_msg' in locals() else 'Unknown error'
         )
         
-        return False, error_msg
+        return False, error_msg if 'error_msg' in locals() else 'Unknown error'
+    
+    @staticmethod
+    def send_welcome_email_after_activation(user, request=None):
+        """Send comprehensive welcome email after successful activation - Template 2: Welcome + Account Details"""
+        try:
+            if request:
+                domain = request.get_host()
+                protocol = 'https' if request.is_secure() else 'http'
+            else:
+                domain = 'pulseprep.net' if not settings.DEBUG else 'localhost:8000'
+                protocol = 'https' if 'pulseprep.net' in domain else 'http'
+            
+            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Medical Studies"
+            subject = f"📚 Welcome to PulsePrep - Your {user.degree} Account is Ready!"
+            
+            # Simplified welcome email with essential details
+            message = f'''🎓 PULSEPREP ACCOUNT CONFIRMATION
+
+Dear {user.first_name} {user.last_name},
+
+Thank you for joining PulsePrep! We're excited to have you as part of our {degree_year} journey.
+
+👤 ACCOUNT DETAILS
+- Name: {user.first_name} {user.last_name}
+- Login Email: {user.email}
+- Program: {degree_year}
+- Account Activated: {timezone.now().strftime("%B %d, %Y")}
+
+🔐 LOGIN INFORMATION
+- Login Page: {protocol}://{domain}/user-management/login/
+- Username: {user.email}
+- Password: [your chosen password]
+
+📖 WHAT'S INCLUDED IN YOUR ACCOUNT
+- Complete question bank for {degree_year} with tutor + student mode support
+- Available and upcoming model papers for {degree_year} with tutor + student mode support
+- Available and upcoming mock tests for {degree_year}
+- Create easy and quick study notes to boost your preparation
+- Study progress tracking and analytics
+- Performance insights and recommendations
+- Real-time notification updates from PulsePrep
+- Everything that helps boost your productivity and enhance your preparation
+
+Welcome to PulsePrep! We're here to support your medical education journey.
+
+Best regards,
+PulsePrep Support Team
+
+---
+PulsePrep Medical Education Platform
+📧 support@pulseprep.net | 🌐 pulseprep.net
+
+© 2025 PulsePrep. All rights reserved.
+This is a confirmation email for your account. Please keep it for your records.'''
+            
+            # Send with professional headers
+            email = EmailMessage(
+                subject=subject,
+                body=message,
+                from_email='PulsePrep Support <support@pulseprep.net>',
+                to=[user.email],
+                headers={
+                    'X-Priority': '3',  # Normal priority
+                    'X-Auto-Response-Suppress': 'All',
+                    'X-Entity-Type': 'account-confirmation',
+                    'List-Unsubscribe': '<mailto:unsubscribe@pulseprep.net>',
+                }
+            )
+            
+            success = email.send(fail_silently=True)
+            
+            if success:
+                # Log welcome email
+                EmailLog.objects.create(
+                    user=user,
+                    email_type='welcome',
+                    recipient_email=user.email,
+                    subject=subject,
+                    status='sent'
+                )
+                
+                logger.info(f"Welcome email sent to {user.email}")
+                return True, "Welcome email sent successfully"
+            else:
+                return False, "Welcome email failed to send"
+                
+        except Exception as e:
+            logger.error(f"Welcome email failed for {user.email}: {str(e)}")
+            return False, f"Welcome email error: {str(e)}"
     
     @staticmethod
     def send_bulk_activation_emails(users, request=None):
@@ -239,11 +311,10 @@ This email contains important account information. Please keep it for your recor
     def send_approval_notification(user):
         """Send notification that account has been approved (without activation link)"""
         try:
-            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Student"
+            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Medical Studies"
             
             subject = f"✅ Your {user.degree} Account Application Approved"
-            message = f'''
-Hello {user.first_name},
+            message = f'''Hello {user.first_name},
 
 Great news! Your {degree_year} account application has been approved.
 
@@ -253,8 +324,7 @@ Thank you for choosing PulsePrep for your medical education journey!
 
 Best regards,
 PulsePrep Support Team
-support@pulseprep.net
-            '''
+support@pulseprep.net'''
             
             success = send_mail(
                 subject=subject,
@@ -288,94 +358,3 @@ support@pulseprep.net
             )
             
             return False
-    
-    @staticmethod
-    def send_welcome_email_after_activation(user, request=None):
-        """Send permanent welcome email after successful activation"""
-        try:
-            if request:
-                domain = request.get_host()
-                protocol = 'https' if request.is_secure() else 'http'
-            else:
-                domain = 'pulseprep.net' if not settings.DEBUG else 'localhost:8000'
-                protocol = 'https' if 'pulseprep.net' in domain else 'http'
-            
-            degree_year = f"{user.degree} Year {user.year}" if user.degree and user.year else "Student"
-            subject = f"📚 Your PulsePrep {user.degree} Study Account - Keep This Email"
-            
-            message = f'''
-🎓 PULSEPREP ACCOUNT CONFIRMATION
-
-Dear {user.first_name} {user.last_name},
-
-This email confirms your PulsePrep account setup and contains important information to keep.
-
-ACCOUNT DETAILS:
-👤 Name: {user.first_name} {user.last_name}
-📧 Login Email: {user.email}
-🎓 Program: {degree_year}
-📅 Account Activated: {timezone.now().strftime("%B %d, %Y")}
-
-LOGIN INFORMATION:
-🔗 Login Page: {protocol}://{domain}/user-management/login/
-📧 Username: {user.email}
-🔑 Password: [Your chosen password]
-
-QUICK START GUIDE:
-1. Login to your account using the link above
-2. Browse the {degree_year} question bank
-3. Take your first practice test
-4. Check your progress in Analytics
-
-SUPPORT CONTACT:
-📧 Email: support@pulseprep.net
-🕒 Support Hours: 9 AM - 6 PM (Monday - Saturday)
-
-KEEP THIS EMAIL: Save this email in a folder for easy reference. It contains your login details and will not be automatically deleted.
-
-Welcome to PulsePrep! We're here to support your medical education journey.
-
-Best regards,
-PulsePrep Support Team
-
----
-PulsePrep Medical Education Platform
-📧 support@pulseprep.net | 🌐 pulseprep.net
-
-© 2025 PulsePrep. All rights reserved.
-This is a confirmation email for your account. Please keep it for your records.
-            '''
-            
-            # Send with headers to ensure it stays
-            email = EmailMessage(
-                subject=subject,
-                body=message,
-                from_email='PulsePrep Support <support@pulseprep.net>',
-                to=[user.email],
-                headers={
-                    'X-Priority': '3',  # Normal priority
-                    'X-Auto-Response-Suppress': 'All',
-                    'X-Entity-Type': 'account-confirmation',
-                }
-            )
-            
-            success = email.send(fail_silently=True)
-            
-            if success:
-                # Log welcome email
-                EmailLog.objects.create(
-                    user=user,
-                    email_type='approval_notification',
-                    recipient_email=user.email,
-                    subject=subject,
-                    status='sent'
-                )
-                
-                logger.info(f"Welcome email sent to {user.email}")
-                return True, "Welcome email sent successfully"
-            else:
-                return False, "Welcome email failed to send"
-                
-        except Exception as e:
-            logger.error(f"Welcome email failed for {user.email}: {str(e)}")
-            return False, f"Welcome email error: {str(e)}"

@@ -1,4 +1,4 @@
-# modelpaper/models.py - UPDATED: Removed all image-related code
+# modelpaper/models.py - UPDATED: Added image support
 
 from django.db import models
 from django.utils import timezone
@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.models import Q
 
 class PaperQuestion(models.Model):
-    """Independent storage for all paper questions from CSV uploads - No image support"""
+    """Independent storage for all paper questions from CSV uploads - With image support"""
     CORRECT_ANSWER_CHOICES = [
         ('A', 'A'),
         ('B', 'B'),
@@ -56,6 +56,12 @@ class PaperQuestion(models.Model):
     explanation = models.TextField(blank=True, null=True)
     marks = models.IntegerField(default=1)
     
+    # Image fields - Added for compatibility with question bank
+    paper_image = models.CharField(max_length=255, blank=True, null=True, 
+                                  help_text="Image to display with the question (filename only)")
+    image = models.CharField(max_length=255, blank=True, null=True, 
+                           help_text="Image to display with explanation (filename only)")
+    
     # Import tracking
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
@@ -65,6 +71,32 @@ class PaperQuestion(models.Model):
         
     def __str__(self):
         return f"{self.paper_name} - {self.question_text[:50]}..."
+    
+    @property
+    def has_paper_image(self):
+        """Check if question has a paper image"""
+        return bool(self.paper_image and self.paper_image.strip())
+    
+    @property
+    def has_explanation_image(self):
+        """Check if explanation has an image"""
+        return bool(self.image and self.image.strip())
+    
+    @property
+    def paper_image_url(self):
+        """Get URL for paper image if it exists"""
+        if self.has_paper_image:
+            from django.conf import settings
+            return f"{settings.MEDIA_URL}question_images/{self.paper_image}"
+        return None
+    
+    @property
+    def explanation_image_url(self):
+        """Get URL for explanation image if it exists"""
+        if self.has_explanation_image:
+            from django.conf import settings
+            return f"{settings.MEDIA_URL}question_images/{self.image}"
+        return None
     
     @classmethod
     def get_available_paper_names(cls):
@@ -101,6 +133,37 @@ class PaperQuestion(models.Model):
             'subjects': list(questions.values_list('subject', flat=True).distinct().exclude(subject='')),
             'topics': list(questions.values_list('topic', flat=True).distinct().exclude(topic=''))
         }
+    
+    @classmethod
+    def get_stats(cls):
+        """Get basic statistics for paper questions"""
+        total_questions = cls.objects.count()
+        
+        stats = {
+            'total_questions': total_questions,
+            'by_degree': {},
+            'by_difficulty': {},
+            'recent_count': cls.objects.filter(
+                created_at__gte=timezone.now() - timezone.timedelta(days=7)
+            ).count(),
+            'with_paper_images': cls.objects.exclude(
+                Q(paper_image__isnull=True) | Q(paper_image__exact='')
+            ).count(),
+            'with_explanation_images': cls.objects.exclude(
+                Q(image__isnull=True) | Q(image__exact='')
+            ).count(),
+            'paper_names_count': cls.objects.values('paper_name').distinct().count(),
+        }
+        
+        # Count by degree
+        for degree, _ in cls.DEGREE_CHOICES:
+            stats['by_degree'][degree] = cls.objects.filter(degree=degree).count()
+        
+        # Count by difficulty
+        for difficulty, _ in cls.DIFFICULTY_CHOICES:
+            stats['by_difficulty'][difficulty] = cls.objects.filter(difficulty=difficulty).count()
+        
+        return stats
 
 
 # Keep the rest of the models exactly the same...

@@ -5,3 +5,1202 @@ INFO 2025-06-28 20:07:35,712 autoreload 16296 9400 D:\PulsePrepProject\config\se
 INFO 2025-06-28 20:07:47,247 autoreload 13908 15760 Watching for file changes with StatReloader
 INFO 2025-06-28 20:12:08,875 autoreload 11384 2704 Watching for file changes with StatReloader
 INFO 2025-06-28 20:15:08,916 autoreload 15740 1252 Watching for file changes with StatReloader
+INFO 2025-06-28 21:09:55,583 autoreload 5684 14276 Watching for file changes with StatReloader
+ERROR 2025-06-28 21:10:02,056 exception 5684 12084 Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\utils\deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+WARNING 2025-06-28 21:10:02,352 log 5684 12084 Bad Request: /questionbank/manage-csv/
+WARNING 2025-06-28 21:10:02,354 basehttp 5684 12084 "GET /questionbank/manage-csv/ HTTP/1.1" 400 83949
+ERROR 2025-06-28 21:10:02,627 exception 5684 6760 Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\utils\deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\middleware\common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\http\request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+WARNING 2025-06-28 21:10:02,705 log 5684 6760 Bad Request: /favicon.ico
+WARNING 2025-06-28 21:10:02,708 basehttp 5684 6760 "GET /favicon.ico HTTP/1.1" 400 83231
+INFO 2025-06-28 21:10:38,691 autoreload 5684 14276 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-28 21:10:41,300 autoreload 10812 13108 Watching for file changes with StatReloader
+ERROR 2025-06-28 21:10:46,161 log 10812 5168 Internal Server Error: /questionbank/manage-csv/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\questionbank\views.py", line 263, in manage_csv
+    return render(request, 'questionbank/manage_csv.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 1008, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'export_paper_questions' with no arguments not found. 1 pattern(s) tried: ['modelpaper/export/(?P<paper_id>[0-9]+)/\\Z']
+ERROR 2025-06-28 21:10:46,178 basehttp 10812 5168 "GET /questionbank/manage-csv/ HTTP/1.1" 500 149357
+WARNING 2025-06-28 21:10:46,441 log 10812 5168 Not Found: /favicon.ico
+WARNING 2025-06-28 21:10:46,443 basehttp 10812 5168 "GET /favicon.ico HTTP/1.1" 404 11401
+INFO 2025-06-28 21:46:02,482 autoreload 10812 13108 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-28 21:46:04,389 autoreload 14712 14732 Watching for file changes with StatReloader
+INFO 2025-06-28 21:46:11,216 basehttp 14712 15272 "GET /questionbank/manage-csv/ HTTP/1.1" 200 34875
+INFO 2025-06-28 21:46:11,333 basehttp 14712 15272 "GET /static/css/MQstyles.css HTTP/1.1" 200 30488
+INFO 2025-06-28 21:46:11,635 basehttp 14712 15272 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-28 21:46:11,674 basehttp 14712 15272 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-28 21:46:11,700 basehttp 14712 9284 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-28 21:46:24,289 basehttp 14712 2672 "GET /questionbank/questionbank/ HTTP/1.1" 200 44160
+INFO 2025-06-28 21:46:33,477 basehttp 14712 2672 "GET /dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-28 21:46:33,512 basehttp 14712 2672 "GET /login/?next=/dashboard/ HTTP/1.1" 200 5782
+INFO 2025-06-28 21:46:36,753 basehttp 14712 13612 "POST /login/?next=/dashboard/ HTTP/1.1" 302 0
+INFO 2025-06-28 21:46:36,880 basehttp 14712 13612 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-28 21:46:36,982 basehttp 14712 13612 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:36,996 basehttp 14712 18040 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:37,050 basehttp 14712 18040 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:37,081 basehttp 14712 2736 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-28 21:46:37,108 basehttp 14712 13612 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:37,146 basehttp 14712 17804 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-28 21:46:37,155 basehttp 14712 17324 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,385 basehttp 14712 17324 "GET /images/ HTTP/1.1" 200 61513
+INFO 2025-06-28 21:46:40,512 basehttp 14712 17324 "GET /images/usage-summary/30/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:40,541 basehttp 14712 18040 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,578 basehttp 14712 17804 "GET /media/question_images/zzzzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,594 basehttp 14712 13612 "GET /media/question_images/zzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,631 basehttp 14712 7476 "GET /media/question_images/ccc.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,677 basehttp 14712 2736 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,688 basehttp 14712 13612 "GET /media/question_images/mtt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,722 basehttp 14712 17324 "GET /media/question_images/mttt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,764 basehttp 14712 17804 "GET /media/question_images/aaaaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-28 21:46:40,788 basehttp 14712 13612 "GET /images/usage-summary/27/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:40,810 basehttp 14712 7476 "GET /images/usage-summary/28/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:40,857 basehttp 14712 18040 "GET /images/usage-summary/29/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:40,881 basehttp 14712 17804 "GET /media/question_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,917 basehttp 14712 2736 "GET /images/usage-summary/26/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:40,947 basehttp 14712 13612 "GET /media/question_images/aaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-28 21:46:40,950 basehttp 14712 17324 "GET /media/question_images/dental_xray_canine.png HTTP/1.1" 200 5251
+INFO 2025-06-28 21:46:40,966 basehttp 14712 7476 "GET /media/question_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-28 21:46:40,991 basehttp 14712 2736 "GET /images/usage-summary/25/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:41,048 basehttp 14712 2736 "GET /images/usage-summary/24/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:41,141 basehttp 14712 2736 "GET /images/usage-summary/22/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:41,254 basehttp 14712 2736 "GET /images/usage-summary/8/ HTTP/1.1" 200 76
+INFO 2025-06-28 21:46:41,348 basehttp 14712 2736 "GET /images/usage-summary/7/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:41,454 basehttp 14712 2736 "GET /images/usage-summary/4/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:46:41,548 basehttp 14712 2736 "GET /images/usage-summary/3/ HTTP/1.1" 200 71
+INFO 2025-06-28 21:48:18,322 basehttp 14712 10860 "GET /questionbank/manage-csv/ HTTP/1.1" 200 34875
+INFO 2025-06-28 23:55:57,757 autoreload 1600 18244 Watching for file changes with StatReloader
+INFO 2025-06-29 00:03:13,409 autoreload 1600 18244 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 00:03:14,992 autoreload 14348 18108 Watching for file changes with StatReloader
+INFO 2025-06-29 00:03:35,746 autoreload 14348 18108 D:\PulsePrepProject\manageimage\models.py changed, reloading.
+INFO 2025-06-29 00:03:37,547 autoreload 18224 14404 Watching for file changes with StatReloader
+INFO 2025-06-29 00:09:37,359 autoreload 18224 14404 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 00:09:38,926 autoreload 17356 5092 Watching for file changes with StatReloader
+INFO 2025-06-29 00:14:24,825 autoreload 17356 5092 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 00:14:26,581 autoreload 6816 14328 Watching for file changes with StatReloader
+INFO 2025-06-29 00:14:38,889 autoreload 6816 14328 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 00:14:40,454 autoreload 6500 10404 Watching for file changes with StatReloader
+INFO 2025-06-29 00:14:50,620 autoreload 6500 10404 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 00:14:52,046 autoreload 12592 5152 Watching for file changes with StatReloader
+INFO 2025-06-29 00:15:09,607 autoreload 12592 5152 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 00:15:11,565 autoreload 10824 1952 Watching for file changes with StatReloader
+ERROR 2025-06-29 00:21:16,430 log 10824 6748 Internal Server Error: /questionbank/manage-csv/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\questionbank\views.py", line 263, in manage_csv
+    return render(request, 'questionbank/manage_csv.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 1008, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'export_paper_questions' with no arguments not found. 1 pattern(s) tried: ['modelpaper/export/(?P<paper_id>[0-9]+)/\\Z']
+ERROR 2025-06-29 00:21:16,449 basehttp 10824 6748 "GET /questionbank/manage-csv/ HTTP/1.1" 500 149220
+INFO 2025-06-29 00:40:20,650 autoreload 10824 1952 D:\PulsePrepProject\questionbank\urls.py changed, reloading.
+INFO 2025-06-29 00:40:22,380 autoreload 15356 3432 Watching for file changes with StatReloader
+INFO 2025-06-29 00:52:27,718 basehttp 15356 6148 "GET / HTTP/1.1" 200 11131
+INFO 2025-06-29 00:52:27,787 basehttp 15356 6148 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+WARNING 2025-06-29 00:52:27,799 log 15356 6148 Not Found: /script.js
+WARNING 2025-06-29 00:52:27,801 basehttp 15356 6148 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 00:52:30,107 basehttp 15356 6148 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 00:52:30,693 basehttp 15356 6148 "GET /login/ HTTP/1.1" 200 5782
+INFO 2025-06-29 00:52:33,613 basehttp 15356 6148 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 00:52:33,701 basehttp 15356 6148 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-29 00:52:33,797 basehttp 15356 6148 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 00:52:33,824 basehttp 15356 15308 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 00:52:33,860 basehttp 15356 16724 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 00:52:33,873 basehttp 15356 15320 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 00:52:33,899 basehttp 15356 17612 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 00:52:33,906 basehttp 15356 6148 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 00:52:33,925 basehttp 15356 7784 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 00:52:36,642 basehttp 15356 7784 "GET /questionbank/manage-csv/ HTTP/1.1" 200 69848
+INFO 2025-06-29 00:55:05,321 autoreload 15356 3432 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 00:55:06,370 autoreload 15176 16044 Watching for file changes with StatReloader
+INFO 2025-06-29 01:06:27,498 autoreload 15176 16044 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 01:06:28,425 autoreload 3632 13552 Watching for file changes with StatReloader
+INFO 2025-06-29 01:06:35,061 autoreload 3632 13552 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 01:06:35,923 autoreload 12412 17004 Watching for file changes with StatReloader
+INFO 2025-06-29 01:07:34,829 autoreload 12412 17004 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 01:07:35,564 autoreload 14372 17308 Watching for file changes with StatReloader
+INFO 2025-06-29 01:08:31,395 autoreload 14372 17308 D:\PulsePrepProject\questionbank\urls.py changed, reloading.
+INFO 2025-06-29 01:08:32,219 autoreload 2728 1528 Watching for file changes with StatReloader
+INFO 2025-06-29 01:08:37,654 autoreload 2728 1528 D:\PulsePrepProject\questionbank\urls.py changed, reloading.
+INFO 2025-06-29 01:08:38,423 autoreload 6128 6092 Watching for file changes with StatReloader
+INFO 2025-06-29 01:09:31,822 autoreload 6128 6092 D:\PulsePrepProject\questionbank\urls.py changed, reloading.
+INFO 2025-06-29 01:09:32,599 autoreload 348 17648 Watching for file changes with StatReloader
+INFO 2025-06-29 01:09:36,077 autoreload 348 17648 D:\PulsePrepProject\questionbank\urls.py changed, reloading.
+INFO 2025-06-29 01:09:36,953 autoreload 15148 3452 Watching for file changes with StatReloader
+INFO 2025-06-29 01:12:12,266 autoreload 15148 3452 D:\PulsePrepProject\manageimage\models.py changed, reloading.
+INFO 2025-06-29 01:12:13,185 autoreload 8056 6656 Watching for file changes with StatReloader
+INFO 2025-06-29 01:12:22,119 autoreload 8056 6656 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:12:23,687 autoreload 16272 11500 Watching for file changes with StatReloader
+INFO 2025-06-29 01:20:07,944 autoreload 16272 11500 D:\PulsePrepProject\manageimage\models.py changed, reloading.
+INFO 2025-06-29 01:20:08,853 autoreload 17964 1236 Watching for file changes with StatReloader
+INFO 2025-06-29 01:21:04,703 autoreload 17964 1236 D:\PulsePrepProject\manageimage\models.py changed, reloading.
+INFO 2025-06-29 01:21:05,514 autoreload 15812 2404 Watching for file changes with StatReloader
+INFO 2025-06-29 01:21:33,707 autoreload 15812 2404 D:\PulsePrepProject\questionbank\views.py changed, reloading.
+INFO 2025-06-29 01:21:34,484 autoreload 13504 10732 Watching for file changes with StatReloader
+INFO 2025-06-29 01:28:53,100 autoreload 10356 16804 Watching for file changes with StatReloader
+INFO 2025-06-29 01:28:53,913 basehttp 10356 6164 "GET /questionbank/manage-csv/ HTTP/1.1" 200 86694
+INFO 2025-06-29 01:29:00,706 basehttp 10356 6164 "GET /images/ HTTP/1.1" 200 60715
+INFO 2025-06-29 01:29:00,928 basehttp 10356 6164 "GET /media/question_images/zzzzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:00,958 basehttp 10356 316 "GET /media/question_images/zzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:00,978 basehttp 10356 7900 "GET /media/question_images/ccc.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:00,994 basehttp 10356 12996 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:01,015 basehttp 10356 6164 "GET /media/question_images/mttt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:01,047 basehttp 10356 12996 "GET /media/question_images/aaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 01:29:01,090 basehttp 10356 316 "GET /media/question_images/aaaaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 01:29:01,103 basehttp 10356 3480 "GET /media/question_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:01,118 basehttp 10356 7900 "GET /media/question_images/mtt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:01,139 basehttp 10356 6164 "GET /media/question_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:29:01,198 basehttp 10356 2104 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+WARNING 2025-06-29 01:29:01,207 log 10356 12996 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:29:01,208 basehttp 10356 12996 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,242 log 10356 316 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:29:01,243 basehttp 10356 316 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,271 log 10356 12996 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:29:01,273 basehttp 10356 12996 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,288 log 10356 6164 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:29:01,288 basehttp 10356 6164 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,315 log 10356 3480 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:29:01,315 basehttp 10356 3480 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,346 log 10356 316 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:29:01,346 basehttp 10356 316 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,378 log 10356 12996 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:29:01,378 basehttp 10356 12996 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:29:01,393 log 10356 2104 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:29:01,396 basehttp 10356 2104 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:29:01,411 log 10356 6164 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:29:01,412 basehttp 10356 6164 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:29:01,420 log 10356 3480 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:29:01,430 basehttp 10356 3480 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:29:01,446 log 10356 316 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:29:01,447 basehttp 10356 316 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:29:01,461 log 10356 7900 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:29:01,467 basehttp 10356 7900 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+INFO 2025-06-29 01:29:01,495 basehttp 10356 316 "GET /media/question_images/dental_xray_canine.png HTTP/1.1" 200 5251
+INFO 2025-06-29 01:29:58,934 basehttp 10356 9868 "GET /questionbank/manage-csv/ HTTP/1.1" 200 86694
+INFO 2025-06-29 01:30:22,593 basehttp 10356 13436 "POST /modelpaper/import-questions/ HTTP/1.1" 200 140
+INFO 2025-06-29 01:30:26,857 basehttp 10356 13436 "GET /questionbank/manage-csv/ HTTP/1.1" 200 86717
+INFO 2025-06-29 01:30:31,038 basehttp 10356 13436 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-29 01:30:31,123 basehttp 10356 13436 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:30:31,138 basehttp 10356 6544 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:30:31,156 basehttp 10356 6804 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:30:31,174 basehttp 10356 6320 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 01:30:31,191 basehttp 10356 6416 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:30:31,205 basehttp 10356 13436 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 01:30:31,226 basehttp 10356 8976 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 01:30:33,686 basehttp 10356 16328 "GET /modelpaper/ HTTP/1.1" 200 48785
+INFO 2025-06-29 01:31:14,684 basehttp 10356 4312 "GET /modelpaper/create/?paper_name=model%20image%20update HTTP/1.1" 200 20055
+INFO 2025-06-29 01:31:44,023 basehttp 10356 3932 "GET / HTTP/1.1" 200 11151
+WARNING 2025-06-29 01:31:44,101 log 10356 3932 Not Found: /script.js
+WARNING 2025-06-29 01:31:44,103 basehttp 10356 3932 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 01:31:50,296 basehttp 10356 11532 "GET /modelpaper/ HTTP/1.1" 200 48785
+INFO 2025-06-29 01:31:53,892 basehttp 10356 12124 "GET /modelpaper/questions/model%20image%20update/ HTTP/1.1" 200 15222
+INFO 2025-06-29 01:32:03,907 basehttp 10356 13492 "GET /images/ HTTP/1.1" 200 60715
+WARNING 2025-06-29 01:32:04,026 log 10356 7140 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:32:04,026 basehttp 10356 7140 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,038 log 10356 13492 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:32:04,038 basehttp 10356 13492 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,059 log 10356 15344 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:32:04,059 basehttp 10356 15344 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,091 log 10356 7140 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:32:04,091 basehttp 10356 7140 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,118 log 10356 15820 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:32:04,121 basehttp 10356 15820 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,126 log 10356 13492 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:32:04,133 basehttp 10356 13492 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,162 log 10356 13720 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:32:04,162 basehttp 10356 13720 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,175 log 10356 15344 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:32:04,176 basehttp 10356 15344 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:32:04,186 log 10356 7140 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:32:04,188 basehttp 10356 7140 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:32:04,198 log 10356 14936 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:32:04,200 basehttp 10356 14936 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:32:04,223 log 10356 13492 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:32:04,224 basehttp 10356 13492 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:32:04,257 log 10356 15820 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:32:04,257 basehttp 10356 15820 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:33:17,853 log 10356 15196 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:33:17,854 basehttp 10356 15196 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+INFO 2025-06-29 01:33:45,977 basehttp 10356 6696 "GET /images/ HTTP/1.1" 200 60715
+WARNING 2025-06-29 01:33:46,067 log 10356 6696 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:33:46,067 basehttp 10356 6696 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,101 log 10356 17432 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:33:46,101 basehttp 10356 17432 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,112 log 10356 5508 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:33:46,121 basehttp 10356 5508 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,148 log 10356 17432 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:33:46,148 basehttp 10356 17432 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,174 log 10356 16040 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:33:46,177 basehttp 10356 16040 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,187 log 10356 6696 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:33:46,187 basehttp 10356 6696 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,202 log 10356 5508 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:33:46,202 basehttp 10356 5508 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:33:46,220 log 10356 16868 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:33:46,220 basehttp 10356 16868 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:33:46,250 log 10356 17432 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:33:46,252 basehttp 10356 17432 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:33:46,262 log 10356 6696 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:33:46,263 basehttp 10356 6696 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:33:46,281 log 10356 16040 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:33:46,283 basehttp 10356 16040 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:33:46,295 log 10356 7468 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:33:46,296 basehttp 10356 7468 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:34:08,791 log 10356 7828 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:34:08,793 basehttp 10356 7828 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+INFO 2025-06-29 01:34:51,152 autoreload 10356 16804 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:34:52,148 autoreload 4044 12840 Watching for file changes with StatReloader
+WARNING 2025-06-29 01:35:06,483 log 4044 14588 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:35:06,483 basehttp 4044 14588 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+INFO 2025-06-29 01:41:39,970 autoreload 4044 12840 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:41:40,817 autoreload 15764 15284 Watching for file changes with StatReloader
+INFO 2025-06-29 01:41:51,284 autoreload 15764 15284 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:41:52,007 autoreload 1364 2764 Watching for file changes with StatReloader
+INFO 2025-06-29 01:44:53,338 autoreload 1364 2764 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:44:54,159 autoreload 15356 14620 Watching for file changes with StatReloader
+INFO 2025-06-29 01:45:01,547 autoreload 15356 14620 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:45:02,355 autoreload 2404 12384 Watching for file changes with StatReloader
+INFO 2025-06-29 01:45:32,091 basehttp 2404 12020 "GET /images/ HTTP/1.1" 200 61171
+WARNING 2025-06-29 01:45:32,198 log 2404 12020 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:45:32,199 basehttp 2404 12020 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,230 log 2404 17624 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:45:32,232 basehttp 2404 17624 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,252 log 2404 16368 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:45:32,252 basehttp 2404 16368 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,266 log 2404 16856 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:45:32,266 basehttp 2404 16856 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,278 log 2404 7668 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:45:32,278 basehttp 2404 7668 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,309 log 2404 17624 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:45:32,309 basehttp 2404 17624 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,332 log 2404 12020 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:45:32,332 basehttp 2404 12020 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,352 log 2404 1996 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:45:32,352 basehttp 2404 1996 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:32,367 log 2404 7668 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:45:32,367 basehttp 2404 7668 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:32,386 log 2404 16856 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:45:32,387 basehttp 2404 16856 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:32,399 log 2404 16368 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:45:32,400 basehttp 2404 16368 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:32,411 log 2404 17624 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:45:32,412 basehttp 2404 17624 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+INFO 2025-06-29 01:45:34,607 basehttp 2404 18036 "GET /images/ HTTP/1.1" 200 61171
+WARNING 2025-06-29 01:45:34,711 log 2404 18036 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:45:34,711 basehttp 2404 18036 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,743 log 2404 7372 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:45:34,743 basehttp 2404 7372 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,767 log 2404 13908 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:45:34,770 basehttp 2404 13908 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,780 log 2404 18036 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:45:34,780 basehttp 2404 18036 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,810 log 2404 7372 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:45:34,810 basehttp 2404 7372 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,843 log 2404 18036 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:45:34,845 basehttp 2404 18036 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:34,866 log 2404 12504 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:45:34,868 basehttp 2404 12504 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,880 log 2404 7372 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:45:34,881 basehttp 2404 7372 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:34,890 log 2404 18036 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:45:34,891 basehttp 2404 18036 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:34,904 log 2404 6248 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:45:34,904 basehttp 2404 6248 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:34,932 log 2404 13908 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:45:34,933 basehttp 2404 13908 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:45:34,957 log 2404 16080 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:45:34,957 basehttp 2404 16080 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:45:48,910 log 2404 7656 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:45:48,910 basehttp 2404 7656 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+INFO 2025-06-29 01:47:53,536 autoreload 2404 12384 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:47:54,403 autoreload 17548 17204 Watching for file changes with StatReloader
+INFO 2025-06-29 01:48:02,704 basehttp 17548 11984 "GET /images/ HTTP/1.1" 200 61171
+WARNING 2025-06-29 01:48:02,785 log 17548 11984 Not Found: /manageimage/usage-summary/30/
+WARNING 2025-06-29 01:48:02,796 basehttp 17548 11984 "GET /manageimage/usage-summary/30/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,805 log 17548 15496 Not Found: /manageimage/usage-summary/29/
+WARNING 2025-06-29 01:48:02,807 basehttp 17548 15496 "GET /manageimage/usage-summary/29/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,836 log 17548 16828 Not Found: /manageimage/usage-summary/25/
+WARNING 2025-06-29 01:48:02,836 basehttp 17548 16828 "GET /manageimage/usage-summary/25/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,856 log 17548 15880 Not Found: /manageimage/usage-summary/26/
+WARNING 2025-06-29 01:48:02,856 basehttp 17548 15880 "GET /manageimage/usage-summary/26/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,891 log 17548 15496 Not Found: /manageimage/usage-summary/22/
+WARNING 2025-06-29 01:48:02,891 basehttp 17548 15496 "GET /manageimage/usage-summary/22/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,920 log 17548 14372 Not Found: /manageimage/usage-summary/28/
+WARNING 2025-06-29 01:48:02,920 basehttp 17548 14372 "GET /manageimage/usage-summary/28/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,937 log 17548 15880 Not Found: /manageimage/usage-summary/7/
+WARNING 2025-06-29 01:48:02,937 basehttp 17548 15880 "GET /manageimage/usage-summary/7/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:48:02,975 log 17548 14612 Not Found: /manageimage/usage-summary/27/
+WARNING 2025-06-29 01:48:02,977 basehttp 17548 14612 "GET /manageimage/usage-summary/27/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:02,989 log 17548 16828 Not Found: /manageimage/usage-summary/8/
+WARNING 2025-06-29 01:48:02,990 basehttp 17548 16828 "GET /manageimage/usage-summary/8/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:48:03,006 log 17548 11984 Not Found: /manageimage/usage-summary/24/
+WARNING 2025-06-29 01:48:03,007 basehttp 17548 11984 "GET /manageimage/usage-summary/24/ HTTP/1.1" 404 11455
+WARNING 2025-06-29 01:48:03,037 log 17548 14372 Not Found: /manageimage/usage-summary/3/
+WARNING 2025-06-29 01:48:03,037 basehttp 17548 14372 "GET /manageimage/usage-summary/3/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:48:03,061 log 17548 15496 Not Found: /manageimage/usage-summary/4/
+WARNING 2025-06-29 01:48:03,063 basehttp 17548 15496 "GET /manageimage/usage-summary/4/ HTTP/1.1" 404 11452
+WARNING 2025-06-29 01:48:12,519 log 17548 16736 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:48:12,521 basehttp 17548 16736 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+WARNING 2025-06-29 01:48:33,011 log 17548 7756 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:48:33,014 basehttp 17548 7756 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+WARNING 2025-06-29 01:48:39,119 log 17548 14368 Not Found: /manageimage/usage/28/
+WARNING 2025-06-29 01:48:39,119 basehttp 17548 14368 "GET /manageimage/usage/28/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:48:41,203 log 17548 14368 Not Found: /manageimage/usage/28/
+WARNING 2025-06-29 01:48:41,204 basehttp 17548 14368 "GET /manageimage/usage/28/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:48:42,825 log 17548 14368 Not Found: /manageimage/usage/28/
+WARNING 2025-06-29 01:48:42,825 basehttp 17548 14368 "GET /manageimage/usage/28/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:48:43,869 log 17548 14368 Not Found: /manageimage/usage/28/
+WARNING 2025-06-29 01:48:43,870 basehttp 17548 14368 "GET /manageimage/usage/28/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:48:44,084 log 17548 14236 Not Found: /manageimage/usage/28/
+WARNING 2025-06-29 01:48:44,084 basehttp 17548 14236 "GET /manageimage/usage/28/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:48:45,484 log 17548 14236 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:48:45,484 basehttp 17548 14236 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:49:05,311 log 17548 5248 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:49:05,311 basehttp 17548 5248 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+INFO 2025-06-29 01:50:30,207 autoreload 17548 17204 D:\PulsePrepProject\manageimage\urls.py changed, reloading.
+INFO 2025-06-29 01:50:31,089 autoreload 13608 8736 Watching for file changes with StatReloader
+WARNING 2025-06-29 01:50:42,977 log 13608 6996 Not Found: /manageimage/upload/
+WARNING 2025-06-29 01:50:42,978 basehttp 13608 6996 "POST /manageimage/upload/ HTTP/1.1" 404 11426
+WARNING 2025-06-29 01:50:50,732 log 13608 3040 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:50:50,732 basehttp 13608 3040 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:50:51,528 log 13608 3040 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:50:51,528 basehttp 13608 3040 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:50:51,690 log 13608 3040 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:50:51,691 basehttp 13608 3040 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:50:51,862 log 13608 3040 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:50:51,863 basehttp 13608 3040 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+WARNING 2025-06-29 01:50:52,084 log 13608 3040 Not Found: /manageimage/usage/29/
+WARNING 2025-06-29 01:50:52,085 basehttp 13608 3040 "GET /manageimage/usage/29/ HTTP/1.1" 404 11431
+ERROR 2025-06-29 01:51:41,401 views 13608 9884 Error in debug_upload: Object of type WindowsPath is not JSON serializable
+ERROR 2025-06-29 01:51:41,403 log 13608 9884 Internal Server Error: /images/debug-upload/
+ERROR 2025-06-29 01:51:41,404 basehttp 13608 9884 "GET /images/debug-upload/ HTTP/1.1" 500 130
+INFO 2025-06-29 01:55:59,351 autoreload 13608 8736 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 01:56:00,897 autoreload 10920 17308 Watching for file changes with StatReloader
+INFO 2025-06-29 01:56:21,066 autoreload 10920 17308 D:\PulsePrepProject\manageimage\urls.py changed, reloading.
+INFO 2025-06-29 01:56:22,483 autoreload 12128 2984 Watching for file changes with StatReloader
+INFO 2025-06-29 02:00:30,338 autoreload 12128 2984 D:\PulsePrepProject\manageimage\views.py changed, reloading.
+INFO 2025-06-29 02:00:31,820 autoreload 15532 10896 Watching for file changes with StatReloader
+INFO 2025-06-29 02:01:40,570 autoreload 15532 10896 D:\PulsePrepProject\manageimage\urls.py changed, reloading.
+INFO 2025-06-29 02:01:42,088 autoreload 7896 16376 Watching for file changes with StatReloader
+INFO 2025-06-29 02:37:31,877 autoreload 7896 16376 D:\PulsePrepProject\manageimage\models.py changed, reloading.
+INFO 2025-06-29 02:37:33,781 autoreload 10344 15808 Watching for file changes with StatReloader
+INFO 2025-06-29 02:38:55,434 autoreload 11468 12240 Watching for file changes with StatReloader
+INFO 2025-06-29 02:39:01,673 basehttp 11468 8032 "GET /images/ HTTP/1.1" 200 62317
+INFO 2025-06-29 02:39:01,863 basehttp 11468 11124 "GET /media/question_images/yyy.jpeg HTTP/1.1" 304 0
+INFO 2025-06-29 02:39:01,879 basehttp 11468 8032 "GET /media/question_images/zzzzz.jpeg HTTP/1.1" 304 0
+INFO 2025-06-29 02:39:01,899 basehttp 11468 8072 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 304 0
+INFO 2025-06-29 02:39:01,928 basehttp 11468 12012 "GET /media/question_images/zzz.jpeg HTTP/1.1" 304 0
+INFO 2025-06-29 02:39:01,961 basehttp 11468 8032 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,027 basehttp 11468 8032 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,108 basehttp 11468 8032 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,206 basehttp 11468 8032 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,308 basehttp 11468 8032 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,394 basehttp 11468 8032 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,511 basehttp 11468 8032 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,618 basehttp 11468 8032 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,725 basehttp 11468 8032 "GET /images/usage-summary/8/ HTTP/1.1" 200 245
+INFO 2025-06-29 02:39:02,807 basehttp 11468 8032 "GET /images/usage-summary/7/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:02,907 basehttp 11468 8032 "GET /images/usage-summary/4/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:03,005 basehttp 11468 8032 "GET /images/usage-summary/3/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:24,531 basehttp 11468 9012 "POST /images/upload/ HTTP/1.1" 200 356
+INFO 2025-06-29 02:39:26,610 basehttp 11468 9012 "GET /images/ HTTP/1.1" 200 62246
+INFO 2025-06-29 02:39:26,756 basehttp 11468 16640 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:26,807 basehttp 11468 16640 "GET /images/usage-summary/31/ HTTP/1.1" 200 230
+INFO 2025-06-29 02:39:26,914 basehttp 11468 9012 "GET /media/question_images/mmmmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 02:39:26,939 basehttp 11468 14624 "GET /media/question_images/mmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 02:39:26,958 basehttp 11468 16640 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:26,990 basehttp 11468 14624 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,091 basehttp 11468 14624 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,185 basehttp 11468 14624 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,294 basehttp 11468 14624 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,386 basehttp 11468 14624 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,490 basehttp 11468 14624 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,599 basehttp 11468 14624 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:39:27,693 basehttp 11468 14624 "GET /images/usage-summary/8/ HTTP/1.1" 200 245
+INFO 2025-06-29 02:39:27,795 basehttp 11468 14624 "GET /images/usage-summary/7/ HTTP/1.1" 200 240
+INFO 2025-06-29 02:49:50,162 basehttp 11468 13172 "GET / HTTP/1.1" 200 11131
+INFO 2025-06-29 02:49:50,210 basehttp 11468 13172 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+INFO 2025-06-29 02:49:50,254 basehttp 11468 16520 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 02:49:50,277 log 11468 16520 Not Found: /script.js
+WARNING 2025-06-29 02:49:50,280 basehttp 11468 16520 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 02:49:51,802 basehttp 11468 16520 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 02:49:52,278 basehttp 11468 16520 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+INFO 2025-06-29 02:50:03,731 basehttp 11468 16128 "GET /questionbank/questionbank/ HTTP/1.1" 200 44160
+INFO 2025-06-29 02:50:06,774 basehttp 11468 5484 "GET /modelpaper/ HTTP/1.1" 200 48785
+INFO 2025-06-29 02:50:11,762 basehttp 11468 5484 "GET /modelpaper/create/ HTTP/1.1" 200 20055
+INFO 2025-06-29 02:51:07,746 basehttp 11468 11876 "POST /modelpaper/create/ HTTP/1.1" 302 0
+INFO 2025-06-29 02:51:07,829 basehttp 11468 11876 "GET /modelpaper/ HTTP/1.1" 200 49582
+INFO 2025-06-29 02:51:18,739 basehttp 11468 6552 "GET /login/ HTTP/1.1" 200 5782
+INFO 2025-06-29 02:51:18,782 basehttp 11468 6552 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 02:51:18,805 basehttp 11468 6552 "GET /static/css/user_management/signup.css HTTP/1.1" 200 7009
+INFO 2025-06-29 02:51:30,483 basehttp 11468 16164 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 02:51:30,582 basehttp 11468 16164 "GET /dashboard/ HTTP/1.1" 200 66136
+INFO 2025-06-29 02:51:30,663 basehttp 11468 16164 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 02:51:32,708 basehttp 11468 16164 "GET /modelpaper/student/ HTTP/1.1" 200 79454
+INFO 2025-06-29 02:51:35,449 basehttp 11468 2776 "GET /modelpaper/take/12/ HTTP/1.1" 302 0
+INFO 2025-06-29 02:51:35,526 basehttp 11468 2776 "GET /modelpaper/student/ HTTP/1.1" 200 79452
+INFO 2025-06-29 02:52:57,188 basehttp 11468 1460 "GET /questionbank/manage-csv/ HTTP/1.1" 200 86717
+INFO 2025-06-29 02:53:07,124 basehttp 11468 4460 "POST /modelpaper/import-questions/ HTTP/1.1" 200 140
+INFO 2025-06-29 02:53:10,591 basehttp 11468 4460 "GET /questionbank/manage-csv/ HTTP/1.1" 200 86740
+INFO 2025-06-29 02:53:17,621 basehttp 11468 16204 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 02:53:19,848 basehttp 11468 16204 "GET /modelpaper/take/12/ HTTP/1.1" 200 99135
+WARNING 2025-06-29 02:53:20,007 log 11468 16204 Not Found: /modelpaper/take/12/${question.questionImageUrl}
+WARNING 2025-06-29 02:53:20,007 basehttp 11468 16204 "GET /modelpaper/take/12/$%7Bquestion.questionImageUrl%7D HTTP/1.1" 404 16607
+INFO 2025-06-29 10:22:29,016 autoreload 13304 5532 Watching for file changes with StatReloader
+INFO 2025-06-29 10:22:30,287 basehttp 13304 8272 "GET / HTTP/1.1" 200 11131
+WARNING 2025-06-29 10:22:30,372 log 13304 8272 Not Found: /script.js
+WARNING 2025-06-29 10:22:30,372 basehttp 13304 8272 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 10:22:37,932 basehttp 13304 2228 "GET / HTTP/1.1" 200 11131
+WARNING 2025-06-29 10:22:38,013 log 13304 2228 Not Found: /script.js
+WARNING 2025-06-29 10:22:38,013 basehttp 13304 2228 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 10:22:40,987 basehttp 13304 2228 "GET /login/ HTTP/1.1" 200 5782
+INFO 2025-06-29 10:22:56,099 basehttp 13304 2228 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 10:22:56,200 basehttp 13304 2228 "GET /dashboard/ HTTP/1.1" 200 66128
+INFO 2025-06-29 10:22:56,400 basehttp 13304 2228 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:23:06,390 basehttp 13304 2228 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 10:23:08,386 basehttp 13304 2228 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66128
+INFO 2025-06-29 10:23:12,040 basehttp 13304 2228 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 10:23:14,128 basehttp 13304 2228 "GET /mocktest/student/ HTTP/1.1" 200 64177
+INFO 2025-06-29 10:23:23,069 basehttp 13304 2228 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 10:23:34,082 basehttp 13304 2228 "GET /notes/ HTTP/1.1" 200 430990
+INFO 2025-06-29 10:23:52,973 basehttp 13304 8272 "GET /login/ HTTP/1.1" 200 5782
+INFO 2025-06-29 10:23:56,258 basehttp 13304 8272 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 10:23:56,336 basehttp 13304 8272 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-29 10:23:56,409 basehttp 13304 8272 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:23:56,461 basehttp 13304 5680 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:23:56,482 basehttp 13304 7604 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:23:56,513 basehttp 13304 8272 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 10:23:56,533 basehttp 13304 9728 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:23:56,544 basehttp 13304 6556 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 10:23:56,575 basehttp 13304 7184 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:26:51,786 basehttp 13304 2228 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 10:26:54,343 basehttp 13304 2228 "GET /modelpaper/take/12/ HTTP/1.1" 200 88968
+INFO 2025-06-29 10:26:57,028 basehttp 13304 2228 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 313
+INFO 2025-06-29 10:27:05,993 basehttp 13304 2228 "POST /modelpaper/report-warning/ HTTP/1.1" 200 94
+INFO 2025-06-29 10:27:06,347 basehttp 13304 2228 "POST /modelpaper/report-warning/ HTTP/1.1" 200 94
+INFO 2025-06-29 10:40:54,134 autoreload 2516 15736 Watching for file changes with StatReloader
+INFO 2025-06-29 10:40:58,477 basehttp 2516 13504 "GET /modelpaper/take/12/ HTTP/1.1" 200 136203
+INFO 2025-06-29 10:40:58,639 basehttp 2516 13504 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 10:41:01,686 basehttp 2516 13504 "GET /modelpaper/take/12/ HTTP/1.1" 200 136203
+INFO 2025-06-29 10:41:04,057 basehttp 2516 13504 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 10:41:04,123 basehttp 2516 13504 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 10:41:04,143 basehttp 2516 10032 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 10:41:07,947 basehttp 2516 15720 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 313
+INFO 2025-06-29 10:41:18,243 basehttp 2516 15720 "POST /modelpaper/report-warning/ HTTP/1.1" 200 135
+INFO 2025-06-29 10:41:22,786 basehttp 2516 14428 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-29 10:41:22,840 basehttp 2516 14428 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 10:41:22,891 basehttp 2516 14428 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 10:41:22,919 basehttp 2516 6776 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:41:22,954 basehttp 2516 14428 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:41:22,996 basehttp 2516 6776 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:41:23,010 basehttp 2516 14428 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:41:23,042 basehttp 2516 6776 "GET /static/js/DAscript.js HTTP/1.1" 200 14880
+INFO 2025-06-29 10:41:23,340 basehttp 2516 6776 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 10:41:23,386 basehttp 2516 6776 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:41:23,455 basehttp 2516 6776 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 10:41:26,359 basehttp 2516 6776 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 10:41:26,414 basehttp 2516 6776 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 10:41:26,418 basehttp 2516 14428 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 10:41:49,245 basehttp 2516 14452 "POST /modelpaper/report-warning/ HTTP/1.1" 200 135
+INFO 2025-06-29 10:41:49,302 basehttp 2516 15720 "GET /modelpaper/result/43/ HTTP/1.1" 200 48558
+INFO 2025-06-29 10:41:49,349 basehttp 2516 14796 "POST /modelpaper/report-warning/ HTTP/1.1" 200 135
+INFO 2025-06-29 10:41:52,006 basehttp 2516 14796 "GET /modelpaper/result/43/ HTTP/1.1" 200 48558
+INFO 2025-06-29 10:41:55,094 basehttp 2516 14796 "GET /modelpaper/result/43/ HTTP/1.1" 200 48558
+INFO 2025-06-29 10:41:55,137 basehttp 2516 15040 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 10:41:55,204 basehttp 2516 14796 - Broken pipe from ('127.0.0.1', 51129)
+INFO 2025-06-29 10:41:55,275 basehttp 2516 14452 - Broken pipe from ('127.0.0.1', 51128)
+INFO 2025-06-29 10:41:55,308 basehttp 2516 15720 - Broken pipe from ('127.0.0.1', 51099)
+INFO 2025-06-29 10:43:19,059 autoreload 2516 15736 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 10:43:20,700 autoreload 15832 15692 Watching for file changes with StatReloader
+INFO 2025-06-29 10:53:46,790 autoreload 15832 15692 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 10:53:48,222 autoreload 15796 10744 Watching for file changes with StatReloader
+INFO 2025-06-29 10:54:34,375 autoreload 15796 10744 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 10:54:35,666 autoreload 14104 12080 Watching for file changes with StatReloader
+INFO 2025-06-29 10:54:55,935 basehttp 14104 6152 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 10:54:56,076 basehttp 14104 6152 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:55:04,939 basehttp 14104 6152 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 10:55:08,437 basehttp 14104 6152 "GET /modelpaper/take/12/ HTTP/1.1" 200 141135
+INFO 2025-06-29 10:58:53,476 autoreload 13860 13912 Watching for file changes with StatReloader
+INFO 2025-06-29 10:58:55,695 basehttp 13860 14508 "GET /modelpaper/take/12/ HTTP/1.1" 200 137177
+INFO 2025-06-29 10:58:55,842 basehttp 13860 14508 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 10:59:08,656 basehttp 13860 13604 "GET / HTTP/1.1" 200 11151
+INFO 2025-06-29 10:59:08,814 basehttp 13860 13604 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+INFO 2025-06-29 10:59:08,837 basehttp 13860 15168 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 10:59:09,032 log 13860 15168 Not Found: /script.js
+WARNING 2025-06-29 10:59:09,035 basehttp 13860 15168 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 10:59:12,213 basehttp 13860 15168 "GET /dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 10:59:12,322 basehttp 13860 15168 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 10:59:14,767 basehttp 13860 15168 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 10:59:15,400 basehttp 13860 15168 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 10:59:18,794 basehttp 13860 15168 "GET /modelpaper/take/12/ HTTP/1.1" 200 137177
+INFO 2025-06-29 10:59:18,816 basehttp 13860 15168 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:01:15,669 autoreload 13860 13912 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 11:01:17,424 autoreload 8220 10656 Watching for file changes with StatReloader
+INFO 2025-06-29 11:01:58,623 autoreload 8220 10656 D:\PulsePrepProject\modelpaper\urls.py changed, reloading.
+INFO 2025-06-29 11:02:00,186 autoreload 5712 14748 Watching for file changes with StatReloader
+INFO 2025-06-29 11:03:24,001 basehttp 5712 12476 "GET /modelpaper/take/12/ HTTP/1.1" 200 88970
+INFO 2025-06-29 11:03:24,086 basehttp 5712 12476 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:03:25,138 basehttp 5712 12476 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:03:25,170 basehttp 5712 12476 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 11:03:25,186 basehttp 5712 11692 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 11:03:26,331 basehttp 5712 6084 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 314
+INFO 2025-06-29 11:03:32,253 basehttp 5712 6084 "POST /modelpaper/report-warning/ HTTP/1.1" 200 94
+INFO 2025-06-29 11:03:33,337 basehttp 5712 6084 "POST /modelpaper/report-warning/ HTTP/1.1" 200 94
+INFO 2025-06-29 11:08:36,464 autoreload 13940 13840 Watching for file changes with StatReloader
+INFO 2025-06-29 11:16:38,776 basehttp 13940 14616 "GET /dashboard/ HTTP/1.1" 200 36614
+INFO 2025-06-29 11:16:39,035 basehttp 13940 14616 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:16:39,091 basehttp 13940 14616 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 11:16:39,129 basehttp 13940 6496 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:16:39,153 basehttp 13940 14616 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:16:39,218 basehttp 13940 6496 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:16:39,234 basehttp 13940 6496 "GET /static/js/DAscript.js HTTP/1.1" 200 14880
+INFO 2025-06-29 11:16:39,243 basehttp 13940 14616 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:16:40,997 basehttp 13940 9132 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 11:16:41,071 basehttp 13940 9132 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:16:41,132 basehttp 13940 9132 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 11:20:53,743 basehttp 13940 14124 "GET /modelpaper/take/12/ HTTP/1.1" 200 88970
+INFO 2025-06-29 11:20:53,805 basehttp 13940 14124 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:20:58,129 basehttp 13940 14952 "POST /modelpaper/report-warning/ HTTP/1.1" 200 135
+INFO 2025-06-29 11:20:58,197 basehttp 13940 7608 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+INFO 2025-06-29 11:20:58,236 basehttp 13940 14952 "GET /modelpaper/result/44/ HTTP/1.1" 200 48702
+INFO 2025-06-29 11:20:58,277 basehttp 13940 14952 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:20:58,315 basehttp 13940 7304 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 11:20:59,900 basehttp 13940 14952 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:20:59,932 basehttp 13940 14952 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 11:20:59,943 basehttp 13940 8888 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 11:21:00,149 basehttp 13940 11344 "GET / HTTP/1.1" 200 11151
+INFO 2025-06-29 11:21:00,220 basehttp 13940 11344 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+INFO 2025-06-29 11:21:00,223 basehttp 13940 14492 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:21:00,260 log 13940 6860 Not Found: /script.js
+WARNING 2025-06-29 11:21:00,260 basehttp 13940 6860 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 11:21:01,117 basehttp 13940 6860 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 11:21:03,673 basehttp 13940 6860 "GET /dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 11:21:03,766 basehttp 13940 6860 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:21:23,436 basehttp 13940 7608 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:21:33,279 basehttp 13940 12112 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 11:21:49,474 basehttp 13940 4416 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 11:21:51,620 basehttp 13940 4416 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:21:53,115 basehttp 13940 4416 "GET /mocktest/student/ HTTP/1.1" 200 63681
+INFO 2025-06-29 11:21:54,436 basehttp 13940 4416 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 11:21:55,687 basehttp 13940 13544 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 11:21:57,853 basehttp 13940 13544 "GET /myaccount/ HTTP/1.1" 200 61437
+INFO 2025-06-29 11:22:00,549 basehttp 13940 13544 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:22:02,896 basehttp 13940 13544 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 11:22:04,448 basehttp 13940 13544 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:22:06,409 basehttp 13940 1504 "GET /mocktest/student/ HTTP/1.1" 200 63681
+INFO 2025-06-29 11:22:08,164 basehttp 13940 1504 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:22:09,531 basehttp 13940 1504 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 11:22:11,153 basehttp 13940 1504 "GET /managemodule/student/ HTTP/1.1" 200 423821
+INFO 2025-06-29 11:22:13,126 basehttp 13940 1504 "GET /mocktest/student/ HTTP/1.1" 200 63681
+INFO 2025-06-29 11:22:14,420 basehttp 13940 1504 "GET /modelpaper/student/ HTTP/1.1" 200 78958
+INFO 2025-06-29 11:22:16,438 basehttp 13940 792 "GET /notes/ HTTP/1.1" 200 430990
+INFO 2025-06-29 11:22:18,046 basehttp 13940 792 "GET /myaccount/ HTTP/1.1" 200 61437
+INFO 2025-06-29 11:22:19,558 basehttp 13940 792 "GET /notification/student/ HTTP/1.1" 200 51495
+INFO 2025-06-29 11:22:21,865 basehttp 13940 792 "GET /myaccount/ HTTP/1.1" 200 61437
+INFO 2025-06-29 11:22:23,022 basehttp 13940 792 "GET /notification/student/ HTTP/1.1" 200 51495
+INFO 2025-06-29 11:22:34,975 basehttp 13940 15488 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 11:23:02,487 basehttp 13940 15720 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 11:23:24,395 basehttp 13940 9076 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66128
+INFO 2025-06-29 11:29:27,472 basehttp 13940 12720 "GET /modelpaper/result/44/ HTTP/1.1" 200 54822
+INFO 2025-06-29 11:29:27,590 basehttp 13940 12720 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:29:30,660 log 13940 11460 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 11:29:30,661 basehttp 13940 11460 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 11:29:30,714 log 13940 14280 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 11:29:30,716 basehttp 13940 14280 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 11:29:30,779 log 13940 11460 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 11:29:30,784 basehttp 13940 11460 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 11:29:30,823 log 13940 15196 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 11:29:30,828 basehttp 13940 15196 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 11:30:58,656 basehttp 13940 3600 "GET /images/ HTTP/1.1" 200 62625
+INFO 2025-06-29 11:30:58,693 basehttp 13940 3600 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:30:58,701 basehttp 13940 3600 "GET /static/css/MQstyles.css HTTP/1.1" 200 30488
+INFO 2025-06-29 11:31:00,210 basehttp 13940 3600 "GET /media/question_images/mmmmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,233 basehttp 13940 15980 "GET /media/question_images/mmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,289 basehttp 13940 15992 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,303 basehttp 13940 3600 "GET /media/question_images/ccc.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,342 basehttp 13940 1240 "GET /media/question_images/zzzzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,373 basehttp 13940 15708 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,398 basehttp 13940 13652 "GET /media/question_images/zzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,421 basehttp 13940 15980 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,482 basehttp 13940 15992 "GET /media/question_images/mttt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,545 basehttp 13940 3600 "GET /media/question_images/aaaaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 11:31:00,554 basehttp 13940 1240 "GET /images/usage-summary/31/ HTTP/1.1" 200 230
+INFO 2025-06-29 11:31:00,572 basehttp 13940 13652 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,617 basehttp 13940 15992 "GET /media/question_images/mtt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,659 basehttp 13940 1240 "GET /media/question_images/aaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 11:31:00,673 basehttp 13940 15980 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,714 basehttp 13940 3600 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,751 basehttp 13940 13652 "GET /media/question_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:31:00,773 basehttp 13940 15980 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,843 basehttp 13940 15980 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:00,934 basehttp 13940 15980 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:01,039 basehttp 13940 15980 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:01,131 basehttp 13940 15980 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:01,231 basehttp 13940 15980 "GET /images/usage-summary/8/ HTTP/1.1" 200 245
+INFO 2025-06-29 11:31:01,329 basehttp 13940 15980 "GET /images/usage-summary/7/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:31:07,145 basehttp 13940 3036 "GET /images/usage/32/ HTTP/1.1" 200 1289
+INFO 2025-06-29 11:31:24,731 basehttp 13940 15624 "GET /modelpaper/questions/model%20image%20update/ HTTP/1.1" 200 18890
+INFO 2025-06-29 11:31:24,804 basehttp 13940 15624 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 11:31:24,823 basehttp 13940 15624 "GET /static/css/MQstyles.css HTTP/1.1" 200 30488
+INFO 2025-06-29 11:31:24,823 basehttp 13940 10796 "GET /static/js/DAscript.js HTTP/1.1" 200 14880
+INFO 2025-06-29 11:31:24,831 basehttp 13940 15300 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 11:32:51,542 basehttp 13940 3976 "POST /images/upload/ HTTP/1.1" 200 356
+INFO 2025-06-29 11:32:53,660 basehttp 13940 3976 "GET /images/ HTTP/1.1" 200 62268
+INFO 2025-06-29 11:32:53,773 basehttp 13940 8068 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+INFO 2025-06-29 11:32:53,798 basehttp 13940 13968 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+WARNING 2025-06-29 11:32:53,831 basehttp 13940 13968 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+INFO 2025-06-29 11:32:53,834 basehttp 13940 4644 "GET /media/question_images/nnn.jpeg HTTP/1.1" 200 10238
+WARNING 2025-06-29 11:32:53,855 basehttp 13940 4644 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 11:32:53,865 basehttp 13940 3976 "GET /media/question_images/nnnnn.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 11:32:53,889 basehttp 13940 8068 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:53,927 basehttp 13940 8068 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,096 basehttp 13940 8068 "GET /images/usage-summary/31/ HTTP/1.1" 200 230
+INFO 2025-06-29 11:32:54,142 basehttp 13940 8068 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,235 basehttp 13940 8068 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,328 basehttp 13940 8068 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,433 basehttp 13940 8068 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,523 basehttp 13940 8068 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,630 basehttp 13940 8068 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,726 basehttp 13940 8068 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:32:54,832 basehttp 13940 8068 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 11:33:15,844 basehttp 13940 9124 "GET /modelpaper/result/44/ HTTP/1.1" 200 54822
+INFO 2025-06-29 11:33:15,972 basehttp 13940 9124 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:33:18,563 log 13940 14296 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 11:33:18,563 basehttp 13940 14296 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 11:33:18,586 log 13940 9124 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 11:33:18,591 basehttp 13940 9124 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 11:33:18,657 log 13940 14296 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 11:33:18,660 basehttp 13940 14296 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+WARNING 2025-06-29 11:33:18,699 log 13940 9124 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 11:33:18,699 basehttp 13940 9124 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+INFO 2025-06-29 11:37:11,343 basehttp 13940 14964 "GET /modelpaper/result/44/ HTTP/1.1" 200 54822
+INFO 2025-06-29 11:37:11,452 basehttp 13940 14964 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 11:37:15,766 log 13940 14964 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 11:37:15,768 basehttp 13940 14964 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 11:37:15,795 log 13940 14892 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 11:37:15,795 basehttp 13940 14892 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 11:37:15,844 log 13940 11564 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 11:37:15,850 basehttp 13940 11564 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 11:37:15,864 log 13940 14644 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 11:37:15,867 basehttp 13940 14644 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 13:12:32,287 autoreload 15164 5432 Watching for file changes with StatReloader
+INFO 2025-06-29 13:12:40,707 basehttp 15164 7260 "GET /modelpaper/result/44/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:12:40,817 basehttp 15164 7260 "GET /login/?next=/modelpaper/result/44/ HTTP/1.1" 200 5782
+INFO 2025-06-29 13:12:41,026 basehttp 15164 14784 "GET /static/css/user_management/signup.css HTTP/1.1" 200 7009
+INFO 2025-06-29 13:12:41,030 basehttp 15164 7260 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 13:12:41,030 basehttp 15164 14820 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 13:12:41,107 basehttp 15164 14820 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 13:12:41,172 basehttp 15164 14820 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 13:12:41,179 basehttp 15164 7260 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 13:12:51,372 basehttp 15164 14784 "POST /login/?next=/modelpaper/result/44/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:12:51,579 basehttp 15164 14784 "GET /dashboard/ HTTP/1.1" 200 66141
+INFO 2025-06-29 13:12:51,680 basehttp 15164 14784 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:12:57,441 basehttp 15164 14784 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 13:13:03,068 basehttp 15164 14784 "GET /modelpaper/student/ HTTP/1.1" 200 79454
+INFO 2025-06-29 13:13:07,398 basehttp 15164 14784 "GET /modelpaper/take/12/ HTTP/1.1" 200 92928
+INFO 2025-06-29 13:13:17,374 basehttp 15164 14784 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 367
+INFO 2025-06-29 13:13:22,735 basehttp 15164 14784 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 363
+INFO 2025-06-29 13:13:28,248 basehttp 15164 14784 "POST /modelpaper/submit-paper/ HTTP/1.1" 200 136
+INFO 2025-06-29 13:13:29,835 basehttp 15164 14784 "GET /modelpaper/result/45/ HTTP/1.1" 200 55008
+INFO 2025-06-29 13:18:17,112 autoreload 15164 5432 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 13:18:18,816 autoreload 2400 4600 Watching for file changes with StatReloader
+INFO 2025-06-29 13:19:26,870 autoreload 2400 4600 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 13:19:28,312 autoreload 4184 14676 Watching for file changes with StatReloader
+INFO 2025-06-29 13:21:11,206 autoreload 13488 15480 Watching for file changes with StatReloader
+INFO 2025-06-29 13:22:34,490 autoreload 13488 15480 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 13:22:35,876 autoreload 7084 16072 Watching for file changes with StatReloader
+INFO 2025-06-29 13:22:46,496 basehttp 7084 7928 "GET /modelpaper/result/45/ HTTP/1.1" 200 55008
+INFO 2025-06-29 13:23:03,094 basehttp 7084 7928 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66126
+INFO 2025-06-29 13:23:03,255 basehttp 7084 7928 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:23:19,618 basehttp 7084 7928 "GET /modelpaper/student/ HTTP/1.1" 200 79533
+INFO 2025-06-29 13:23:22,226 basehttp 7084 7928 "GET /modelpaper/take/12/ HTTP/1.1" 200 92928
+INFO 2025-06-29 13:26:08,295 autoreload 7084 16072 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 13:26:09,923 autoreload 15356 15452 Watching for file changes with StatReloader
+ERROR 2025-06-29 13:28:15,516 log 15356 16108 Internal Server Error: /modelpaper/take/12/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\decorators.py", line 207, in wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\modelpaper\views.py", line 125, in take_paper
+    'paper_image_url': pq.paper_image_url,
+                       ^^^^^^^^^^^^^^^^^^
+TypeError: 'property' object is not callable
+ERROR 2025-06-29 13:28:15,526 basehttp 15356 16108 "GET /modelpaper/take/12/?practice_mode=student HTTP/1.1" 500 91830
+WARNING 2025-06-29 13:28:15,706 log 15356 16108 Not Found: /favicon.ico
+WARNING 2025-06-29 13:28:15,706 basehttp 15356 16108 "GET /favicon.ico HTTP/1.1" 404 11401
+INFO 2025-06-29 13:28:44,725 basehttp 15356 16108 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66124
+INFO 2025-06-29 13:28:47,602 basehttp 15356 16108 "GET /modelpaper/student/ HTTP/1.1" 200 79533
+ERROR 2025-06-29 13:28:49,923 log 15356 16108 Internal Server Error: /modelpaper/take/12/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\decorators.py", line 207, in wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\modelpaper\views.py", line 125, in take_paper
+    'paper_image_url': pq.paper_image_url,
+                       ^^^^^^^^^^^^^^^^^^
+TypeError: 'property' object is not callable
+ERROR 2025-06-29 13:28:49,930 basehttp 15356 16108 "GET /modelpaper/take/12/ HTTP/1.1" 500 91193
+INFO 2025-06-29 13:28:53,907 basehttp 15356 16108 "GET /modelpaper/student/ HTTP/1.1" 200 79533
+INFO 2025-06-29 13:28:59,588 basehttp 15356 16108 "GET /dashboard/student/progress/ HTTP/1.1" 200 53234
+INFO 2025-06-29 13:29:02,718 basehttp 15356 16108 "GET /modelpaper/progress/ HTTP/1.1" 200 64082
+INFO 2025-06-29 13:29:02,823 basehttp 15356 16108 "GET /static/js/DAscript.js HTTP/1.1" 200 14880
+ERROR 2025-06-29 13:29:08,970 log 15356 16108 Internal Server Error: /modelpaper/result/45/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\decorators.py", line 207, in wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\modelpaper\views.py", line 210, in paper_result
+    'paper_image_url': paper_question.paper_image_url,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'property' object is not callable
+ERROR 2025-06-29 13:29:08,976 basehttp 15356 16108 "GET /modelpaper/result/45/ HTTP/1.1" 500 90863
+INFO 2025-06-29 13:29:24,448 autoreload 15356 15452 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 13:29:26,006 autoreload 10228 9008 Watching for file changes with StatReloader
+ERROR 2025-06-29 13:29:31,127 log 10228 4948 Internal Server Error: /modelpaper/result/45/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 60, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\decorators.py", line 207, in wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\modelpaper\views.py", line 210, in paper_result
+    'paper_image_url': paper_question.paper_image_url,
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'property' object is not callable
+ERROR 2025-06-29 13:29:31,133 basehttp 10228 4948 "GET /modelpaper/result/45/ HTTP/1.1" 500 91000
+INFO 2025-06-29 13:30:24,994 autoreload 10228 9008 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 13:30:26,584 autoreload 10680 8400 Watching for file changes with StatReloader
+INFO 2025-06-29 13:30:51,450 autoreload 10680 8400 D:\PulsePrepProject\modelpaper\models.py changed, reloading.
+INFO 2025-06-29 13:30:52,978 autoreload 7256 2296 Watching for file changes with StatReloader
+INFO 2025-06-29 13:30:58,540 basehttp 7256 5116 "GET /modelpaper/result/45/ HTTP/1.1" 200 54984
+WARNING 2025-06-29 13:31:01,806 log 7256 7032 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 13:31:01,810 basehttp 7256 7032 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 13:31:01,877 log 7256 5116 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 13:31:01,882 basehttp 7256 5116 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 13:31:01,936 log 7256 7032 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 13:31:01,940 basehttp 7256 7032 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 13:31:01,952 log 7256 16992 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 13:31:01,956 basehttp 7256 16992 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 13:31:12,166 basehttp 7256 16992 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66124
+INFO 2025-06-29 13:31:30,891 basehttp 7256 9604 "GET /images/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:31:30,902 basehttp 7256 9604 "GET /login/?next=/images/ HTTP/1.1" 200 5782
+INFO 2025-06-29 13:31:31,142 basehttp 7256 9604 "GET /static/css/DAstyles.css HTTP/1.1" 200 23997
+INFO 2025-06-29 13:31:31,147 basehttp 7256 5256 "GET /static/css/user_management/signup.css HTTP/1.1" 200 7009
+INFO 2025-06-29 13:31:31,151 basehttp 7256 9604 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 13:31:33,188 basehttp 7256 9604 "GET /modelpaper/questions/model%20image%20update/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:31:33,204 basehttp 7256 9604 "GET /login/?next=/modelpaper/questions/model%2520image%2520update/ HTTP/1.1" 200 5782
+INFO 2025-06-29 13:50:37,441 autoreload 7256 2296 D:\PulsePrepProject\user_management\email_service.py changed, reloading.
+INFO 2025-06-29 13:50:39,395 autoreload 16832 15100 Watching for file changes with StatReloader
+INFO 2025-06-29 13:51:23,220 autoreload 16832 15100 D:\PulsePrepProject\user_management\email_service.py changed, reloading.
+INFO 2025-06-29 13:51:24,588 autoreload 10900 8116 Watching for file changes with StatReloader
+INFO 2025-06-29 13:52:44,754 autoreload 10900 8116 D:\PulsePrepProject\user_management\email_service.py changed, reloading.
+INFO 2025-06-29 13:52:46,144 autoreload 14832 7656 Watching for file changes with StatReloader
+INFO 2025-06-29 13:52:52,678 autoreload 14832 7656 D:\PulsePrepProject\user_management\email_service.py changed, reloading.
+INFO 2025-06-29 13:52:54,152 autoreload 7280 5596 Watching for file changes with StatReloader
+INFO 2025-06-29 13:54:29,403 autoreload 7280 5596 D:\PulsePrepProject\user_management\email_service.py changed, reloading.
+INFO 2025-06-29 13:54:30,739 autoreload 11504 4048 Watching for file changes with StatReloader
+INFO 2025-06-29 13:54:57,883 basehttp 11504 15364 "POST /login/?next=/images/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:54:58,140 basehttp 11504 15364 "GET /dashboard/ HTTP/1.1" 200 36619
+INFO 2025-06-29 13:54:58,350 basehttp 11504 15364 "GET /media/profile_images/bbb.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:54:58,378 basehttp 11504 10464 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:54:58,427 basehttp 11504 15364 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:54:58,439 basehttp 11504 15364 "GET /static/js/DAscript.js HTTP/1.1" 200 14880
+INFO 2025-06-29 13:54:58,445 basehttp 11504 10464 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:54:58,501 basehttp 11504 10464 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 13:54:58,548 basehttp 11504 10464 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 13:54:58,608 basehttp 11504 10464 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 13:55:04,115 basehttp 11504 10464 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41718
+WARNING 2025-06-29 13:55:04,210 basehttp 11504 10112 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:55:04,212 basehttp 11504 10464 "GET /static/admin/css/base.css HTTP/1.1" 200 22092
+INFO 2025-06-29 13:55:04,223 basehttp 11504 7040 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-06-29 13:55:04,225 basehttp 11504 12636 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6878
+INFO 2025-06-29 13:55:04,225 basehttp 11504 2056 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2804
+INFO 2025-06-29 13:55:04,263 basehttp 11504 4736 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17972
+INFO 2025-06-29 13:55:04,281 basehttp 11504 2056 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-06-29 13:55:04,284 basehttp 11504 4640 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-06-29 13:55:04,314 basehttp 11504 12636 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-06-29 13:55:04,331 basehttp 11504 10464 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:55:04,349 basehttp 11504 4736 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9097
+INFO 2025-06-29 13:55:04,362 basehttp 11504 4640 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-06-29 13:55:04,372 basehttp 11504 2056 "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+INFO 2025-06-29 13:55:04,382 basehttp 11504 12636 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-06-29 13:55:04,423 basehttp 11504 2056 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2025-06-29 13:55:04,423 basehttp 11504 12636 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-06-29 13:55:04,448 basehttp 11504 7040 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-06-29 13:55:04,503 basehttp 11504 7040 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-06-29 13:55:04,538 basehttp 11504 7040 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-06-29 13:55:04,540 basehttp 11504 10464 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-06-29 13:55:04,603 basehttp 11504 7040 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-06-29 13:55:04,606 basehttp 11504 10464 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-06-29 13:55:04,606 basehttp 11504 12636 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-06-29 13:55:04,606 basehttp 11504 2056 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-06-29 13:55:04,731 basehttp 11504 2056 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+WARNING 2025-06-29 13:55:04,834 log 11504 2056 Not Found: /favicon.ico
+WARNING 2025-06-29 13:55:04,835 basehttp 11504 2056 "GET /favicon.ico HTTP/1.1" 404 11401
+INFO 2025-06-29 13:55:16,983 basehttp 11504 16812 "POST /admin/user_management/customuser/ HTTP/1.1" 200 26751
+WARNING 2025-06-29 13:55:17,031 basehttp 11504 16812 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:55:17,073 basehttp 11504 3244 "GET /static/admin/js/cancel.js HTTP/1.1" 200 884
+INFO 2025-06-29 13:55:17,123 basehttp 11504 3244 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:55:20,516 basehttp 11504 3244 "POST /admin/user_management/customuser/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:55:20,613 basehttp 11504 3244 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41854
+WARNING 2025-06-29 13:55:20,675 basehttp 11504 11772 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:55:20,703 basehttp 11504 3244 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:55:20,795 basehttp 11504 3244 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:55:50,813 basehttp 11504 8404 "GET /managemodule/student/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:55:50,845 basehttp 11504 8404 "GET /login/?next=/managemodule/student/ HTTP/1.1" 200 5782
+INFO 2025-06-29 13:55:51,313 basehttp 11504 12452 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:55:53,977 basehttp 11504 15208 "GET /signup/ HTTP/1.1" 200 11558
+INFO 2025-06-29 13:56:21,336 basehttp 11504 16524 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:56:43,169 basehttp 11504 2488 "POST /signup/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:56:43,194 basehttp 11504 2488 "GET /login/ HTTP/1.1" 200 6123
+WARNING 2025-06-29 13:56:51,005 log 11504 3304 Forbidden (CSRF token from POST incorrect.): /login/
+WARNING 2025-06-29 13:56:51,016 basehttp 11504 3304 "POST /login/?next=/modelpaper/questions/model%2520image%2520update/ HTTP/1.1" 403 2503
+INFO 2025-06-29 13:56:51,288 basehttp 11504 3304 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:57:01,203 basehttp 11504 16708 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41632
+WARNING 2025-06-29 13:57:01,255 basehttp 11504 14940 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:57:01,278 basehttp 11504 16708 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:57:01,363 basehttp 11504 16708 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:57:31,371 basehttp 11504 16708 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:57:53,442 basehttp 11504 16708 "POST /admin/user_management/customuser/ HTTP/1.1" 302 0
+INFO 2025-06-29 13:57:53,554 basehttp 11504 16708 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41986
+WARNING 2025-06-29 13:57:53,612 basehttp 11504 7360 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:57:53,636 basehttp 11504 16708 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:57:53,753 basehttp 11504 16708 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:58:24,329 basehttp 11504 16708 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:58:46,999 autoreload 11504 4048 D:\PulsePrepProject\user_management\admin.py changed, reloading.
+INFO 2025-06-29 13:58:48,752 autoreload 3484 8832 Watching for file changes with StatReloader
+INFO 2025-06-29 13:58:51,629 basehttp 3484 16308 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41848
+WARNING 2025-06-29 13:58:51,692 basehttp 3484 5832 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:58:51,932 basehttp 3484 16308 "GET /static/admin/css/base.css HTTP/1.1" 200 22092
+INFO 2025-06-29 13:58:51,956 basehttp 3484 6364 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2804
+INFO 2025-06-29 13:58:51,966 basehttp 3484 16608 "GET /static/admin/js/theme.js HTTP/1.1" 200 1653
+INFO 2025-06-29 13:58:51,976 basehttp 3484 16608 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-06-29 13:58:51,976 basehttp 3484 16308 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:58:51,986 basehttp 3484 16668 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6878
+INFO 2025-06-29 13:58:51,992 basehttp 3484 16608 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2025-06-29 13:58:51,992 basehttp 3484 2320 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2025-06-29 13:58:52,007 basehttp 3484 8872 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17972
+INFO 2025-06-29 13:58:52,011 basehttp 3484 16308 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9097
+INFO 2025-06-29 13:58:52,012 basehttp 3484 16608 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-06-29 13:58:52,016 basehttp 3484 2320 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-06-29 13:58:52,016 basehttp 3484 16668 "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+INFO 2025-06-29 13:58:52,036 basehttp 3484 6364 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2025-06-29 13:58:52,038 basehttp 3484 2320 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-06-29 13:58:52,043 basehttp 3484 16668 "GET /static/images/Logo.png HTTP/1.1" 200 68700
+INFO 2025-06-29 13:58:52,047 basehttp 3484 8872 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2025-06-29 13:58:52,061 basehttp 3484 8872 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2025-06-29 13:58:52,068 basehttp 3484 8872 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-06-29 13:58:52,081 basehttp 3484 8872 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-06-29 13:58:52,094 basehttp 3484 8872 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-06-29 13:58:52,094 basehttp 3484 16668 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-06-29 13:58:52,102 basehttp 3484 2320 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-06-29 13:58:52,102 basehttp 3484 6364 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-06-29 13:58:52,175 basehttp 3484 6364 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+WARNING 2025-06-29 13:58:52,232 log 3484 6364 Not Found: /favicon.ico
+WARNING 2025-06-29 13:58:52,235 basehttp 3484 6364 "GET /favicon.ico HTTP/1.1" 404 11401
+INFO 2025-06-29 13:59:22,316 basehttp 3484 6364 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 13:59:28,871 autoreload 3484 8832 D:\PulsePrepProject\user_management\admin.py changed, reloading.
+INFO 2025-06-29 13:59:30,441 autoreload 13920 13600 Watching for file changes with StatReloader
+INFO 2025-06-29 13:59:34,964 basehttp 13920 16036 "GET /admin/user_management/customuser/ HTTP/1.1" 200 41758
+WARNING 2025-06-29 13:59:35,018 basehttp 13920 12316 "GET /static/admin/css/disable_dark_mode.css HTTP/1.1" 404 1907
+INFO 2025-06-29 13:59:35,037 basehttp 13920 16036 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2025-06-29 13:59:35,131 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:00:05,304 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:00:35,308 basehttp 13920 15760 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:00:36,924 basehttp 13920 16036 "GET /activate/088567f1-5fba-458b-b5b4-be9a08b2a025/ HTTP/1.1" 302 0
+INFO 2025-06-29 14:00:36,960 basehttp 13920 16036 "GET /login/ HTTP/1.1" 200 6114
+INFO 2025-06-29 14:01:05,330 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:01:35,327 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:02:05,308 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:02:35,331 basehttp 13920 16036 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 200 46
+INFO 2025-06-29 14:03:45,791 autoreload 13920 13600 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 14:03:47,507 autoreload 10820 1276 Watching for file changes with StatReloader
+ERROR 2025-06-29 14:03:55,525 log 10820 14480 Internal Server Error: /admin/user_management/customuser/api/navigation-counts/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\middleware.py", line 17, in __call__
+    if request.user.is_authenticated:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\utils\functional.py", line 251, in inner
+    self._setup()
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\utils\functional.py", line 404, in _setup
+    self._wrapped = self._setupfunc()
+                    ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\middleware.py", line 37, in <lambda>
+    request.user = SimpleLazyObject(lambda: get_user(request))
+                                            ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\middleware.py", line 17, in get_user
+    request._cached_user = auth.get_user(request)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\__init__.py", line 209, in get_user
+    user_id = _get_user_session_key(request)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\__init__.py", line 62, in _get_user_session_key
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+                                               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 55, in __getitem__
+    return self._session[key]
+           ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+                          ^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 645, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
+    self._fetch_all()
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 747, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 296, in get_select
+    sql, params = self.compile(col)
+                  ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 557, in compile
+    sql, params = node.as_sql(self, self.connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\expressions.py", line 1309, in as_sql
+    sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 548, in quote_name_unless_alias
+    r = self.connection.ops.quote_name(name)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\backends\dummy\base.py", line 20, in complain
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.
+ERROR 2025-06-29 14:03:55,702 log 10820 14480 Internal Server Error: /admin/user_management/customuser/api/navigation-counts/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 244, in _get_session
+    return self._session_cache
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'SessionStore' object has no attribute '_session_cache'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\utils\deprecation.py", line 131, in __call__
+    response = self.process_response(request, response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\middleware.py", line 48, in process_response
+    if request.session.get_expire_at_browser_close():
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 403, in get_expire_at_browser_close
+    if (expiry := self.get("_session_expiry")) is None:
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 74, in get
+    return self._session.get(key, default)
+           ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\base.py", line 249, in _get_session
+    self._session_cache = self.load()
+                          ^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 55, in load
+    s = self._get_session_from_db()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\sessions\backends\db.py", line 34, in _get_session_from_db
+    return self.model.objects.get(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 645, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
+    self._fetch_all()
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 747, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 296, in get_select
+    sql, params = self.compile(col)
+                  ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 557, in compile
+    sql, params = node.as_sql(self, self.connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\expressions.py", line 1309, in as_sql
+    sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 548, in quote_name_unless_alias
+    r = self.connection.ops.quote_name(name)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\backends\dummy\base.py", line 20, in complain
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.
+ERROR 2025-06-29 14:03:55,722 basehttp 10820 14480 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 500 165083
+INFO 2025-06-29 14:04:08,399 autoreload 10820 1276 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 14:04:10,055 autoreload 11300 1816 Watching for file changes with StatReloader

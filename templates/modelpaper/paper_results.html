@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-/* Paper Results specific styles that complement DAstyles.css - NO IMAGE SUPPORT */
+
+/* Paper Results specific styles that complement DAstyles.css - WITH IMAGE SUPPORT */
 :root {
 --primary: #82272e;
 --primary-light: #a53b47;
@@ -159,6 +160,11 @@ body::before {
 .score-text {
     font-size: 24pt !important;
     color: #82272e !important;
+}
+
+/* Hide images in print */
+.question-image, .explanation-image {
+    display: none !important;
 }
 }
 
@@ -535,6 +541,34 @@ font-weight: 500;
 white-space: pre-wrap; /* Preserve line breaks and formatting */
 }
 
+/* Question Image Styles - Same as Mock Test */
+.question-image {
+margin: 16px 0;
+padding: 12px;
+background: #f8fafc;
+border-radius: 8px;
+border: 1px solid #e2e8f0;
+text-align: center;
+}
+
+.question-image img {
+max-width: 100%;
+width: auto;
+height: auto;
+max-height: clamp(200px, 40vh, 400px);
+border-radius: 8px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+border: 1px solid #e2e8f0;
+object-fit: contain;
+background: white;
+cursor: pointer;
+transition: transform 0.2s ease;
+}
+
+.question-image img:hover {
+transform: scale(1.02);
+}
+
 .options-list {
 list-style: none;
 padding: 0;
@@ -612,6 +646,97 @@ font-size: 14px;
 line-height: 1.6;
 color: var(--dark);
 white-space: pre-wrap; /* Preserve formatting in explanations */
+}
+
+/* Explanation Image Styles - Same as Mock Test */
+.explanation-image {
+margin: 16px 0;
+text-align: center;
+width: 100%;
+}
+
+.explanation-image img {
+max-width: 100%;
+width: auto;
+height: auto;
+max-height: clamp(200px, 40vh, 400px);
+border-radius: 8px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+border: 1px solid #e2e8f0;
+object-fit: contain;
+background: white;
+display: block;
+margin: 0 auto;
+cursor: pointer;
+transition: transform 0.2s ease;
+}
+
+.explanation-image img:hover {
+transform: scale(1.02);
+}
+
+.image-caption {
+font-size: 12px;
+color: var(--gray);
+margin-top: 8px;
+font-style: italic;
+}
+
+.image-error {
+background: #fef2f2;
+border: 1px solid #fecaca;
+color: #dc2626;
+padding: 12px;
+border-radius: 8px;
+text-align: center;
+font-size: 14px;
+margin: 16px 0;
+}
+
+.image-error i {
+margin-right: 8px;
+}
+
+/* Image Modal for zoomed view */
+.image-modal {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.9);
+display: none;
+align-items: center;
+justify-content: center;
+z-index: 10000;
+padding: 20px;
+}
+
+.image-modal img {
+max-width: 95%;
+max-height: 95%;
+object-fit: contain;
+border-radius: 8px;
+box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.image-modal-close {
+position: absolute;
+top: 20px;
+right: 20px;
+background: rgba(255,255,255,0.2);
+color: white;
+border: none;
+padding: 10px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 20px;
+width: 40px;
+height: 40px;
+display: flex;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(10px);
 }
 
 /* Action Buttons */
@@ -797,6 +922,10 @@ flex-wrap: wrap;
 .filter-btn {
     flex: 1;
     text-align: center;
+}
+
+.question-image img, .explanation-image img {
+    max-height: clamp(150px, 30vh, 250px);
 }
 }
 
@@ -1008,7 +1137,7 @@ Paper Results
 </div>
 </div>
 
-<!-- Enhanced Answers Review - NO IMAGE SUPPORT -->
+<!-- Enhanced Answers Review - WITH IMAGE SUPPORT -->
 {% if paper.show_explanations %}
 <div class="review-section fade-in no-print">
 <div class="review-toggle">
@@ -1051,7 +1180,21 @@ Paper Results
             
             <div class="question-text">{{ response.question.question_text }}</div>
             
-            <!-- REMOVED: All image display code -->
+            <!-- Enhanced Question Image Display -->
+            {% if response.has_paper_image and response.paper_image_url %}
+                <div class="question-image">
+                    <img src="{{ response.paper_image_url }}" 
+                         alt="Question {{ forloop.counter }} Image" 
+                         loading="lazy"
+                         onclick="openImageModal('{{ response.paper_image_url }}')"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div class="image-error" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Question image not found</span>
+                    </div>
+                    <div class="image-caption">Question Image - Click to zoom</div>
+                </div>
+            {% endif %}
             
             <ul class="options-list">
                 {% if response.question.option_a %}
@@ -1153,7 +1296,21 @@ Paper Results
                     </div>
                     <div class="explanation-text">{{ response.question.explanation }}</div>
                     
-                    <!-- REMOVED: All image support in explanations -->
+                    <!-- Enhanced Explanation Image Display -->
+                    {% if response.has_explanation_image and response.explanation_image_url %}
+                        <div class="explanation-image">
+                            <img src="{{ response.explanation_image_url }}" 
+                                 alt="Question {{ forloop.counter }} Explanation Image" 
+                                 loading="lazy"
+                                 onclick="openImageModal('{{ response.explanation_image_url }}')"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div class="image-error" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Explanation image not found</span>
+                            </div>
+                            <div class="image-caption">Explanation Image - Click to zoom</div>
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
@@ -1183,6 +1340,14 @@ Paper Results
 <p>For verification, contact PulsePrep support with reference ID: PAP-{{ attempt.id }}-{{ attempt.started_at|date:"Ymd" }}</p>
 </div>
 
+<!-- Image Modal for zoomed view -->
+<div class="image-modal" id="image-modal" onclick="closeImageModal()">
+    <button class="image-modal-close" onclick="closeImageModal()">
+        <i class="fas fa-times"></i>
+    </button>
+    <img id="modal-image" src="" alt="Zoomed Image">
+</div>
+
 <!-- Back Button Prevention Modal -->
 <div class="back-warning-modal" id="back-warning-modal">
 <div class="back-warning-content">
@@ -1201,6 +1366,19 @@ Paper Results
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Image modal functions
+function openImageModal(imageUrl) {
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    modalImage.src = imageUrl;
+    modal.style.display = 'flex';
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('image-modal');
+    modal.style.display = 'none';
+}
+
 // Enhanced back button prevention
 window.addEventListener('load', function() {
     window.history.replaceState(null, null, window.location.href);
@@ -1582,7 +1760,7 @@ document.querySelectorAll('.explanation-text').forEach(element => {
 });
 });
 
-console.log('Paper results interface initialized with print bypass - no image support');
+console.log('Paper results interface initialized with print bypass and image support');
 </script>
 </body>
 </html>

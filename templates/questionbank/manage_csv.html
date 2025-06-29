@@ -18,8 +18,6 @@
     <div class="container">
       
 <!-- Sidebar Navigation -->
-      
-<!-- Sidebar Navigation -->
 <aside class="sidebar">
   <div class="logo-container">
     <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" class="logo" />
@@ -37,12 +35,10 @@
       <i class="fas fa-file-csv"></i>
       <span>Manage CSVs</span>
     </a>
-
     <a href="{% url 'manage_images' %}" class="nav-item {% if request.resolver_match.url_name == 'manage_images' %}active{% endif %}">
       <i class="fas fa-images"></i>
       <span>Manage Images</span>
     </a>
-    
     <a href="{% url 'managemodule' %}" class="nav-item {% if request.resolver_match.url_name == 'managemodule' %}active{% endif %}">
       <i class="fas fa-cubes"></i>
       <span>Modules</span>
@@ -134,7 +130,7 @@
               </div>
             {% endif %}
             
-            <!-- Statistics Section -->
+            <!-- Statistics Section - Side by Side Layout -->
             <div class="stats-container">
               <!-- Question Bank Statistics -->
               <div class="stats-section">
@@ -183,9 +179,57 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Model Paper Statistics -->
+              <div class="stats-section">
+                <h2><i class="fas fa-file-alt"></i> Model Paper Statistics</h2>
+                <p class="section-description">Overview of model paper CSV import activities</p>
+                
+                <div class="stats-cards">
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.total_imports|default:"0" }}</h3>
+                      <p>Total Imports</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card success">
+                    <div class="stat-icon">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.successful_imports|default:"0" }}</h3>
+                      <p>Successful</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card failed">
+                    <div class="stat-icon">
+                      <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.failed_imports|default:"0" }}</h3>
+                      <p>Failed</p>
+                    </div>
+                  </div>
+                  
+                  <div class="stat-card">
+                    <div class="stat-icon">
+                      <i class="fas fa-copy"></i>
+                    </div>
+                    <div class="stat-content">
+                      <h3>{{ modelpaper_stats.total_paper_names|default:"0" }}</h3>
+                      <p>Paper Names</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Upload Section -->
+            <!-- Upload Section - Side by Side Layout -->
             <div class="upload-container">
               <!-- Question Bank Upload -->
               <div class="upload-section">
@@ -200,7 +244,6 @@
                   <p>or <button type="button" class="browse-link" data-target="questionbank">browse files</button></p>
                   <input type="file" id="questionbank-file-input" accept=".csv" style="display: none;">
                   
-<!-- Question Bank Requirements -->
                   <!-- Question Bank Requirements -->
                   <div class="file-requirements">
                     <h4><i class="fas fa-info-circle"></i> Question Bank CSV Requirements:</h4>
@@ -214,6 +257,36 @@
                       <li><strong>Note:</strong> question_image displays with MCQ options, image displays with explanation</li>
                     </ul>
                   </div>
+                </div>
+              </div>
+
+              <!-- Model Paper Upload -->
+              <div class="upload-section">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Questions for Model Papers</h2>
+                <p class="section-description">Import questions that can be used for creating model papers</p>
+                
+                <div class="upload-area" id="modelpaper-upload-area">
+                  <div class="upload-icon">
+                    <i class="fas fa-file-csv"></i>
+                  </div>
+                  <h3>Drag & Drop CSV File Here</h3>
+                  <p>or <button type="button" class="browse-link" data-target="modelpaper">browse files</button></p>
+                  <input type="file" id="modelpaper-file-input" accept=".csv" style="display: none;">
+                  
+                  <!-- Model Paper Requirements -->
+                  <div class="file-requirements">
+                    <h4><i class="fas fa-info-circle"></i> Model Paper CSV Requirements:</h4>
+                    <ul>
+                      <li><strong>Required:</strong> question_text, option_a, option_b, option_c, option_d</li>
+                      <li><strong>Paper:</strong> <strong>paper_name</strong> (e.g., "Final Exam 2024")</li>
+                      <li><strong>Classification:</strong> degree, year, module, subject, topic</li>
+                      <li><strong>Answer:</strong> correct_answer (A, B, C, D, or E)</li>
+                      <li><strong>Optional:</strong> option_e, difficulty, explanation, marks</li>
+                      <li><strong>Images:</strong> paper_image (with question), image (with explanation)</li>
+                      <li><strong>Image Format:</strong> Filename only (e.g., ecg_reading.png)</li>
+                      <li><strong>Note:</strong> paper_image displays with MCQ options, image displays with explanation</li>
+                    </ul>
+                  </div>                  
                 </div>
               </div>
             </div>
@@ -244,6 +317,21 @@
                 
                 <div class="action-card">
                   <div class="action-icon">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <div class="action-content">
+                    <h3>Model Paper Template</h3>
+                    <p>Template specifically for model paper questions with paper name</p>
+                    <div class="template-buttons">
+                      <button class="action-btn download-template" data-template="modelpaper-medical">
+                        <i class="fas fa-download"></i> Model Paper Template
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="action-card">
+                  <div class="action-icon">
                     <i class="fas fa-file-export"></i>
                   </div>
                   <div class="action-content">
@@ -253,6 +341,21 @@
                       <a href="{% url 'export_questions' %}" class="action-btn">
                         <i class="fas fa-file-export"></i> Export CSV
                       </a>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="action-card">
+                  <div class="action-icon">
+                    <i class="fas fa-file-export"></i>
+                  </div>
+                  <div class="action-content">
+                    <h3>Export Model Papers</h3>
+                    <p>Export model paper questions by paper name</p>
+                    <div class="template-buttons">
+                      <button class="action-btn" id="export-modelpaper-btn">
+                        <i class="fas fa-file-export"></i> Export Model Papers
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -273,6 +376,12 @@
                     <option value="failed">Failed Only</option>
                     <option value="processing">Processing</option>
                   </select>
+                  
+                  <select class="filter-select" id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="questionbank">Question Bank</option>
+                    <option value="modelpaper">Model Paper</option>
+                  </select>
                 </div>
               </div>
               
@@ -281,6 +390,7 @@
                   <thead>
                     <tr>
                       <th><i class="fas fa-file"></i> File Details</th>
+                      <th><i class="fas fa-tag"></i> Type</th>
                       <th><i class="fas fa-calendar"></i> Upload Date</th>
                       <th><i class="fas fa-flag"></i> Status</th>
                       <th><i class="fas fa-list-ol"></i> Total</th>
@@ -300,6 +410,59 @@
                               <span class="file-size">{{ record.file_size|filesizeformat }}</span>
                             </div>
                           </div>
+                        </td>
+                        <td>
+                          <span class="type-badge questionbank">
+                            <i class="fas fa-question-circle"></i> Question Bank
+                          </span>
+                        </td>
+                        <td>
+                          <div class="date-info">
+                            <span class="date">{{ record.uploaded_at|date:"M d, Y" }}</span>
+                            <span class="time">{{ record.uploaded_at|time:"H:i" }}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="status-badge {{ record.status|lower }}">
+                            {% if record.status == 'SUCCESS' %}
+                              <i class="fas fa-check"></i> Success
+                            {% elif record.status == 'FAILED' %}
+                              <i class="fas fa-times"></i> Failed
+                            {% else %}
+                              <i class="fas fa-clock"></i> Processing
+                            {% endif %}
+                          </span>
+                        </td>
+                        <td>
+                          <span class="number-badge">{{ record.total_rows|default:"0" }}</span>
+                        </td>
+                        <td class="success-count">{{ record.successful_imports|default:"0" }}</td>
+                        <td class="failed-count">{{ record.failed_imports|default:"0" }}</td>
+                        <td class="actions">
+                          {% if record.error_details %}
+                            <button class="btn-icon view-errors" data-errors="{{ record.error_details }}" title="View Error Details">
+                              <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+
+                    {% for record in modelpaper_history %}
+                      <tr class="history-row" data-status="{{ record.status|lower }}" data-type="modelpaper">
+                        <td>
+                          <div class="file-info">
+                            <i class="fas fa-file-csv"></i>
+                            <div class="file-details">
+                              <span class="file-name">{{ record.file_name }}</span>
+                              <span class="file-size">{{ record.file_size|filesizeformat }}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span class="type-badge modelpaper">
+                            <i class="fas fa-file-alt"></i> Model Paper
+                          </span>
                         </td>
                         <td>
                           <div class="date-info">
@@ -332,15 +495,17 @@
                         </td>
                       </tr>
                     {% empty %}
-                      <tr>
-                        <td colspan="7" class="no-data">
-                          <div class="no-data-content">
-                            <i class="fas fa-file-csv"></i>
-                            <h3>No Import History</h3>
-                            <p>You haven't uploaded any CSV files yet. Start by uploading your first file above.</p>
-                          </div>
-                        </td>
-                      </tr>
+                      {% if not questionbank_history %}
+                        <tr>
+                          <td colspan="8" class="no-data">
+                            <div class="no-data-content">
+                              <i class="fas fa-file-csv"></i>
+                              <h3>No Import History</h3>
+                              <p>You haven't uploaded any CSV files yet. Start by uploading your first file above.</p>
+                            </div>
+                          </td>
+                        </tr>
+                      {% endif %}
                     {% endfor %}
                   </tbody>
                 </table>
@@ -411,11 +576,33 @@
       </div>
     </div>
 
+    <!-- Export Modal for Model Papers -->
+    <div id="export-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3><i class="fas fa-file-export"></i> Export Model Paper Questions</h3>
+          <button class="close-modal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Select a paper name to export its questions:</p>
+          <select id="paper-name-select" class="filter-select" style="width: 100%; margin-bottom: 1rem;">
+            <option value="">Loading paper names...</option>
+          </select>
+          <div class="template-buttons">
+            <button class="action-btn" id="export-selected-paper" disabled>
+              <i class="fas fa-download"></i> Export Selected Paper
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="{% static 'js/DAscript.js' %}"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // File upload handling for QuestionBank only
+        // File upload handling
         setupFileUpload('questionbank');
+        setupFileUpload('modelpaper');
 
         function setupFileUpload(type) {
           const uploadArea = document.getElementById(type + '-upload-area');
@@ -471,6 +658,7 @@
 
           const formData = new FormData();
           formData.append('csv_file', file);
+          formData.append('import_type', type);
 
           // Show upload modal
           const modal = document.getElementById('upload-modal');
@@ -497,8 +685,13 @@
             }
           }, 300);
 
+          // Determine upload URL based on type
+          const uploadUrl = type === 'questionbank' 
+            ? '{% url "import_questions_with_history" %}'
+            : '{% url "import_paper_questions" %}';
+
           // Upload file
-          fetch('{% url "import_questions_with_history" %}', {
+          fetch(uploadUrl, {
             method: 'POST',
             body: formData,
             headers: {
@@ -565,6 +758,18 @@
                 </div>
               </div>
           `;
+          
+          // Show paper names if any
+          if (data.paper_names && data.paper_names.length > 0) {
+            resultHtml += `
+              <div class="result-papers">
+                <h5><i class="fas fa-copy"></i> Paper Names Imported:</h5>
+                <div class="paper-names-list">
+                  ${data.paper_names.map(name => `<span class="paper-name-tag">${name}</span>`).join('')}
+                </div>
+              </div>
+            `;
+          }
           
           // Show errors if any (including duplicates)
           if (data.errors && data.errors.length > 0) {
@@ -636,39 +841,99 @@
             downloadTemplate(templateType);
           });
         });
-// Updated CSV template generation function (QuestionBank with question_image support)
-function downloadTemplate(type) {
-  let csvContent = '';
-  let filename = '';
-  
-  switch(type) {
-    case 'questionbank-basic':
-      csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation,question_image,image
+
+        // Updated CSV template generation function with image support
+        function downloadTemplate(type) {
+          let csvContent = '';
+          let filename = '';
+          
+          switch(type) {
+            case 'questionbank-basic':
+              csvContent = `question_text,question_type,degree,year,block,module,subject,topic,difficulty,explanation,question_image,image
 "What is the normal heart rate range for a healthy adult?",MCQ,MBBS,1st,Cardiovascular,Physiology,Cardiology,"Heart Rate",Easy,"Normal adult heart rate is 60-100 beats per minute at rest.",heart_rate_diagram.jpg,heart_rate_explanation.jpg
 "Describe the pathophysiology of myocardial infarction",SEQ,MBBS,3rd,Cardiovascular,Pathology,Cardiology,"Myocardial Infarction",Hard,"MI occurs due to coronary artery occlusion leading to myocardial cell death.",,mi_pathology_detailed.png
 "Anatomy of the human heart chambers",NOTE,MBBS,1st,Cardiovascular,Anatomy,Cardiology,"Heart Anatomy",Medium,"Study notes on the four chambers of the heart and their functions.",heart_chambers_labeled.jpg,`;
-      filename = 'questionbank_template_basic.csv';
-      break;
-      
-    case 'questionbank-mcq':
-      csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation,question_image,image
+              filename = 'questionbank_template_basic.csv';
+              break;
+              
+            case 'questionbank-mcq':
+              csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,degree,year,block,module,subject,topic,difficulty,explanation,question_image,image
 "What is the normal blood pressure reading for adults?","120/80 mmHg","140/90 mmHg","160/100 mmHg","100/60 mmHg","180/110 mmHg",A,MBBS,1st,Cardiovascular,Physiology,Cardiology,"Blood Pressure",Easy,"Normal blood pressure is approximately 120/80 mmHg for healthy adults.",bp_measurement_diagram.jpg,bp_ranges_chart.jpg
 "Which tooth is shown in the radiograph?","Central Incisor","Lateral Incisor","Canine","First Premolar","Second Premolar",C,BDS,2nd,Oral,Radiology,Dentistry,"Tooth Identification",Medium,"Canine teeth have characteristic single pointed crown and long root.",dental_xray_canine.png,canine_anatomy.jpg
 "The structure indicated by the arrow is:","Left Ventricle","Right Atrium","Aortic Arch","Pulmonary Trunk","Superior Vena Cava",A,MBBS,1st,Cardiovascular,Anatomy,Cardiology,"Heart Anatomy",Medium,"The left ventricle is the main pumping chamber with thick muscular walls.",heart_anatomy_labeled.jpg,ventricle_detail.png`;
-      filename = 'questionbank_template_mcq.csv';
-      break;
-  }
-  
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  window.URL.revokeObjectURL(url);
-  
-  showNotification(`${filename} downloaded successfully!`, 'success');
-}
+              filename = 'questionbank_template_mcq.csv';
+              break;
+              
+            case 'modelpaper-medical':
+              csvContent = `question_text,option_a,option_b,option_c,option_d,option_e,correct_answer,paper_name,degree,year,module,subject,topic,difficulty,explanation,paper_image,image,marks
+"The ECG shown indicates:","Normal Sinus Rhythm","Atrial Fibrillation","Ventricular Tachycardia","Complete Heart Block","ST Elevation MI",E,"MBBS Final Exam 2024",MBBS,4th,Cardiology,Medicine,"ECG Interpretation",Hard,"ST elevation in leads II, III, aVF indicates inferior wall MI.",ecg_stemi_inferior.jpg,ecg_mi_explanation.png,2
+"Identify the dental restoration material shown:","Amalgam","Composite Resin","Glass Ionomer","Gold Inlay","Ceramic Crown",B,"BDS Final Exam 2024",BDS,4th,Restorative,Dentistry,"Dental Materials",Medium,"Composite resin appears tooth-colored and blends with natural enamel.",composite_restoration.png,composite_properties_chart.jpg,1
+"The radiological finding shows:","Normal Chest X-ray","Pneumothorax","Pleural Effusion","Pneumonia","Pulmonary Edema",C,"MBBS Midterm 2024",MBBS,3rd,Respiratory,Medicine,"Chest Radiology",Medium,"Pleural effusion appears as fluid collection in the pleural space.",chest_xray_effusion.jpg,pleural_anatomy.png,2
+"Which periodontal instrument is shown?","Periodontal Probe","Curette","Scaler","Explorer","Furcation Probe",A,"BDS Midterm 2024",BDS,3rd,Periodontics,Dentistry,"Periodontal Instruments",Easy,"Periodontal probe is used to measure pocket depths and has millimeter markings.",perio_probe.jpg,probe_technique.png,1
+"The histological section demonstrates:","Normal Liver Tissue","Fatty Liver","Cirrhosis","Hepatitis","Liver Cancer",C,"MBBS Pathology Exam 2024",MBBS,2nd,Pathology,Medicine,"Liver Pathology",Hard,"Cirrhosis shows fibrous bands dividing liver into regenerative nodules.",liver_cirrhosis_histo.jpg,cirrhosis_stages.png,3`;
+              filename = 'modelpaper_medical_template.csv';
+              break;
+          }
+          
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          
+          showNotification(`${filename} downloaded successfully!`, 'success');
+        }
+
+        // Model Paper Export functionality
+        const exportModelpaperBtn = document.getElementById('export-modelpaper-btn');
+        const exportModal = document.getElementById('export-modal');
+        const paperNameSelect = document.getElementById('paper-name-select');
+        const exportSelectedBtn = document.getElementById('export-selected-paper');
+
+        exportModelpaperBtn?.addEventListener('click', function() {
+          exportModal.style.display = 'block';
+          loadPaperNames();
+        });
+
+        function loadPaperNames() {
+          // Fetch available paper names from the model paper questions
+          fetch('/modelpaper/api/paper-hierarchy-data/?field=papers', {
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            paperNameSelect.innerHTML = '<option value="">Select a paper name...</option>';
+            data.data.forEach(paperName => {
+              const option = document.createElement('option');
+              option.value = paperName;
+              option.textContent = paperName;
+              paperNameSelect.appendChild(option);
+            });
+          })
+          .catch(error => {
+            paperNameSelect.innerHTML = '<option value="">Error loading paper names</option>';
+            console.error('Error loading paper names:', error);
+          });
+        }
+
+        paperNameSelect?.addEventListener('change', function() {
+          exportSelectedBtn.disabled = !this.value;
+        });
+
+        exportSelectedBtn?.addEventListener('click', function() {
+          const selectedPaper = paperNameSelect.value;
+          if (selectedPaper) {
+            // Create a temporary link to download the exported CSV
+            const encodedPaperName = encodeURIComponent(selectedPaper);
+            window.location.href = `/modelpaper/export-questions/${encodedPaperName}/`;
+            exportModal.style.display = 'none';
+          }
+        });
+
         // View errors modal
         document.querySelectorAll('.view-errors').forEach(btn => {
           btn.addEventListener('click', function() {
@@ -680,17 +945,21 @@ function downloadTemplate(type) {
 
         // History filtering
         const statusFilter = document.getElementById('status-filter');
+        const typeFilter = document.getElementById('type-filter');
         
         function filterHistory() {
           const statusValue = statusFilter?.value.toLowerCase() || '';
+          const typeValue = typeFilter?.value.toLowerCase() || '';
           const rows = document.querySelectorAll('.history-row');
           
           rows.forEach(row => {
             const status = row.dataset.status;
+            const type = row.dataset.type;
             
             const statusMatch = !statusValue || status === statusValue;
+            const typeMatch = !typeValue || type === typeValue;
             
-            if (statusMatch) {
+            if (statusMatch && typeMatch) {
               row.style.display = '';
             } else {
               row.style.display = 'none';
@@ -699,6 +968,7 @@ function downloadTemplate(type) {
         }
         
         statusFilter?.addEventListener('change', filterHistory);
+        typeFilter?.addEventListener('change', filterHistory);
 
         // Close modals
         document.querySelectorAll('.close-modal').forEach(btn => {
@@ -746,7 +1016,7 @@ function downloadTemplate(type) {
     </script>
 
     <style>
-      /* Enhanced CSS for the cleaned layout */
+      /* Enhanced CSS for the new layout */
       .section-description {
         color: #6b7280;
         font-size: 14px;
@@ -754,18 +1024,11 @@ function downloadTemplate(type) {
         line-height: 1.5;
       }
 
-      /* Statistics container - single column now */
-      .stats-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 25px;
-        margin-bottom: 30px;
-      }
-
-      /* Upload container - single column now */
+      /* Side by Side Layout */
+      .stats-container,
       .upload-container {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 25px;
         margin-bottom: 30px;
       }
@@ -905,6 +1168,13 @@ function downloadTemplate(type) {
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
       }
 
+      .action-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
       /* History Section */
       .history-section {
         background: white;
@@ -950,74 +1220,7 @@ function downloadTemplate(type) {
         color: #374151;
       }
 
-      .history-table-container {
-        overflow-x: auto;
-      }
-
-      .history-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-      }
-
-      .history-table th,
-      .history-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .history-table th {
-        background: #f9fafb;
-        font-weight: 600;
-        color: #374151;
-        font-size: 14px;
-      }
-
-      .file-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .file-info i {
-        color: #6b7280;
-        font-size: 16px;
-      }
-
-      .file-details {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .file-name {
-        font-weight: 500;
-        color: #111827;
-        font-size: 14px;
-      }
-
-      .file-size {
-        color: #6b7280;
-        font-size: 12px;
-      }
-
-      .date-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .date {
-        font-weight: 500;
-        color: #111827;
-        font-size: 14px;
-      }
-
-      .time {
-        color: #6b7280;
-        font-size: 12px;
-      }
-
-      .status-badge {
+      .type-badge {
         padding: 4px 8px;
         border-radius: 12px;
         font-size: 12px;
@@ -1027,70 +1230,14 @@ function downloadTemplate(type) {
         gap: 4px;
       }
 
-      .status-badge.success {
+      .type-badge.questionbank {
         background: rgba(16, 185, 129, 0.1);
         color: #10b981;
       }
 
-      .status-badge.failed {
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-      }
-
-      .status-badge.processing {
-        background: rgba(59, 130, 246, 0.1);
-        color: #3b82f6;
-      }
-
-      .number-badge {
-        background: #f3f4f6;
-        color: #374151;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-      }
-
-      .success-count {
-        color: #10b981;
-        font-weight: 600;
-      }
-
-      .failed-count {
-        color: #ef4444;
-        font-weight: 600;
-      }
-
-      .btn-icon {
-        background: #f3f4f6;
-        border: none;
-        padding: 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        color: #6b7280;
-        transition: all 0.2s;
-      }
-
-      .btn-icon:hover {
-        background: #e5e7eb;
-        color: #374151;
-      }
-
-      .no-data {
-        text-align: center;
-        padding: 3rem 1rem;
-        color: #6b7280;
-      }
-
-      .no-data-content i {
-        font-size: 3rem;
-        color: #d1d5db;
-        margin-bottom: 1rem;
-      }
-
-      .no-data-content h3 {
-        color: #374151;
-        margin-bottom: 0.5rem;
+      .type-badge.modelpaper {
+        background: rgba(139, 92, 246, 0.1);
+        color: #8b5cf6;
       }
 
       /* Upload Area Enhancements */
@@ -1136,81 +1283,6 @@ function downloadTemplate(type) {
       }
 
       /* Modal Enhancements */
-      .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-      }
-
-      .modal-content {
-        background: white;
-        border-radius: 8px;
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
-        overflow-y: auto;
-      }
-
-      .modal-header {
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .modal-header h3 {
-        margin: 0;
-        color: #111827;
-      }
-
-      .close-modal {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: #6b7280;
-        cursor: pointer;
-      }
-
-      .modal-body {
-        padding: 1.5rem;
-      }
-
-      .progress-bar {
-        background: #f3f4f6;
-        border-radius: 4px;
-        height: 8px;
-        overflow: hidden;
-        margin-bottom: 1rem;
-      }
-
-      .progress-fill {
-        background: #3b82f6;
-        height: 100%;
-        transition: width 0.3s;
-      }
-
-      .progress-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 10px;
-        font-size: 14px;
-        color: #6b7280;
-      }
-
-      .progress-percentage {
-        font-weight: 600;
-        color: #82272e;
-      }
-
       .upload-result {
         text-align: center;
       }
@@ -1298,6 +1370,39 @@ function downloadTemplate(type) {
         font-size: 24px;
         font-weight: 600;
         color: #1f2937;
+      }
+
+      .result-papers {
+        background: rgba(139, 92, 246, 0.05);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .result-papers h5 {
+        margin: 0 0 15px 0;
+        color: #8b5cf6;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .paper-names-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .paper-name-tag {
+        background: #8b5cf6;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
       }
 
       .result-errors {
@@ -1445,95 +1550,27 @@ function downloadTemplate(type) {
         margin-left: auto;
       }
 
-      .error-content {
-        max-height: 300px;
-        overflow-y: auto;
-      }
-
-      .error-content pre {
-        background: #f3f4f6;
-        padding: 1rem;
-        border-radius: 4px;
-        font-size: 12px;
-        overflow-x: auto;
-      }
-
-      /* Breadcrumb styles */
-      .breadcrumb-nav {
+      /* Progress Enhancement */
+      .progress-info {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-        padding: 0.75rem 1rem;
-        background: #f9fafb;
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
-      }
-
-      .breadcrumb-link {
-        color: #3b82f6;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.875rem;
-      }
-
-      .breadcrumb-link:hover {
-        text-decoration: underline;
-      }
-
-      .breadcrumb-current {
+        margin-top: 10px;
+        font-size: 14px;
         color: #6b7280;
-        font-size: 0.875rem;
       }
 
-      /* Messages styles */
-      .messages {
-        margin-bottom: 1.5rem;
-      }
-
-      .message {
-        padding: 1rem;
-        border-radius: 6px;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .message.success {
-        background: #ecfdf5;
-        color: #065f46;
-        border: 1px solid #d1fae5;
-      }
-
-      .message.error {
-        background: #fef2f2;
-        color: #991b1b;
-        border: 1px solid #fecaca;
-      }
-
-      .message.warning {
-        background: #fffbeb;
-        color: #92400e;
-        border: 1px solid #fed7aa;
-      }
-
-      .message.info {
-        background: #eff6ff;
-        color: #1e40af;
-        border: 1px solid #dbeafe;
+      .progress-percentage {
+        font-weight: 600;
+        color: #82272e;
       }
 
       /* Responsive Design */
       @media (max-width: 768px) {
-        .csv-management-container {
-          padding: 1rem;
-        }
-
-        .stats-cards {
+        .stats-container,
+        .upload-container {
           grid-template-columns: 1fr;
+          gap: 20px;
         }
 
         .action-cards {
@@ -1568,15 +1605,6 @@ function downloadTemplate(type) {
           right: 10px;
           left: 10px;
           max-width: none;
-        }
-
-        .history-table-container {
-          font-size: 14px;
-        }
-
-        .history-table th,
-        .history-table td {
-          padding: 8px;
         }
       }
     </style>

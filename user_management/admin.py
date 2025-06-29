@@ -192,11 +192,11 @@ class CustomUserAdmin(NavigationContextMixin, UserAdmin):
         if obj.approval_status == 'approved' and not obj.is_account_activated:
             buttons.append(
                 f'<a class="admin-action-btn email-btn" href="{reverse("admin:send_activation_email", args=[obj.pk])}" '
-                f'title="Send Activation Email">📧 Send Email</a>'
+                f'title="Send Activation Email">Send Email</a>'
             )
             buttons.append(
                 f'<a class="admin-action-btn activate-btn" href="{reverse("admin:manual_activate", args=[obj.pk])}" '
-                f'title="Manually Activate Account">🔑 Activate</a>'
+                f'title="Manually Activate Account">Active Now</a>'
             )
         
         return mark_safe(''.join(buttons)) if buttons else '-'

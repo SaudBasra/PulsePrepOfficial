@@ -1,4 +1,4 @@
-# modelpaper/views.py - UPDATED: Removed all image-related code
+# modelpaper/views.py - COMPLETE: Added image support throughout
 
 import csv
 import io
@@ -36,7 +36,7 @@ User = get_user_model()
 
 @content_access_required
 def take_paper(request, paper_id):
-    """Enhanced student takes the paper with mode selection popup support"""
+    """Enhanced student takes the paper with mode selection popup support and image support"""
     paper = get_object_or_404(ModelPaper, id=paper_id)
     student = request.user
     
@@ -110,7 +110,7 @@ def take_paper(request, paper_id):
         messages.error(request, "This paper has no accessible questions for you.")
         return redirect('student_model_papers')
     
-    # Process questions - REMOVED image handling
+    # Process questions - WITH image handling
     processed_questions = []
     for pq in paper_questions:
         question_data = {
@@ -120,6 +120,10 @@ def take_paper(request, paper_id):
             'explanation': pq.explanation or '',
             'options': {},
             'correct_answer': pq.correct_answer,  # Add correct answer for student mode
+            'has_paper_image': pq.has_paper_image,
+            'has_explanation_image': pq.has_explanation_image,
+            'paper_image_url': pq.paper_image_url,
+            'explanation_image_url': pq.explanation_image_url,
         }
         
         # Add options
@@ -155,7 +159,7 @@ def take_paper(request, paper_id):
 
 @content_access_required
 def paper_result(request, attempt_id):
-    """Enhanced show paper results with access control - no image support"""
+    """Enhanced show paper results with access control and image support"""
     attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
     
     # Security check: Only allow the student who took the paper to view results
@@ -177,7 +181,7 @@ def paper_result(request, attempt_id):
     all_questions = attempt.model_paper.get_questions()
     accessible_questions = apply_user_access_filter(all_questions, request.user)
     
-    # Process responses - REMOVED image handling
+    # Process responses - WITH image handling
     processed_responses = []
     for paper_question in accessible_questions:
         try:
@@ -194,13 +198,17 @@ def paper_result(request, attempt_id):
                 is_correct=False
             )
         
-        # Create response data - REMOVED image processing
+        # Create response data - WITH image processing
         response_data = {
             'response': response,
             'question': paper_question,
             'is_correct': response.is_correct,
             'selected_answer': response.selected_answer,
             'time_spent': getattr(response, 'time_spent', 0),
+            'has_paper_image': paper_question.has_paper_image,
+            'has_explanation_image': paper_question.has_explanation_image,
+            'paper_image_url': paper_question.paper_image_url,
+            'explanation_image_url': paper_question.explanation_image_url,
         }
         
         processed_responses.append(response_data)
@@ -241,7 +249,7 @@ def paper_result(request, attempt_id):
     context = {
         'attempt': attempt,
         'paper': attempt.model_paper,
-        'responses': processed_responses,  # Using processed responses (no image data)
+        'responses': processed_responses,  # Using processed responses (with image data)
         'passed': attempt.passed,
         'user': request.user,
         
@@ -331,6 +339,8 @@ def submit_paper_answer(request):
             'is_correct': response.is_correct,
             'correct_answer': paper_question.correct_answer,
             'explanation': paper_question.explanation or '',
+            'has_explanation_image': paper_question.has_explanation_image,
+            'explanation_image_url': paper_question.explanation_image_url,
         })
     
     return JsonResponse(response_data)
@@ -663,7 +673,7 @@ def admin_paper_analytics(request):
 
 @admin_required
 def export_paper_questions(request, paper_id):
-    """Enhanced export questions for a specific paper as CSV with access control"""
+    """Enhanced export questions for a specific paper as CSV with image support"""
     paper = get_object_or_404(ModelPaper, id=paper_id)
     questions = paper.get_questions()
     
@@ -684,14 +694,14 @@ def export_paper_questions(request, paper_id):
     writer.writerow([f'# Exported: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'])
     writer.writerow([])  # Empty row
     
-    # Write column headers - REMOVED image column
+    # Write column headers - WITH image columns
     writer.writerow([
         'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 
         'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic',
-        'difficulty', 'explanation', 'marks'
+        'difficulty', 'explanation', 'paper_image', 'image', 'marks'
     ])
     
-    # Write questions - REMOVED image field
+    # Write questions - WITH image fields
     for question in questions:
         writer.writerow([
             question.question_text,
@@ -709,6 +719,67 @@ def export_paper_questions(request, paper_id):
             question.topic,
             question.difficulty,
             question.explanation,
+            question.paper_image or '',  # Paper image field
+            question.image or '',  # Explanation image field
+            question.marks
+        ])
+    
+    return response
+
+
+def export_modelpaper_questions(request, paper_name):
+    """Export model paper questions by paper name with image support"""
+    from urllib.parse import unquote
+    
+    # Decode the URL-encoded paper name
+    decoded_paper_name = unquote(paper_name)
+    
+    # Get questions for this paper
+    questions = PaperQuestion.objects.filter(paper_name=decoded_paper_name).order_by('id')
+    
+    if not questions.exists():
+        return JsonResponse({'error': f'No questions found for paper: {decoded_paper_name}'}, status=404)
+    
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    safe_filename = decoded_paper_name.replace(' ', '_').replace('/', '_')
+    response['Content-Disposition'] = f'attachment; filename="{safe_filename}_questions.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Write header with metadata
+    writer.writerow([f'# Model Paper: {decoded_paper_name}'])
+    writer.writerow([f'# Total Questions: {questions.count()}'])
+    writer.writerow([f'# Exported: {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}'])
+    writer.writerow([])  # Empty row
+    
+# Write column headers with image fields
+    writer.writerow([
+        'question_text', 'option_a', 'option_b', 'option_c', 'option_d', 'option_e', 
+        'correct_answer', 'paper_name', 'degree', 'year', 'module', 'subject', 'topic',
+        'difficulty', 'explanation', 'paper_image', 'image', 'marks'
+    ])
+    
+    # Write questions with image fields
+    for question in questions:
+        writer.writerow([
+            question.question_text,
+            question.option_a,
+            question.option_b,
+            question.option_c,
+            question.option_d,
+            question.option_e,
+            question.correct_answer,
+            question.paper_name,
+            question.degree,
+            question.year,
+            question.module,
+            question.subject,
+            question.topic,
+            question.difficulty,
+            question.explanation,
+            question.paper_image or '',  # Paper image field
+            question.image or '',  # Explanation image field
             question.marks
         ])
     
@@ -717,7 +788,7 @@ def export_paper_questions(request, paper_id):
 
 @admin_required
 def import_paper_questions(request):
-    """Enhanced import paper questions from CSV with access control - Admin only - NO IMAGE SUPPORT"""
+    """Enhanced import paper questions from CSV with image support - Admin only"""
     if request.method == 'POST':
         form = PaperQuestionImportForm(request.POST, request.FILES)
         if form.is_valid():
@@ -835,6 +906,10 @@ def import_paper_questions(request):
                         else:
                             difficulty = 'Medium'
                         
+                        # Handle image fields (paper_image and image)
+                        paper_image_filename = str(row.get('paper_image', '')).strip()
+                        explanation_image_filename = str(row.get('image', '')).strip()
+                        
                         # Enhanced duplicate detection within same paper name
                         is_duplicate, duplicate_reason = enhanced_duplicate_detection(
                             paper_name, question_text, option_a, option_b, option_c, option_d, option_e
@@ -845,7 +920,7 @@ def import_paper_questions(request):
                             error_count += 1
                             continue
                         
-                        # Create paper question - REMOVED image field
+                        # Create paper question - WITH image fields
                         PaperQuestion.objects.create(
                             question_text=question_text,
                             option_a=option_a,
@@ -862,6 +937,8 @@ def import_paper_questions(request):
                             topic=str(row.get('topic', '')).strip(),
                             difficulty=difficulty,
                             explanation=str(row.get('explanation', '')).strip() or None,
+                            paper_image=paper_image_filename or None,  # Paper image field
+                            image=explanation_image_filename or None,  # Explanation image field
                             marks=int(row.get('marks', 1)) if str(row.get('marks', '')).isdigit() else 1,
                             created_by=request.user if request.user.is_authenticated else None
                         )
@@ -941,8 +1018,6 @@ def enhanced_duplicate_detection(paper_name, question_text, option_a, option_b, 
     return False, None
 
 
-# Continue with all other views, but remove any image-related code
-
 def modelpaper_list(request):
     """Enhanced list all model papers with access control and filtering"""
     query = request.GET.get('q', '')
@@ -1020,7 +1095,7 @@ from urllib.parse import unquote
 
 @content_access_required
 def view_paper_questions(request, paper_name):
-    """Enhanced view questions for a specific paper name with access control"""
+    """Enhanced view questions for a specific paper name with access control and image support"""
     # Decode the URL-encoded paper name
     decoded_paper_name = unquote(paper_name)
     print(f"Original paper_name: '{paper_name}'")  # Debug line
@@ -1198,7 +1273,7 @@ def delete_paper(request, paper_id):
 
 @content_access_required
 def preview_paper(request, paper_id):
-    """Enhanced preview paper before publishing with access control"""
+    """Enhanced preview paper before publishing with access control and image support"""
     paper = get_object_or_404(ModelPaper, id=paper_id)
     
     # CHECK OBJECT ACCESS
@@ -1226,142 +1301,7 @@ def preview_paper(request, paper_id):
     return render(request, 'modelpaper/preview_paper.html', context)
 
 
-# Additional utility views - all image-related code removed
-
-@admin_required
-def bulk_paper_actions(request):
-    """Admin view for bulk paper management"""
-    if request.method == 'POST':
-        action = request.POST.get('action')
-        paper_ids = request.POST.getlist('paper_ids')
-        
-        if action == 'activate':
-            ModelPaper.objects.filter(id__in=paper_ids).update(status='live')
-            messages.success(request, f"Activated {len(paper_ids)} papers.")
-        elif action == 'deactivate':
-            ModelPaper.objects.filter(id__in=paper_ids).update(status='draft')
-            messages.success(request, f"Deactivated {len(paper_ids)} papers.")
-        elif action == 'delete':
-            ModelPaper.objects.filter(id__in=paper_ids).delete()
-            messages.success(request, f"Deleted {len(paper_ids)} papers.")
-        
-        return JsonResponse({'success': True})
-    
-    return JsonResponse({'success': False})
-
-
-@admin_required
-def paper_performance_report(request):
-    """Generate detailed performance report for a specific paper"""
-    paper_id = request.GET.get('paper_id')
-    if not paper_id:
-        messages.error(request, "Paper ID is required for performance report.")
-        return redirect('admin_paper_analytics')
-    
-    paper = get_object_or_404(ModelPaper, id=paper_id)
-    attempts = ModelPaperAttempt.objects.filter(model_paper=paper, status='completed').select_related('student')
-    
-    # Calculate detailed statistics
-    total_attempts = attempts.count()
-    if total_attempts == 0:
-        messages.info(request, f"No completed attempts found for paper: {paper.title}")
-        return redirect('admin_paper_analytics')
-    
-    # Score distribution
-    score_ranges = {
-        '90-100': attempts.filter(percentage__gte=90).count(),
-        '80-89': attempts.filter(percentage__gte=80, percentage__lt=90).count(),
-        '70-79': attempts.filter(percentage__gte=70, percentage__lt=80).count(),
-        '60-69': attempts.filter(percentage__gte=60, percentage__lt=70).count(),
-        '50-59': attempts.filter(percentage__gte=50, percentage__lt=60).count(),
-        'Below 50': attempts.filter(percentage__lt=50).count(),
-    }
-    
-    # Top performers
-    top_performers = attempts.order_by('-percentage')[:10]
-    
-    # Question-wise analysis
-    question_stats = {}
-    paper_questions = paper.get_questions()
-    
-    for pq in paper_questions:
-        responses = ModelPaperResponse.objects.filter(
-            attempt__in=attempts,
-            paper_question=pq
-        )
-        total_responses = responses.count()
-        correct_responses = responses.filter(is_correct=True).count()
-        
-        question_stats[pq.id] = {
-            'question': pq,
-            'total_responses': total_responses,
-            'correct_responses': correct_responses,
-            'accuracy': (correct_responses / total_responses * 100) if total_responses > 0 else 0,
-            'difficulty_actual': 'Easy' if correct_responses / total_responses > 0.8 else 'Hard' if correct_responses / total_responses < 0.5 else 'Medium' if total_responses > 0 else 'Unknown'
-        }
-    
-    # Time analysis
-    avg_time = attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
-    time_distribution = {
-        'Under 30 min': attempts.filter(time_taken__lt=1800).count(),
-        '30-45 min': attempts.filter(time_taken__gte=1800, time_taken__lt=2700).count(),
-        '45-60 min': attempts.filter(time_taken__gte=2700, time_taken__lte=3600).count(),
-        'Over 60 min': attempts.filter(time_taken__gt=3600).count(),
-    }
-    
-    context = {
-        'paper': paper,
-        'total_attempts': total_attempts,
-        'score_ranges': score_ranges,
-        'top_performers': top_performers,
-        'question_stats': question_stats,
-        'avg_time_minutes': round(avg_time / 60, 1),
-        'time_distribution': time_distribution,
-        'pass_rate': attempts.filter(percentage__gte=paper.passing_percentage).count() / total_attempts * 100,
-        'avg_score': attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0,
-        'user_access': get_user_access_info(request.user),
-    }
-    
-    return render(request, 'modelpaper/paper_performance_report.html', context)
-
-
-@admin_required
-def export_paper_results(request, paper_id):
-    """Export paper results to CSV"""
-    paper = get_object_or_404(ModelPaper, id=paper_id)
-    attempts = ModelPaperAttempt.objects.filter(model_paper=paper, status='completed').select_related('student')
-    
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{paper.title}_results.csv"'
-    
-    writer = csv.writer(response)
-    
-    # Write header
-    writer.writerow([
-        'Student Name', 'Email', 'Degree', 'Year', 'Score', 'Total Questions', 
-        'Percentage', 'Passed', 'Time Taken (minutes)', 'Started At', 'Completed At'
-    ])
-    
-    # Write data
-    for attempt in attempts:
-        writer.writerow([
-            f"{attempt.student.first_name} {attempt.student.last_name}",
-            attempt.student.email,
-            attempt.student.degree or 'N/A',
-            attempt.student.year or 'N/A',
-            attempt.score,
-            paper.total_questions,
-            round(attempt.percentage, 2),
-            'Yes' if attempt.passed else 'No',
-            round(attempt.time_taken / 60, 2) if attempt.time_taken else 0,
-            attempt.started_at.strftime('%Y-%m-%d %H:%M:%S'),
-            attempt.completed_at.strftime('%Y-%m-%d %H:%M:%S') if attempt.completed_at else 'N/A'
-        ])
-    
-    return response
-
-
-# UTILITY VIEWS WITH ACCESS CONTROL - NO IMAGE SUPPORT
+# ADDITIONAL UTILITY VIEWS WITH IMAGE SUPPORT
 
 @content_access_required
 def get_paper_hierarchy_data(request):
@@ -1518,6 +1458,10 @@ def get_paper_statistics(request):
     hard_count = questions.filter(difficulty='Hard').count()
     total_count = easy_count + medium_count + hard_count
     
+    # Get image statistics
+    with_paper_images = questions.exclude(Q(paper_image__isnull=True) | Q(paper_image__exact='')).count()
+    with_explanation_images = questions.exclude(Q(image__isnull=True) | Q(image__exact='')).count()
+    
     # Get user's progress for this paper (if specific paper)
     user_progress = None
     if paper_name and request.user.is_authenticated:
@@ -1551,17 +1495,25 @@ def get_paper_statistics(request):
             'medium': medium_count,
             'hard': hard_count
         },
+        'image_statistics': {
+            'with_paper_images': with_paper_images,
+            'with_explanation_images': with_explanation_images,
+            'total_with_images': questions.filter(
+                Q(paper_image__isnull=False, paper_image__gt='') | 
+                Q(image__isnull=False, image__gt='')
+            ).count()
+        },
         'user_progress': user_progress,
         'user_access_level': user_access.get('level', 'student'),
         'filter_applied': user_access.get('level') == 'student'
     })
 
 
-# ADDITIONAL UTILITY VIEWS - NO IMAGE SUPPORT
+# ADDITIONAL UTILITY VIEWS
 
 @content_access_required
 def paper_question_detail(request, question_id):
-    """View detailed information about a specific paper question"""
+    """View detailed information about a specific paper question with image support"""
     question = get_object_or_404(PaperQuestion, id=question_id)
     
     # ACCESS CONTROL: Check if user can access this question
@@ -1657,7 +1609,7 @@ def student_paper_statistics(request):
     recent_attempts = sorted(accessible_attempts, key=lambda x: x.completed_at, reverse=True)[:5]
     recent_avg = sum(attempt.percentage for attempt in recent_attempts) / len(recent_attempts) if recent_attempts else 0
     
-    # Performance trend
+    # Performance trend (comparing first half vs second half of attempts)
     if len(recent_attempts) >= 2:
         latest_score = recent_attempts[0].percentage
         previous_avg = sum(attempt.percentage for attempt in recent_attempts[1:]) / len(recent_attempts[1:])
@@ -1762,6 +1714,10 @@ def get_cached_paper_stats(request):
             'medium': questions.filter(difficulty='Medium').count(),
             'hard': questions.filter(difficulty='Hard').count(),
         },
+        'image_statistics': {
+            'with_paper_images': questions.exclude(Q(paper_image__isnull=True) | Q(paper_image__exact='')).count(),
+            'with_explanation_images': questions.exclude(Q(image__isnull=True) | Q(image__exact='')).count(),
+        },
         'user_access_level': user_access.get('level', 'student'),
         'filter_applied': user_access.get('level') == 'student'
     }
@@ -1793,6 +1749,141 @@ def handle_paper_error(request, error_type, error_message):
         }, status=400)
     
     return render(request, 'modelpaper/paper_error.html', error_context)
+
+
+# BULK OPERATIONS
+
+@admin_required
+def bulk_paper_actions(request):
+    """Admin view for bulk paper management"""
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        paper_ids = request.POST.getlist('paper_ids')
+        
+        if action == 'activate':
+            ModelPaper.objects.filter(id__in=paper_ids).update(status='live')
+            messages.success(request, f"Activated {len(paper_ids)} papers.")
+        elif action == 'deactivate':
+            ModelPaper.objects.filter(id__in=paper_ids).update(status='draft')
+            messages.success(request, f"Deactivated {len(paper_ids)} papers.")
+        elif action == 'delete':
+            ModelPaper.objects.filter(id__in=paper_ids).delete()
+            messages.success(request, f"Deleted {len(paper_ids)} papers.")
+        
+        return JsonResponse({'success': True})
+    
+    return JsonResponse({'success': False})
+
+
+@admin_required
+def paper_performance_report(request):
+    """Generate detailed performance report for a specific paper"""
+    paper_id = request.GET.get('paper_id')
+    if not paper_id:
+        messages.error(request, "Paper ID is required for performance report.")
+        return redirect('admin_paper_analytics')
+    
+    paper = get_object_or_404(ModelPaper, id=paper_id)
+    attempts = ModelPaperAttempt.objects.filter(model_paper=paper, status='completed').select_related('student')
+    
+    # Calculate detailed statistics
+    total_attempts = attempts.count()
+    if total_attempts == 0:
+        messages.info(request, f"No completed attempts found for paper: {paper.title}")
+        return redirect('admin_paper_analytics')
+    
+    # Score distribution
+    score_ranges = {
+        '90-100': attempts.filter(percentage__gte=90).count(),
+        '80-89': attempts.filter(percentage__gte=80, percentage__lt=90).count(),
+        '70-79': attempts.filter(percentage__gte=70, percentage__lt=80).count(),
+        '60-69': attempts.filter(percentage__gte=60, percentage__lt=70).count(),
+        '50-59': attempts.filter(percentage__gte=50, percentage__lt=60).count(),
+        'Below 50': attempts.filter(percentage__lt=50).count(),
+    }
+    
+    # Top performers
+    top_performers = attempts.order_by('-percentage')[:10]
+    
+    # Question-wise analysis
+    question_stats = {}
+    paper_questions = paper.get_questions()
+    
+    for pq in paper_questions:
+        responses = ModelPaperResponse.objects.filter(
+            attempt__in=attempts,
+            paper_question=pq
+        )
+        total_responses = responses.count()
+        correct_responses = responses.filter(is_correct=True).count()
+        
+        question_stats[pq.id] = {
+            'question': pq,
+            'total_responses': total_responses,
+            'correct_responses': correct_responses,
+            'accuracy': (correct_responses / total_responses * 100) if total_responses > 0 else 0,
+            'difficulty_actual': 'Easy' if correct_responses / total_responses > 0.8 else 'Hard' if correct_responses / total_responses < 0.5 else 'Medium' if total_responses > 0 else 'Unknown'
+        }
+    
+    # Time analysis
+    avg_time = attempts.aggregate(Avg('time_taken'))['time_taken__avg'] or 0
+    time_distribution = {
+        'Under 30 min': attempts.filter(time_taken__lt=1800).count(),
+        '30-45 min': attempts.filter(time_taken__gte=1800, time_taken__lt=2700).count(),
+        '45-60 min': attempts.filter(time_taken__gte=2700, time_taken__lte=3600).count(),
+        'Over 60 min': attempts.filter(time_taken__gt=3600).count(),
+    }
+    
+    context = {
+        'paper': paper,
+        'total_attempts': total_attempts,
+        'score_ranges': score_ranges,
+        'top_performers': top_performers,
+        'question_stats': question_stats,
+        'avg_time_minutes': round(avg_time / 60, 1),
+        'time_distribution': time_distribution,
+        'pass_rate': attempts.filter(percentage__gte=paper.passing_percentage).count() / total_attempts * 100,
+        'avg_score': attempts.aggregate(Avg('percentage'))['percentage__avg'] or 0,
+        'user_access': get_user_access_info(request.user),
+    }
+    
+    return render(request, 'modelpaper/paper_performance_report.html', context)
+
+
+@admin_required
+def export_paper_results(request, paper_id):
+    """Export paper results to CSV"""
+    paper = get_object_or_404(ModelPaper, id=paper_id)
+    attempts = ModelPaperAttempt.objects.filter(model_paper=paper, status='completed').select_related('student')
+    
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{paper.title}_results.csv"'
+    
+    writer = csv.writer(response)
+    
+    # Write header
+    writer.writerow([
+        'Student Name', 'Email', 'Degree', 'Year', 'Score', 'Total Questions', 
+        'Percentage', 'Passed', 'Time Taken (minutes)', 'Started At', 'Completed At'
+    ])
+    
+    # Write data
+    for attempt in attempts:
+        writer.writerow([
+            f"{attempt.student.first_name} {attempt.student.last_name}",
+            attempt.student.email,
+            attempt.student.degree or 'N/A',
+            attempt.student.year or 'N/A',
+            attempt.score,
+            paper.total_questions,
+            round(attempt.percentage, 2),
+            'Yes' if attempt.passed else 'No',
+            round(attempt.time_taken / 60, 2) if attempt.time_taken else 0,
+            attempt.started_at.strftime('%Y-%m-%d %H:%M:%S'),
+            attempt.completed_at.strftime('%Y-%m-%d %H:%M:%S') if attempt.completed_at else 'N/A'
+        ])
+    
+    return response
 
 
 # DEBUG AND TESTING VIEWS (Remove in production)
@@ -1858,6 +1949,8 @@ def debug_paper_access(request, paper_id):
                 'degree': q.degree,
                 'year': q.year,
                 'subject': q.subject,
+                'has_paper_image': q.has_paper_image,
+                'has_explanation_image': q.has_explanation_image,
             } for q in filtered_questions[:5]
         ],
     }
