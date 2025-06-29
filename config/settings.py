@@ -94,6 +94,7 @@ DATABASES = {
     'default': {
        'NAME': 'pulseprep_db',
         'USER': 'pulseprep_user',
+        'PASSWORD': 'Ppproject@#12345',
        'HOST': 'localhost',
         'PORT': '5432',
     }
