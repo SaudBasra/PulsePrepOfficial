@@ -123,6 +123,19 @@ STATIC_ROOT = '/opt/PulsePrep/staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
+
+# Ensure UTF-8 handling throughout Django
+DEFAULT_CHARSET = 'utf-8'
+FILE_CHARSET = 'utf-8'
+
+# Database connection encoding
+DATABASE_OPTIONS = {
+    'charset': 'utf8',
+    'use_unicode': True,
+}
+
+
 # ================================
 # PASSWORD VALIDATION
 # ================================
