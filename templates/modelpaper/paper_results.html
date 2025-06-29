@@ -1136,8 +1136,7 @@ Paper Results
     </div>
 </div>
 </div>
-
-<!-- Enhanced Answers Review - WITH IMAGE SUPPORT -->
+<!-- FIXED: Enhanced Answers Review - WITH CORRECTED IMAGE SUPPORT -->
 {% if paper.show_explanations %}
 <div class="review-section fade-in no-print">
 <div class="review-toggle">
@@ -1168,25 +1167,25 @@ Paper Results
 </div>
 
 <div id="review-content">
-    {% for response in responses %}
-        <div class="question-review" data-status="{% if not response.response.selected_answer %}unanswered{% elif response.is_correct %}correct{% else %}incorrect{% endif %}">
+    {% for response_data in responses %}
+        <div class="question-review" data-status="{% if not response_data.response.selected_answer %}unanswered{% elif response_data.is_correct %}correct{% else %}incorrect{% endif %}">
             <div class="review-header">
                 <div class="question-number">Question {{ forloop.counter }}</div>
-                <span class="status-badge {% if not response.response.selected_answer %}status-unanswered{% elif response.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
-                    <i class="fas fa-{% if not response.response.selected_answer %}question{% elif response.is_correct %}check{% else %}times{% endif %}"></i>
-                    {% if not response.response.selected_answer %}Unanswered{% elif response.is_correct %}Correct{% else %}Incorrect{% endif %}
+                <span class="status-badge {% if not response_data.response.selected_answer %}status-unanswered{% elif response_data.is_correct %}status-correct{% else %}status-incorrect{% endif %}">
+                    <i class="fas fa-{% if not response_data.response.selected_answer %}question{% elif response_data.is_correct %}check{% else %}times{% endif %}"></i>
+                    {% if not response_data.response.selected_answer %}Unanswered{% elif response_data.is_correct %}Correct{% else %}Incorrect{% endif %}
                 </span>
             </div>
             
-            <div class="question-text">{{ response.question.question_text }}</div>
+            <div class="question-text">{{ response_data.question.question_text }}</div>
             
-            <!-- Enhanced Question Image Display -->
-            {% if response.has_paper_image and response.paper_image_url %}
+            <!-- FIXED: Question Image Display with correct variable names -->
+            {% if response_data.has_paper_image and response_data.paper_image_url %}
                 <div class="question-image">
-                    <img src="{{ response.paper_image_url }}" 
+                    <img src="{{ response_data.paper_image_url }}" 
                          alt="Question {{ forloop.counter }} Image" 
                          loading="lazy"
-                         onclick="openImageModal('{{ response.paper_image_url }}')"
+                         onclick="openImageModal('{{ response_data.paper_image_url }}')"
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                     <div class="image-error" style="display: none;">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -1197,90 +1196,90 @@ Paper Results
             {% endif %}
             
             <ul class="options-list">
-                {% if response.question.option_a %}
+                {% if response_data.question.option_a %}
                     <li class="option-item">
                         <label class="option-label 
-                            {% if response.question.correct_answer == 'A' %}correct{% endif %}
-                            {% if response.selected_answer == 'A' and not response.is_correct %}incorrect{% endif %}
-                            {% if response.selected_answer == 'A' %}selected{% endif %}">
+                            {% if response_data.question.correct_answer == 'A' %}correct{% endif %}
+                            {% if response_data.selected_answer == 'A' and not response_data.is_correct %}incorrect{% endif %}
+                            {% if response_data.selected_answer == 'A' %}selected{% endif %}">
                             <input type="radio" name="q{{ forloop.counter }}" value="A" 
-                                {% if response.selected_answer == 'A' %}checked{% endif %}>
-                            <span class="option-text">A) {{ response.question.option_a }}</span>
-                            {% if response.question.correct_answer == 'A' %}
+                                {% if response_data.selected_answer == 'A' %}checked{% endif %}>
+                            <span class="option-text">A) {{ response_data.question.option_a }}</span>
+                            {% if response_data.question.correct_answer == 'A' %}
                                 <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                            {% elif response.selected_answer == 'A' and not response.is_correct %}
+                            {% elif response_data.selected_answer == 'A' and not response_data.is_correct %}
                                 <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
                             {% endif %}
                         </label>
                     </li>
                 {% endif %}
                 
-                {% if response.question.option_b %}
+                {% if response_data.question.option_b %}
                     <li class="option-item">
                         <label class="option-label 
-                            {% if response.question.correct_answer == 'B' %}correct{% endif %}
-                            {% if response.selected_answer == 'B' and not response.is_correct %}incorrect{% endif %}
-                            {% if response.selected_answer == 'B' %}selected{% endif %}">
+                            {% if response_data.question.correct_answer == 'B' %}correct{% endif %}
+                            {% if response_data.selected_answer == 'B' and not response_data.is_correct %}incorrect{% endif %}
+                            {% if response_data.selected_answer == 'B' %}selected{% endif %}">
                             <input type="radio" name="q{{ forloop.counter }}" value="B" 
-                                {% if response.selected_answer == 'B' %}checked{% endif %}>
-                            <span class="option-text">B) {{ response.question.option_b }}</span>
-                            {% if response.question.correct_answer == 'B' %}
+                                {% if response_data.selected_answer == 'B' %}checked{% endif %}>
+                            <span class="option-text">B) {{ response_data.question.option_b }}</span>
+                            {% if response_data.question.correct_answer == 'B' %}
                                 <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                            {% elif response.selected_answer == 'B' and not response.is_correct %}
+                            {% elif response_data.selected_answer == 'B' and not response_data.is_correct %}
                                 <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
                             {% endif %}
                         </label>
                     </li>
                 {% endif %}
                 
-                {% if response.question.option_c %}
+                {% if response_data.question.option_c %}
                     <li class="option-item">
                         <label class="option-label 
-                            {% if response.question.correct_answer == 'C' %}correct{% endif %}
-                            {% if response.selected_answer == 'C' and not response.is_correct %}incorrect{% endif %}
-                            {% if response.selected_answer == 'C' %}selected{% endif %}">
+                            {% if response_data.question.correct_answer == 'C' %}correct{% endif %}
+                            {% if response_data.selected_answer == 'C' and not response_data.is_correct %}incorrect{% endif %}
+                            {% if response_data.selected_answer == 'C' %}selected{% endif %}">
                             <input type="radio" name="q{{ forloop.counter }}" value="C" 
-                                {% if response.selected_answer == 'C' %}checked{% endif %}>
-                            <span class="option-text">C) {{ response.question.option_c }}</span>
-                            {% if response.question.correct_answer == 'C' %}
+                                {% if response_data.selected_answer == 'C' %}checked{% endif %}>
+                            <span class="option-text">C) {{ response_data.question.option_c }}</span>
+                            {% if response_data.question.correct_answer == 'C' %}
                                 <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                            {% elif response.selected_answer == 'C' and not response.is_correct %}
+                            {% elif response_data.selected_answer == 'C' and not response_data.is_correct %}
                                 <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
                             {% endif %}
                         </label>
                     </li>
                 {% endif %}
                 
-                {% if response.question.option_d %}
+                {% if response_data.question.option_d %}
                     <li class="option-item">
                         <label class="option-label 
-                            {% if response.question.correct_answer == 'D' %}correct{% endif %}
-                            {% if response.selected_answer == 'D' and not response.is_correct %}incorrect{% endif %}
-                            {% if response.selected_answer == 'D' %}selected{% endif %}">
+                            {% if response_data.question.correct_answer == 'D' %}correct{% endif %}
+                            {% if response_data.selected_answer == 'D' and not response_data.is_correct %}incorrect{% endif %}
+                            {% if response_data.selected_answer == 'D' %}selected{% endif %}">
                             <input type="radio" name="q{{ forloop.counter }}" value="D" 
-                                {% if response.selected_answer == 'D' %}checked{% endif %}>
-                            <span class="option-text">D) {{ response.question.option_d }}</span>
-                            {% if response.question.correct_answer == 'D' %}
+                                {% if response_data.selected_answer == 'D' %}checked{% endif %}>
+                            <span class="option-text">D) {{ response_data.question.option_d }}</span>
+                            {% if response_data.question.correct_answer == 'D' %}
                                 <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                            {% elif response.selected_answer == 'D' and not response.is_correct %}
+                            {% elif response_data.selected_answer == 'D' and not response_data.is_correct %}
                                 <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
                             {% endif %}
                         </label>
                     </li>
                 {% endif %}
                 
-                {% if response.question.option_e %}
+                {% if response_data.question.option_e %}
                     <li class="option-item">
                         <label class="option-label 
-                            {% if response.question.correct_answer == 'E' %}correct{% endif %}
-                            {% if response.selected_answer == 'E' and not response.is_correct %}incorrect{% endif %}
-                            {% if response.selected_answer == 'E' %}selected{% endif %}">
+                            {% if response_data.question.correct_answer == 'E' %}correct{% endif %}
+                            {% if response_data.selected_answer == 'E' and not response_data.is_correct %}incorrect{% endif %}
+                            {% if response_data.selected_answer == 'E' %}selected{% endif %}">
                             <input type="radio" name="q{{ forloop.counter }}" value="E" 
-                                {% if response.selected_answer == 'E' %}checked{% endif %}>
-                            <span class="option-text">E) {{ response.question.option_e }}</span>
-                            {% if response.question.correct_answer == 'E' %}
+                                {% if response_data.selected_answer == 'E' %}checked{% endif %}>
+                            <span class="option-text">E) {{ response_data.question.option_e }}</span>
+                            {% if response_data.question.correct_answer == 'E' %}
                                 <i class="fas fa-check option-icon" style="color: #065f46;"></i>
-                            {% elif response.selected_answer == 'E' and not response.is_correct %}
+                            {% elif response_data.selected_answer == 'E' and not response_data.is_correct %}
                                 <i class="fas fa-times option-icon" style="color: #991b1b;"></i>
                             {% endif %}
                         </label>
@@ -1288,21 +1287,21 @@ Paper Results
                 {% endif %}
             </ul>
             
-            {% if response.question.explanation %}
+            {% if response_data.question.explanation %}
                 <div class="explanation-box">
                     <div class="explanation-title">
                         <i class="fas fa-lightbulb"></i>
                         <span>Explanation</span>
                     </div>
-                    <div class="explanation-text">{{ response.question.explanation }}</div>
+                    <div class="explanation-text">{{ response_data.question.explanation }}</div>
                     
-                    <!-- Enhanced Explanation Image Display -->
-                    {% if response.has_explanation_image and response.explanation_image_url %}
+                    <!-- FIXED: Explanation Image Display with correct variable names -->
+                    {% if response_data.has_explanation_image and response_data.explanation_image_url %}
                         <div class="explanation-image">
-                            <img src="{{ response.explanation_image_url }}" 
+                            <img src="{{ response_data.explanation_image_url }}" 
                                  alt="Question {{ forloop.counter }} Explanation Image" 
                                  loading="lazy"
-                                 onclick="openImageModal('{{ response.explanation_image_url }}')"
+                                 onclick="openImageModal('{{ response_data.explanation_image_url }}')"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                             <div class="image-error" style="display: none;">
                                 <i class="fas fa-exclamation-triangle"></i>
@@ -1318,7 +1317,6 @@ Paper Results
 </div>
 </div>
 {% endif %}
-
 <!-- Action Buttons -->
 <div class="action-buttons no-print">
 <a href="{% url 'student_model_papers' %}" class="btn btn-secondary">

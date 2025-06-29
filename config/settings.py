@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'local-default-secret-key')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 # ALLOWED_HOSTS handles both development and production
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1').split()
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'pulseprep.net').split()
 
 # ================================
 # APPLICATION DEFINITION
@@ -92,8 +92,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Production database (PostgreSQL) - Active configuration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pulseprep_db',
+       'NAME': 'pulseprep_db',
         'USER': 'pulseprep_user',
        'HOST': 'localhost',
         'PORT': '5432',
@@ -103,11 +102,13 @@ DATABASES = {
 # Development database configuration (commented out)
 # Uncomment this and comment out the PostgreSQL config above for local development:
 #
+# Database config (SQLite for now)
 #DATABASES = {
- #    'default': {
-  ##      'NAME': BASE_DIR / 'db.sqlite3',
-    # }
- #}
+ #   'default': {
+  #      'ENGINE': 'django.db.backends.sqlite3',
+   #     'NAME': BASE_DIR / 'db.sqlite3',
+   # }
+#}
 
 # ================================
 # STATIC AND MEDIA FILES

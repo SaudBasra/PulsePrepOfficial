@@ -156,10 +156,9 @@ def take_paper(request, paper_id):
     
     return render(request, 'modelpaper/take_paper.html', context)
 
-
 @content_access_required
 def paper_result(request, attempt_id):
-    """Enhanced show paper results with access control and image support"""
+    """Enhanced show paper results with access control and FIXED image support"""
     attempt = get_object_or_404(ModelPaperAttempt, id=attempt_id)
     
     # Security check: Only allow the student who took the paper to view results
@@ -181,7 +180,7 @@ def paper_result(request, attempt_id):
     all_questions = attempt.model_paper.get_questions()
     accessible_questions = apply_user_access_filter(all_questions, request.user)
     
-    # Process responses - WITH image handling
+    # Process responses - WITH FIXED image handling
     processed_responses = []
     for paper_question in accessible_questions:
         try:
@@ -198,13 +197,14 @@ def paper_result(request, attempt_id):
                 is_correct=False
             )
         
-        # Create response data - WITH image processing
+        # FIXED: Create response data with correct template variable names
         response_data = {
             'response': response,
             'question': paper_question,
             'is_correct': response.is_correct,
             'selected_answer': response.selected_answer,
             'time_spent': getattr(response, 'time_spent', 0),
+            # FIXED: Use correct property names that match template
             'has_paper_image': paper_question.has_paper_image,
             'has_explanation_image': paper_question.has_explanation_image,
             'paper_image_url': paper_question.paper_image_url,
@@ -249,7 +249,7 @@ def paper_result(request, attempt_id):
     context = {
         'attempt': attempt,
         'paper': attempt.model_paper,
-        'responses': processed_responses,  # Using processed responses (with image data)
+        'responses': processed_responses,  # FIXED: Using processed responses with correct image data
         'passed': attempt.passed,
         'user': request.user,
         
@@ -277,7 +277,6 @@ def paper_result(request, attempt_id):
     }
     
     return render(request, 'modelpaper/paper_results.html', context)
-
 
 @content_access_required
 @require_POST

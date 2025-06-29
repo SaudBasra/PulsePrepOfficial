@@ -63,58 +63,56 @@ def practice_session(request, session_id):
     if session.difficulty_filter:
         questions_query = questions_query.filter(difficulty=session.difficulty_filter)
     
-    # Get random questions for the session
+    # FIXED: Get random questions for the session with proper limiting
     questions = list(questions_query.order_by('?')[:session.total_questions])
     
-    if session.randomize_questions:
-        random.shuffle(questions)
+    # Check if we have enough questions
+    if len(questions) < session.total_questions:
+        messages.warning(request, f"Only {len(questions)} questions available. Session adjusted accordingly.")
+        # Update session total if needed
+        session.total_questions = len(questions)
+        session.save()
     
-    # FILTER QUESTIONS BY ACCESS CONTROL AGAIN (double-check)
-    accessible_questions = []
-    for question in questions:
-        if check_object_access(question, request.user):
-            accessible_questions.append(question)
+    if not questions:
+        messages.error(request, "No questions available for this practice session.")
+        return redirect('student_practice_modules')
     
-    # Process questions with proper data structure and access control
+    # Add order field to questions for navigation
     processed_questions = []
-    for idx, question in enumerate(accessible_questions):
-        # Create options dictionary with proper handling
-        options = {}
-        if question.option_a and question.option_a.strip():
-            options['A'] = question.option_a.strip()
-        if question.option_b and question.option_b.strip():
-            options['B'] = question.option_b.strip()
-        if question.option_c and question.option_c.strip():
-            options['C'] = question.option_c.strip()
-        if question.option_d and question.option_d.strip():
-            options['D'] = question.option_d.strip()
-        if question.option_e and question.option_e.strip():
-            options['E'] = question.option_e.strip()
-        
+    for index, question in enumerate(questions, 1):
+        # Check if user has access to this specific question
+        if not check_object_access(question, request.user):
+            continue
+            
         question_data = {
             'id': question.id,
-            'order': idx + 1,
-            'text': question.question_text if question.question_text else '',
-            'options': options,
-            'correct_answer': question.correct_answer if question.correct_answer else '',
-            'explanation': question.explanation if question.explanation else '',
-            'difficulty': question.difficulty if question.difficulty else 'Medium',
-            # UPDATED: Support both question_image and explanation image
-            'has_question_image': bool(question.question_image),
-            'question_image_url': None,
-            'question_image_filename': question.question_image if question.question_image else None,
-            'has_explanation_image': bool(question.image),
-            'explanation_image_url': None,
-            'explanation_image_filename': question.image if question.image else None,
+            'order': index,
+            'text': question.question_text,
+            'options': {
+                'A': question.option_a,
+                'B': question.option_b, 
+                'C': question.option_c,
+                'D': question.option_d,
+                'E': question.option_e
+            },
+            'correct_answer': question.correct_answer,
+            'explanation': question.explanation or '',
+            'difficulty': question.difficulty,
             'degree': question.degree,
             'year': question.year,
             'block': question.block,
             'module': question.module,
             'subject': question.subject,
-            'topic': question.topic
+            'topic': question.topic,
+            'has_question_image': bool(question.question_image),
+            'has_explanation_image': bool(question.image),
+            'question_image_url': None,
+            'question_image_filename': None,
+            'explanation_image_url': None,
+            'explanation_image_filename': None
         }
         
-        # Handle question image URL generation
+        # Handle question image URL generation (if exists)
         if question.question_image:
             try:
                 question_image_url, actual_filename = get_question_image_url_for_field(question, 'question_image')
@@ -134,9 +132,7 @@ def practice_session(request, session_id):
             except Exception as e:
                 print(f"Error processing explanation image for question {question.id}: {str(e)}")
         
-    processed_questions.append(question_data)
-    
-    
+        processed_questions.append(question_data)
     
     # Update session if question count changed due to access control
     if len(processed_questions) != session.total_questions:
@@ -144,15 +140,19 @@ def practice_session(request, session_id):
         session.save()
         messages.info(request, f"Session adjusted to {len(processed_questions)} questions based on your access level.")
     
+    # Mark session as started if not already
+    if not session.started_at:
+        session.started_at = timezone.now()
+        session.save()
+    
     context = {
         'session': session,
         'questions': processed_questions,
-        'total_questions': len(processed_questions),
         'user_access': get_user_access_info(request.user),
-        'accessible_question_count': len(processed_questions),
     }
     
     return render(request, 'managemodule/practice_session.html', context)
+
 
 def get_question_image_url_for_field(question, field_name):
     """

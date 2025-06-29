@@ -1204,3 +1204,471 @@ django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly co
 ERROR 2025-06-29 14:03:55,722 basehttp 10820 14480 "GET /admin/user_management/customuser/api/navigation-counts/ HTTP/1.1" 500 165083
 INFO 2025-06-29 14:04:08,399 autoreload 10820 1276 D:\PulsePrepProject\config\settings.py changed, reloading.
 INFO 2025-06-29 14:04:10,055 autoreload 11300 1816 Watching for file changes with StatReloader
+INFO 2025-06-29 16:43:02,590 autoreload 8732 3248 Watching for file changes with StatReloader
+INFO 2025-06-29 16:43:32,873 autoreload 8732 3248 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:43:33,763 autoreload 5752 1952 Watching for file changes with StatReloader
+INFO 2025-06-29 16:44:07,021 autoreload 5752 1952 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:44:07,884 autoreload 2904 10136 Watching for file changes with StatReloader
+INFO 2025-06-29 16:44:16,547 autoreload 2904 10136 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:44:17,401 autoreload 7056 3448 Watching for file changes with StatReloader
+INFO 2025-06-29 16:44:37,296 autoreload 7056 3448 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:44:38,072 autoreload 11820 15368 Watching for file changes with StatReloader
+INFO 2025-06-29 16:44:50,506 basehttp 11820 14324 "GET / HTTP/1.1" 200 11131
+INFO 2025-06-29 16:44:50,566 basehttp 11820 14324 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+WARNING 2025-06-29 16:44:51,134 log 11820 14324 Not Found: /script.js
+WARNING 2025-06-29 16:44:51,134 basehttp 11820 14324 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 16:44:53,137 basehttp 11820 14324 "GET /login/ HTTP/1.1" 200 5782
+ERROR 2025-06-29 16:45:01,827 log 11820 14324 Internal Server Error: /login/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\views.py", line 103, in login_view
+    user = authenticate(request, username=email, password=password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\views\decorators\debug.py", line 75, in sensitive_variables_wrapper
+    return func(*func_args, **func_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\__init__.py", line 79, in authenticate
+    user = backend.authenticate(request, **credentials)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\backends.py", line 42, in authenticate
+    user = UserModel._default_manager.get_by_natural_key(username)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 37, in get_by_natural_key
+    return self.get(**{self.model.USERNAME_FIELD: username})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 645, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
+    self._fetch_all()
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 747, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 296, in get_select
+    sql, params = self.compile(col)
+                  ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 557, in compile
+    sql, params = node.as_sql(self, self.connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\expressions.py", line 1309, in as_sql
+    sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 548, in quote_name_unless_alias
+    r = self.connection.ops.quote_name(name)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\backends\dummy\base.py", line 20, in complain
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.
+ERROR 2025-06-29 16:45:01,842 basehttp 11820 14324 "POST /login/ HTTP/1.1" 500 164874
+WARNING 2025-06-29 16:45:01,933 log 11820 14324 Not Found: /favicon.ico
+WARNING 2025-06-29 16:45:01,933 basehttp 11820 14324 "GET /favicon.ico HTTP/1.1" 404 11401
+INFO 2025-06-29 16:45:02,406 basehttp 11820 14324 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 16:45:32,123 autoreload 11820 15368 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:45:33,054 autoreload 2856 11496 Watching for file changes with StatReloader
+ERROR 2025-06-29 16:45:47,619 log 2856 4328 Internal Server Error: /login/
+Traceback (most recent call last):
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\user_management\views.py", line 103, in login_view
+    user = authenticate(request, username=email, password=password)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\views\decorators\debug.py", line 75, in sensitive_variables_wrapper
+    return func(*func_args, **func_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\__init__.py", line 79, in authenticate
+    user = backend.authenticate(request, **credentials)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\backends.py", line 42, in authenticate
+    user = UserModel._default_manager.get_by_natural_key(username)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\contrib\auth\base_user.py", line 37, in get_by_natural_key
+    return self.get(**{self.model.USERNAME_FIELD: username})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 645, in get
+    num = len(clone)
+          ^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
+    self._fetch_all()
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
+    results = compiler.execute_sql(
+              ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
+    sql, params = self.as_sql()
+                  ^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 747, in as_sql
+    extra_select, order_by, group_by = self.pre_sql_setup(
+                                       ^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
+    self.setup_query(with_col_aliases=with_col_aliases)
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
+    self.select, self.klass_info, self.annotation_col_map = self.get_select(
+                                                            ^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 296, in get_select
+    sql, params = self.compile(col)
+                  ^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 557, in compile
+    sql, params = node.as_sql(self, self.connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\expressions.py", line 1309, in as_sql
+    sql = ".".join(map(compiler.quote_name_unless_alias, identifiers))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 548, in quote_name_unless_alias
+    r = self.connection.ops.quote_name(name)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PulsePrepProject\venv\Lib\site-packages\django\db\backends\dummy\base.py", line 20, in complain
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: settings.DATABASES is improperly configured. Please supply the ENGINE value. Check settings documentation for more details.
+ERROR 2025-06-29 16:45:47,631 basehttp 2856 4328 "POST /login/ HTTP/1.1" 500 164874
+INFO 2025-06-29 16:49:28,547 autoreload 2856 11496 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 16:49:56,215 autoreload 18308 17696 Watching for file changes with StatReloader
+INFO 2025-06-29 16:50:05,396 basehttp 18308 2796 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 16:50:05,465 basehttp 18308 2796 "GET /dashboard/ HTTP/1.1" 200 63324
+INFO 2025-06-29 16:50:05,557 basehttp 18308 2796 "GET /media/profile_images/bbb_11zac4Z.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 16:50:09,519 basehttp 18308 2796 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 16:50:16,057 basehttp 18308 2796 "GET /managemodule/student/practice/?block=B&module=musculoskeletal&subject=Biochemistry&topic=Amino%20acids%20and%20Proteins&degree=MBBS&year=1st HTTP/1.1" 200 53493
+INFO 2025-06-29 16:50:18,911 basehttp 18308 2796 "POST /managemodule/student/practice/ HTTP/1.1" 302 0
+INFO 2025-06-29 16:50:18,976 basehttp 18308 2796 "GET /managemodule/student/session/77/ HTTP/1.1" 200 181007
+INFO 2025-06-29 16:50:19,046 basehttp 18308 2796 "GET /managemodule/student/check-note/?session_id=77&question_id=304 HTTP/1.1" 200 102
+INFO 2025-06-29 16:50:23,640 basehttp 18308 2796 "POST /managemodule/student/submit-answer/ HTTP/1.1" 200 532
+INFO 2025-06-29 16:50:56,406 basehttp 18308 2796 "GET /managemodule/student/practice/?block=B&module=musculoskeletal&subject=Biochemistry&topic=Amino%20acids%20and%20Proteins&degree=MBBS&year=1st HTTP/1.1" 200 53493
+INFO 2025-06-29 16:50:58,781 basehttp 18308 2796 "GET /modelpaper/student/ HTTP/1.1" 200 79864
+INFO 2025-06-29 16:51:08,459 basehttp 18308 2796 "GET /modelpaper/take/12/ HTTP/1.1" 200 70783
+INFO 2025-06-29 16:51:14,703 basehttp 18308 2796 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 63324
+INFO 2025-06-29 16:51:17,688 basehttp 18308 2796 "GET /notes/ HTTP/1.1" 200 430998
+INFO 2025-06-29 16:51:25,384 basehttp 18308 2796 "GET /notes/add/?block=image&module=Physiology&subject=Cardiology&topic=Blood%20Pressure&degree=MBBS&year=1st HTTP/1.1" 200 31675
+WARNING 2025-06-29 16:51:25,413 basehttp 18308 2796 "GET /static/css/notes.css HTTP/1.1" 404 1853
+INFO 2025-06-29 16:51:28,910 basehttp 18308 1648 "GET /dashboard/ HTTP/1.1" 200 63324
+INFO 2025-06-29 16:51:45,880 basehttp 18308 1648 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 16:53:29,932 basehttp 18308 9536 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 63324
+INFO 2025-06-29 16:53:31,979 basehttp 18308 9536 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 16:53:42,207 basehttp 18308 9536 "GET /mocktest/student/ HTTP/1.1" 200 62024
+INFO 2025-06-29 16:53:45,272 basehttp 18308 9536 "GET /mocktest/take/4/ HTTP/1.1" 200 104960
+INFO 2025-06-29 16:53:45,336 basehttp 18308 9536 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 16:53:49,716 basehttp 18308 6428 "GET /mocktest/student/ HTTP/1.1" 200 62024
+INFO 2025-06-29 16:53:49,765 basehttp 18308 6428 "POST /mocktest/report-warning/ HTTP/1.1" 200 62
+INFO 2025-06-29 16:54:13,329 basehttp 18308 6428 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 16:54:25,579 basehttp 18308 6428 "GET /managemodule/student/practice/?block=images%20test&module=Anatomy&subject=Cardiology&topic=Heart%20Anatomy&degree=MBBS&year=1st HTTP/1.1" 200 53190
+INFO 2025-06-29 16:54:32,494 basehttp 18308 6428 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 16:54:39,119 basehttp 18308 6428 "GET /managemodule/student/practice/?block=B&module=musculoskeletal&subject=Histology&topic=Bone&degree=MBBS&year=1st HTTP/1.1" 200 53417
+INFO 2025-06-29 16:54:46,832 basehttp 18308 6428 "POST /managemodule/student/practice/ HTTP/1.1" 302 0
+INFO 2025-06-29 16:54:46,881 basehttp 18308 6428 "GET /managemodule/student/session/78/ HTTP/1.1" 200 181729
+INFO 2025-06-29 16:54:46,975 basehttp 18308 6428 "GET /managemodule/student/check-note/?session_id=78&question_id=408 HTTP/1.1" 200 102
+INFO 2025-06-29 16:59:33,098 basehttp 18308 10784 "GET / HTTP/1.1" 200 11151
+WARNING 2025-06-29 16:59:33,158 log 18308 10784 Not Found: /script.js
+WARNING 2025-06-29 16:59:33,160 basehttp 18308 10784 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 16:59:37,951 basehttp 18308 5204 "GET /dashboard/ HTTP/1.1" 200 63324
+INFO 2025-06-29 16:59:38,006 basehttp 18308 5204 "GET /media/profile_images/bbb_11zac4Z.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 16:59:39,832 basehttp 18308 5204 "GET /modelpaper/student/ HTTP/1.1" 200 79464
+INFO 2025-06-29 16:59:47,656 basehttp 18308 16056 "GET /modelpaper/take/12/ HTTP/1.1" 200 88968
+INFO 2025-06-29 16:59:58,132 basehttp 18308 10484 "POST /modelpaper/submit-paper/ HTTP/1.1" 200 136
+INFO 2025-06-29 16:59:59,772 basehttp 18308 10484 "GET /modelpaper/result/47/ HTTP/1.1" 200 54697
+INFO 2025-06-29 16:59:59,830 basehttp 18308 10484 - Broken pipe from ('127.0.0.1', 59482)
+WARNING 2025-06-29 17:00:05,065 log 18308 4640 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:00:05,065 basehttp 18308 4640 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:00:05,130 log 18308 17772 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:00:05,133 basehttp 18308 17772 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:00:05,165 log 18308 2148 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:00:05,165 basehttp 18308 2148 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+WARNING 2025-06-29 17:00:05,183 log 18308 4640 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:00:05,184 basehttp 18308 4640 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+INFO 2025-06-29 17:00:10,205 basehttp 18308 4640 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 63646
+INFO 2025-06-29 17:00:12,419 basehttp 18308 4640 "GET /modelpaper/student/ HTTP/1.1" 200 79541
+INFO 2025-06-29 17:00:17,063 basehttp 18308 6580 "GET /modelpaper/take/11/ HTTP/1.1" 200 95607
+INFO 2025-06-29 17:00:26,055 basehttp 18308 5036 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 99
+INFO 2025-06-29 17:00:30,645 basehttp 18308 5036 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 99
+INFO 2025-06-29 17:00:32,121 basehttp 18308 5036 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 99
+INFO 2025-06-29 17:00:34,432 basehttp 18308 5036 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 99
+INFO 2025-06-29 17:00:34,902 basehttp 18308 5036 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 99
+INFO 2025-06-29 17:00:40,616 basehttp 18308 14888 "POST /modelpaper/submit-paper/ HTTP/1.1" 200 136
+INFO 2025-06-29 17:00:42,328 basehttp 18308 14888 "GET /modelpaper/result/48/ HTTP/1.1" 200 63189
+INFO 2025-06-29 17:00:51,316 basehttp 18308 17860 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 64257
+INFO 2025-06-29 17:00:59,892 basehttp 18308 12648 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 17:03:12,813 basehttp 18308 316 "GET /dashboard/student/progress/ HTTP/1.1" 200 53242
+INFO 2025-06-29 17:03:20,463 basehttp 18308 7724 "GET /myaccount/ HTTP/1.1" 200 61461
+INFO 2025-06-29 17:03:30,535 basehttp 18308 1908 "GET /managemodule/student/ HTTP/1.1" 200 423816
+INFO 2025-06-29 17:04:44,873 basehttp 18308 1196 "GET /managemodule/student/?q=&degree=BDS&year= HTTP/1.1" 200 49920
+INFO 2025-06-29 17:06:16,804 basehttp 18308 5140 "GET /managemodule/student/?q=&degree=BDS&year= HTTP/1.1" 200 48211
+WARNING 2025-06-29 17:06:16,848 basehttp 18308 5140 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 17:06:16,856 basehttp 18308 18080 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 17:06:23,013 basehttp 18308 17412 "GET /managemodule/student/ HTTP/1.1" 200 422107
+INFO 2025-06-29 17:06:29,753 basehttp 18308 13456 "GET /mocktest/student/ HTTP/1.1" 200 62024
+INFO 2025-06-29 17:06:37,698 basehttp 18308 13456 "GET /managemodule/student/ HTTP/1.1" 200 422107
+INFO 2025-06-29 17:06:46,639 basehttp 18308 16368 "GET /managemodule/student/practice/?block=B&module=musculoskeletal&subject=Physiology&topic=Characteristics%20of%20Whole%20Muscle%20Contraction&degree=MBBS&year=1st HTTP/1.1" 200 53276
+INFO 2025-06-29 17:06:52,642 basehttp 18308 16356 "POST /managemodule/student/practice/ HTTP/1.1" 302 0
+INFO 2025-06-29 17:06:52,708 basehttp 18308 16356 "GET /managemodule/student/session/79/ HTTP/1.1" 200 131257
+INFO 2025-06-29 17:06:52,773 basehttp 18308 16356 "GET /managemodule/student/check-note/?session_id=79&question_id=454 HTTP/1.1" 200 102
+INFO 2025-06-29 17:06:54,809 basehttp 18308 16356 "POST /managemodule/student/submit-answer/ HTTP/1.1" 200 936
+INFO 2025-06-29 17:07:18,965 basehttp 18308 8560 "POST /managemodule/student/complete-session/ HTTP/1.1" 200 215
+INFO 2025-06-29 17:07:22,000 basehttp 18308 18108 "GET /managemodule/student/session/79/result/ HTTP/1.1" 200 141026
+INFO 2025-06-29 17:07:31,205 basehttp 18308 17040 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 64899
+INFO 2025-06-29 17:07:43,234 basehttp 18308 7936 "GET /managemodule/student/ HTTP/1.1" 200 422114
+INFO 2025-06-29 17:15:28,362 autoreload 18308 17696 D:\PulsePrepProject\managemodule\views.py changed, reloading.
+INFO 2025-06-29 17:15:29,391 autoreload 16172 2068 Watching for file changes with StatReloader
+INFO 2025-06-29 17:15:38,808 basehttp 16172 16524 "GET /managemodule/student/ HTTP/1.1" 200 422114
+INFO 2025-06-29 17:15:47,375 basehttp 16172 16524 "GET /managemodule/student/practice/?block=B&module=musculoskeletal&subject=Embryology&topic=Development%20of%20bone%2C%20cartilage%20and%20joints&degree=MBBS&year=1st HTTP/1.1" 200 53400
+INFO 2025-06-29 17:15:53,800 basehttp 16172 16376 "POST /managemodule/student/practice/ HTTP/1.1" 302 0
+INFO 2025-06-29 17:15:53,843 basehttp 16172 16376 "GET /managemodule/student/session/80/ HTTP/1.1" 200 143599
+INFO 2025-06-29 17:15:53,971 basehttp 16172 9976 "GET /managemodule/student/check-note/?session_id=80&question_id=366 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,017 basehttp 16172 16376 "GET /managemodule/student/check-note/?session_id=80&question_id=367 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,084 basehttp 16172 15748 "GET /managemodule/student/check-note/?session_id=80&question_id=379 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,118 basehttp 16172 10100 "GET /managemodule/student/check-note/?session_id=80&question_id=377 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,137 basehttp 16172 9976 "GET /managemodule/student/check-note/?session_id=80&question_id=382 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,150 basehttp 16172 18276 "GET /managemodule/student/check-note/?session_id=80&question_id=390 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:54,167 basehttp 16172 16000 "GET /managemodule/student/check-note/?session_id=80&question_id=387 HTTP/1.1" 200 102
+INFO 2025-06-29 17:15:57,606 basehttp 16172 16000 "POST /managemodule/student/submit-answer/ HTTP/1.1" 200 947
+INFO 2025-06-29 17:16:14,152 basehttp 16172 1536 "POST /managemodule/student/complete-session/ HTTP/1.1" 200 215
+INFO 2025-06-29 17:16:16,850 basehttp 16172 1536 "GET /managemodule/student/session/80/result/ HTTP/1.1" 200 140958
+INFO 2025-06-29 17:16:34,730 basehttp 16172 9200 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 65541
+INFO 2025-06-29 17:16:40,761 basehttp 16172 9200 "GET /managemodule/student/ HTTP/1.1" 200 422121
+INFO 2025-06-29 17:16:47,803 basehttp 16172 9200 "GET /managemodule/student/practice/?block=images%20test&module=Anatomy&subject=Cardiology&topic=Heart%20Anatomy&degree=MBBS&year=1st HTTP/1.1" 200 53190
+INFO 2025-06-29 17:16:53,946 basehttp 16172 9200 "POST /managemodule/student/practice/ HTTP/1.1" 302 0
+INFO 2025-06-29 17:16:53,985 basehttp 16172 9200 "GET /managemodule/student/session/81/ HTTP/1.1" 200 130426
+INFO 2025-06-29 17:16:54,040 basehttp 16172 9200 "GET /managemodule/student/check-note/?session_id=81&question_id=503 HTTP/1.1" 200 102
+INFO 2025-06-29 17:16:54,109 basehttp 16172 4972 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:16:56,062 basehttp 16172 4972 "POST /managemodule/student/submit-answer/ HTTP/1.1" 200 245
+INFO 2025-06-29 17:16:58,681 basehttp 16172 4972 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:17:04,706 basehttp 16172 4972 "POST /managemodule/student/complete-session/ HTTP/1.1" 200 215
+INFO 2025-06-29 17:17:07,436 basehttp 16172 7056 "GET /managemodule/student/session/81/result/ HTTP/1.1" 200 142583
+INFO 2025-06-29 17:27:34,356 basehttp 16172 16944 "GET /dashboard/student/dashboard/ HTTP/1.1" 200 66156
+INFO 2025-06-29 17:27:34,412 basehttp 16172 16944 "GET /media/profile_images/bbb_11zac4Z.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:27:36,802 basehttp 16172 16944 "GET /modelpaper/student/ HTTP/1.1" 200 80614
+INFO 2025-06-29 17:27:39,963 basehttp 16172 16944 "GET /modelpaper/take/12/ HTTP/1.1" 200 92926
+INFO 2025-06-29 17:27:53,687 basehttp 16172 4904 "POST /modelpaper/submit-answer/ HTTP/1.1" 200 322
+INFO 2025-06-29 17:28:00,790 basehttp 16172 4904 "POST /modelpaper/submit-paper/ HTTP/1.1" 200 136
+INFO 2025-06-29 17:28:02,442 basehttp 16172 13524 "GET /modelpaper/result/49/ HTTP/1.1" 200 54840
+WARNING 2025-06-29 17:28:05,461 log 16172 13304 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:28:05,461 basehttp 16172 13304 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:28:05,490 log 16172 13524 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:28:05,490 basehttp 16172 13524 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:28:05,563 log 16172 13524 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:28:05,563 basehttp 16172 13524 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:28:05,575 log 16172 13304 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:28:05,575 basehttp 16172 13304 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:35:53,814 autoreload 16172 2068 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 17:35:55,572 autoreload 2136 16744 Watching for file changes with StatReloader
+INFO 2025-06-29 17:36:02,437 basehttp 2136 2420 "GET /modelpaper/result/49/ HTTP/1.1" 200 54840
+WARNING 2025-06-29 17:36:04,732 log 2136 15208 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:36:04,732 basehttp 2136 15208 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:36:04,779 log 2136 15460 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:36:04,779 basehttp 2136 15460 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:36:04,832 log 2136 15208 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:36:04,832 basehttp 2136 15208 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:36:04,877 log 2136 5728 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:36:04,879 basehttp 2136 5728 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:36:08,582 basehttp 2136 5728 "GET /modelpaper/result/49/ HTTP/1.1" 200 54840
+WARNING 2025-06-29 17:36:11,445 log 2136 5728 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:36:11,445 basehttp 2136 5728 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:36:11,475 log 2136 15208 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:36:11,475 basehttp 2136 15208 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:36:11,532 log 2136 15460 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:36:11,532 basehttp 2136 15460 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:36:11,563 log 2136 8880 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:36:11,563 basehttp 2136 8880 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:37:00,501 basehttp 2136 13264 "GET / HTTP/1.1" 200 11131
+INFO 2025-06-29 17:37:00,671 basehttp 2136 13264 "GET /static/css/main/style.css HTTP/1.1" 200 17661
+WARNING 2025-06-29 17:37:00,978 log 2136 13264 Not Found: /script.js
+WARNING 2025-06-29 17:37:00,978 basehttp 2136 13264 "GET /script.js HTTP/1.1" 404 11395
+INFO 2025-06-29 17:37:01,560 basehttp 2136 13264 "GET /static/images/onlyName.png HTTP/1.1" 200 4832
+INFO 2025-06-29 17:37:02,770 basehttp 2136 14316 "GET /login/ HTTP/1.1" 200 5782
+INFO 2025-06-29 17:37:05,394 basehttp 2136 14316 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-29 17:37:05,485 basehttp 2136 14316 "GET /dashboard/ HTTP/1.1" 200 36627
+INFO 2025-06-29 17:37:05,584 basehttp 2136 14316 "GET /media/profile_images/bbb_11zac4Z.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:05,611 basehttp 2136 12648 "GET /media/profile_images/biology_SJVIymG.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:05,677 basehttp 2136 9976 "GET /media/profile_images/biology_SRC7kll.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:05,702 basehttp 2136 4580 "GET /media/profile_images/bp_measurement.jpg HTTP/1.1" 200 5842
+INFO 2025-06-29 17:37:05,718 basehttp 2136 14316 "GET /media/profile_images/biology_U9qwrNA.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:05,756 basehttp 2136 12648 "GET /media/profile_images/heart_anatomy_labeled_ejIPZ3A.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 17:37:05,760 basehttp 2136 17580 "GET /media/profile_images/biology.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:07,874 basehttp 2136 17580 "GET /images/ HTTP/1.1" 200 62647
+INFO 2025-06-29 17:37:07,919 basehttp 2136 17580 "GET /static/css/MQstyles.css HTTP/1.1" 200 30488
+INFO 2025-06-29 17:37:08,069 basehttp 2136 17580 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,121 basehttp 2136 12648 "GET /media/question_images/nnnnn.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,146 basehttp 2136 4580 "GET /media/question_images/mmmmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,157 basehttp 2136 9976 "GET /media/question_images/mmm.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,175 basehttp 2136 1844 "GET /media/question_images/zzzzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,223 basehttp 2136 14316 "GET /media/question_images/nnn.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,251 basehttp 2136 17580 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,294 basehttp 2136 12648 "GET /media/question_images/zzz.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,315 basehttp 2136 1844 "GET /media/question_images/yyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,332 basehttp 2136 4580 "GET /media/question_images/yyyyy.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:08,372 basehttp 2136 9976 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,414 basehttp 2136 14316 "GET /images/usage-summary/31/ HTTP/1.1" 200 230
+INFO 2025-06-29 17:37:08,433 basehttp 2136 4580 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,492 basehttp 2136 4580 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,584 basehttp 2136 4580 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,683 basehttp 2136 4580 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,782 basehttp 2136 4580 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,884 basehttp 2136 4580 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:08,982 basehttp 2136 4580 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:09,088 basehttp 2136 4580 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:37:09,259 basehttp 2136 14316 "GET /media/question_images/mttt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:09,289 basehttp 2136 9976 "GET /media/question_images/aaaaa.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 17:37:09,295 basehttp 2136 1844 "GET /media/question_images/mtt.jpeg HTTP/1.1" 200 10238
+INFO 2025-06-29 17:37:09,304 basehttp 2136 4580 "GET /media/question_images/ccc.jpeg HTTP/1.1" 200 10238
+WARNING 2025-06-29 17:38:53,979 views 2136 16664 nnn.jpeg: File with this name already exists (uploaded by rootadmin on 2025-06-29)
+WARNING 2025-06-29 17:38:53,979 views 2136 16664 nnnnn.jpeg: File with this name already exists (uploaded by rootadmin on 2025-06-29)
+WARNING 2025-06-29 17:38:53,995 log 2136 16664 Bad Request: /images/upload/
+WARNING 2025-06-29 17:38:53,995 basehttp 2136 16664 "POST /images/upload/ HTTP/1.1" 400 333
+WARNING 2025-06-29 17:39:26,743 views 2136 15164 Delete blocked for image 32: Cannot delete "mmmmm.jpeg". Image is currently used in: Model Papers: 2 explanation image(s)
+WARNING 2025-06-29 17:39:26,811 log 2136 15164 Bad Request: /images/delete/32/
+WARNING 2025-06-29 17:39:26,811 basehttp 2136 15164 "POST /images/delete/32/ HTTP/1.1" 400 143
+INFO 2025-06-29 17:39:31,359 basehttp 2136 15164 "POST /images/delete/31/ HTTP/1.1" 200 71
+WARNING 2025-06-29 17:39:44,662 views 2136 16112 Delete blocked for image 32: Cannot delete "mmmmm.jpeg". Image is currently used in: Model Papers: 2 explanation image(s)
+WARNING 2025-06-29 17:39:44,679 log 2136 16112 Bad Request: /images/delete/32/
+WARNING 2025-06-29 17:39:44,684 basehttp 2136 16112 "POST /images/delete/32/ HTTP/1.1" 400 143
+WARNING 2025-06-29 17:39:52,402 views 2136 16112 Delete blocked for image 32: Cannot delete "mmmmm.jpeg". Image is currently used in: Model Papers: 2 explanation image(s)
+WARNING 2025-06-29 17:39:52,433 log 2136 16112 Bad Request: /images/delete/32/
+WARNING 2025-06-29 17:39:52,433 basehttp 2136 16112 "POST /images/delete/32/ HTTP/1.1" 400 143
+INFO 2025-06-29 17:39:57,849 basehttp 2136 14960 "GET /images/ HTTP/1.1" 200 62260
+INFO 2025-06-29 17:39:57,955 basehttp 2136 14960 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:57,955 basehttp 2136 13692 "GET /static/images/favicon.png HTTP/1.1" 200 68700
+WARNING 2025-06-29 17:39:58,014 basehttp 2136 13692 "GET /static/images/favicon-32x32.png HTTP/1.1" 404 1886
+WARNING 2025-06-29 17:39:58,030 basehttp 2136 17976 "GET /static/images/favicon-16x16.png HTTP/1.1" 404 1886
+INFO 2025-06-29 17:39:58,068 basehttp 2136 14960 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,123 basehttp 2136 14960 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,243 basehttp 2136 14960 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,315 basehttp 2136 14960 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,418 basehttp 2136 14960 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,562 basehttp 2136 14960 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,632 basehttp 2136 14960 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,724 basehttp 2136 14960 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,827 basehttp 2136 14960 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:58,918 basehttp 2136 14960 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:39:59,021 basehttp 2136 14960 "GET /images/usage-summary/8/ HTTP/1.1" 200 245
+INFO 2025-06-29 17:39:59,794 basehttp 2136 14960 "GET /media/question_images/aaa.jpg HTTP/1.1" 200 772584
+WARNING 2025-06-29 17:40:03,905 views 2136 9976 Delete blocked for image 32: Cannot delete "mmmmm.jpeg". Image is currently used in: Model Papers: 2 explanation image(s)
+WARNING 2025-06-29 17:40:03,929 log 2136 9976 Bad Request: /images/delete/32/
+WARNING 2025-06-29 17:40:03,929 basehttp 2136 9976 "POST /images/delete/32/ HTTP/1.1" 400 143
+INFO 2025-06-29 17:40:29,323 basehttp 2136 13872 "POST /images/upload/ HTTP/1.1" 200 354
+INFO 2025-06-29 17:40:31,401 basehttp 2136 13872 "GET /images/ HTTP/1.1" 200 62270
+INFO 2025-06-29 17:40:31,529 basehttp 2136 13872 "GET /images/usage-summary/36/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:31,556 basehttp 2136 5204 "GET /media/question_images/mmm.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 17:40:31,599 basehttp 2136 8748 "GET /media/question_images/mmmmm.jpg HTTP/1.1" 200 772584
+INFO 2025-06-29 17:40:31,621 basehttp 2136 13872 "GET /images/usage-summary/35/ HTTP/1.1" 200 230
+INFO 2025-06-29 17:40:31,660 basehttp 2136 13872 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:31,767 basehttp 2136 13872 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:31,866 basehttp 2136 13872 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:31,975 basehttp 2136 13872 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,066 basehttp 2136 13872 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,166 basehttp 2136 13872 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,275 basehttp 2136 13872 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,372 basehttp 2136 13872 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,465 basehttp 2136 13872 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:32,564 basehttp 2136 13872 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:40:53,710 basehttp 2136 14596 "GET /images/usage/34/ HTTP/1.1" 200 1292
+INFO 2025-06-29 17:41:04,416 basehttp 2136 4328 "GET /images/usage/33/ HTTP/1.1" 200 1282
+INFO 2025-06-29 17:41:13,983 basehttp 2136 8692 "GET /modelpaper/result/49/ HTTP/1.1" 200 54840
+WARNING 2025-06-29 17:41:16,876 log 2136 8692 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:41:16,881 basehttp 2136 8692 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:41:16,893 log 2136 13008 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:41:16,898 basehttp 2136 13008 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:41:16,979 log 2136 10832 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:41:16,979 basehttp 2136 10832 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+WARNING 2025-06-29 17:41:17,000 log 2136 8692 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:41:17,000 basehttp 2136 8692 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+INFO 2025-06-29 17:44:03,290 autoreload 2136 16744 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 17:44:05,110 autoreload 13692 17976 Watching for file changes with StatReloader
+INFO 2025-06-29 17:44:16,138 basehttp 13692 17704 "GET /modelpaper/result/49/ HTTP/1.1" 200 54840
+WARNING 2025-06-29 17:44:18,522 log 13692 17704 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:44:18,526 basehttp 13692 17704 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:44:18,537 log 13692 14656 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:44:18,542 basehttp 13692 14656 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:44:18,615 log 13692 17704 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:44:18,615 basehttp 13692 17704 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:44:18,637 log 13692 4644 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:44:18,637 basehttp 13692 4644 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:44:38,834 basehttp 13692 13496 "POST /images/delete/35/ HTTP/1.1" 200 70
+INFO 2025-06-29 17:44:45,487 basehttp 13692 9196 "GET /images/ HTTP/1.1" 200 62274
+INFO 2025-06-29 17:44:45,596 basehttp 13692 9196 "GET /media/question_images/mmmmm.jpg HTTP/1.1" 304 0
+INFO 2025-06-29 17:44:45,636 basehttp 13692 16684 "GET /images/usage-summary/36/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:45,692 basehttp 13692 16684 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:45,759 basehttp 13692 16684 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:45,867 basehttp 13692 16684 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:45,957 basehttp 13692 16684 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,056 basehttp 13692 16684 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,152 basehttp 13692 16684 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,256 basehttp 13692 16684 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,351 basehttp 13692 16684 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,456 basehttp 13692 16684 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,550 basehttp 13692 16684 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:44:46,654 basehttp 13692 16684 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:50:15,514 autoreload 13692 17976 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 17:50:17,286 autoreload 10100 2160 Watching for file changes with StatReloader
+INFO 2025-06-29 17:57:03,500 autoreload 10100 2160 D:\PulsePrepProject\modelpaper\views.py changed, reloading.
+INFO 2025-06-29 17:57:05,115 autoreload 2592 16432 Watching for file changes with StatReloader
+INFO 2025-06-29 17:58:46,688 basehttp 2592 14532 "GET /modelpaper/result/49/ HTTP/1.1" 200 54959
+WARNING 2025-06-29 17:58:49,992 log 2592 14532 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:58:49,992 basehttp 2592 14532 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:58:50,012 log 2592 15480 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:58:50,013 basehttp 2592 15480 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:58:50,093 log 2592 18300 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:58:50,096 basehttp 2592 18300 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:58:50,116 log 2592 14508 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:58:50,118 basehttp 2592 14508 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:59:25,256 autoreload 17492 12736 Watching for file changes with StatReloader
+INFO 2025-06-29 17:59:29,776 basehttp 17492 16436 "GET /modelpaper/result/49/ HTTP/1.1" 200 54959
+WARNING 2025-06-29 17:59:32,566 log 17492 7452 Not Found: /media/question_images/nnnnn
+WARNING 2025-06-29 17:59:32,577 basehttp 17492 7452 "GET /media/question_images/nnnnn HTTP/1.1" 404 11658
+WARNING 2025-06-29 17:59:32,599 log 17492 16436 Not Found: /media/question_images/nnn
+WARNING 2025-06-29 17:59:32,602 basehttp 17492 16436 "GET /media/question_images/nnn HTTP/1.1" 404 11650
+WARNING 2025-06-29 17:59:32,653 log 17492 7452 Not Found: /media/question_images/mmm.png
+WARNING 2025-06-29 17:59:32,653 basehttp 17492 7452 "GET /media/question_images/mmm.png HTTP/1.1" 404 11666
+WARNING 2025-06-29 17:59:32,694 log 17492 14740 Not Found: /media/question_images/mmmmm.png
+WARNING 2025-06-29 17:59:32,694 basehttp 17492 14740 "GET /media/question_images/mmmmm.png HTTP/1.1" 404 11674
+INFO 2025-06-29 17:59:58,964 basehttp 17492 18020 "GET /images/ HTTP/1.1" 200 62274
+INFO 2025-06-29 17:59:59,043 basehttp 17492 18020 "GET /media/question_images/mmmmm.jpg HTTP/1.1" 304 0
+INFO 2025-06-29 17:59:59,099 basehttp 17492 18020 "GET /images/usage-summary/36/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,168 basehttp 17492 18020 "GET /images/usage-summary/34/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,275 basehttp 17492 18020 "GET /images/usage-summary/33/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,362 basehttp 17492 18020 "GET /images/usage-summary/32/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,449 basehttp 17492 18020 "GET /images/usage-summary/30/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,548 basehttp 17492 18020 "GET /images/usage-summary/29/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,655 basehttp 17492 18020 "GET /images/usage-summary/28/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,758 basehttp 17492 18020 "GET /images/usage-summary/27/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,863 basehttp 17492 18020 "GET /images/usage-summary/26/ HTTP/1.1" 200 240
+INFO 2025-06-29 17:59:59,955 basehttp 17492 18020 "GET /images/usage-summary/25/ HTTP/1.1" 200 240
+INFO 2025-06-29 18:00:00,058 basehttp 17492 18020 "GET /images/usage-summary/24/ HTTP/1.1" 200 240
+INFO 2025-06-29 18:00:00,186 basehttp 17492 18020 "GET /images/usage-summary/22/ HTTP/1.1" 200 240
+INFO 2025-06-29 18:01:08,135 basehttp 17492 18020 "GET /images/usage/36/ HTTP/1.1" 200 1288
+INFO 2025-06-29 18:01:15,056 basehttp 17492 18020 "GET /images/usage/34/ HTTP/1.1" 200 1292
+INFO 2025-06-29 18:01:28,845 basehttp 17492 18020 "GET /images/usage/33/ HTTP/1.1" 200 1282
+INFO 2025-06-29 18:01:32,196 basehttp 17492 18020 "GET /images/usage/34/ HTTP/1.1" 200 1292
+INFO 2025-06-29 18:01:36,668 basehttp 17492 18020 "GET /images/usage/32/ HTTP/1.1" 200 1289
+INFO 2025-06-29 18:13:37,280 autoreload 17492 12736 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 18:13:38,853 autoreload 15568 13676 Watching for file changes with StatReloader
+INFO 2025-06-29 18:13:56,368 autoreload 15568 13676 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 18:13:57,769 autoreload 15624 14612 Watching for file changes with StatReloader
+INFO 2025-06-29 18:14:23,760 autoreload 15624 14612 D:\PulsePrepProject\config\settings.py changed, reloading.
+INFO 2025-06-29 18:14:25,434 autoreload 16056 9120 Watching for file changes with StatReloader
