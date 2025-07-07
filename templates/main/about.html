@@ -1,322 +1,2735 @@
-{% load static %} 
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    {% include 'includes/favicon.html' %}
+<head>
+<meta charset="UTF-8" />
+{% include 'includes/favicon.html' %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About Us - PulsePrep</title>
+<link
+rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Enhanced Modern CSS with Mobile-First Approach - Same as Home Page */
+:root {
+  --arterial-red: #dc143c;
+  --venous-blue: #1e3a8a;
+  --primary-color: var(--arterial-red);
+  --secondary-color: var(--venous-blue);
+  --accent-color: #f7d6dc;
+  --gradient-start: #fdfafb;
+  --gradient-end: #f5e0e3;
+  --text-dark: #1a1a1a;
+  --text-light: #6b7280;
+  --text-muted: #9ca3af;
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 0.75rem;
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+  --border-radius-2xl: 2rem;
+  --transition-all: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-transform: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-opacity: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PulsePrep - About Us</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link rel="stylesheet" href="{% static 'css/main/style.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/main/aboutUS.css' %}" />
+  /* Enhanced Tech Colors */
+  --tech-primary: #6366f1;
+  --tech-secondary: #8b5cf6;
+  --tech-accent: #06b6d4;
+  --tech-success: #10b981;
+  --tech-warning: #f59e0b;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+  --gradient-secondary: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e40af 100%);
+  --gradient-card: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
 
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: var(--text-dark);
+  background: var(--white);
+  overflow-x: hidden;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Enhanced Modern Header with Larger Height for Prominent Logo */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: var(--transition-all);
+  padding: 0;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+}
+
+.header-container {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: 5rem;
+  position: relative;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Left Navigation */
+.nav-menu {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  padding: 6rem 2rem 2rem;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+  box-shadow: var(--shadow-xl);
+}
+
+.nav-menu.show {
+  display: flex;
+  transform: translateX(0);
+}
+
+.nav-menu a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-menu a.active {
+  color: var(--primary-color);
+  background: rgba(220, 20, 60, 0.1);
+}
+
+.nav-menu a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+  z-index: -1;
+}
+
+.nav-menu a:hover::before {
+  opacity: 0.1;
+  transform: translateY(0);
+}
+
+.nav-menu a:hover {
+  color: var(--primary-color);
+  transform: translateX(0.5rem);
+}
+
+/* Enhanced Centered Logo - More Prominent & Bouncy */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 2.25rem;
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: var(--transition-all);
+  position: relative;
+  z-index: 10;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-lg);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.logo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: inherit;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  opacity: 0;
+  transition: var(--transition-opacity);
+}
+
+.logo:hover::before {
+  opacity: 1;
+}
+
+.logo:hover {
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 8px 25px rgba(220, 20, 60, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.logo img {
+  height: 4rem;
+  width: auto;
+  filter: drop-shadow(0 6px 16px rgba(220, 20, 60, 0.3));
+  transition: var(--transition-all);
+  animation: logoBounce 2s ease-in-out infinite;
+}
+
+.logo:hover img {
+  transform: rotate(5deg) scale(1.05);
+  filter: drop-shadow(0 8px 20px rgba(220, 20, 60, 0.4));
+}
+
+.logo-text {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(220, 20, 60, 0.2);
+  position: relative;
+}
+
+.logo-text::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 2px;
+  transform: scaleX(0);
+  transition: var(--transition-transform);
+}
+
+.logo:hover .logo-text::after {
+  transform: scaleX(1);
+}
+
+/* Mobile Menu Button - Left Positioned */
+.mobile-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  justify-self: start;
+}
+
+.mobile-menu-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  opacity: 0;
+  transition: var(--transition-opacity);
+}
+
+.mobile-menu-btn:hover::before {
+  opacity: 1;
+}
+
+.mobile-menu-btn i {
+  color: var(--text-dark);
+  font-size: 0.875rem;
+  transition: var(--transition-all);
+  position: relative;
+  z-index: 2;
+}
+
+.mobile-menu-btn:hover i {
+  color: var(--white);
+}
+
+.mobile-menu-btn:hover {
+  transform: scale(1.05);
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Auth Buttons - Right Aligned */
+.auth-buttons {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-self: end;
+}
+
+.auth-btn {
+  padding: 0.625rem 1.5rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-btn, .dashboard-btn, .logout-btn {
+  background: var(--white);
+  color: var(--text-dark);
+  border: 2px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.login-btn:hover, .dashboard-btn:hover, .logout-btn:hover {
+  background: var(--gray-50);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.signup-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  border: 2px solid transparent;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+.signup-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+  opacity: 0;
+  transition: var(--transition-opacity);
+}
+
+.signup-btn:hover::before {
+  opacity: 1;
+}
+
+.signup-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.signup-btn span {
+  position: relative;
+  z-index: 2;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-all);
+  z-index: 998;
+  backdrop-filter: blur(4px);
+}
+
+.overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* About Page Specific Styles */
+.about-hero {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, 
+    var(--white) 0%, 
+    var(--gray-50) 25%, 
+    var(--accent-color) 50%, 
+    var(--gray-50) 75%, 
+    var(--white) 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 7rem 1rem 2rem;
+}
+
+.about-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(220, 20, 60, 0.03) 0%, transparent 70%),
+    radial-gradient(circle at 75% 75%, rgba(30, 58, 138, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.about-hero-content {
+  text-align: center;
+  max-width: 56rem;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  animation: heroFadeIn 1s ease-out;
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(220, 20, 60, 0.1);
+  color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius-xl);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(220, 20, 60, 0.2);
+  animation: slideUp 1s ease-out 0.2s both;
+}
+
+.about-hero h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  animation: titleAnimation 1.2s ease-out 0.4s both;
+}
+
+.about-gradient-text {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.about-hero-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  font-weight: 500;
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
+  animation: subtitleAnimation 1.2s ease-out 0.6s both;
+}
+
+/* Collaborators Logos */
+.collaborators {
+  padding: 2rem 1rem;
+  background: var(--gray-50);
+}
+
+.collaborators-content {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.collaborators h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.collaborators-subtitle {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+.collaborators-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.collaborator-logo {
+  width: 120px;
+  height: 80px;
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-all);
+  border: 2px solid var(--gray-200);
+}
+
+.collaborator-logo:hover {
+  transform: translateY(-0.25rem) scale(1.05);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-color);
+}
+
+.collaborator-logo img {
+  max-width: 80%;
+  max-height: 60%;
+  object-fit: contain;
+}
+
+/* Section Styles - Compact Spacing */
+.section {
+  padding: 3rem 1rem;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-badge {
+  display: inline-block;
+  background: rgba(30, 58, 138, 0.1);
+  color: var(--secondary-color);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(30, 58, 138, 0.2);
+}
+
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+/* Mission Section */
+.mission {
+  background: var(--white);
+}
+
+.mission-content {
+  text-align: center;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.mission-text {
+  font-size: 1.125rem;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.core-values {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.value-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.value-item i {
+  color: var(--primary-color);
+  font-size: 1.125rem;
+}
+
+/* Team Sections */
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.team-member {
+  background: var(--white);
+  padding: 1.75rem;
+  border-radius: var(--border-radius-xl);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.team-member::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  transform: scaleX(0);
+  transition: var(--transition-transform);
+}
+
+.team-member:hover::before {
+  transform: scaleX(1);
+}
+
+.team-member:hover {
+  transform: translateY(-0.5rem);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--gray-300);
+}
+
+.member-avatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: var(--transition-transform);
+  overflow: hidden;
+}
+
+.member-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.team-member:hover .member-avatar {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.member-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+  font-family: 'Outfit', sans-serif;
+}
+
+.member-role {
+  color: var(--text-light);
+  font-size: 0.9375rem;
+  margin-bottom: 1rem;
+}
+
+.member-linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition-all);
+}
+
+.member-linkedin:hover {
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+/* Simple Team Lists - 4 per row layout */
+.simple-team-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.simple-member {
+  background: var(--gray-50);
+  padding: 1.25rem;
+  border-radius: var(--border-radius-lg);
+  border-left: 4px solid var(--primary-color);
+  transition: var(--transition-all);
+}
+
+.simple-member:hover {
+  background: var(--white);
+  box-shadow: var(--shadow-md);
+  transform: translateX(0.25rem);
+}
+
+.simple-member-name {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.25rem;
+  font-size: 0.9375rem;
+}
+
+.simple-member-role {
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+/* Enhanced Tech Tycoons Section - Professional & Modern */
+.tech-tycoons {
+  background: var(--gradient-secondary);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+  margin-top: 5rem;
+  padding: 4rem 2rem;
+  border-radius: var(--border-radius-2xl);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Animated Background */
+.tech-tycoons::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+  animation: backgroundShift 20s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.tech-tycoons::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--gradient-primary);
+  animation: shimmer 3s linear infinite;
+}
+
+/* Header Section */
+.tech-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+}
+
+.tech-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+/* Brand Container */
+.tech-brand-showcase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-brand-showcase::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--tech-primary), var(--tech-secondary), transparent);
+  animation: scan 3s linear infinite;
+}
+
+.tech-logo-container {
+  position: relative;
+}
+
+.tech-logo-circle {
+  width: 5rem;
+  height: 5rem;
+  background: var(--white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    0 0 0 4px rgba(255, 255, 255, 0.1);
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-logo-circle::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  transition: var(--transition-all);
+}
+
+.tech-logo-circle:hover::before {
+  opacity: 1;
+}
+
+.tech-logo-circle:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 6px rgba(255, 255, 255, 0.2);
+}
+
+.tech-logo-circle img {
+  max-width: 70%;
+  max-height: 70%;
+  object-fit: contain;
+}
+
+.tech-brand-info {
+  text-align: left;
+}
+
+.tech-brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.tech-tagline {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.tech-contact-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tech-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition-all);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tech-contact-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.tech-contact-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 0.75rem;
+}
+
+.tech-contact-link {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  transition: var(--transition-all);
+}
+
+.tech-contact-link:hover {
+  color: var(--white);
+}
+
+/* Tech Description Text */
+.tech-description-text {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-xl);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(20px);
+}
+
+.tech-description-highlight {
+  color: var(--white);
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Main Content Layout */
+.tech-content-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  position: relative;
+  z-index: 2;
+  align-items: start;
+}
+
+/* Development Section */
+.development-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-xl);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.development-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tech-primary), var(--tech-secondary));
+  border-radius: 3px 3px 0 0;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+}
+
+.panel-icon {
+  width: 3rem;
+  height: 3rem;
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.125rem;
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+}
+
+.panel-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--white);
+  margin: 0;
+}
+
+.dev-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.dev-member-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.dev-member-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+  opacity: 0;
+  transition: var(--transition-all);
+}
+
+.dev-member-card:hover::before {
+  opacity: 1;
+}
+
+.dev-member-card:hover {
+  transform: translateY(-0.5rem);
+  border-color: var(--tech-primary);
+  box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3);
+}
+
+.dev-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.25rem;
+  font-weight: 700;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.dev-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.dev-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.dev-role {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+.dev-linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0077b5, #00a0dc);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition-all);
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 4px 15px rgba(0, 119, 181, 0.3);
+  margin-top: auto;
+}
+
+.dev-linkedin:hover {
+  background: linear-gradient(135deg, #00a0dc, #0077b5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 119, 181, 0.4);
+}
+
+/* Support Panel */
+.support-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius-xl);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.support-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--tech-accent), var(--tech-success));
+  border-radius: 3px 3px 0 0;
+}
+
+.support-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.support-member {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+}
+
+.support-member::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--gradient-primary);
+  transform: scaleY(0);
+  transition: var(--transition-all);
+}
+
+.support-member:hover::before {
+  transform: scaleY(1);
+}
+
+.support-member:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: var(--tech-accent);
+  color: var(--white);
+  transform: translateX(0.5rem);
+}
+
+/* Animations */
+@keyframes backgroundShift {
+  0%, 100% { 
+    background-position: 0% 0%, 100% 100%, 50% 50%; 
+  }
+  50% { 
+    background-position: 100% 100%, 0% 0%, 25% 75%; 
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes scan {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Compact Modern Footer */
+footer {
+  background: var(--gray-900);
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(220, 20, 60, 0.05) 0%, transparent 70%),
+    radial-gradient(circle at 75% 75%, rgba(30, 58, 138, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.footer-main {
+  padding: 3rem 1rem 0;
+  position: relative;
+  z-index: 2;
+}
+
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.footer-brand {
+  text-align: center;
+  transform: translateY(-1rem);
+  animation: footerBounce 0.8s ease-out;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  transition: var(--transition-transform);
+}
+
+.footer-logo:hover {
+  transform: translateY(-0.25rem) scale(1.05);
+}
+
+.footer-logo img {
+  height: 2.5rem;
+  width: auto;
+  filter: brightness(0) invert(1);
+  transition: var(--transition-transform);
+}
+
+.brand-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #60a5fa, var(--primary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.footer-tagline {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  max-width: 18rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-social-icons {
+  display: flex;
+  gap: 0.875rem;
+  justify-content: center;
+}
+
+.footer-social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  transition: var(--transition-all);
+  position: relative;
+  overflow: hidden;
+}
+
+.footer-social-icons a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  opacity: 0;
+  transition: var(--transition-opacity);
+}
+
+.footer-social-icons a:hover::before {
+  opacity: 1;
+}
+
+.footer-social-icons a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-lg);
+  color: var(--white);
+}
+
+.footer-social-icons a i {
+  position: relative;
+  z-index: 2;
+}
+
+.footer-section {
+  text-align: center;
+}
+
+.footer-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 1.25rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.footer-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: 2px;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section li {
+  margin-bottom: 0.625rem;
+}
+
+.footer-section a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 400;
+  transition: var(--transition-all);
+  display: inline-block;
+  position: relative;
+}
+
+.footer-section a::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--primary-color);
+  transition: var(--transition-all);
+}
+
+.footer-section a:hover {
+  color: var(--white);
+  transform: translateX(0.25rem);
+}
+
+.footer-section a:hover::before {
+  width: 100%;
+}
+
+.footer-bottom {
+  margin-top: 2.5rem;
+  padding: 1.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.footer-bottom-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.copyright {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+.made-with {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heart-beat {
+  color: var(--primary-color);
+  animation: heartbeat 2s infinite;
+  font-size: 0.875rem;
+}
+
+/* Enhanced Animations */
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes titleAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.95);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(-0.5rem) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes subtitleAnimation {
+  0% {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(3rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heartbeat {
+  0%, 100% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.1); 
+  }
+}
+
+@keyframes logoBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-0.25rem);
+  }
+  75% {
+    transform: translateY(0.125rem);
+  }
+}
+
+@keyframes footerBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  60% {
+    opacity: 0.8;
+    transform: translateY(-0.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-1rem);
+  }
+}
+
+/* Scroll Animations */
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+.scroll-animate.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Enhanced Responsive Design - Mobile First */
+@media (max-width: 480px) {
+  .header-container {
+    height: 4rem;
+    padding: 0 0.75rem;
+  }
+
+  .logo img {
+    height: 3rem;
+  }
+
+  .logo {
+    font-size: 1.75rem;
+    padding: 0.375rem;
+  }
+
+  .about-hero {
+    padding: 5rem 1rem 2rem;
+  }
+
+  .section {
+    padding: 2rem 1rem;
+  }
+
+  .team-member {
+    padding: 1.5rem;
+  }
+
+  .auth-buttons {
+    gap: 0.5rem;
+  }
+
+  .auth-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    min-width: auto;
+  }
+
+  .collaborators-logos {
+    gap: 1rem;
+  }
+
+  .collaborator-logo {
+    width: 100px;
+    height: 70px;
+  }
+
+  .core-values {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .footer-main {
+    padding: 2.5rem 1rem 0;
+  }
+
+  .footer-bottom {
+    padding: 1.5rem 1rem;
+  }
+
+  .simple-team-list {
+    grid-template-columns: 1fr;
+  }
+
+  /* Tech Section Mobile */
+  .tech-tycoons {
+    padding: 2rem 1rem;
+  }
+
+  .tech-content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tech-brand-showcase {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .tech-brand-info {
+    text-align: center;
+  }
+
+  .dev-team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tech-brand-name {
+    font-size: 2rem;
+  }
+
+  .tech-contact-grid {
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .development-panel,
+  .support-panel {
+    padding: 1.5rem;
+    height: auto;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .section {
+    padding: 3rem 1rem;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .collaborators-logos {
+    gap: 1.5rem;
+  }
+
+  .simple-team-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Tech Section Tablet */
+  .tech-content-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .development-panel,
+  .support-panel {
+    height: auto;
+  }
+}
+
+@media (min-width: 641px) {
+  .section {
+    padding: 3rem 1rem;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .simple-team-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    text-align: left;
+  }
+
+  .footer-brand {
+    text-align: left;
+  }
+
+  .footer-logo {
+    justify-content: flex-start;
+  }
+
+  .footer-social-icons {
+    justify-content: flex-start;
+  }
+
+  .footer-section {
+    text-align: left;
+  }
+
+  .footer-section h3::after {
+    left: 0;
+    transform: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+
+  .nav-menu {
+    position: static;
+    display: flex;
+    width: auto;
+    height: auto;
+    background: transparent;
+    padding: 0;
+    flex-direction: row;
+    gap: 1.5rem;
+    transform: none;
+    backdrop-filter: none;
+    box-shadow: none;
+    justify-self: start;
+  }
+
+  .nav-menu a {
+    font-size: 0.9375rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+  }
+
+  .auth-buttons {
+    gap: 1rem;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .simple-team-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .footer-container {
+    grid-template-columns: 2fr 1fr 1fr;
+    text-align: left;
+  }
+
+  .footer-bottom-content {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  /* Tech Section Desktop */
+  .tech-brand-showcase {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .tech-brand-info {
+    text-align: left;
+  }
+
+  .tech-contact-grid {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1024px) {
+  .team-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Tech Section Large Desktop - Keep panels same height */
+  .tech-content-layout {
+    grid-template-columns: 2fr 1fr;
+    align-items: stretch;
+  }
+
+  .development-panel,
+  .support-panel {
+    height: 100%;
+  }
+}
+
+/* Utility Classes */
+.hidden {
+  display: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Enhanced Focus States for Accessibility */
+button:focus-visible,
+a:focus-visible,
+.auth-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduce Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
 </head>
-  <body>
-    <!-- Header -->
-    <header>
-      <div class="header-container">
-        <nav class="nav-menu">
-          <a href="{% url 'home' %}">Features</a>
-          <a href="{% url 'about' %}">About Us</a>
-          <a href="{% url 'faqs' %}">FAQs</a>
-          <a href="{% url 'contact' %}">Contact Us</a>
+<body>
+<!-- Overlay for mobile menu -->
+<div class="overlay" id="overlay"></div>
 
-        </nav>
+<!-- Enhanced Modern Header -->
+<header>
+<div class="header-container">
+  <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu">
+    <i class="fas fa-bars" aria-hidden="true"></i>
+  </button>
 
-        <div class="logo">
-          <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+  <nav class="nav-menu" id="nav-menu" role="navigation" aria-label="Main navigation">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'about' %}" class="active">About Us</a>
+    <a href="{% url 'faqs' %}">FAQs</a>
+    <a href="{% url 'contact' %}">Contact Us</a>
+  </nav>
+
+  <a href="{% url 'home' %}" class="logo" aria-label="PulsePrep - Home">
+    <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+    <span class="logo-text">PulsePrep</span>
+  </a>
+
+  <div class="auth-buttons">
+    {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="auth-btn dashboard-btn">
+          <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{% url 'logout' %}" class="auth-btn logout-btn">
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+          <span>Logout</span>
+        </a>
+    {% else %}
+        <a href="{% url 'login' %}" class="auth-btn login-btn">
+          <span>Log in</span>
+        </a>
+        <a href="{% url 'signup' %}" class="auth-btn signup-btn">
+          <span>Sign up</span>
+        </a>
+    {% endif %}
+  </div>
+</div>
+</header>
+
+<!-- About Hero Section -->
+<section class="about-hero">
+<div class="container">
+  <div class="about-hero-content">
+    <div class="about-badge">
+      <i class="fas fa-heart" aria-hidden="true"></i>
+      <span>Mission-Driven, Student-Focused</span>
+    </div>
+    
+    <h1>
+      <span class="about-gradient-text">Empowering</span> Medical Excellence Through Smart Learning
+    </h1>
+    
+    <p class="about-hero-subtitle">
+      We're a team of MBBS graduates, tech experts, and educators passionate about modernizing medical preparation in Pakistan. Our mission: Make smart medical learning accessible, local, and affordable.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- Collaborators Section -->
+<section class="collaborators scroll-animate">
+<div class="container">
+  <div class="collaborators-content">
+    <h2>Proud Collaborators</h2>
+    <p class="collaborators-subtitle">Powered by Passion, Backed by Community</p>
+  </div>
+  
+  <div class="collaborators-logos">
+    <div class="collaborator-logo">
+      <!-- Replace with actual SAFE logo -->
+      <img src="{% static 'images/studyaidlogo.png' %}" alt="SAFE" />
+    </div>
+    <div class="collaborator-logo">
+      <!-- Replace with actual Alkhidmat logo -->
+      <img src="{% static 'images/alkhidmat-logo.png' %}" alt="Alkhidmat" />
+    </div>
+    <div class="collaborator-logo">
+      <!-- Replace with actual PIMA logo -->
+      <img src="{% static 'images/pima-logo.png' %}" alt="PIMA" />
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Mission Section -->
+<section class="mission section scroll-animate">
+<div class="container">
+  <div class="section-header">
+    <span class="section-badge">Our Purpose</span>
+    <h2 class="section-title">Who Are We?</h2>
+  </div>
+  
+  <div class="mission-content">
+    <p class="mission-text">
+      We are a team of passionate MBBS graduates, current students, and tech innovators who believe in revolutionizing medical education in Pakistan. PulsePrep is our solution to outdated MCQ books and scattered online content.
+    </p>
+    
+    <div class="core-values">
+      <div class="value-item">
+        <i class="fas fa-universal-access" aria-hidden="true"></i>
+        <span>Accessibility</span>
+      </div>
+      <div class="value-item">
+        <i class="fas fa-bullseye" aria-hidden="true"></i>
+        <span>Accuracy</span>
+      </div>
+      <div class="value-item">
+        <i class="fas fa-lightbulb" aria-hidden="true"></i>
+        <span>Innovation</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Founding Team Section -->
+<section class="section scroll-animate" style="background: var(--gray-50);">
+<div class="container">
+  <div class="section-header">
+    <span class="section-badge">Leadership</span>
+    <h2 class="section-title">PulsePrep Elite - Founding Team</h2>
+    <p class="section-subtitle">Meet the visionaries behind PulsePrep's mission to transform medical education.</p>
+  </div>
+  
+  <div class="team-grid">
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/male-avatar.jpg' %}" alt="Dr. Shahab Iqbal" />
+      </div>
+      <h3 class="member-name">Dr. Shahab Iqbal</h3>
+      <p class="member-role">CEO, PulsePrep</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/female-avatar.jpg' %}" alt="Dr. Aishah Binte Nawaz" />
+      </div>
+      <h3 class="member-name">Dr. Aishah Binte Nawaz</h3>
+      <p class="member-role">COO, PulsePrep</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/male-avatar.jpg' %}" alt="Dr. Waqar Ahmad" />
+      </div>
+      <h3 class="member-name">Dr. Waqar Ahmad</h3>
+      <p class="member-role">Patron in Chief, Academics</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/male-avatar.jpg' %}" alt="Mr. Noorullah" />
+      </div>
+      <h3 class="member-name">Mr. Noorullah</h3>
+      <p class="member-role">Tech Coordinator & Finance Manager</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/male-avatar.jpg' %}" alt="Dr. Zia ur Rahman Momand" />
+      </div>
+      <h3 class="member-name">Dr. Zia ur Rahman Momand</h3>
+      <p class="member-role">Special Advisor, PulsePrep</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/female-avatar.jpg' %}" alt="Arooba Khitab" />
+      </div>
+      <h3 class="member-name">Arooba Khitab</h3>
+      <p class="member-role">Director Academics</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/female-avatar.jpg' %}" alt="Mahnoor Qasim" />
+      </div>
+      <h3 class="member-name">Mahnoor Qasim</h3>
+      <p class="member-role">Assistant Director Academics</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+
+    <div class="team-member scroll-animate">
+      <div class="member-avatar">
+        <!-- Replace with actual image or use avatar placeholder -->
+        <img src="{% static 'images/male-avatar.jpg' %}" alt="Alyan Malik" />
+      </div>
+      <h3 class="member-name">Alyan Malik</h3>
+      <p class="member-role">Member of Academics</p>
+      <a href="#" class="member-linkedin">
+        <i class="fab fa-linkedin" aria-hidden="true"></i>
+        <span>Connect</span>
+      </a>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Academic Contributors Section -->
+<section class="section scroll-animate">
+<div class="container">
+  <div class="section-header">
+    <span class="section-badge">Contributors</span>
+    <h2 class="section-title">Academic Contributors</h2>
+    <p class="section-subtitle">Dedicated students and professionals contributing to our comprehensive question bank.</p>
+  </div>
+  
+  <div class="simple-team-list">
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Waqar Ahmad</div>
+      <div class="simple-member-role">House Officer KTH-MTI</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Arooba Khitab</div>
+      <div class="simple-member-role">Student, Khyber Medical College</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Mahnoor Qasim</div>
+      <div class="simple-member-role">Student, Khyber Medical College</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Fatima Sajjad</div>
+      <div class="simple-member-role">Student, Khyber Medical College</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Alyan Malik</div>
+      <div class="simple-member-role">Student, Khyber Medical College</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Huma</div>
+      <div class="simple-member-role">Student, Gomal Medical College</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Jalwa Khan</div>
+      <div class="simple-member-role">Student, Khyber Medical College</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Supporters Recognition Section -->
+<section class="section scroll-animate" style="background: var(--gray-50);">
+<div class="container">
+  <div class="section-header">
+    <span class="section-badge">Recognition</span>
+    <h2 class="section-title">Supporters Recognition</h2>
+    <p class="section-subtitle">Acknowledging the medical professionals who support our mission.</p>
+  </div>
+  
+  <div class="simple-team-list">
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Muhammad Asghar</div>
+      <div class="simple-member-role">Interventional Cardiologist</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Samiullah</div>
+      <div class="simple-member-role">Interventional Cardiologist</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Asad Ullah</div>
+      <div class="simple-member-role">World Health Organization</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Saleem Ullah</div>
+      <div class="simple-member-role">Consultant & Interventional Cardiologist</div>
+    </div>
+
+    <div class="simple-member scroll-animate">
+      <div class="simple-member-name">Dr. Kamran Hassan</div>
+      <div class="simple-member-role">Consultant Gastroenterologist</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Enhanced Tech Tycoons Section -->
+<section class="tech-tycoons scroll-animate">
+<div class="container">
+  <!-- Header -->
+  <div class="tech-header">
+    <div class="tech-badge">
+      <i class="fas fa-rocket"></i>
+      <span>Technical Partnership</span>
+    </div>
+    <h2 class="tech-title">Powered by Innovation</h2>
+  </div>
+  
+  <!-- Brand Showcase -->
+  <div class="tech-brand-showcase">
+    <div class="tech-logo-container">
+      <div class="tech-logo-circle">
+        <!-- Replace with actual Tech Tycoons logo -->
+        <img src="{% static 'images/tech-tycoons-logo.png' %}" alt="Tech Tycoons" />
+      </div>
+    </div>
+    
+    <div class="tech-brand-info">
+      <h3 class="tech-brand-name">Tech Tycoons</h3>
+      <p class="tech-tagline">Engineering Excellence • Driving Innovation</p>
+      
+      <div class="tech-contact-grid">
+        <div class="tech-contact-item">
+          <div class="tech-contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <a href="mailto:techtycoons2025@gmail.com" class="tech-contact-link">
+            techtycoons2025@gmail.com
+          </a>
         </div>
+        
+        <div class="tech-contact-item">
+          <div class="tech-contact-icon">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <a href="https://wa.me/923705788837" class="tech-contact-link">
+            +92 370 5788837
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="auth-buttons">
-          {% if user.is_authenticated %}
-              <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
-          {% else %}
-              <a href="{% url 'login' %}" class="login-btn">Log in</a>
-              <a href="{% url 'signup' %}" class="signup-btn">Sign up</a>
-          {% endif %}
+  <!-- Tech Description -->
+  <div class="tech-description-text">
+    <span class="tech-description-highlight">Tech Tycoons</span> provided comprehensive end-to-end solution for PulsePrep, covering the complete <span class="tech-description-highlight">Software Development Life Cycle (SDLC)</span> from initial requirements gathering to production deployment and ensure the beta testing and updates.
+  </div>
+
+  <!-- Main Content Layout -->
+  <div class="tech-content-layout">
+    <!-- Development Team Panel -->
+    <div class="development-panel">
+      <div class="panel-header">
+        <div class="panel-icon">
+          <i class="fas fa-code"></i>
+        </div>
+        <h3 class="panel-title">Development Team</h3>
       </div>
       
-        <button class="mobile-menu-btn">
-          <i class="fas fa-bars"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Heroo Section -->
-    <section class="heroo">
-      <div class="container">
-        <h1>Our mission is to help you for your future</h1>
-
-        <div class="heroo-buttons">
-          <a href="#" class="btn btn-outline">About us</a>
-          <a href="#" class="btn btn-primary">Donate</a>
-        </div>
-
-        <div class="heroo-image">
-          <img
-            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-            alt="Books collection"
-          />
-        </div>
-      </div>
-    </section>
-
-    <!-- Mission Section -->
-    <section class="container mission-section">
-      <div class="mission-content">
-        <h2>Our Mission</h2>
-        <p>
-          Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt occaecat
-          incididunt commodo occaecat deserunt. Do eiusmod incididunt.
-        </p>
-      </div>
-      <div class="mission-image">
-        <img
-          src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-          alt="Mission"
-        />
-      </div>
-    </section>
-
-    <!-- Vision Section -->
-    <section class="container vision-section">
-      <div class="vision-content">
-        <h2>Our Vision</h2>
-        <p>
-          Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt occaecat
-          incididunt commodo occaecat deserunt. Do eiusmod incididunt.
-        </p>
-      </div>
-      <div class="vision-image">
-        <img
-          src="https://images.unsplash.com/photo-1550399105-c4db5fb85c18?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-          alt="Vision"
-        />
-      </div>
-    </section>
-
-    <!-- Info Section -->
-    <section class="container info-section">
-      <h2>Together, We Find A Way</h2>
-
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>Who we are</h3>
-          <p>
-            Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt
-            occaecat incididunt.
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h3>How to help</h3>
-          <p>
-            Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt
-            occaecat incididunt.
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h3>What we do</h3>
-          <p>
-            Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt
-            occaecat incididunt.
-          </p>
-        </div>
-
-        <div class="info-card">
-          <h3>Where we work</h3>
-          <p>
-            Lorem aliqua commodo occaecat deserunt. Do eiusmod incididunt
-            occaecat incididunt.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Team Section -->
-    <section class="container team-section">
-      <h2>Meet our team</h2>
-
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="team-image">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Team member"
-            />
+      <div class="dev-team-grid">
+        <div class="dev-member-card scroll-animate">
+          <div class="dev-avatar">
+            <!-- Replace with actual image or use avatar placeholder -->
+            <img src="{% static 'images/male-avatar.jpg' %}" alt="M Abdullah Amir" />
           </div>
-          <div class="team-name">Kyreshkuakh</div>
-          <div class="team-role">Founder</div>
+          <h4 class="dev-name">M Abdullah Amir</h4>
+          <p class="dev-role">Project Coordinator</p>
+          <a href="#" class="dev-linkedin">
+            <i class="fab fa-linkedin"></i>
+            <span>Connect</span>
+          </a>
         </div>
 
-        <div class="team-card">
-          <div class="team-image">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Team member"
-            />
+        <div class="dev-member-card scroll-animate">
+          <div class="dev-avatar">
+            <!-- Replace with actual image or use avatar placeholder -->
+            <img src="{% static 'images/male-avatar.jpg' %}" alt="Saud Ahmad Basra" />
           </div>
-          <div class="team-name">Kyreshkuakh</div>
-          <div class="team-role">Co-founder</div>
+          <h4 class="dev-name">Saud Ahmad Basra</h4>
+          <p class="dev-role">Full Stack Developer</p>
+          <a href="#" class="dev-linkedin">
+            <i class="fab fa-linkedin"></i>
+            <span>Connect</span>
+          </a>
         </div>
 
-        <div class="team-card">
-          <div class="team-image">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Team member"
-            />
+        <div class="dev-member-card scroll-animate">
+          <div class="dev-avatar">
+            <!-- Replace with actual image or use avatar placeholder -->
+            <img src="{% static 'images/female-avatar.jpg' %}" alt="Iqra Noor" />
           </div>
-          <div class="team-name">Kyreshkuakh</div>
-          <div class="team-role">Lead Designer</div>
-        </div>
-
-        <div class="team-card">
-          <div class="team-image">
-            <img
-              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-              alt="Team member"
-            />
-          </div>
-          <div class="team-name">Kyreshkuakh</div>
-          <div class="team-role">Developer</div>
+          <h4 class="dev-name">Iqra Noor</h4>
+          <p class="dev-role">UI/UX Designer</p>
+          <a href="#" class="dev-linkedin">
+            <i class="fab fa-linkedin"></i>
+            <span>Connect</span>
+          </a>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Contact Section -->
-    <section class="container contact-section">
-      <div class="contact-form">
-        <h2>Stay Connected</h2>
-        <p>
-          Let's talk about how we can make a positive impact on your today or
-          for people you keep in mind.
-        </p>
-
-        <form>
-          <div class="form-group">
-            <input type="email" class="form-control" placeholder="Your email" />
-          </div>
-
-          <div class="form-group">
-            <textarea
-              class="form-control"
-              placeholder="Your message"
-            ></textarea>
-          </div>
-
-          <button type="submit" class="submit-btn">Submit</button>
-        </form>
+    <!-- Support Team Panel -->
+    <div class="support-panel">
+      <div class="panel-header">
+        <div class="panel-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <h3 class="panel-title">Support Team</h3>
       </div>
-
-      <div class="contact-images">
-        <div class="contact-image large">
-          <img
-            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-            alt="Contact"
-          />
-          <div class="contact-icon">
-            <i class="fab fa-facebook-f"></i>
-          </div>
-        </div>
-
-        <div class="contact-image">
-          <img
-            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-            alt="Contact"
-          />
-          <div class="contact-icon twitter">
-            <i class="fab fa-twitter"></i>
-          </div>
-        </div>
-
-        <div class="contact-image">
-          <img
-            src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
-            alt="Contact"
-          />
-          <div class="contact-icon linkedin">
-            <i class="fab fa-linkedin-in"></i>
-          </div>
-        </div>
+      
+      <div class="support-grid">
+        <div class="support-member">Saad Malik</div>
+        <div class="support-member">Ahmad Kamran</div>
+        <div class="support-member">Fatima Amir</div>
       </div>
-    </section>
+    </div>
+  </div>
+</div>
+</section>
 
-    <!-- Newsletter Section -->
-    <section class="newsletter">
-      <div class="container">
-        <h3>Subscribe to our newsletter</h3>
-
-        <form class="newsletter-form">
-          <input
-            type="email"
-            class="newsletter-input"
-            placeholder="Input your email"
-          />
-          <button type="submit" class="newsletter-btn">Subscribe</button>
-        </form>
+<!-- Enhanced Compact Modern Footer -->
+<footer>
+<div class="footer-main">
+  <div class="footer-container">
+    <!-- Brand Section -->
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <img src="{% static 'images/Logo.png' %}" alt="PulsePrep Logo" />
+        <div class="brand-name">PulsePrep</div>
       </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-      <div class="container">
-        <div class="footer-container">
-          <div class="footer-logo">
-            
-            <img src="{% static 'images/onlyName.png' %}" alt="PulsePrep Logo" />            
-            <div class="social-icons">
-              <a href="#"><i class="fab fa-facebook-f"></i></a>
-              <a href="#"><i class="fab fa-twitter"></i></a>
-              <a href="#"><i class="fab fa-instagram"></i></a>
-              <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-          </div>
-
-          <div class="footer-links">
-            <div class="footer-column">
-              <h3>Company</h3>
-              <a href="#">About Us</a>
-              <a href="#">Careers</a>
-              <a href="#">Blog</a>
-              <a href="#">Press</a>
-            </div>
-
-            <div class="footer-column">
-              <h3>Resources</h3>
-              <a href="#">Help Center</a>
-              <a href="#">Contact Us</a>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-            </div>
-
-            <div class="footer-column">
-              <h3>Products</h3>
-              <a href="#">MBBS</a>
-              <a href="#">BDS</a>
-              <a href="#">Medical PG</a>
-              <a href="#">NEET</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="footer-bottom">
-          <p>&copy; 2025 PulsePrep. All rights reserved.</p>
-        </div>
+      <p class="footer-tagline">Empowering Medical Excellence Through Smart Learning</p>
+      <div class="footer-social-icons">
+        <a href="https://facebook.com/profile.php?id=61576776451528" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook">
+          <i class="fab fa-facebook-f" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.youtube.com/@pulseprepofficial" target="_blank" rel="noopener noreferrer" aria-label="Follow us on YouTube">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+        </a>
+        <a href="https://instagram.com/pulseprepofficial" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
+          <i class="fab fa-instagram" aria-hidden="true"></i>
+        </a>
+        <a href="https://linkedin.com/in/pulse-prep-778292368" target="_blank" rel="noopener noreferrer" aria-label="Connect with us on LinkedIn">
+          <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+        </a>
       </div>
-    </footer>
-    <script src="script.js"></script>
-  </body>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="footer-section">
+      <h3>Platform</h3>
+      <ul>
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About Us</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        <li><a href="{% url 'faqs' %}">FAQs</a></li>
+        <li><a href="{% url 'signup' %}">Join Now</a></li>
+      </ul>
+    </div>
+
+    <!-- Community Links -->
+    <div class="footer-section">
+      <h3>Community</h3>
+      <ul>
+        <li><a href="{% url 'about' %}">Proud Collaborators</a></li>
+        <li><a href="{% url 'about' %}">Founding Team</a></li>
+        <li><a href="{% url 'about' %}">Academic Contributors</a></li>
+        <li><a href="{% url 'about' %}">Supporters Recognition</a></li>
+        <li><a href="{% url 'about' %}">Technical Partners</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Footer Bottom -->
+<div class="footer-bottom">
+  <div class="footer-bottom-content">
+    <div class="copyright">
+      &copy; 2025 PulsePrep. All rights reserved.
+    </div>
+    <div class="made-with">
+      Made with <span class="heart-beat">❤️</span> for Medical Students in Pakistan
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+// Enhanced JavaScript for modern UX - Updated with Enhanced Tech Section Interactions
+document.addEventListener('DOMContentLoaded', function() {
+  // Mobile menu functionality with improved animations
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const navMenu = document.getElementById('nav-menu');
+  const overlay = document.getElementById('overlay');
+  const body = document.body;
+
+  function toggleMobileMenu() {
+    const isOpen = navMenu.classList.contains('show');
+    
+    navMenu.classList.toggle('show');
+    overlay.classList.toggle('show');
+    
+    // Prevent body scroll when menu is open
+    if (!isOpen) {
+      body.style.overflow = 'hidden';
+    } else {
+      body.style.overflow = '';
+    }
+    
+    // Toggle hamburger icon with smooth transition
+    const icon = mobileMenuBtn.querySelector('i');
+    if (navMenu.classList.contains('show')) {
+      icon.style.transform = 'rotate(90deg)';
+      setTimeout(() => {
+        icon.className = 'fas fa-times';
+        icon.style.transform = 'rotate(0deg)';
+      }, 150);
+    } else {
+      icon.style.transform = 'rotate(90deg)';
+      setTimeout(() => {
+        icon.className = 'fas fa-bars';
+        icon.style.transform = 'rotate(0deg)';
+      }, 150);
+    }
+  }
+
+  mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+  overlay.addEventListener('click', toggleMobileMenu);
+
+  // Close menu when clicking on nav links
+  navMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 767) {
+        toggleMobileMenu();
+      }
+    });
+  });
+
+  // Enhanced scroll animations with Intersection Observer
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        // Add stagger effect for multiple elements
+        setTimeout(() => {
+          entry.target.classList.add('animate');
+        }, index * 100);
+      }
+    });
+  }, observerOptions);
+
+  // Observe all scroll-animate elements
+  document.querySelectorAll('.scroll-animate').forEach(el => {
+    observer.observe(el);
+  });
+
+  // Enhanced header background on scroll with performance optimization
+  let ticking = false;
+  
+  function updateHeader() {
+    const header = document.querySelector('header');
+    const scrollY = window.scrollY;
+    
+    if (scrollY > 50) {
+      header.style.background = 'rgba(255, 255, 255, 0.95)';
+      header.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+      header.style.borderBottomColor = 'rgba(0, 0, 0, 0.1)';
+    } else {
+      header.style.background = 'rgba(255, 255, 255, 0.85)';
+      header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.05)';
+      header.style.borderBottomColor = 'rgba(0, 0, 0, 0.08)';
+    }
+    
+    ticking = false;
+  }
+
+  function requestHeaderUpdate() {
+    if (!ticking) {
+      requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener('scroll', requestHeaderUpdate, { passive: true });
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        const headerHeight = document.querySelector('header').offsetHeight;
+        const targetPosition = target.offsetTop - headerHeight - 20;
+        
+        window.scrollTo({
+          top: targetPosition,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Enhanced team member interactions
+  const teamMembers = document.querySelectorAll('.team-member');
+  teamMembers.forEach(member => {
+    member.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-0.75rem) scale(1.02)';
+    });
+    
+    member.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(-0.5rem) scale(1)';
+    });
+  });
+
+  // Collaborator logo animations
+  const collaboratorLogos = document.querySelectorAll('.collaborator-logo');
+  collaboratorLogos.forEach(logo => {
+    logo.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-0.5rem) scale(1.1) rotate(2deg)';
+    });
+    
+    logo.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1) rotate(0deg)';
+    });
+  });
+
+  // Enhanced Tech Section Interactions
+  function initEnhancedTechSectionInteractions() {
+    // Enhanced development team card interactions
+    const devCards = document.querySelectorAll('.dev-member-card');
+    devCards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-0.75rem) scale(1.02)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(-0.5rem) scale(1)';
+      });
+    });
+
+    // Support member hover effects
+    const supportMembers = document.querySelectorAll('.support-member');
+    supportMembers.forEach(member => {
+      member.addEventListener('mouseenter', function() {
+        this.style.background = 'rgba(6, 182, 212, 0.2)';
+        this.style.transform = 'translateX(0.75rem)';
+      });
+      
+      member.addEventListener('mouseleave', function() {
+        this.style.background = 'rgba(255, 255, 255, 0.05)';
+        this.style.transform = 'translateX(0)';
+      });
+    });
+
+    // Tech logo circle interactions
+    const techLogoCircle = document.querySelector('.tech-logo-circle');
+    if (techLogoCircle) {
+      techLogoCircle.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.15) rotate(10deg)';
+      });
+      
+      techLogoCircle.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1) rotate(0deg)';
+      });
+    }
+
+    // Contact item interactions
+    const contactItems = document.querySelectorAll('.tech-contact-item');
+    contactItems.forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.style.background = 'rgba(255, 255, 255, 0.25)';
+        this.style.transform = 'translateY(-3px) scale(1.02)';
+      });
+      
+      item.addEventListener('mouseleave', function() {
+        this.style.background = 'rgba(255, 255, 255, 0.1)';
+        this.style.transform = 'translateY(-2px) scale(1)';
+      });
+    });
+
+    // Add ripple effect to clickable elements
+    const clickableElements = document.querySelectorAll('.dev-linkedin, .tech-contact-link');
+    clickableElements.forEach(element => {
+      element.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.height, rect.width);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.cssText = `
+          position: absolute;
+          width: ${size}px;
+          height: ${size}px;
+          left: ${x}px;
+          top: ${y}px;
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          transform: scale(0);
+          animation: ripple 0.6s linear;
+          pointer-events: none;
+        `;
+        
+        this.style.position = 'relative';
+        this.style.overflow = 'hidden';
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+
+    // Tech description text animation
+    const techDescription = document.querySelector('.tech-description-text');
+    if (techDescription) {
+      techDescription.addEventListener('mouseenter', function() {
+        this.style.background = 'rgba(255, 255, 255, 0.08)';
+        this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+      });
+      
+      techDescription.addEventListener('mouseleave', function() {
+        this.style.background = 'rgba(255, 255, 255, 0.05)';
+        this.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+      });
+    }
+  }
+
+  // Initialize enhanced tech section interactions
+  initEnhancedTechSectionInteractions();
+
+  // Accessibility improvements
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && navMenu.classList.contains('show')) {
+      toggleMobileMenu();
+    }
+  });
+
+  
+  function updateParallax() {
+    const scrolled = window.pageYOffset;
+    const parallax = aboutHero.querySelector('.about-hero-content');
+    const speed = 0.3;
+    
+    if (parallax && scrolled < aboutHero.offsetHeight) {
+      parallax.style.transform = `translateY(${scrolled * speed}px)`;
+    }
+    
+    heroTicking = false;
+  }
+  
+  function requestParallaxUpdate() {
+    if (!heroTicking && window.innerWidth > 768) {
+      requestAnimationFrame(updateParallax);
+      heroTicking = true;
+    }
+  }
+  
+  window.addEventListener('scroll', requestParallaxUpdate, { passive: true });
+
+  // Initialize tooltips for team members (optional enhancement)
+  function initTooltips() {
+    const membersWithLinkedIn = document.querySelectorAll('.member-linkedin, .dev-linkedin');
+    membersWithLinkedIn.forEach(link => {
+      link.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      link.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  }
+  
+  initTooltips();
+
+  console.log('PulsePrep About: Enhanced modern UI/UX with professional tech section loaded successfully! 🚀');
+});
+
+// Add ripple animation CSS
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(style);
+
+// Performance monitoring (optional)
+if ('performance' in window) {
+  window.addEventListener('load', () => {
+    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+    console.log(`About page load time: ${loadTime}ms`);
+  });
+}
+</script>
+</body>
 </html>

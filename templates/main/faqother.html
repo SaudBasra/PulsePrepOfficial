@@ -5,7 +5,7 @@
 <meta charset="UTF-8" />
 {% include 'includes/favicon.html' %}
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Contact Us - PulsePrep</title>
+<title>FAQs - PulsePrep</title>
 <link
 rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -132,6 +132,11 @@ header {
   transition: var(--transition-all);
   position: relative;
   overflow: hidden;
+}
+
+.nav-menu a.active {
+  color: var(--primary-color);
+  background: rgba(220, 20, 60, 0.1);
 }
 
 .nav-menu a::before {
@@ -388,8 +393,8 @@ header {
   visibility: visible;
 }
 
-/* Contact Page Specific Styles */
-.contact-hero {
+/* FAQ Page Specific Styles */
+.faq-hero {
   min-height: 40vh;
   display: flex;
   align-items: center;
@@ -405,7 +410,7 @@ header {
   padding: 7rem 1rem 2rem;
 }
 
-.contact-hero::before {
+.faq-hero::before {
   content: '';
   position: absolute;
   top: 0;
@@ -418,7 +423,7 @@ header {
   pointer-events: none;
 }
 
-.contact-hero-content {
+.faq-hero-content {
   text-align: center;
   max-width: 48rem;
   margin: 0 auto;
@@ -427,7 +432,7 @@ header {
   animation: heroFadeIn 1s ease-out;
 }
 
-.contact-badge {
+.faq-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -442,7 +447,7 @@ header {
   animation: slideUp 1s ease-out 0.2s both;
 }
 
-.contact-hero h1 {
+.faq-hero h1 {
   font-family: 'Outfit', sans-serif;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
@@ -453,14 +458,14 @@ header {
   animation: titleAnimation 1.2s ease-out 0.4s both;
 }
 
-.contact-gradient-text {
+.faq-gradient-text {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.contact-hero-subtitle {
+.faq-hero-subtitle {
   font-size: clamp(1rem, 2.5vw, 1.125rem);
   color: var(--text-light);
   margin-bottom: 2rem;
@@ -471,167 +476,87 @@ header {
   animation: subtitleAnimation 1.2s ease-out 0.6s both;
 }
 
-/* Contact Section */
-.contact-section {
+/* FAQ Section */
+.faq-section {
   padding: 4rem 1rem;
   background: var(--white);
 }
 
-.contact-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-  max-width: 1280px;
+.faq-container {
+  max-width: 56rem;
   margin: 0 auto;
 }
 
-/* Contact Form */
-.contact-form-container {
-  background: var(--white);
-  padding: 2.5rem;
-  border-radius: var(--border-radius-xl);
-  border: 1px solid var(--gray-200);
-  box-shadow: var(--shadow-xl);
-  position: relative;
-  overflow: hidden;
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
-.contact-form-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+.section-badge {
+  display: inline-block;
+  background: rgba(30, 58, 138, 0.1);
+  color: var(--secondary-color);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(30, 58, 138, 0.2);
 }
 
-.contact-form h2 {
+.section-title {
   font-family: 'Outfit', sans-serif;
-  font-size: 2rem;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 800;
   color: var(--text-dark);
   margin-bottom: 0.75rem;
   letter-spacing: -0.02em;
 }
 
-.contact-form-subtitle {
+.section-subtitle {
   font-size: 1rem;
   color: var(--text-light);
-  margin-bottom: 2rem;
   line-height: 1.6;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-dark);
-  margin-bottom: 0.5rem;
-}
-
-.form-control {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  border: 2px solid var(--gray-200);
-  border-radius: var(--border-radius-lg);
-  font-size: 0.9375rem;
-  font-family: inherit;
-  background: var(--white);
-  transition: var(--transition-all);
-  resize: vertical;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
-  transform: translateY(-1px);
-}
-
-.form-control::placeholder {
-  color: var(--text-muted);
-}
-
-textarea.form-control {
-  min-height: 8rem;
-  font-family: inherit;
-}
-
-.submit-btn {
-  width: 100%;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: var(--white);
-  border: none;
-  border-radius: var(--border-radius-lg);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-all);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.submit-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
-  opacity: 0;
-  transition: var(--transition-opacity);
-}
-
-.submit-btn:hover::before {
-  opacity: 1;
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-}
-
-.submit-btn span {
-  position: relative;
-  z-index: 2;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Contact Info */
-.contact-info {
+/* FAQ Accordion */
+.faq-accordion {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.contact-card {
+.faq-item {
   background: var(--white);
-  padding: 2rem;
-  border-radius: var(--border-radius-xl);
   border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius-xl);
+  overflow: hidden;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--gray-300);
+}
+
+.faq-item.active {
+  border-color: var(--primary-color);
   box-shadow: var(--shadow-lg);
+}
+
+.faq-question {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  cursor: pointer;
+  background: var(--white);
   transition: var(--transition-all);
   position: relative;
   overflow: hidden;
 }
 
-.contact-card::before {
+.faq-question::before {
   content: '';
   position: absolute;
   top: 0;
@@ -643,164 +568,166 @@ textarea.form-control {
   transition: var(--transition-transform);
 }
 
-.contact-card:hover::before {
+.faq-item.active .faq-question::before {
   transform: scaleX(1);
 }
 
-.contact-card:hover {
-  transform: translateY(-0.5rem);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--gray-300);
+.faq-question:hover {
+  background: var(--gray-50);
 }
 
-.contact-icon {
-  width: 3.5rem;
-  height: 3.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: var(--border-radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  transition: var(--transition-transform);
-}
-
-.contact-icon i {
-  font-size: 1.25rem;
-  color: var(--white);
-}
-
-.contact-card:hover .contact-icon {
-  transform: scale(1.1) rotate(5deg);
-}
-
-.contact-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
+.faq-question h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 0.75rem;
+  margin: 0;
+  padding-right: 1rem;
+  line-height: 1.4;
   font-family: 'Outfit', sans-serif;
 }
 
-.contact-card p {
+.toggle-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--gray-100);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  transition: var(--transition-all);
+  flex-shrink: 0;
+}
+
+.faq-item.active .toggle-icon {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--white);
+  transform: rotate(180deg);
+}
+
+.faq-answer {
+  padding: 0 1.5rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--gray-50);
+}
+
+.faq-item.active .faq-answer {
+  padding: 0 1.5rem 1.5rem;
+  max-height: 20rem;
+}
+
+.faq-answer p {
   color: var(--text-light);
   line-height: 1.6;
-  margin-bottom: 1rem;
+  margin: 0;
+  padding-top: 0.5rem;
   font-size: 0.9375rem;
 }
 
-.contact-detail {
-  display: flex;
+/* Help Banner */
+.help-banner {
+  padding: 4rem 1rem;
+  background: var(--gray-50);
+}
+
+.help-banner-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: var(--border-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+
+.help-banner-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.help-banner-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.help-text {
+  text-align: center;
+  color: var(--white);
+}
+
+.help-text h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.02em;
+}
+
+.help-text p {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+  line-height: 1.6;
+  max-width: 32rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contact-btn {
+  display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  color: var(--text-dark);
+  gap: 0.5rem;
+  background: var(--white);
+  color: var(--primary-color);
+  padding: 0.875rem 2rem;
+  border-radius: var(--border-radius-lg);
   font-weight: 600;
-  font-size: 0.9375rem;
   text-decoration: none;
   transition: var(--transition-all);
-  padding: 0.5rem;
-  border-radius: var(--border-radius-md);
-}
-
-.contact-detail:hover {
-  background: var(--gray-50);
-  color: var(--primary-color);
-  transform: translateX(0.25rem);
-}
-
-.contact-detail i {
-  font-size: 1rem;
-  color: var(--primary-color);
-}
-
-/* Success/Error Messages */
-.message {
-  padding: 1rem 1.5rem;
-  border-radius: var(--border-radius-lg);
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-weight: 500;
-  animation: slideDown 0.3s ease-out;
-}
-
-.message.success {
-  background: rgba(34, 197, 94, 0.1);
-  color: #16a34a;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.message.error {
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.message i {
-  font-size: 1.125rem;
-}
-
-/* Loading Animation */
-.loading {
-  display: inline-block;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--white);
-  animation: spin 1s ease-in-out infinite;
-}
-
-/* Social Links */
-.social-links {
-  display: flex;
-  gap: 0.875rem;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  background: var(--white);
-  border: 2px solid var(--gray-200);
-  border-radius: var(--border-radius-lg);
-  color: var(--text-dark);
-  font-size: 1rem;
-  transition: var(--transition-all);
+  box-shadow: var(--shadow-lg);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
 }
 
-.social-links a::before {
+.contact-btn::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: var(--gray-50);
   opacity: 0;
   transition: var(--transition-opacity);
 }
 
-.social-links a:hover::before {
+.contact-btn:hover::before {
   opacity: 1;
 }
 
-.social-links a:hover {
+.contact-btn:hover {
   transform: translateY(-2px);
-  border-color: var(--primary-color);
-  box-shadow: var(--shadow-lg);
-  color: var(--white);
+  box-shadow: var(--shadow-xl);
 }
 
-.social-links a i {
+.contact-btn span {
   position: relative;
   z-index: 2;
 }
@@ -1089,17 +1016,6 @@ footer::before {
   }
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes heartbeat {
   0%, 100% { 
     transform: scale(1); 
@@ -1136,12 +1052,6 @@ footer::before {
   }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* Scroll Animations */
 .scroll-animate {
   opacity: 0;
@@ -1170,20 +1080,20 @@ footer::before {
     padding: 0.375rem;
   }
 
-  .contact-hero {
+  .faq-hero {
     padding: 5rem 1rem 2rem;
   }
 
-  .contact-section {
+  .faq-section {
     padding: 2rem 1rem;
   }
 
-  .contact-form-container {
-    padding: 1.5rem;
+  .faq-question {
+    padding: 1rem;
   }
 
-  .contact-card {
-    padding: 1.5rem;
+  .faq-question h3 {
+    font-size: 1rem;
   }
 
   .auth-buttons {
@@ -1196,6 +1106,10 @@ footer::before {
     min-width: auto;
   }
 
+  .help-banner-content {
+    padding: 2rem;
+  }
+
   .footer-main {
     padding: 2.5rem 1rem 0;
   }
@@ -1206,28 +1120,24 @@ footer::before {
 }
 
 @media (min-width: 481px) and (max-width: 640px) {
-  .contact-container {
-    gap: 2rem;
+  .faq-section {
+    padding: 3rem 1rem;
   }
 
-  .contact-info {
+  .help-banner-content {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
 @media (min-width: 641px) {
-  .contact-section {
+  .faq-section {
     padding: 4rem 1rem;
   }
 
-  .contact-container {
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
-
-  .contact-info {
+  .help-banner-content {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
   .footer-container {
@@ -1299,13 +1209,6 @@ footer::before {
   }
 }
 
-@media (min-width: 1024px) {
-  .contact-info {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-}
-
 /* Utility Classes */
 .hidden {
   display: none;
@@ -1327,7 +1230,7 @@ footer::before {
 button:focus-visible,
 a:focus-visible,
 .auth-btn:focus-visible,
-.form-control:focus-visible {
+.faq-question:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
@@ -1363,8 +1266,8 @@ html {
   <nav class="nav-menu" id="nav-menu" role="navigation" aria-label="Main navigation">
     <a href="{% url 'home' %}">Home</a>
     <a href="{% url 'about' %}">About Us</a>
-    <a href="{% url 'faqs' %}">FAQs</a>
-    <a href="{% url 'contact' %}" class="active">Contact Us</a>
+    <a href="{% url 'faqs' %}" class="active">FAQs</a>
+    <a href="{% url 'contact' %}">Contact Us</a>
   </nav>
 
   <a href="{% url 'home' %}" class="logo" aria-label="PulsePrep - Home">
@@ -1394,174 +1297,166 @@ html {
 </div>
 </header>
 
-<!-- Contact Hero Section -->
-<section class="contact-hero">
+<!-- FAQ Hero Section -->
+<section class="faq-hero">
 <div class="container">
-  <div class="contact-hero-content">
-    <div class="contact-badge">
-      <i class="fas fa-envelope" aria-hidden="true"></i>
-      <span>Get in Touch</span>
+  <div class="faq-hero-content">
+    <div class="faq-badge">
+      <i class="fas fa-question-circle" aria-hidden="true"></i>
+      <span>Quick Answers</span>
     </div>
     
     <h1>
-      <span class="contact-gradient-text">Contact</span> Our Team
+      <span class="faq-gradient-text">Frequently</span> Asked Questions
     </h1>
     
-    <p class="contact-hero-subtitle">
-      Have questions about PulsePrep? We're here to help you succeed in your medical journey. 
-      Reach out to our friendly support team.
+    <p class="faq-hero-subtitle">
+      Find quick answers to common queries about PulsePrep. Can't find what you're looking for? 
+      Feel free to contact our support team.
     </p>
   </div>
 </div>
 </section>
 
-<!-- Contact Section -->
-<section class="contact-section scroll-animate">
+<!-- FAQ Section -->
+<section class="faq-section scroll-animate">
 <div class="container">
-  <div class="contact-container">
-    <!-- Contact Form -->
-    <div class="contact-form-container scroll-animate">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="message {{ message.tags }}">
-            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %}" aria-hidden="true"></i>
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      <div class="contact-form">
-        <h2>Send us a Message</h2>
-        <p class="contact-form-subtitle">
-          Fill out the form below and we'll get back to you within 24 hours.
-        </p>
-
-        <form method="post" id="contactForm">
-          {% csrf_token %}
-          <div class="form-group">
-            <label for="name" class="form-label">Full Name</label>
-            <input 
-              type="text" 
-              id="name" 
-              name="name" 
-              class="form-control" 
-              placeholder="Enter your full name"
-              required 
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="email" class="form-label">Email Address</label>
-            <input 
-              type="email" 
-              id="email" 
-              name="email" 
-              class="form-control" 
-              placeholder="Enter your email address"
-              required 
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="phone" class="form-label">Phone Number</label>
-            <input 
-              type="tel" 
-              id="phone" 
-              name="phone" 
-              class="form-control" 
-              placeholder="Enter your phone number (optional)"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="subject" class="form-label">Subject</label>
-            <input 
-              type="text" 
-              id="subject" 
-              name="subject" 
-              class="form-control" 
-              placeholder="What is this about?"
-              required 
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="message" class="form-label">Message</label>
-            <textarea 
-              id="message" 
-              name="message" 
-              class="form-control" 
-              placeholder="Tell us how we can help you..."
-              required
-            ></textarea>
-          </div>
-
-          <button type="submit" class="submit-btn" id="submitBtn">
-            <span>Send Message</span>
-            <i class="fas fa-paper-plane" aria-hidden="true"></i>
-          </button>
-        </form>
-      </div>
+  <div class="faq-container">
+    <div class="section-header">
+      <span class="section-badge">Common Queries</span>
+      <h2 class="section-title">Everything You Need to Know</h2>
+      <p class="section-subtitle">Get instant answers to the most common questions about PulsePrep features, pricing, and content.</p>
     </div>
 
-    <!-- Contact Info -->
-    <div class="contact-info scroll-animate">
-      <div class="contact-card">
-        <div class="contact-icon">
-          <i class="fas fa-envelope" aria-hidden="true"></i>
+    <div class="faq-accordion">
+      <!-- FAQ Item 1 - Platform Features -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>What makes PulsePrep different from other medical learning platforms?</h3>
+          <div class="toggle-icon">+</div>
         </div>
-        <h3>Email Us</h3>
-        <p>Send us an email and we'll respond within 24 hours.</p>
-        <a href="mailto:pulseprepofficial@gmail.com" class="contact-detail">
-          <i class="fas fa-envelope" aria-hidden="true"></i>
-          pulseprepofficial@gmail.com
+        <div class="faq-answer">
+          <p>PulsePrep is specifically designed for Pakistani medical students with content aligned to KMU/PMDC guidelines. We offer hierarchical question organization (Block → Module → Subject → Topic), AI-powered analytics, and Pakistan-centric medical scenarios that you won't find on generic platforms.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 2 - Content Updates -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>Is content updated for 2025 PMDC guidelines?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Yes, our content is reviewed and updated quarterly to ensure alignment with the latest PMDC guidelines and medical education standards. Our team of medical experts continuously monitors curriculum changes and updates our question bank accordingly.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 3 - Question Bank -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>How many questions are available in the PulsePrep question bank?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>PulsePrep features over 15,000 expert-verified MCQs covering all MBBS and BDS subjects. Our questions include detailed explanations, references, and are organized by degree, year, block, module, subject, topic, and difficulty level for systematic learning.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 4 - Mock Tests -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>Are mock tests included in all subscription plans?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Mock tests and model papers are included in our Annual subscription plan (Rs. 1,700) and provide comprehensive exam simulation. The 1-Month plan (Rs. 500) includes full access to our MCQ bank but excludes mock tests and model papers.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 5 - Pricing -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>What are the different pricing plans available?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>We offer three plans: Free Trial (100 MCQs, basic features), 1-Month Plan (Rs. 500 - full MCQ bank, no mock tests), and Annual Plan (Rs. 1,700 - all features including mock tests, model papers, and bonus content). All plans can be cancelled anytime with no hidden fees.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 6 - Device Compatibility -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>Can I access PulsePrep on mobile devices?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Absolutely! PulsePrep is fully responsive and optimized for all devices including smartphones, tablets, and desktop computers. You can study anywhere, anytime with a seamless experience across all platforms.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 7 - Analytics -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>How does the performance analytics system work?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Our advanced analytics track your performance across subjects, identify weak areas, show progress over time, and provide personalized study recommendations. You get detailed insights including accuracy rates, time spent, and topic-wise breakdowns to optimize your study strategy.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 8 - Content Quality -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>Who creates and verifies the questions on PulsePrep?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>All questions are created and verified by qualified medical professionals and subject matter experts. Each question undergoes a rigorous review process to ensure accuracy, relevance, and alignment with current medical standards and examination patterns.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 9 - Technical Support -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>What if I face technical issues or need help?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Our support team is available Monday-Friday, 9:00 AM - 6:00 PM (PKT). You can reach us via email at pulseprepofficial@gmail.com or call +92 346 4793431. We typically respond to queries within 24 hours and provide comprehensive assistance.</p>
+        </div>
+      </div>
+
+      <!-- FAQ Item 10 - Feedback -->
+      <div class="faq-item scroll-animate">
+        <div class="faq-question" tabindex="0" role="button" aria-expanded="false">
+          <h3>How do I submit feedback or complaints?</h3>
+          <div class="toggle-icon">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>We value your feedback! You can email us directly at pulseprepofficial@gmail.com or use our contact form on the website. We review all feedback carefully and use it to continuously improve our platform and services.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Help Banner -->
+<section class="help-banner scroll-animate">
+<div class="container">
+  <div class="help-banner-container">
+    <div class="help-banner-content">
+      <div class="help-text">
+        <h2>Still Need Help?</h2>
+        <p>
+          Can't find the answer you're looking for? Our friendly support team is here to help you succeed in your medical journey. Get in touch with us today!
+        </p>
+        <a href="{% url 'contact' %}" class="contact-btn">
+          <span>Contact Support</span>
+          <i class="fas fa-arrow-right" aria-hidden="true"></i>
         </a>
-      </div>
-
-      <div class="contact-card">
-        <div class="contact-icon">
-          <i class="fas fa-phone" aria-hidden="true"></i>
-        </div>
-        <h3>Call Us</h3>
-        <p>Speak directly with our support team during business hours.</p>
-        <a href="tel:+923464793431" class="contact-detail">
-          <i class="fas fa-phone" aria-hidden="true"></i>
-          +92 346 4793431
-        </a>
-      </div>
-
-      <div class="contact-card">
-        <div class="contact-icon">
-          <i class="fas fa-clock" aria-hidden="true"></i>
-        </div>
-        <h3>Business Hours</h3>
-        <p>Our support team is available during these hours:</p>
-        <div class="contact-detail">
-          <i class="fas fa-clock" aria-hidden="true"></i>
-          Monday - Friday: 9:00 AM - 6:00 PM (PKT)
-        </div>
-      </div>
-
-      <div class="contact-card">
-        <div class="contact-icon">
-          <i class="fas fa-users" aria-hidden="true"></i>
-        </div>
-        <h3>Follow Us</h3>
-        <p>Stay connected with us on social media for updates and tips.</p>
-        <div class="social-links">
-          <a href="https://facebook.com/profile.php?id=61576776451528" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Facebook">
-            <i class="fab fa-facebook-f" aria-hidden="true"></i>
-          </a>
-          <a href="https://www.youtube.com/@pulseprepofficial" target="_blank" rel="noopener noreferrer" aria-label="Follow us on YouTube">
-            <i class="fab fa-youtube" aria-hidden="true"></i>
-          </a>
-          <a href="https://instagram.com/pulseprepofficial" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">
-            <i class="fab fa-instagram" aria-hidden="true"></i>
-          </a>
-          <a href="https://linkedin.com/in/pulse-prep-778292368" target="_blank" rel="noopener noreferrer" aria-label="Connect with us on LinkedIn">
-            <i class="fab fa-linkedin-in" aria-hidden="true"></i>
-          </a>
-        </div>
       </div>
     </div>
   </div>
@@ -1611,11 +1506,11 @@ html {
     <div class="footer-section">
       <h3>Community</h3>
       <ul>
-        <li><a href="{% url 'about' %}">Proud Collaborators</a></li>
+        <li><a href="{% url 'about' %}">Collaborators</a></li>
         <li><a href="{% url 'about' %}">Founding Team</a></li>
-        <li><a href="{% url 'about' %}">Academic Contributors</a></li>
-        <li><a href="{% url 'about' %}">Supporters Recognition</a></li>
-        <li><a href="{% url 'about' %}">Technical Partners </a></li>
+        <li><a href="{% url 'about' %}">Contributors</a></li>
+        <li><a href="{% url 'about' %}">Supporters</a></li>
+        <li><a href="{% url 'about' %}">Partners</a></li>
       </ul>
     </div>
   </div>
@@ -1635,7 +1530,7 @@ html {
 </footer>
 
 <script>
-// Enhanced JavaScript for modern UX - Same as Home Page
+// Enhanced JavaScript for modern UX - Same as Home Page + FAQ functionality
 document.addEventListener('DOMContentLoaded', function() {
   // Mobile menu functionality with improved animations
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -1681,6 +1576,48 @@ document.addEventListener('DOMContentLoaded', function() {
     link.addEventListener('click', () => {
       if (window.innerWidth <= 767) {
         toggleMobileMenu();
+      }
+    });
+  });
+
+  // Enhanced FAQ Accordion functionality
+  const faqItems = document.querySelectorAll('.faq-item');
+  
+  faqItems.forEach(item => {
+    const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    const icon = question.querySelector('.toggle-icon');
+    
+    question.addEventListener('click', function() {
+      // Close other open items (optional - remove for multiple open items)
+      faqItems.forEach(otherItem => {
+        if (otherItem !== item && otherItem.classList.contains('active')) {
+          otherItem.classList.remove('active');
+          const otherIcon = otherItem.querySelector('.toggle-icon');
+          otherIcon.textContent = '+';
+          otherItem.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        }
+      });
+      
+      // Toggle current item
+      const isActive = item.classList.contains('active');
+      
+      if (isActive) {
+        item.classList.remove('active');
+        icon.textContent = '+';
+        question.setAttribute('aria-expanded', 'false');
+      } else {
+        item.classList.add('active');
+        icon.textContent = '−';
+        question.setAttribute('aria-expanded', 'true');
+      }
+    });
+    
+    // Keyboard navigation support
+    question.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        question.click();
       }
     });
   });
@@ -1736,116 +1673,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.addEventListener('scroll', requestHeaderUpdate, { passive: true });
 
-  // Contact Form Enhancement
-  const contactForm = document.getElementById('contactForm');
-  const submitBtn = document.getElementById('submitBtn');
-  
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      // Add loading state
-      const originalText = submitBtn.innerHTML;
-      submitBtn.innerHTML = '<span class="loading"></span> Sending...';
-      submitBtn.disabled = true;
-      
-      // Form will submit normally, loading state will be visible until page reloads
-    });
-
-    // Real-time form validation
-    const inputs = contactForm.querySelectorAll('input, textarea');
-    inputs.forEach(input => {
-      input.addEventListener('blur', function() {
-        validateField(this);
-      });
-      
-      input.addEventListener('input', function() {
-        clearValidation(this);
-      });
-    });
-  }
-
-  function validateField(field) {
-    const value = field.value.trim();
-    const fieldName = field.getAttribute('name');
-    
-    // Remove existing validation
-    clearValidation(field);
-    
-    if (field.hasAttribute('required') && !value) {
-      showFieldError(field, `${getFieldLabel(fieldName)} is required`);
-      return false;
-    }
-    
-    if (fieldName === 'email' && value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(value)) {
-        showFieldError(field, 'Please enter a valid email address');
-        return false;
-      }
-    }
-    
-    if (fieldName === 'phone' && value) {
-      const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-      if (!phoneRegex.test(value)) {
-        showFieldError(field, 'Please enter a valid phone number');
-        return false;
-      }
-    }
-    
-    showFieldSuccess(field);
-    return true;
-  }
-
-  function showFieldError(field, message) {
-    field.style.borderColor = '#dc2626';
-    field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-    
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'field-error';
-    errorDiv.style.color = '#dc2626';
-    errorDiv.style.fontSize = '0.875rem';
-    errorDiv.style.marginTop = '0.25rem';
-    errorDiv.textContent = message;
-    
-    field.parentNode.appendChild(errorDiv);
-  }
-
-  function showFieldSuccess(field) {
-    field.style.borderColor = '#16a34a';
-    field.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.1)';
-  }
-
-  function clearValidation(field) {
-    field.style.borderColor = '';
-    field.style.boxShadow = '';
-    
-    const errorDiv = field.parentNode.querySelector('.field-error');
-    if (errorDiv) {
-      errorDiv.remove();
-    }
-  }
-
-  function getFieldLabel(fieldName) {
-    const labels = {
-      'name': 'Name',
-      'email': 'Email',
-      'phone': 'Phone',
-      'subject': 'Subject',
-      'message': 'Message'
-    };
-    return labels[fieldName] || fieldName;
-  }
-
-  // Enhanced form interactions
-  document.querySelectorAll('.form-control').forEach(input => {
-    input.addEventListener('focus', function() {
-      this.parentElement.classList.add('focused');
-    });
-    
-    input.addEventListener('blur', function() {
-      this.parentElement.classList.remove('focused');
-    });
-  });
-
   // Smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -1865,31 +1692,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Accessibility improvements
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && navMenu.classList.contains('show')) {
-      toggleMobileMenu();
+    if (e.key === 'Escape') {
+      if (navMenu.classList.contains('show')) {
+        toggleMobileMenu();
+      }
+      // Close any open FAQ items when pressing Escape
+      faqItems.forEach(item => {
+        if (item.classList.contains('active')) {
+          item.classList.remove('active');
+          const icon = item.querySelector('.toggle-icon');
+          icon.textContent = '+';
+          item.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
+        }
+      });
     }
   });
 
-  // Auto-hide messages after 5 seconds
-  const messages = document.querySelectorAll('.message');
-  messages.forEach(message => {
-    setTimeout(() => {
-      message.style.opacity = '0';
-      message.style.transform = 'translateY(-1rem)';
-      setTimeout(() => {
-        message.remove();
-      }, 300);
-    }, 5000);
-  });
+  // FAQ Search functionality (optional enhancement)
+  function addFAQSearch() {
+    const searchContainer = document.querySelector('.section-header');
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search FAQs...';
+    searchInput.className = 'faq-search';
+    searchInput.style.cssText = `
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--border-radius-lg);
+      font-size: 0.9375rem;
+      background: var(--white);
+      transition: var(--transition-all);
+    `;
+    
+    searchContainer.appendChild(searchInput);
+    
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      faqItems.forEach(item => {
+        const question = item.querySelector('h3').textContent.toLowerCase();
+        const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+        
+        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = searchTerm ? 'none' : 'block';
+        }
+      });
+    });
+  }
 
-  console.log('PulsePrep Contact: Modern UI/UX enhancements loaded successfully! 🚀');
+  // Uncomment to enable FAQ search
+  // addFAQSearch();
+
+  console.log('PulsePrep FAQ: Modern UI/UX enhancements loaded successfully! 🚀');
 });
 
 // Performance monitoring (optional)
 if ('performance' in window) {
   window.addEventListener('load', () => {
     const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-    console.log(`Contact page load time: ${loadTime}ms`);
+    console.log(`FAQ page load time: ${loadTime}ms`);
   });
 }
 </script>

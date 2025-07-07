@@ -92,8 +92,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Production database (PostgreSQL) - Active configuration
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'pulseprep_db',
+      'NAME': 'pulseprep_db',
         'USER': 'pulseprep_user',
         'PASSWORD': 'Ppproject@#12345',
        'HOST': 'localhost',
@@ -109,7 +108,7 @@ DATABASES = {
  #   'default': {
   #      'ENGINE': 'django.db.backends.sqlite3',
    #     'NAME': BASE_DIR / 'db.sqlite3',
-   # }
+    #}
 #}
 
 # ================================
@@ -123,8 +122,6 @@ STATIC_ROOT = '/opt/PulsePrep/staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-
 
 
 # ================================

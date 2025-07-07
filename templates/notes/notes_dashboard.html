@@ -1297,22 +1297,6 @@
                                         <i class="fas fa-search search-icon"></i>
                                     </div>
                                     <div class="filter-container">
-                                        <select class="filter-select" name="degree" onchange="this.form.submit()">
-                                            <option value="" {% if not filter_degree %}selected{% endif %}>All Degrees</option>
-                                            {% for value, label in degree_choices %}
-                                                <option value="{{ value }}" {% if filter_degree == value %}selected{% endif %}>{{ label }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="filter-container">
-                                        <select class="filter-select" name="year" onchange="this.form.submit()">
-                                            <option value="" {% if not filter_year %}selected{% endif %}>All Years</option>
-                                            {% for value, label in year_choices %}
-                                                <option value="{{ value }}" {% if filter_year == value %}selected{% endif %}>{{ label }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="filter-container">
                                         <select class="filter-select" name="note_type" onchange="this.form.submit()">
                                             <option value="" {% if not filter_note_type %}selected{% endif %}>All Types</option>
                                             {% for value, label in note_type_choices %}

@@ -34,6 +34,8 @@ urlpatterns = [
     path('result/<int:attempt_id>/', views.paper_result, name='paper_result'),
     path('report-warning/', views.report_warning, name='report_paper_warning'),
     path('progress/', views.student_paper_progress, name='student_paper_progress'),
+    path('delete-paper-questions/', views.delete_paper_questions, name='delete_paper_questions'),
+
     # ==================== ADMIN IMPORT HISTORY (optional) ====================
     # Uncomment these if you want import history views
     # path('admin/import-history/', views.import_history, name='modelpaper_import_history'),

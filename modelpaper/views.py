@@ -1,4 +1,4 @@
-# modelpaper/views.py - COMPLETE: Added image support throughout
+# modelpaper/views.py - FIXED: Always show mode selection popup
 
 import csv
 import io
@@ -36,11 +36,11 @@ User = get_user_model()
 
 @content_access_required
 def take_paper(request, paper_id):
-    """Enhanced student takes the paper with mode selection popup support and image support"""
+    """Enhanced student takes the paper with FIXED mode selection popup that always shows"""
     paper = get_object_or_404(ModelPaper, id=paper_id)
     student = request.user
     
-    # Get practice mode from URL parameter (default to None for popup)
+    # Get practice mode from URL parameter
     practice_mode = request.GET.get('practice_mode')
     
     print(f"DEBUG: User {student} trying to take paper: {paper.title} with mode: {practice_mode}")
@@ -83,14 +83,34 @@ def take_paper(request, paper_id):
         status='in_progress'
     ).first()
     
-    # Determine if mode selection popup should be shown
-    show_mode_popup = not practice_mode and not current_attempt
+    # FIXED: Always show mode selection popup if no practice_mode is specified
+    # Even if there's an existing attempt, user should be able to choose mode
+    show_mode_popup = practice_mode is None
     
-    # Set default practice mode if not specified
-    if not practice_mode:
-        practice_mode = 'student'  # Default mode
+    # If showing popup, don't proceed with paper setup yet
+    if show_mode_popup:
+        # Get questions for display in popup (but don't create attempt yet)
+        paper_questions = paper.get_questions()
+        paper_questions = apply_user_access_filter(paper_questions, request.user)
+        
+        if paper_questions.count() == 0:
+            messages.error(request, "This paper has no accessible questions for you.")
+            return redirect('student_model_papers')
+        
+        context = {
+            'paper': paper,
+            'total_questions': paper_questions.count(),
+            'show_mode_popup': True,
+            'user_access': get_user_access_info(student),
+        }
+        
+        return render(request, 'modelpaper/take_paper.html', context)
     
-    # Create new attempt if none exists
+    # If we reach here, practice_mode is specified, so proceed with paper setup
+    if practice_mode not in ['student', 'tutor']:
+        practice_mode = 'student'  # Fallback to student mode
+    
+    # Create new attempt if none exists, or use existing one
     if not current_attempt:
         current_attempt = ModelPaperAttempt.objects.create(
             student=student,
@@ -100,7 +120,7 @@ def take_paper(request, paper_id):
         )
         print(f"DEBUG: Created new attempt with ID: {current_attempt.id}")
     else:
-        print(f"DEBUG: Found existing attempt with ID: {current_attempt.id}")
+        print(f"DEBUG: Using existing attempt with ID: {current_attempt.id}")
     
     # Get questions based on paper filters WITH ACCESS CONTROL
     paper_questions = paper.get_questions()
@@ -150,7 +170,7 @@ def take_paper(request, paper_id):
         'paper_questions': processed_questions,
         'total_questions': len(processed_questions),
         'practice_mode': practice_mode,
-        'show_mode_popup': show_mode_popup,  # Flag for popup display
+        'show_mode_popup': False,  # Mode already selected
         'user_access': get_user_access_info(student),
     }
     
@@ -343,7 +363,6 @@ def submit_paper_answer(request):
         })
     
     return JsonResponse(response_data)
-
 
 @content_access_required
 @require_POST
@@ -1883,6 +1902,75 @@ def export_paper_results(request, paper_id):
         ])
     
     return response
+
+
+# Add this to your modelpaper/views.py
+
+@admin_required
+@require_POST
+def delete_paper_questions(request):
+    """Delete all questions for a specific paper name - Admin only"""
+    paper_name = request.POST.get('paper_name')
+    
+    if not paper_name:
+        return JsonResponse({
+            'success': False,
+            'error': 'Paper name is required'
+        }, status=400)
+    
+    try:
+        # Get questions to delete with access control
+        questions_to_delete = PaperQuestion.objects.filter(paper_name=paper_name)
+        
+        # Apply user access filter (even for admin, in case there are restrictions)
+        # Uncomment the line below if you want to apply access control to admins too
+        # questions_to_delete = apply_user_access_filter(questions_to_delete, request.user)
+        
+        deleted_count = questions_to_delete.count()
+        
+        if deleted_count == 0:
+            return JsonResponse({
+                'success': False,
+                'error': f'No questions found for paper: "{paper_name}"'
+            }, status=404)
+        
+        # Check if any model papers are using these questions
+        related_papers = ModelPaper.objects.filter(selected_paper_name=paper_name)
+        if related_papers.exists():
+            paper_titles = [paper.title for paper in related_papers[:3]]  # Show first 3
+            more_count = related_papers.count() - 3
+            
+            warning_message = f"Warning: {related_papers.count()} model paper(s) are using questions from '{paper_name}': {', '.join(paper_titles)}"
+            if more_count > 0:
+                warning_message += f" and {more_count} more"
+            
+            return JsonResponse({
+                'success': False,
+                'error': warning_message + ". Delete or modify those papers first."
+            }, status=400)
+        
+        # Delete all questions for this paper name
+        questions_to_delete.delete()
+        
+        # Log the deletion for audit purposes
+        print(f"ADMIN ACTION: User {request.user.email} deleted {deleted_count} questions for paper '{paper_name}'")
+        
+        return JsonResponse({
+            'success': True,
+            'deleted_count': deleted_count,
+            'paper_name': paper_name,
+            'message': f'Successfully deleted {deleted_count} questions for "{paper_name}"'
+        })
+        
+    except Exception as e:
+        print(f"Error deleting paper questions: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': f'Error deleting questions: {str(e)}'
+        }, status=500)
+
+
+
 
 
 # DEBUG AND TESTING VIEWS (Remove in production)
