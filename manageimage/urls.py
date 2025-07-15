@@ -10,7 +10,8 @@ urlpatterns = [
     # Upload and delete operations
     path('upload/', views.upload_images, name='upload_images'),
     path('delete/<int:image_id>/', views.delete_image, name='delete_image'),
-    
+        path('bulk-delete/', views.bulk_delete_images, name='bulk_delete_images'),
+
     # Usage information
     path('usage/<int:image_id>/', views.get_image_usage, name='get_image_usage'),
     path('usage-summary/<int:image_id>/', views.get_image_usage_summary, name='get_image_usage_summary'),

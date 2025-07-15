@@ -224,6 +224,17 @@
               </div>
             </div>
 
+            <!-- Bulk Actions Section -->
+            <div class="bulk-actions">
+              <button class="btn-secondary" id="select-all-btn">
+                <i class="fas fa-check-square"></i> Select All
+              </button>
+              <button class="btn-danger" id="bulk-delete-btn" disabled>
+                <i class="fas fa-trash"></i> Delete Selected
+              </button>
+              <span id="selected-count">0 selected</span>
+            </div>
+
             <!-- Search and Filter Section -->
             <div class="controls-section">
               <form method="GET" class="search-controls">
@@ -283,6 +294,9 @@
                 <div class="images-grid" id="images-grid">
                   {% for image in page_obj %}
                     <div class="image-card" data-image-id="{{ image.id }}">
+                      <div class="image-checkbox">
+                        <input type="checkbox" class="image-checkbox-input" data-image-id="{{ image.id }}">
+                      </div>
                       <div class="image-preview">
                         <img src="{{ image.image.url }}" alt="{{ image.filename }}" loading="lazy" 
                              onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-error\'><i class=\'fas fa-exclamation-triangle\'></i><br>Image not found<br><small>{{ image.filename }}</small></div>';">
@@ -431,6 +445,130 @@
         // File upload handling
         setupFileUpload();
         loadImageUsage();
+
+        // Bulk delete functionality
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        const selectAllBtn = document.getElementById('select-all-btn');
+        const selectedCountSpan = document.getElementById('selected-count');
+        let selectedImages = new Set();
+        let allSelected = false;
+
+        // Toggle selection for individual images
+        document.addEventListener('click', function(e) {
+          if (e.target.classList.contains('image-checkbox-input')) {
+            const imageId = e.target.dataset.imageId;
+            
+            if (e.target.checked) {
+              selectedImages.add(imageId);
+            } else {
+              selectedImages.delete(imageId);
+              allSelected = false;
+              selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+            }
+            
+            updateSelectionUI();
+          }
+        });
+
+        // Select all/deselect all
+        selectAllBtn.addEventListener('click', function() {
+          allSelected = !allSelected;
+          const checkboxes = document.querySelectorAll('.image-checkbox-input');
+          
+          if (allSelected) {
+            checkboxes.forEach(checkbox => {
+              checkbox.checked = true;
+              selectedImages.add(checkbox.dataset.imageId);
+            });
+            selectAllBtn.innerHTML = '<i class="fas fa-times-circle"></i> Deselect All';
+          } else {
+            checkboxes.forEach(checkbox => {
+              checkbox.checked = false;
+            });
+            selectedImages.clear();
+            selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+          }
+          
+          updateSelectionUI();
+        });
+
+        // Bulk delete button
+        bulkDeleteBtn.addEventListener('click', function() {
+          if (selectedImages.size === 0) return;
+          
+          const modal = document.getElementById('delete-modal');
+          const confirmBtn = document.getElementById('confirm-delete-btn');
+          const filenameElement = document.getElementById('delete-filename');
+          
+          filenameElement.textContent = `${selectedImages.size} images selected`;
+          modal.style.display = 'block';
+          
+          confirmBtn.onclick = function() {
+            bulkDeleteImages(Array.from(selectedImages));
+            modal.style.display = 'none';
+          };
+        });
+
+        function updateSelectionUI() {
+          selectedCountSpan.textContent = `${selectedImages.size} selected`;
+          bulkDeleteBtn.disabled = selectedImages.size === 0;
+        }
+
+        function bulkDeleteImages(imageIds) {
+          const modal = document.getElementById('upload-modal');
+          const statusDiv = document.getElementById('upload-status');
+          const progressFill = document.getElementById('upload-progress-fill');
+          const progressPercentage = document.getElementById('upload-percentage');
+          
+          modal.style.display = 'block';
+          statusDiv.textContent = `Deleting ${imageIds.length} image(s)...`;
+          
+          fetch('{% url "bulk_delete_images" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+              image_ids: imageIds
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showNotification(`Deleted ${data.deleted_count} images successfully`, 'success');
+              
+              // Remove deleted images from the UI
+              imageIds.forEach(id => {
+                const card = document.querySelector(`.image-card[data-image-id="${id}"]`);
+                if (card) card.remove();
+              });
+              
+              // Show warnings if any
+              if (data.used_images_count > 0) {
+                showNotification(`${data.used_images_count} images were in use and not deleted`, 'warning');
+              }
+              if (data.delete_errors && data.delete_errors.length > 0) {
+                showNotification(`${data.delete_errors.length} images had deletion errors`, 'error');
+              }
+            } else {
+              showNotification(data.error || 'Bulk delete failed', 'error');
+            }
+            
+            // Reset selection
+            selectedImages.clear();
+            updateSelectionUI();
+            document.querySelectorAll('.image-checkbox-input').forEach(cb => cb.checked = false);
+            allSelected = false;
+            selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+          })
+          .catch(error => {
+            showNotification('Bulk delete failed: ' + error.message, 'error');
+          })
+          .finally(() => {
+            modal.style.display = 'none';
+          });
+        }
 
         function setupFileUpload() {
           const uploadArea = document.getElementById('upload-area');
@@ -753,7 +891,7 @@
         }
       });
     </script>
-    
+
     <style>
       /* Enhanced styles for improved usage display and Model Paper support */
       .usage-tags {
@@ -1579,6 +1717,44 @@
           flex-wrap: wrap;
         }
       }
+
+      /* Bulk actions styles */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+#selected-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-left: auto;
+}
+
+.image-checkbox {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+}
+
+.image-checkbox-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
+}
+
+/* Adjust image card for checkbox */
+.image-card {
+  position: relative;
+  padding-top: 0.5rem;
+}
+
     </style>
   </body>
 </html>

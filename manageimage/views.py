@@ -1129,3 +1129,92 @@ def test_connection(request):
         'method': request.method,
         'timestamp': timezone.now().isoformat()
     })
+    
+    
+@login_required
+@require_POST
+def bulk_delete_images(request):
+    """Handle bulk deletion of images with comprehensive usage checking"""
+    try:
+        if request.content_type == 'application/json':
+            data = json.loads(request.body)
+        else:
+            data = request.POST
+            
+        image_ids = data.get('image_ids', [])
+        
+        if not image_ids:
+            return JsonResponse({
+                'success': False,
+                'error': 'No images selected for deletion'
+            }, status=400)
+        
+        logger.info(f"Bulk delete request for {len(image_ids)} images from user {request.user.username}")
+        
+        # Check usage for all selected images
+        used_images = []
+        can_delete = []
+        not_found = []
+        
+        for image_id in image_ids:
+            try:
+                image = QuestionImage.objects.get(id=image_id)
+                usage_details = image.get_image_usage_details()
+                
+                if usage_details['total_usage'] > 0:
+                    used_images.append({
+                        'id': image_id,
+                        'filename': image.filename,
+                        'usage_count': usage_details['total_usage'],
+                        'questionbank_count': usage_details['questionbank_count'],
+                        'modelpaper_count': usage_details['modelpaper_count'],
+                        'usage_tags': usage_details['usage_tags']
+                    })
+                else:
+                    can_delete.append(image)
+                    
+            except QuestionImage.DoesNotExist:
+                not_found.append(image_id)
+                continue
+        
+        # Delete images that can be deleted
+        deleted_count = 0
+        deleted_filenames = []
+        delete_errors = []
+        
+        for image in can_delete:
+            try:
+                deleted_filenames.append(image.filename)
+                image.delete()
+                deleted_count += 1
+                logger.info(f"Bulk deleted image: {image.filename}")
+            except Exception as e:
+                delete_errors.append(f"Failed to delete {image.filename}: {str(e)}")
+                logger.error(f"Error deleting image {image.filename}: {str(e)}")
+        
+        response_data = {
+            'success': True,
+            'deleted_count': deleted_count,
+            'deleted_filenames': deleted_filenames,
+            'used_images_count': len(used_images),
+            'used_images': used_images[:10],  # Return first 10 used images
+            'not_found_count': len(not_found),
+            'delete_errors': delete_errors,
+            'message': f'Bulk deletion completed: {deleted_count} deleted, {len(used_images)} skipped (in use), {len(not_found)} not found'
+        }
+        
+        if used_images:
+            response_data['warning'] = f'{len(used_images)} image(s) could not be deleted because they are currently in use'
+        
+        if delete_errors:
+            response_data['warning'] = f'{len(delete_errors)} image(s) encountered errors during deletion'
+        
+        logger.info(f"Bulk delete completed: {response_data}")
+        return JsonResponse(response_data)
+        
+    except Exception as e:
+        logger.error(f"Critical error in bulk_delete_images: {str(e)}", exc_info=True)
+        return JsonResponse({
+            'success': False,
+            'error': f'Bulk delete failed: {str(e)}'
+        }, status=500)

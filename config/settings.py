@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # ================================
 # Production database (PostgreSQL) - Active configuration
 DATABASES = {
-    'default': {
+   'default': {
         'ENGINE': 'django.db.backends.postgresql',
       'NAME': 'pulseprep_db',
         'USER': 'pulseprep_user',
@@ -101,15 +101,15 @@ DATABASES = {
     }
 }
 
-# Development database configuration (commented out)
+ #Development database configuration (commented out)
 # Uncomment this and comment out the PostgreSQL config above for local development:
-#
+
 # Database config (SQLite for now)
 #DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.sqlite3',
-   #     'NAME': BASE_DIR / 'db.sqlite3',
-    #}
+#    'default': {
+ #       'ENGINE': 'django.db.backends.sqlite3',
+  #      'NAME': BASE_DIR / 'db.sqlite3',
+   # }
 #}
 
 # ================================

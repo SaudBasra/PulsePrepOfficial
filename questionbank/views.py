@@ -1,4 +1,4 @@
-# questionbank/views.py - COMPLETE: Updated with Model Paper integration and image support
+# questionbank/views.py - COMPLETE: Updated with CSV deletion functionality
 
 import json
 import io
@@ -10,9 +10,10 @@ from django.http import JsonResponse, HttpResponse
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST
 from django.db.models import Q, Sum
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from datetime import timedelta
 
 from .models import Question, CSVImportHistory
 from .forms import QuestionForm, QuestionImportForm
@@ -209,9 +210,10 @@ def import_questions(request):
     
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+# questionbank/views.py - Enhanced manage_csv view with pagination and detailed delete info
 
 def manage_csv(request):
-    """Enhanced CSV management view for both QuestionBank and Model Papers"""
+    """Enhanced CSV management view with pagination and detailed delete confirmation"""
     
     # Get questionbank statistics
     questionbank_total_imports = CSVImportHistory.objects.count()
@@ -244,12 +246,115 @@ def manage_csv(request):
             'success_rate': round((modelpaper_successful_imports / modelpaper_total_imports * 100), 1) if modelpaper_total_imports > 0 else 0
         }
     
-    # Get import history
-    questionbank_history = CSVImportHistory.objects.all()[:10]
-    modelpaper_history = []
+    # PAGINATION FOR IMPORT HISTORY
+    # Get questionbank history with pagination
+    questionbank_history_queryset = CSVImportHistory.objects.all().order_by('-uploaded_at')
+    questionbank_paginator = Paginator(questionbank_history_queryset, 10)  # 10 per page
+    questionbank_page = request.GET.get('qb_page', 1)
+    questionbank_history_page = questionbank_paginator.get_page(questionbank_page)
     
+    # Get modelpaper history with pagination
+    modelpaper_history_page = None
     if MODELPAPER_AVAILABLE:
-        modelpaper_history = PaperCSVImportHistory.objects.all()[:10]
+        modelpaper_history_queryset = PaperCSVImportHistory.objects.all().order_by('-uploaded_at')
+        modelpaper_paginator = Paginator(modelpaper_history_queryset, 10)  # 10 per page
+        modelpaper_page = request.GET.get('mp_page', 1)
+        modelpaper_history_page = modelpaper_paginator.get_page(modelpaper_page)
+    
+    # ENHANCED DELETION IMPACT CALCULATION
+    # For each record, calculate detailed impact information
+    questionbank_history_enhanced = []
+    for record in questionbank_history_page:
+        # Calculate import time range for finding associated questions
+        time_buffer = timedelta(minutes=5)
+        start_time = record.uploaded_at - time_buffer
+        end_time = record.uploaded_at + time_buffer
+        
+        # Find associated questions
+        associated_questions = Question.objects.filter(
+            created_on__range=(start_time, end_time),
+            created_by=record.uploaded_by
+        )
+        
+        if not record.uploaded_by:
+            associated_questions = Question.objects.filter(
+                created_on__range=(start_time, end_time)
+            )
+        
+        # Calculate impact details
+        question_count = associated_questions.count()
+        affected_blocks = list(associated_questions.values_list('block', flat=True).distinct()[:5])
+        affected_subjects = list(associated_questions.values_list('subject', flat=True).distinct()[:5])
+        questions_with_images = associated_questions.exclude(
+            Q(question_image__isnull=True) | Q(question_image__exact='') |
+            Q(image__isnull=True) | Q(image__exact='')
+        ).count()
+        
+        # Calculate time since import
+        time_since_import = timezone.now() - record.uploaded_at
+        days_ago = time_since_import.days
+        hours_ago = time_since_import.seconds // 3600
+        
+        record_enhanced = {
+            'record': record,
+            'deletion_impact': {
+                'question_count': question_count,
+                'affected_blocks': affected_blocks,
+                'affected_subjects': affected_subjects,
+                'questions_with_images': questions_with_images,
+                'days_ago': days_ago,
+                'hours_ago': hours_ago,
+                'is_recent': days_ago < 7,  # Recent if within a week
+                'is_large_import': question_count > 50,  # Large if > 50 questions
+            }
+        }
+        questionbank_history_enhanced.append(record_enhanced)
+    
+    # Enhanced modelpaper history
+    modelpaper_history_enhanced = []
+    if MODELPAPER_AVAILABLE and modelpaper_history_page:
+        for record in modelpaper_history_page:
+            time_buffer = timedelta(minutes=5)
+            start_time = record.uploaded_at - time_buffer
+            end_time = record.uploaded_at + time_buffer
+            
+            associated_questions = PaperQuestion.objects.filter(
+                created_at__range=(start_time, end_time),
+                created_by=record.uploaded_by
+            )
+            
+            if not record.uploaded_by:
+                associated_questions = PaperQuestion.objects.filter(
+                    created_at__range=(start_time, end_time)
+                )
+            
+            # Calculate impact details
+            question_count = associated_questions.count()
+            affected_papers = list(associated_questions.values_list('paper_name', flat=True).distinct())
+            affected_subjects = list(associated_questions.values_list('subject', flat=True).distinct()[:5])
+            questions_with_images = associated_questions.exclude(
+                Q(paper_image__isnull=True) | Q(paper_image__exact='') |
+                Q(image__isnull=True) | Q(image__exact='')
+            ).count()
+            
+            time_since_import = timezone.now() - record.uploaded_at
+            days_ago = time_since_import.days
+            hours_ago = time_since_import.seconds // 3600
+            
+            record_enhanced = {
+                'record': record,
+                'deletion_impact': {
+                    'question_count': question_count,
+                    'affected_papers': affected_papers,
+                    'affected_subjects': affected_subjects,
+                    'questions_with_images': questions_with_images,
+                    'days_ago': days_ago,
+                    'hours_ago': hours_ago,
+                    'is_recent': days_ago < 7,
+                    'is_large_import': question_count > 30,  # Large if > 30 questions for papers
+                }
+            }
+            modelpaper_history_enhanced.append(record_enhanced)
     
     context = {
         'questionbank_stats': {
@@ -260,14 +365,107 @@ def manage_csv(request):
             'success_rate': round((questionbank_successful_imports / questionbank_total_imports * 100), 1) if questionbank_total_imports > 0 else 0
         },
         'modelpaper_stats': modelpaper_stats,
-        'questionbank_history': questionbank_history,
-        'modelpaper_history': modelpaper_history,
+        
+        # ENHANCED PAGINATION DATA
+        'questionbank_history': questionbank_history_enhanced,
+        'questionbank_history_page': questionbank_history_page,
+        'modelpaper_history': modelpaper_history_enhanced,
+        'modelpaper_history_page': modelpaper_history_page,
         'modelpaper_available': MODELPAPER_AVAILABLE,
+        
+        # PAGINATION INFO
+        'show_pagination': (
+            questionbank_history_page.paginator.num_pages > 1 or 
+            (modelpaper_history_page and modelpaper_history_page.paginator.num_pages > 1)
+        ),
     }
     
     return render(request, 'questionbank/manage_csv.html', context)
 
 
+# API endpoint to get detailed deletion impact for AJAX requests
+def get_deletion_impact_api(request, record_id):
+    """API endpoint to get detailed deletion impact information"""
+    try:
+        import_type = request.GET.get('type', 'questionbank')
+        
+        if import_type == 'questionbank':
+            record = get_object_or_404(CSVImportHistory, id=record_id)
+            
+            # Calculate impact
+            time_buffer = timedelta(minutes=5)
+            start_time = record.uploaded_at - time_buffer
+            end_time = record.uploaded_at + time_buffer
+            
+            associated_questions = Question.objects.filter(
+                created_on__range=(start_time, end_time),
+                created_by=record.uploaded_by
+            )
+            
+            if not record.uploaded_by:
+                associated_questions = Question.objects.filter(
+                    created_on__range=(start_time, end_time)
+                )
+            
+            # Detailed impact analysis
+            impact_data = {
+                'total_questions': associated_questions.count(),
+                'by_degree': list(associated_questions.values('degree').annotate(count=models.Count('id'))),
+                'by_difficulty': list(associated_questions.values('difficulty').annotate(count=models.Count('id'))),
+                'affected_blocks': list(associated_questions.values_list('block', flat=True).distinct()),
+                'affected_modules': list(associated_questions.values_list('module', flat=True).distinct()),
+                'affected_subjects': list(associated_questions.values_list('subject', flat=True).distinct()),
+                'questions_with_images': associated_questions.exclude(
+                    Q(question_image__isnull=True) | Q(question_image__exact='') |
+                    Q(image__isnull=True) | Q(image__exact='')
+                ).count(),
+                'import_date': record.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'days_since_import': (timezone.now() - record.uploaded_at).days,
+            }
+            
+        elif import_type == 'modelpaper' and MODELPAPER_AVAILABLE:
+            record = get_object_or_404(PaperCSVImportHistory, id=record_id)
+            
+            time_buffer = timedelta(minutes=5)
+            start_time = record.uploaded_at - time_buffer
+            end_time = record.uploaded_at + time_buffer
+            
+            associated_questions = PaperQuestion.objects.filter(
+                created_at__range=(start_time, end_time),
+                created_by=record.uploaded_by
+            )
+            
+            if not record.uploaded_by:
+                associated_questions = PaperQuestion.objects.filter(
+                    created_at__range=(start_time, end_time)
+                )
+            
+            impact_data = {
+                'total_questions': associated_questions.count(),
+                'by_degree': list(associated_questions.values('degree').annotate(count=models.Count('id'))),
+                'by_difficulty': list(associated_questions.values('difficulty').annotate(count=models.Count('id'))),
+                'affected_papers': list(associated_questions.values_list('paper_name', flat=True).distinct()),
+                'affected_modules': list(associated_questions.values_list('module', flat=True).distinct()),
+                'affected_subjects': list(associated_questions.values_list('subject', flat=True).distinct()),
+                'questions_with_images': associated_questions.exclude(
+                    Q(paper_image__isnull=True) | Q(paper_image__exact='') |
+                    Q(image__isnull=True) | Q(image__exact='')
+                ).count(),
+                'import_date': record.uploaded_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'days_since_import': (timezone.now() - record.uploaded_at).days,
+            }
+        else:
+            return JsonResponse({'error': 'Invalid import type'}, status=400)
+        
+        return JsonResponse({
+            'success': True,
+            'impact': impact_data,
+            'file_name': record.file_name,
+            'import_type': import_type
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 def import_questions_with_history(request):
     """Enhanced CSV import that handles both QuestionBank and Model Paper imports"""
     if request.method == 'POST':
@@ -330,6 +528,9 @@ def import_to_questionbank(request):
             error_count = 0
             total_rows = 0
             errors = []
+            
+            # Store import start time for tracking imported questions
+            import_start_time = import_record.uploaded_at
             
             for row_num, row in enumerate(reader, start=1):
                 total_rows += 1
@@ -415,7 +616,8 @@ def import_to_questionbank(request):
                         explanation=str(row.get('explanation', '')).strip() or None,
                         question_image=question_image_filename or None,  # Question image
                         image=explanation_image_filename or None,  # Explanation image
-                        created_by=creator
+                        created_by=creator,
+                        created_on=import_start_time  # Use import time for tracking
                     )
                     question_count += 1
                     
@@ -494,6 +696,9 @@ def import_to_modelpaper(request):
             total_rows = 0
             errors = []
             paper_names_imported = set()
+            
+            # Store import start time for tracking imported questions
+            import_start_time = import_record.uploaded_at
             
             for row_num, row in enumerate(reader, start=1):
                 total_rows += 1
@@ -586,7 +791,8 @@ def import_to_modelpaper(request):
                         paper_image=paper_image_filename or None,  # Paper image field
                         image=explanation_image_filename or None,  # Explanation image field
                         marks=int(row.get('marks', 1)) if str(row.get('marks', '')).isdigit() else 1,
-                        created_by=request.user if request.user.is_authenticated else None
+                        created_by=request.user if request.user.is_authenticated else None,
+                        created_at=import_start_time  # Use import time for tracking
                     )
                     question_count += 1
                     paper_names_imported.add(paper_name)
@@ -622,6 +828,120 @@ def import_to_modelpaper(request):
             return JsonResponse({'error': str(e)}, status=400)
     else:
         return JsonResponse({'error': 'Invalid form submission'}, status=400)
+
+
+@require_POST
+def delete_csv_record(request, record_id):
+    """Delete CSV import record and associated questions"""
+    try:
+        import_type = request.POST.get('import_type', 'questionbank')
+        
+        if import_type == 'questionbank':
+            return delete_questionbank_csv_record(request, record_id)
+        elif import_type == 'modelpaper' and MODELPAPER_AVAILABLE:
+            return delete_modelpaper_csv_record(request, record_id)
+        else:
+            return JsonResponse({'error': 'Invalid import type'}, status=400)
+            
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+def delete_questionbank_csv_record(request, record_id):
+    """Delete questionbank CSV record and its associated questions"""
+    try:
+        with transaction.atomic():
+            # Get the import record
+            import_record = get_object_or_404(CSVImportHistory, id=record_id)
+            
+            # Find questions imported from this CSV
+            # We'll use the upload time and user to identify questions from this import
+            time_buffer = timedelta(minutes=5)  # 5-minute buffer for import duration
+            start_time = import_record.uploaded_at - time_buffer
+            end_time = import_record.uploaded_at + time_buffer
+            
+            questions_to_delete = Question.objects.filter(
+                created_on__range=(start_time, end_time),
+                created_by=import_record.uploaded_by
+            )
+            
+            # If no user, try to find questions created around the import time
+            if not import_record.uploaded_by:
+                # Find questions created around the exact import time
+                questions_to_delete = Question.objects.filter(
+                    created_on__range=(start_time, end_time)
+                )
+            
+            # Count questions to be deleted
+            questions_count = questions_to_delete.count()
+            
+            # Delete the questions
+            questions_to_delete.delete()
+            
+            # Delete the import record
+            file_name = import_record.file_name
+            import_record.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Successfully deleted CSV record "{file_name}" and {questions_count} associated questions.',
+                'deleted_questions': questions_count,
+                'deleted_csv': file_name
+            })
+            
+    except Exception as e:
+        return JsonResponse({'error': f'Error deleting CSV record: {str(e)}'}, status=500)
+
+
+def delete_modelpaper_csv_record(request, record_id):
+    """Delete model paper CSV record and its associated questions"""
+    if not MODELPAPER_AVAILABLE:
+        return JsonResponse({'error': 'Model paper functionality not available'}, status=400)
+    
+    try:
+        with transaction.atomic():
+            # Get the import record
+            import_record = get_object_or_404(PaperCSVImportHistory, id=record_id)
+            
+            # Find questions imported from this CSV
+            time_buffer = timedelta(minutes=5)  # 5-minute buffer for import duration
+            start_time = import_record.uploaded_at - time_buffer
+            end_time = import_record.uploaded_at + time_buffer
+            
+            questions_to_delete = PaperQuestion.objects.filter(
+                created_at__range=(start_time, end_time),
+                created_by=import_record.uploaded_by
+            )
+            
+            # If no user, try to find questions created around the import time
+            if not import_record.uploaded_by:
+                questions_to_delete = PaperQuestion.objects.filter(
+                    created_at__range=(start_time, end_time)
+                )
+            
+            # Count questions to be deleted
+            questions_count = questions_to_delete.count()
+            
+            # Get paper names that will be affected
+            affected_papers = list(questions_to_delete.values_list('paper_name', flat=True).distinct())
+            
+            # Delete the questions
+            questions_to_delete.delete()
+            
+            # Delete the import record
+            file_name = import_record.file_name
+            import_record.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Successfully deleted CSV record "{file_name}" and {questions_count} associated questions.',
+                'deleted_questions': questions_count,
+                'deleted_csv': file_name,
+                'affected_papers': affected_papers
+            })
+            
+    except Exception as e:
+        return JsonResponse({'error': f'Error deleting model paper CSV record: {str(e)}'}, status=500)
 
 
 def enhanced_duplicate_detection_questionbank(question_text, option_a, option_b, option_c, option_d, option_e=None):
