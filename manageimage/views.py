@@ -1,5 +1,5 @@
 # manageimage/views.py - Complete views with QuestionBank and Model Paper support
-# FIXED for Windows Path serialization issues
+# FIXED: Removed duplicate functions and enhanced error handling
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -15,6 +15,7 @@ from .models import QuestionImage
 import json
 import logging
 import os
+import csv
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -225,57 +226,26 @@ def upload_images(request):
             'uploaded': 0,
             'failed': 0
         }, status=500)
-
 @login_required
 @require_POST
 def delete_image(request, image_id):
-    """Delete a single image with comprehensive usage checking"""
+    """Delete a single image - DELETES ANY SELECTED (including used images)"""
     try:
         logger.info(f"Delete request for image {image_id} from user {request.user.username}")
         
         image = get_object_or_404(QuestionImage, id=image_id)
         
-        # Get comprehensive usage information
+        # Optional: Get usage information for logging/reporting (but don't block deletion)
         usage_details = image.get_image_usage_details()
         total_usage = usage_details['total_usage']
         
-        if total_usage > 0:
-            # Create detailed error message
-            usage_parts = []
-            if usage_details['questionbank_count'] > 0:
-                qb_details = []
-                if usage_details['questionbank_question_usage'] > 0:
-                    qb_details.append(f"{usage_details['questionbank_question_usage']} question image(s)")
-                if usage_details['questionbank_explanation_usage'] > 0:
-                    qb_details.append(f"{usage_details['questionbank_explanation_usage']} explanation image(s)")
-                usage_parts.append(f"QuestionBank: {', '.join(qb_details)}")
-            
-            if usage_details['modelpaper_count'] > 0:
-                mp_details = []
-                if usage_details['modelpaper_question_usage'] > 0:
-                    mp_details.append(f"{usage_details['modelpaper_question_usage']} question image(s)")
-                if usage_details['modelpaper_explanation_usage'] > 0:
-                    mp_details.append(f"{usage_details['modelpaper_explanation_usage']} explanation image(s)")
-                usage_parts.append(f"Model Papers: {', '.join(mp_details)}")
-            
-            usage_message = "; ".join(usage_parts)
-            error_msg = f'Cannot delete "{image.filename}". Image is currently used in: {usage_message}'
-            
-            logger.warning(f"Delete blocked for image {image_id}: {error_msg}")
-            return JsonResponse({
-                'success': False,
-                'error': error_msg,
-                'usage_count': total_usage
-            }, status=400)
-        
-        # Image is not used, safe to delete
         filename = image.filename
         
         # Get file path as string to avoid WindowsPath serialization issues
         file_path_str = str(image.image.path) if image.image else None
         
         # Delete the database record (this will also delete the file via model's delete method)
-        image.delete()
+        image.delete()  # DELETE REGARDLESS OF USAGE
         
         # Double-check file deletion
         if file_path_str and os.path.exists(file_path_str):
@@ -285,10 +255,15 @@ def delete_image(request, image_id):
             except Exception as e:
                 logger.warning(f"Could not remove file {file_path_str}: {e}")
         
-        logger.info(f"Successfully deleted image: {filename}")
+        # Log the deletion with usage info
+        usage_info = f" (was used in {total_usage} questions)" if total_usage > 0 else " (was unused)"
+        logger.info(f"Successfully deleted image: {filename}{usage_info}")
+        
         return JsonResponse({
             'success': True,
-            'message': f'Image "{filename}" deleted successfully'
+            'message': f'Image "{filename}" deleted successfully',
+            'had_usage': total_usage > 0,
+            'usage_count': total_usage
         })
         
     except Exception as e:
@@ -297,7 +272,9 @@ def delete_image(request, image_id):
             'success': False,
             'error': f'Delete failed: {str(e)}'
         }, status=500)
-
+        
+        
+        
 @login_required
 def get_image_usage(request, image_id):
     """Get detailed usage information for both QuestionBank and Model Paper"""
@@ -324,6 +301,7 @@ def get_image_usage(request, image_id):
             'question_image_usage': usage_details['question_image_usage'],
             'explanation_image_usage': usage_details['explanation_image_usage'],
             'usage_tags': usage_details['usage_tags'],
+            'modelpaper_available': usage_details.get('modelpaper_available', False),
             'usage_breakdown': {
                 'questionbank_question_usage': usage_details['questionbank_question_usage'],
                 'questionbank_explanation_usage': usage_details['questionbank_explanation_usage'],
@@ -436,6 +414,7 @@ def get_image_usage_summary(request, image_id):
             'usage_tags': usage_details['usage_tags'],
             'questionbank_count': usage_details['questionbank_count'],
             'modelpaper_count': usage_details['modelpaper_count'],
+            'modelpaper_available': usage_details.get('modelpaper_available', False),
             'breakdown': {
                 'questionbank_question': usage_details['questionbank_question_usage'],
                 'questionbank_explanation': usage_details['questionbank_explanation_usage'],
@@ -451,10 +430,11 @@ def get_image_usage_summary(request, image_id):
             'error': str(e)
         }, status=500)
 
+
 @login_required
 @require_POST
 def bulk_delete_images(request):
-    """Handle bulk deletion of images with comprehensive usage checking"""
+    """Handle bulk deletion of images - DELETES ALL SELECTED (including used images)"""
     try:
         if request.content_type == 'application/json':
             data = json.loads(request.body)
@@ -471,43 +451,44 @@ def bulk_delete_images(request):
         
         logger.info(f"Bulk delete request for {len(image_ids)} images from user {request.user.username}")
         
-        # Check usage for all selected images
-        used_images = []
-        can_delete = []
+        # Get all selected images (no usage checking)
+        images_to_delete = []
         not_found = []
         
         for image_id in image_ids:
             try:
                 image = QuestionImage.objects.get(id=image_id)
+                images_to_delete.append(image)
+            except QuestionImage.DoesNotExist:
+                not_found.append(image_id)
+                continue
+        
+        # Delete ALL selected images (regardless of usage)
+        deleted_count = 0
+        deleted_filenames = []
+        delete_errors = []
+        deleted_with_usage = []
+        
+        for image in images_to_delete:
+            try:
+                # Optional: Get usage details for reporting (but don't block deletion)
                 usage_details = image.get_image_usage_details()
                 
+                # Track which deleted images had usage
                 if usage_details['total_usage'] > 0:
-                    used_images.append({
-                        'id': image_id,
+                    deleted_with_usage.append({
                         'filename': image.filename,
                         'usage_count': usage_details['total_usage'],
                         'questionbank_count': usage_details['questionbank_count'],
                         'modelpaper_count': usage_details['modelpaper_count'],
                         'usage_tags': usage_details['usage_tags']
                     })
-                else:
-                    can_delete.append(image)
-                    
-            except QuestionImage.DoesNotExist:
-                not_found.append(image_id)
-                continue
-        
-        # Delete images that can be deleted
-        deleted_count = 0
-        deleted_filenames = []
-        delete_errors = []
-        
-        for image in can_delete:
-            try:
+                
                 deleted_filenames.append(image.filename)
-                image.delete()
+                image.delete()  # DELETE REGARDLESS OF USAGE
                 deleted_count += 1
-                logger.info(f"Bulk deleted image: {image.filename}")
+                logger.info(f"Bulk deleted image: {image.filename} (usage: {usage_details['total_usage']})")
+                
             except Exception as e:
                 delete_errors.append(f"Failed to delete {image.filename}: {str(e)}")
                 logger.error(f"Error deleting image {image.filename}: {str(e)}")
@@ -516,15 +497,16 @@ def bulk_delete_images(request):
             'success': True,
             'deleted_count': deleted_count,
             'deleted_filenames': deleted_filenames,
-            'used_images_count': len(used_images),
-            'used_images': used_images[:10],  # Return first 10 used images
+            'deleted_with_usage_count': len(deleted_with_usage),
+            'deleted_with_usage': deleted_with_usage[:10],  # Return first 10 for info
             'not_found_count': len(not_found),
             'delete_errors': delete_errors,
-            'message': f'Bulk deletion completed: {deleted_count} deleted, {len(used_images)} skipped (in use), {len(not_found)} not found'
+            'message': f'Bulk deletion completed: {deleted_count} deleted, {len(not_found)} not found'
         }
         
-        if used_images:
-            response_data['warning'] = f'{len(used_images)} image(s) could not be deleted because they are currently in use'
+        # Add warnings for informational purposes
+        if deleted_with_usage:
+            response_data['info'] = f'{len(deleted_with_usage)} image(s) that were in use have been deleted'
         
         if delete_errors:
             response_data['warning'] = f'{len(delete_errors)} image(s) encountered errors during deletion'
@@ -538,7 +520,8 @@ def bulk_delete_images(request):
             'success': False,
             'error': f'Bulk delete failed: {str(e)}'
         }, status=500)
-
+        
+        
 @login_required
 def get_usage_statistics(request):
     """Get comprehensive usage statistics for dashboard"""
@@ -862,8 +845,6 @@ def debug_upload(request):
 def export_image_list(request):
     """Export list of images with usage information to CSV"""
     try:
-        import csv
-        
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="images_export_{timezone.now().strftime("%Y%m%d_%H%M%S")}.csv"'
         
@@ -1129,92 +1110,3 @@ def test_connection(request):
         'method': request.method,
         'timestamp': timezone.now().isoformat()
     })
-    
-    
-@login_required
-@require_POST
-def bulk_delete_images(request):
-    """Handle bulk deletion of images with comprehensive usage checking"""
-    try:
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-            
-        image_ids = data.get('image_ids', [])
-        
-        if not image_ids:
-            return JsonResponse({
-                'success': False,
-                'error': 'No images selected for deletion'
-            }, status=400)
-        
-        logger.info(f"Bulk delete request for {len(image_ids)} images from user {request.user.username}")
-        
-        # Check usage for all selected images
-        used_images = []
-        can_delete = []
-        not_found = []
-        
-        for image_id in image_ids:
-            try:
-                image = QuestionImage.objects.get(id=image_id)
-                usage_details = image.get_image_usage_details()
-                
-                if usage_details['total_usage'] > 0:
-                    used_images.append({
-                        'id': image_id,
-                        'filename': image.filename,
-                        'usage_count': usage_details['total_usage'],
-                        'questionbank_count': usage_details['questionbank_count'],
-                        'modelpaper_count': usage_details['modelpaper_count'],
-                        'usage_tags': usage_details['usage_tags']
-                    })
-                else:
-                    can_delete.append(image)
-                    
-            except QuestionImage.DoesNotExist:
-                not_found.append(image_id)
-                continue
-        
-        # Delete images that can be deleted
-        deleted_count = 0
-        deleted_filenames = []
-        delete_errors = []
-        
-        for image in can_delete:
-            try:
-                deleted_filenames.append(image.filename)
-                image.delete()
-                deleted_count += 1
-                logger.info(f"Bulk deleted image: {image.filename}")
-            except Exception as e:
-                delete_errors.append(f"Failed to delete {image.filename}: {str(e)}")
-                logger.error(f"Error deleting image {image.filename}: {str(e)}")
-        
-        response_data = {
-            'success': True,
-            'deleted_count': deleted_count,
-            'deleted_filenames': deleted_filenames,
-            'used_images_count': len(used_images),
-            'used_images': used_images[:10],  # Return first 10 used images
-            'not_found_count': len(not_found),
-            'delete_errors': delete_errors,
-            'message': f'Bulk deletion completed: {deleted_count} deleted, {len(used_images)} skipped (in use), {len(not_found)} not found'
-        }
-        
-        if used_images:
-            response_data['warning'] = f'{len(used_images)} image(s) could not be deleted because they are currently in use'
-        
-        if delete_errors:
-            response_data['warning'] = f'{len(delete_errors)} image(s) encountered errors during deletion'
-        
-        logger.info(f"Bulk delete completed: {response_data}")
-        return JsonResponse(response_data)
-        
-    except Exception as e:
-        logger.error(f"Critical error in bulk_delete_images: {str(e)}", exc_info=True)
-        return JsonResponse({
-            'success': False,
-            'error': f'Bulk delete failed: {str(e)}'
-        }, status=500)

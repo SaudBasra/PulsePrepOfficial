@@ -294,9 +294,11 @@
                 <div class="images-grid" id="images-grid">
                   {% for image in page_obj %}
                     <div class="image-card" data-image-id="{{ image.id }}">
+                      <!-- FIXED: Added missing checkbox for bulk selection -->
                       <div class="image-checkbox">
                         <input type="checkbox" class="image-checkbox-input" data-image-id="{{ image.id }}">
                       </div>
+                      
                       <div class="image-preview">
                         <img src="{{ image.image.url }}" alt="{{ image.filename }}" loading="lazy" 
                              onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\'image-error\'><i class=\'fas fa-exclamation-triangle\'></i><br>Image not found<br><small>{{ image.filename }}</small></div>';">
@@ -522,6 +524,8 @@
           
           modal.style.display = 'block';
           statusDiv.textContent = `Deleting ${imageIds.length} image(s)...`;
+          progressFill.style.width = '50%';
+          progressPercentage.textContent = '50%';
           
           fetch('{% url "bulk_delete_images" %}', {
             method: 'POST',
@@ -535,19 +539,29 @@
           })
           .then(response => response.json())
           .then(data => {
+            progressFill.style.width = '100%';
+            progressPercentage.textContent = '100%';
+            
             if (data.success) {
               showNotification(`Deleted ${data.deleted_count} images successfully`, 'success');
               
               // Remove deleted images from the UI
-              imageIds.forEach(id => {
-                const card = document.querySelector(`.image-card[data-image-id="${id}"]`);
-                if (card) card.remove();
+              data.deleted_filenames.forEach(filename => {
+                const cards = document.querySelectorAll('.image-card');
+                cards.forEach(card => {
+                  const nameElement = card.querySelector('.image-name');
+                  if (nameElement && nameElement.textContent.trim() === filename) {
+                    card.remove();
+                  }
+                });
               });
               
-              // Show warnings if any
-              if (data.used_images_count > 0) {
-                showNotification(`${data.used_images_count} images were in use and not deleted`, 'warning');
+              // Show info if images with usage were deleted
+              if (data.deleted_with_usage_count > 0) {
+                showNotification(`Note: ${data.deleted_with_usage_count} images that were in use have been deleted`, 'info');
               }
+              
+              // Show warnings for any errors
               if (data.delete_errors && data.delete_errors.length > 0) {
                 showNotification(`${data.delete_errors.length} images had deletion errors`, 'error');
               }
@@ -561,15 +575,16 @@
             document.querySelectorAll('.image-checkbox-input').forEach(cb => cb.checked = false);
             allSelected = false;
             selectAllBtn.innerHTML = '<i class="fas fa-check-square"></i> Select All';
+            
+            setTimeout(() => {
+              modal.style.display = 'none';
+            }, 1500);
           })
           .catch(error => {
             showNotification('Bulk delete failed: ' + error.message, 'error');
-          })
-          .finally(() => {
             modal.style.display = 'none';
           });
         }
-
         function setupFileUpload() {
           const uploadArea = document.getElementById('upload-area');
           const fileInput = document.getElementById('file-input');
@@ -1198,11 +1213,31 @@
         border: 1px solid #e5e7eb;
         border-left: 4px solid #e5e7eb;
         transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.3s;
+        position: relative; /* Added for checkbox positioning */
       }
 
       .image-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Checkbox styling */
+      .image-checkbox {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 4px;
+        padding: 0.25rem;
+        backdrop-filter: blur(4px);
+      }
+
+      .image-checkbox-input {
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+        accent-color: #3b82f6;
       }
 
       .image-preview {
@@ -1286,6 +1321,24 @@
         text-align: center;
         border: 1px solid transparent;
         transition: all 0.3s;
+      }
+
+      /* Bulk actions styles */
+      .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+      }
+
+      #selected-count {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-left: auto;
       }
 
       .no-images {
@@ -1661,6 +1714,12 @@
         background: #4b5563;
       }
 
+      .btn-secondary:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
       .btn-danger {
         background: #dc2626;
         color: white;
@@ -1674,6 +1733,12 @@
 
       .btn-danger:hover {
         background: #b91c1c;
+      }
+
+      .btn-danger:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
       }
 
       /* Responsive design */
@@ -1716,45 +1781,22 @@
         .breadcrumb-nav {
           flex-wrap: wrap;
         }
+
+        .bulk-actions {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .image-checkbox {
+          top: 0.25rem;
+          left: 0.25rem;
+        }
+
+        .image-checkbox-input {
+          width: 1rem;
+          height: 1rem;
+        }
       }
-
-      /* Bulk actions styles */
-.bulk-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  background: #f8fafc;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-}
-
-#selected-count {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-left: auto;
-}
-
-.image-checkbox {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  z-index: 10;
-}
-
-.image-checkbox-input {
-  width: 1.2rem;
-  height: 1.2rem;
-  cursor: pointer;
-}
-
-/* Adjust image card for checkbox */
-.image-card {
-  position: relative;
-  padding-top: 0.5rem;
-}
-
     </style>
   </body>
 </html>
